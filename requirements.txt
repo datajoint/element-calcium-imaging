@@ -1,0 +1,8 @@
+datajoint
+scipy
+pyfftw
+imreg_dft
+sklearn
+h5py
+canonical-utils @ git+https://github.com/vathes/canonical-utils.git
+scanreader @ git+https://github.com/atlab/scanreader.git
