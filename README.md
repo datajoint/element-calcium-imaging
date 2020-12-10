@@ -1,5 +1,5 @@
-# DataJoint Element - Canonical Functional Calcium Imaging
-DataJoint Element for Calcium imaging.
+# DataJoint Elements - Functional Calcium Imaging
+DataJoint Elements for Calcium imaging.
 This repository features DataJoint pipeline design for functional Calcium imaging, 
 with ***ScanImage*** acquisition system and ***Suite2p*** or ***CaImAn*** suites for analysis. 
 
@@ -29,7 +29,7 @@ typically from the moment of pressing the *start* button to pressing the *stop* 
 
 + ***ScanInfo.Field*** - a field is a 2D image at a particular xy-coordinate and plane (scanning depth) within the field-of-view (FOV) of the scan.
 
-    For resonant scanner, a field is usually the 2D image occupying the entire FOV from a certain plane (at some depth).
+For resonant scanner, a field is usually the 2D image occupying the entire FOV from a certain plane (at some depth).
 For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
 
 ### Preprocessing - Motion Correction
@@ -60,4 +60,4 @@ For mesoscope scanner, with much wider FOV, there may be multiple fields on one 
 
 ## Usage
 
-See [this project](https://github.com/vathes/canonical-full-imaging-pipeline) for an example usage of this imaging pipeline element.
+See [this project](https://github.com/datajoint/workflow-imaging) for an example usage of this elements-imaging pipeline.

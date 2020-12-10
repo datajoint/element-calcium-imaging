@@ -1,13 +1,73 @@
+"""
+ScanImage scans
+"""
+
 import datajoint as dj
 import scanreader
-import numpy as np
 import pathlib
+import importlib
+import inspect
 
-from djutils.templates import required
+schema = dj.schema()
 
-from .file import schema, PhysicalFile
+_linking_module = None
 
-# ===================================== Lookup =====================================
+
+def activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None):
+    """
+    activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
+        :param scan_schema_name: schema name on the database server to activate the `scan` element
+        :param create_schema: when True (default), create schema in the database if it does not yet exist.
+        :param create_tables: when True (default), create tables in the database if they do not yet exist.
+        :param linking_module: a module name or a module containing the
+         required dependencies to activate the `scan` element:
+            Upstream tables:
+                + Session: parent table to Scan, typically identifying a recording session
+                + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
+                + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
+            Functions:
+                + get_root_data_dir() -> str
+                    Retrieve the full path for the root data directory (e.g. the mounted drive)
+                    :return: a string with full path to the root data directory
+                + get_scan_image_files(scan_key: dict) -> list
+                    Retrieve the list of ScanImage files associated with a given Scan
+                    :param scan_key: key of a Scan
+                    :return: list of ScanImage files' full file-paths
+    """
+
+    if isinstance(linking_module, str):
+        linking_module = importlib.import_module(linking_module)
+    assert inspect.ismodule(linking_module), "The argument 'dependency' must be a module's name or a module"
+
+    global _linking_module
+    _linking_module = linking_module
+
+    # activate
+    schema.activate(scan_schema_name, create_schema=create_schema,
+                    create_tables=create_tables, add_objects=_linking_module.__dict__)
+
+
+# -------------- Functions required by the elements-imaging  ---------------
+
+
+def get_root_data_dir() -> str:
+    """
+    Retrieve the full path for the root data directory (e.g. the mounted drive)
+    :return: a string with full path to the root data directory
+    """
+    return _linking_module.get_root_data_dir()
+
+
+def get_scan_image_files(scan_key: dict) -> list:
+    """
+    Retrieve the list of ScanImage files associated with a given Scan
+    :param scan_key: key of a Scan
+    :return: list of ScanImage files' full file-paths
+    """
+    return _linking_module.get_scan_image_files(scan_key)
+
+
+# ----------------------------- Table declarations ----------------------
 
 
 @schema
@@ -18,32 +78,26 @@ class Channel(dj.Lookup):
     contents = zip(range(5))
 
 
-# ===================================== ScanImage's scan =====================================
+# ------------ ScanImage's scan ------------
 
 
 @schema
 class Scan(dj.Manual):
-
-    _Session = ...      # reference to Session
-    _Equipment = ...    # reference to Equipment
-
     definition = """    
-    -> self._Session    
+    -> Session
     scan_id: int        
     ---
-    -> self._Equipment  
+    -> Equipment  
     scan_notes='' : varchar(4095)         # free-notes
     """
 
 
 @schema
 class ScanLocation(dj.Manual):
-
-    _Location = ...   # reference to a Location table
-
     definition = """
-    -> Scan       
-    -> self._Location      
+    -> Scan   
+    ---    
+    -> Location      
     """
 
 
@@ -83,24 +137,14 @@ class ScanInfo(dj.Imported):
     class ScanFile(dj.Part):
         definition = """
         -> master
-        -> PhysicalFile
+        file_path: varchar(255)  # filepath relative to root data directory
         """
-
-    @staticmethod
-    @required
-    def _get_scan_image_files(scan_key: dict) -> list:
-        """
-        Get the list of ScanImage files associated with a given Scan
-        :param scan_key: key of a Scan
-        :return: list of ScanImage files' full file-paths
-        """
-        return None
 
     def make(self, key):
         """ Read and store some scan meta information."""
         # Read the scan
         print('Reading header...')
-        scan_filenames = ScanInfo._get_scan_image_files(key)
+        scan_filenames = get_scan_image_files(key)
         scan = scanreader.read_scan(scan_filenames)
 
         # Insert in ScanInfo
@@ -145,7 +189,6 @@ class ScanInfo(dj.Imported):
                                for plane_idx in range(scan.num_scanning_depths)])
 
         # Insert file(s)
-        root = pathlib.Path(PhysicalFile._get_root_data_dir())
+        root = pathlib.Path(get_root_data_dir())
         scan_files = [pathlib.Path(f).relative_to(root).as_posix() for f in scan_filenames]
-        PhysicalFile.insert(zip(scan_files), skip_duplicates=True)
         self.ScanFile.insert([{**key, 'file_path': f} for f in scan_files])
