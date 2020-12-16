@@ -1,4 +1,4 @@
 datajoint
-canonical-imaging @ git+https://github.com/vathes/canonical-imaging.git
-canonical-lab-management @ git+https://github.com/vathes/canonical-lab-management.git
-canonical-colony-management @ git+https://github.com/vathes/canonical-colony-management.git
+elements-lab @ git+https://github.com/datajoint/elements-lab.git
+elements-animal @ git+https://github.com/datajoint/elements-animal.git
+elements-imaging @ git+https://github.com/datajoint/elements-imaging.git
