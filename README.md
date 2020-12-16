@@ -1,32 +1,32 @@
 # Pipeline for Calcium imaging using ScanImage acquisition software and Suite2p or CaImAn analysis suites
 
-Build a full imaging pipeline using the canonical pipeline elements
-+ [lab-management](https://github.com/vathes/canonical-lab-management)
-+ [colony-management](https://github.com/vathes/canonical-colony-management)
-+ [imaging](https://github.com/vathes/canonical-imaging)
+Build a full imaging pipeline using the DataJoint pipeline elements
++ [elements-lab](https://github.com/datajoint/elements-lab)
++ [elements-animal](https://github.com/datajoint/elements-animal)
++ [elements-imaging](https://github.com/datajoint/elements-imaging)
 
 This repository provides demonstrations for: 
-1. Set up a pipeline using different pipeline modules (see [here](workflow_imaging/__init__.py))
+1. Set up a pipeline using different pipeline modules (see [here](workflow_imaging/pipeline.py))
 2. Ingestion of data/metadata based on:
     + predefined file/folder structure and naming convention
     + predefined directory lookup methods (see [here](workflow_imaging/paths.py))
-3. Ingestion of clustering results (built-in routine from the ephys pipeline module)
+3. Ingestion of clustering results (built-in routine from the imaging pipeline module)
 
 
 ## Pipeline Architecture
 
 The Calcium imaging pipeline presented here uses pipeline components from 3 DataJoint pipeline elements, 
-***lab-management***, ***colony-management*** and ***imaging***, assembled together to form a fully functional pipeline. 
+***elements-lab***, ***elements-animal*** and ***elements-imaging***, assembled together to form a fully functional pipeline. 
 
-### lab-management
+### elements-lab
 
-![lab-management](images/lab_erd.svg)
+![elements-lab](images/lab_erd.svg)
 
-### colony-management
+### elements-animal
 
-![colony-management](images/subject_erd.svg)
+![elements-animal](images/subject_erd.svg)
 
-### assembled with imaging-element
+### assembled with elements-imaging
 
 ![assembled_pipeline](images/attached_imaging_erd.svg)
 
@@ -34,7 +34,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 ### Step 1 - clone this project
 
-Clone this repository from [here](https://github.com/vathes/canonical-full-imaging-pipeline)
+Clone this repository from [here](https://github.com/datajoint/workflow-imaging)
 
 + Launch a new terminal and change directory to where you want to clone the repository to
     ```
@@ -42,11 +42,11 @@ Clone this repository from [here](https://github.com/vathes/canonical-full-imagi
     ```
 + Clone the repository:
     ```
-    git clone https://github.com/vathes/canonical-full-imaging-pipeline 
+    git clone https://github.com/datajoint/workflow-imaging 
     ```
-+ Change directory to ***canonical-full-imaging-pipeline***
++ Change directory to ***workflow-imaging***
     ```
-    cd canonical-full-imaging-pipeline
+    cd workflow-imaging
     ```
 
 ### Step 2 - setup virtual environment
@@ -84,17 +84,13 @@ At the root of the repository folder,
   "database.host": "hostname",
   "database.user": "username",
   "database.password": "password",
-  "database.port": 3306,
-  "connection.init_function": null,
-  "database.reconnect": true,
-  "enable_python_native_blobs": true,
   "loglevel": "INFO",
   "safemode": true,
   "display.limit": 7,
   "display.width": 14,
   "display.show_tuple_count": true,
   "custom": {
-      "database.prefix": "db_",
+      "database.prefix": "neuro_",
       "imaging_data_dir": "C:/data/imaging_data_dir"
     }
 }
@@ -113,7 +109,7 @@ Create a kernel for the virtual environment
 
     pip install ipykernel
     
-    ipython kernel install --name=full-imaging
+    ipython kernel install --name=workflow-imaging
 
 At this point the setup/installation of this pipeline is completed. Users can start browsing the example jupyter notebooks for demo usage of the pipeline.
 
@@ -176,18 +172,18 @@ Once you have your data directory configured with the above convention,
  
 1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify and run:
     ```
-    python my_project/insert_lookup.py
+    python workflow_imaging/prepare.py
     ```
 2. Import session data - run:
     ```
-    python my_project/ingestion.py
+    python workflow_imaging/ingestion.py
     ```
 3. Import clustering data and populate downstream analyses - run:
     ```
-    python my_project/populate.py
+    python workflow_imaging/populate.py
     ```
     
-For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `insert_lookup.py` with the new information)
+For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `prepare.py` with the new information)
 
 Rerun step 2 and 3 every time new sessions or clustering data become available.
 In fact, step 2 and 3 can be executed as scheduled jobs
