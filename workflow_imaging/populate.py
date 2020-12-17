@@ -1,15 +1,18 @@
 import numpy as np
-from workflow_imaging import imaging
+from workflow_imaging.pipeline import imaging, scan
 
 populate_settings = {'reserve_jobs': True, 'suppress_errors': True, 'display_progress': True}
 
 
 def populate():
     # populate "dj.Imported" and "dj.Computed" tables
-    for tbl in imaging._table_classes:
-        if np.any([c.__name__ in ('Imported', 'Computed') for c in tbl.__bases__]):
-            print('\n--- Populating {} ---'.format(tbl.__name__))
-            tbl.populate(**populate_settings)
+    scan.ScanInfo.populate(**populate_settings)
+    imaging.Processing.populate(**populate_settings)
+    imaging.MotionCorrection.populate(**populate_settings)
+    imaging.Segmentation.populate(**populate_settings)
+    imaging.MaskClassification.populate(**populate_settings)
+    imaging.Fluorescence.populate(**populate_settings)
+    imaging.Activity.populate(**populate_settings)
 
 
 if __name__ == '__main__':

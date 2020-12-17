@@ -3,9 +3,9 @@ from elements_animal import subject
 from elements_lab import lab
 from elements_imaging import scan, imaging
 
-from elements_lab.lab import Source, Lab, Protocol, User
+from elements_lab.lab import Source, Lab, Protocol, User, Location
 
-from .paths import (get_imaging_root_data_dir, get_scan_image_files,
+from .paths import (get_imaging_data_dir, get_scan_image_files,
                     get_suite2p_dir, get_caiman_dir)
 
 
@@ -19,10 +19,10 @@ db_prefix = dj.config['custom'].get('database.prefix', '')
 
 lab.activate(db_prefix + 'lab')
 
-subject.activate(db_prefix + 'subject', required_module=__name__)
+subject.activate(db_prefix + 'subject', linking_module=__name__)
 
 
-# ------------- Declare tables Session and Scanner for use in elements_imaging -------------
+# ------------- Declare tables Session and Equipment for use in elements_imaging -------------
 
 schema = dj.schema(db_prefix + 'experiment')
 
@@ -36,11 +36,12 @@ class Session(dj.Manual):
 
 
 @schema
-class Scanner(dj.Manual):
+class Equipment(dj.Manual):
     definition = """
-    scanner: varchar(32)    
+    scanner: varchar(32) 
     """
 
 
-# ------------- Activate "imaging" schema -------------
-imaging.activate(db_prefix + 'imaging', db_prefix + 'scan', required_module=__name__)
+# ------------- Activate "imaging" and "scan" schemas -------------
+scan.activate(db_prefix + 'scan', linking_module=__name__)
+imaging.activate(db_prefix + 'imaging',  linking_module=__name__)

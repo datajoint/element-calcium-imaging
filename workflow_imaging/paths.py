@@ -2,14 +2,14 @@ import datajoint as dj
 import pathlib
 
 
-def get_imaging_root_data_dir():
+def get_imaging_data_dir():
     data_dir = dj.config.get('custom', {}).get('imaging_data_dir', None)
     return pathlib.Path(data_dir) if data_dir else None
 
 
 def get_scan_image_files(scan_key):
     # Folder structure: root / subject / session / .tif (raw)
-    data_dir = get_imaging_root_data_dir()
+    data_dir = get_imaging_data_dir()
     subj_dir = data_dir / scan_key['subject']
     sess_datetime_string = scan_key['session_datetime'].strftime('%Y%m%d_%H%M%S')
     sess_dir = subj_dir / sess_datetime_string

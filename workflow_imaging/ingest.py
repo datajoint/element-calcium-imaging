@@ -1,14 +1,14 @@
 import scanreader
 
-from workflow_imaging import subject, imaging, Session, Scanner
-from workflow_imaging.paths import get_imaging_root_data_dir
+from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
+from workflow_imaging.paths import get_imaging_data_dir
 
-from img_loaders import get_scanimage_acq_time, parse_scanimage_header
+from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
 
 
 def ingest():
     # ========== Insert new "Session" and "Scan" ===========
-    data_dir = get_imaging_root_data_dir()
+    data_dir = get_imaging_data_dir()
 
     # Folder structure: root / subject / session / .tif (raw)
     sessions, scans, scanners = [], [], []
@@ -21,14 +21,14 @@ def ingest():
                 if sess_folder not in sess_folder_names:
                     tiff_filepaths = [fp.as_posix() for fp in (subj_dir / sess_folder).glob('*.tif')]
                     try:  # attempt to read .tif as a scanimage file
-                        scan = scanreader.read_scan(tiff_filepaths)
+                        scanimage = scanreader.read_scan(tiff_filepaths)
                     except Exception as e:
                         print(f'ScanImage loading error: {tiff_filepaths}\n{str(e)}')
-                        scan = None
+                        scanimage = None
 
-                    if scan is not None:
-                        recording_time = get_scanimage_acq_time(scan)
-                        header = parse_scanimage_header(scan)
+                    if scanimage is not None:
+                        recording_time = get_scanimage_acq_time(scanimage)
+                        header = parse_scanimage_header(scanimage)
                         scanner = header['SI_imagingSystem']
 
                         scanners.append({'scanner': scanner})
@@ -38,19 +38,19 @@ def ingest():
                         sess_folder_names.append(sess_folder)
 
     print(f'Inserting {len(sessions)} session(s)')
-    Scanner.insert(scanners, skip_duplicates=True)
+    Equipment.insert(scanners, skip_duplicates=True)
     Session.insert(sessions, skip_duplicates=True)
-    imaging.Scan.insert(scans, skip_duplicates=True)
+    scan.Scan.insert(scans, skip_duplicates=True)
 
-    # ========== Create ProcessingTask for each scan ===========
+    # ---------- Create ProcessingTask for each scan ----------
 
     # suite2p
     imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 0, 'task_mode': 'load'}
-                                   for sc in imaging.Scan.fetch('KEY')])
+                                   for sc in scan.Scan.fetch('KEY')], skip_duplicates=True)
 
     # caiman
     imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 1, 'task_mode': 'load'}
-                                   for sc in imaging.Scan.fetch('KEY')])
+                                   for sc in scan.Scan.fetch('KEY')], skip_duplicates=True)
 
 
 if __name__ == '__main__':
