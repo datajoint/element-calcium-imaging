@@ -7,7 +7,7 @@ from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_hea
 
 
 def ingest():
-    # ========== Insert new "Session" and "Scan" ===========
+    # ---------- Insert new "Session" and "Scan" ----------
     data_dir = get_imaging_root_data_dir()
 
     # Folder structure: root / subject / session / .tif (raw)
@@ -42,15 +42,24 @@ def ingest():
     Session.insert(sessions, skip_duplicates=True)
     scan.Scan.insert(scans, skip_duplicates=True)
 
+    # populate ScanInfo
+    scan.ScanInfo.populate(reserve_jobs=True, suppress_errors=True, display_progress=True)
+
     # ---------- Create ProcessingTask for each scan ----------
 
     # suite2p
     imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 0, 'task_mode': 'load'}
                                    for sc in scan.Scan.fetch('KEY')], skip_duplicates=True)
 
-    # caiman
+    # caiman - 2D
     imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 1, 'task_mode': 'load'}
-                                   for sc in scan.Scan.fetch('KEY')], skip_duplicates=True)
+                                   for sc in (scan.Scan & (scan.ScanInfo & 'ndepths = 1')).fetch('KEY')],
+                                  skip_duplicates=True)
+
+    # caiman - 3D
+    imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 2, 'task_mode': 'load'}
+                                   for sc in (scan.Scan & (scan.ScanInfo & 'ndepths > 1')).fetch('KEY')],
+                                  skip_duplicates=True)
 
 
 if __name__ == '__main__':
