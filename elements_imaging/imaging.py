@@ -79,9 +79,12 @@ def get_suite2p_dir(processing_task_key: dict) -> str:
 class ProcessingMethod(dj.Lookup):
     definition = """
     processing_method: char(8)
+    ---
+    processing_method_desc: varchar(1000)
     """
 
-    contents = zip(['suite2p', 'caiman'])
+    contents = [('suite2p', 'suite2p analysis suite'),
+                ('caiman', 'caiman analysis suite')]
 
 
 @schema
