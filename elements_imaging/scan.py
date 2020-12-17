@@ -26,7 +26,7 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                 + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
                 + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
             Functions:
-                + get_imaging_data_dir() -> str
+                + get_imaging_root_data_dir() -> str
                     Retrieve the full path for the root data directory (e.g. the mounted drive)
                     :return: a string with full path to the root data directory
                 + get_scan_image_files(scan_key: dict) -> list
@@ -50,12 +50,12 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
 # -------------- Functions required by the elements-imaging  ---------------
 
 
-def get_imaging_data_dir() -> str:
+def get_imaging_root_data_dir() -> str:
     """
     Retrieve the full path for the root data directory (e.g. the mounted drive)
     :return: a string with full path to the root data directory
     """
-    return _linking_module.get_imaging_data_dir()
+    return _linking_module.get_imaging_root_data_dir()
 
 
 def get_scan_image_files(scan_key: dict) -> list:
@@ -189,6 +189,6 @@ class ScanInfo(dj.Imported):
                                for plane_idx in range(scan.num_scanning_depths)])
 
         # Insert file(s)
-        root = pathlib.Path(get_imaging_data_dir())
+        root = pathlib.Path(get_imaging_root_data_dir())
         scan_files = [pathlib.Path(f).relative_to(root).as_posix() for f in scan_filenames]
         self.ScanFile.insert([{**key, 'file_path': f} for f in scan_files])

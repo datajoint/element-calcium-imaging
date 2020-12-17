@@ -47,6 +47,8 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
     global _linking_module
     _linking_module = linking_module
 
+    scan.activate(scan_schema_name, create_schema=create_schema,	
+                  create_tables=create_tables, linking_module=linking_module)
     schema.activate(imaging_schema_name, create_schema=create_schema,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
 
@@ -176,7 +178,7 @@ class Processing(dj.Computed):
                 loaded_s2p = suite2p_loader.Suite2p(data_dir)
                 key = {**key, 'proc_completion_time': loaded_s2p.creation_time, 'proc_curation_time': loaded_s2p.curation_time}
                 # Insert file(s)
-                root = pathlib.Path(scan.get_imaging_data_dir())
+                root = pathlib.Path(scan.get_imaging_root_data_dir())
                 output_files = data_dir.glob('*')
                 output_files = [f.relative_to(root).as_posix() for f in output_files if f.is_file()]
 
@@ -188,7 +190,7 @@ class Processing(dj.Computed):
                               'proc_curation_time': loaded_cm.curation_time}
 
                 # Insert file(s)
-                root = pathlib.Path(scan.get_imaging_data_dir())
+                root = pathlib.Path(scan.get_imaging_root_data_dir())
                 output_files = [loaded_cm.caiman_fp.relative_to(root).as_posix()]
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
@@ -388,7 +390,7 @@ class MotionCorrection(dj.Imported):
                          'block_y': np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 2:4]),
                          'block_z': (np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 4:6])
                                      if is3D
-                                     else np.full_like(loaded_cm.motion_correction['coord_shifts_els'][b_id, 0:2], 0)),
+                                     else np.full_like(np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 0:2]), 0)),
                          'x_shifts': loaded_cm.motion_correction['x_shifts_els'][:, b_id],
                          'y_shifts': loaded_cm.motion_correction['y_shifts_els'][:, b_id],
                          'z_shifts': (loaded_cm.motion_correction['z_shifts_els'][:, b_id]
@@ -411,10 +413,10 @@ class MotionCorrection(dj.Imported):
                              'max_proj_image': max_img}
                             for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    loaded_cm.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['reference_image'][...],
-                    loaded_cm.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['average_image'][...],
-                    loaded_cm.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['correlation_image'][...],
-                    loaded_cm.motion_correction['max_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['max_image'][...])]
+                    loaded_cm.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['reference_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['average_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['correlation_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['max_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['max_image'][...][np.newaxis, ...])]
             self.Summary.insert(summary_imgs)
 
         else:
@@ -499,14 +501,14 @@ class Segmentation(dj.Computed):
                               'mask_weights': mask['mask_weights']})
                 if loaded_cm.cnmf.estimates.idx_components is not None:
                     if mask['mask_id'] in loaded_cm.cnmf.estimates.idx_components:
-                        cells.append({**key, 'mask_classification_method': 'caiman_default',
+                        cells.append({**key, 'mask_classification_method': 'caiman_default_classifier',
                                     'mask': mask['mask_id'], 'mask_type': 'soma'})
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
-                MaskClassification.insert1({**key, 'mask_classification_method': 'caiman_default'}, allow_direct_insert=True)
+                MaskClassification.insert1({**key, 'mask_classification_method': 'caiman_default_classifier'}, allow_direct_insert=True)
                 MaskClassification.MaskType.insert(cells, ignore_extra_fields=True, allow_direct_insert=True)
 
         else:
@@ -519,7 +521,8 @@ class MaskClassificationMethod(dj.Lookup):
     mask_classification_method: varchar(32)
     """
 
-    contents = zip(['suite2p_default_classifier'])
+    contents = zip(['suite2p_default_classifier',
+                    'caiman_default_classifier'])
 
 
 @schema
