@@ -1,14 +1,14 @@
 import scanreader
 
 from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
-from workflow_imaging.paths import get_imaging_data_dir
+from workflow_imaging.paths import get_imaging_root_data_dir
 
 from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
 
 
 def ingest():
     # ========== Insert new "Session" and "Scan" ===========
-    data_dir = get_imaging_data_dir()
+    data_dir = get_imaging_root_data_dir()
 
     # Folder structure: root / subject / session / .tif (raw)
     sessions, scans, scanners = [], [], []

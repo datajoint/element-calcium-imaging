@@ -53,12 +53,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 + If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the conda environment created for the CaImAn installation.
 
-+ You will need to install CaImAn
-    ```
-    conda create -n <virtual environment name>
-    conda activate <virtual environment name>
-    conda install caiman -c conda-forge
-    ```
++ [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
 
 + If `virtualenv` not yet installed, run `pip install --user virtualenv`
 
@@ -101,7 +96,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
   "display.show_tuple_count": true,
   "custom": {
       "database.prefix": "neuro_",
-      "imaging_data_dir": "C:/data/imaging_data_dir"
+      "imaging_root_data_dir": "C:/data/imaging_root_data_dir"
     }
 }
 ```

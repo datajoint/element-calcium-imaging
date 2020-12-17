@@ -9,13 +9,13 @@ subjects = [{'subject': 'subjectname', 'sex': 'F', 'subject_birth_date': '2020-0
 subject.Subject.insert(subjects, skip_duplicates=True)
 
 # -------------- Insert new "ProcessingParamSet" for Suite2p --------------
-params = np.load('./params/suite2p_0.npy', allow_pickle=True).item()
+params = np.load('./params/suite2p_default.npy', allow_pickle=True).item()
 
 imaging.ProcessingParamSet.insert_new_params(
     'suite2p', 0, 'Calcium imaging analysis with Suite2p using default Suite2p parameters', params)
 
 # -------------- Insert new "ProcessingParamSet" for CaImAn --------------
-params = np.load('./params/caiman_1.npy', allow_pickle=True).item()
+params = np.load('./params/caiman_2d_default.npy', allow_pickle=True).item()
 
 imaging.ProcessingParamSet.insert_new_params(
     'caiman', 1, 'Calcium imaging analysis with CaImAn using default CaImAn parameters', params)

@@ -5,7 +5,7 @@ from elements_imaging import scan, imaging
 
 from elements_lab.lab import Source, Lab, Protocol, User, Location
 
-from .paths import (get_imaging_data_dir, get_scan_image_files,
+from .paths import (get_imaging_root_data_dir, get_scan_image_files,
                     get_suite2p_dir, get_caiman_dir)
 
 
@@ -42,6 +42,5 @@ class Equipment(dj.Manual):
     """
 
 
-# ------------- Activate "imaging" and "scan" schemas -------------
-scan.activate(db_prefix + 'scan', linking_module=__name__)
-imaging.activate(db_prefix + 'imaging',  linking_module=__name__)
+# ------------- Activate "imaging" schema -------------
+imaging.activate(db_prefix + 'imaging',  db_prefix + 'scan',  linking_module=__name__)
