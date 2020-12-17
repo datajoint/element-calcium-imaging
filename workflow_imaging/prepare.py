@@ -18,4 +18,4 @@ imaging.ProcessingParamSet.insert_new_params(
 params = np.load('./params/caiman_2d_default.npy', allow_pickle=True).item()
 
 imaging.ProcessingParamSet.insert_new_params(
-    'caiman', 1, 'Calcium imaging analysis with CaImAn using default CaImAn parameters', params)
+    'caiman', 1, 'Calcium imaging analysis with CaImAn using default CaImAn parameters for 2d planar images', params)

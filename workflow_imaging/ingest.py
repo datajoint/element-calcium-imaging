@@ -21,14 +21,14 @@ def ingest():
                 if sess_folder not in sess_folder_names:
                     tiff_filepaths = [fp.as_posix() for fp in (subj_dir / sess_folder).glob('*.tif')]
                     try:  # attempt to read .tif as a scanimage file
-                        scanimage = scanreader.read_scan(tiff_filepaths)
+                        loaded_scan = scanreader.read_scan(tiff_filepaths)
                     except Exception as e:
                         print(f'ScanImage loading error: {tiff_filepaths}\n{str(e)}')
-                        scanimage = None
+                        loaded_scan = None
 
-                    if scanimage is not None:
-                        recording_time = get_scanimage_acq_time(scanimage)
-                        header = parse_scanimage_header(scanimage)
+                    if loaded_scan is not None:
+                        recording_time = get_scanimage_acq_time(loaded_scan)
+                        header = parse_scanimage_header(loaded_scan)
                         scanner = header['SI_imagingSystem']
 
                         scanners.append({'scanner': scanner})
