@@ -7,7 +7,6 @@ import hashlib
 import importlib
 import inspect
 
-from .readers import caiman_loader, suite2p_loader
 from . import scan
 
 schema = dj.schema()
@@ -47,14 +46,13 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
     global _linking_module
     _linking_module = linking_module
 
-    # activate
-    scan.activate(scan_schema_name, create_schema=create_schema,
+    scan.activate(scan_schema_name, create_schema=create_schema,	
                   create_tables=create_tables, linking_module=linking_module)
     schema.activate(imaging_schema_name, create_schema=create_schema,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
 
 
-# -------------- Functions required by the elements-imaging  ---------------
+# -------------- Functions required by the elements-imaging  --------------
 
 def get_caiman_dir(processing_task_key: dict) -> str:
     """
@@ -73,16 +71,19 @@ def get_suite2p_dir(processing_task_key: dict) -> str:
     """
     return _linking_module.get_suite2p_dir(processing_task_key)
 
-# ----------------------------- Table declarations ----------------------
+# -------------- Table declarations --------------
 
 
 @schema
 class ProcessingMethod(dj.Lookup):
     definition = """
     processing_method: char(8)
+    ---
+    processing_method_desc: varchar(1000)
     """
 
-    contents = zip(['suite2p', 'caiman'])
+    contents = [('suite2p', 'suite2p analysis suite'),
+                ('caiman', 'caiman analysis suite')]
 
 
 @schema
@@ -107,7 +108,7 @@ class ProcessingParamSet(dj.Lookup):
         q_param = cls & {'param_set_hash': param_dict['param_set_hash']}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1('param_set_name')
+            pname = q_param.fetch1('paramset_idx')
             if pname == paramset_idx:  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
@@ -134,7 +135,7 @@ class MaskType(dj.Lookup):
     contents = zip(['soma', 'axon', 'dendrite', 'neuropil', 'artefact', 'unknown'])
 
 
-# ===================================== Trigger a processing routine =====================================
+# -------------- Trigger a processing routine --------------
 
 @schema
 class ProcessingTask(dj.Manual):
@@ -174,16 +175,20 @@ class Processing(dj.Computed):
             if method == 'suite2p':
                 if (scan.ScanInfo & key).fetch1('nrois') > 0:
                     raise NotImplementedError(f'Suite2p ingestion error - Unable to handle ScanImage multi-ROI scanning mode yet')
+                
+                from .readers import suite2p_loader
 
                 data_dir = pathlib.Path(get_suite2p_dir(key))
                 loaded_s2p = suite2p_loader.Suite2p(data_dir)
                 key = {**key, 'proc_completion_time': loaded_s2p.creation_time, 'proc_curation_time': loaded_s2p.curation_time}
                 # Insert file(s)
-                root = pathlib.Path(scan.get_root_data_dir())
+                root = pathlib.Path(scan.get_imaging_root_data_dir())
                 output_files = data_dir.glob('*')
                 output_files = [f.relative_to(root).as_posix() for f in output_files if f.is_file()]
 
             elif method == 'caiman':
+                from .readers import caiman_loader
+
                 data_dir = pathlib.Path(get_caiman_dir(key))
                 loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -191,7 +196,7 @@ class Processing(dj.Computed):
                               'proc_curation_time': loaded_cm.curation_time}
 
                 # Insert file(s)
-                root = pathlib.Path(scan.get_root_data_dir())
+                root = pathlib.Path(scan.get_imaging_root_data_dir())
                 output_files = [loaded_cm.caiman_fp.relative_to(root).as_posix()]
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
@@ -206,7 +211,7 @@ class Processing(dj.Computed):
             return
 
 
-# ===================================== Motion Correction =====================================
+# -------------- Motion Correction --------------
 
 @schema
 class MotionCorrection(dj.Imported):
@@ -275,6 +280,8 @@ class MotionCorrection(dj.Imported):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -346,6 +353,8 @@ class MotionCorrection(dj.Imported):
             self.Summary.insert(summary_imgs)
 
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -391,7 +400,7 @@ class MotionCorrection(dj.Imported):
                          'block_y': np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 2:4]),
                          'block_z': (np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 4:6])
                                      if is3D
-                                     else np.full_like(np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 0:2], 0))),
+                                     else np.full_like(np.arange(*loaded_cm.motion_correction['coord_shifts_els'][b_id, 0:2]), 0)),
                          'x_shifts': loaded_cm.motion_correction['x_shifts_els'][:, b_id],
                          'y_shifts': loaded_cm.motion_correction['y_shifts_els'][:, b_id],
                          'z_shifts': (loaded_cm.motion_correction['z_shifts_els'][:, b_id]
@@ -408,24 +417,22 @@ class MotionCorrection(dj.Imported):
 
             # -- summary images --
             field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
-
-            summary_imgs = [{**fkey, 'ref_image': ref_image,
+            summary_imgs = [{**key, **fkey, 'ref_image': ref_image,
                              'average_image': ave_img,
                              'correlation_image': corr_img,
                              'max_proj_image': max_img}
                             for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    loaded_cm.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['reference_image'][np.newaxis, ...],
-                    loaded_cm.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['average_image'][np.newaxis, ...],
-                    loaded_cm.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['correlation_image'][np.newaxis, ...],
-                    loaded_cm.motion_correction['max_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['max_image'][np.newaxis, ...])]
-
+                    loaded_cm.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['reference_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['average_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['correlation_image'][...][np.newaxis, ...],
+                    loaded_cm.motion_correction['max_image'].transpose(2, 0, 1) if is3D else loaded_cm.motion_correction['max_image'][...][np.newaxis, ...])]
             self.Summary.insert(summary_imgs)
 
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
-# ===================================== Segmentation =====================================
+# -------------- Segmentation --------------
 
 
 @schema
@@ -439,7 +446,7 @@ class Segmentation(dj.Computed):
         -> master
         mask                : smallint
         ---
-        -> Channel.proj(seg_channel='channel')   # channel used for the segmentation
+        -> scan.Channel.proj(seg_channel='channel')   # channel used for the segmentation
         mask_npix                : int           # number of pixels in ROIs
         mask_center_x            : int           # center x coordinate in pixel
         mask_center_y            : int           # center y coordinate in pixel
@@ -454,6 +461,8 @@ class Segmentation(dj.Computed):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -483,6 +492,8 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(cells, ignore_extra_fields=True, allow_direct_insert=True)
         
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -502,15 +513,16 @@ class Segmentation(dj.Computed):
                               'mask_ypix': mask['mask_ypix'],
                               'mask_zpix': mask['mask_zpix'],
                               'mask_weights': mask['mask_weights']})
-                if mask['mask_id'] in loaded_cm.cnmf.estimates.idx_components:
-                    cells.append({**key, 'mask_classification_method': 'caiman_default',
-                                  'mask': mask['mask_id'], 'mask_type': 'soma'})
+                if loaded_cm.cnmf.estimates.idx_components is not None:
+                    if mask['mask_id'] in loaded_cm.cnmf.estimates.idx_components:
+                        cells.append({**key, 'mask_classification_method': 'caiman_default_classifier',
+                                    'mask': mask['mask_id'], 'mask_type': 'soma'})
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
-                MaskClassification.insert1({**key, 'mask_classification_method': 'caiman_default'}, allow_direct_insert=True)
+                MaskClassification.insert1({**key, 'mask_classification_method': 'caiman_default_classifier'}, allow_direct_insert=True)
                 MaskClassification.MaskType.insert(cells, ignore_extra_fields=True, allow_direct_insert=True)
 
         else:
@@ -523,7 +535,8 @@ class MaskClassificationMethod(dj.Lookup):
     mask_classification_method: varchar(32)
     """
 
-    contents = zip(['suite2p_default_classifier'])
+    contents = zip(['suite2p_default_classifier',
+                    'caiman_default_classifier'])
 
 
 @schema
@@ -546,7 +559,7 @@ class MaskClassification(dj.Computed):
         pass
 
 
-# ===================================== Activity Trace =====================================
+# -------------- Activity Trace --------------
 
 
 @schema
@@ -569,6 +582,8 @@ class Fluorescence(dj.Computed):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -591,6 +606,8 @@ class Fluorescence(dj.Computed):
             self.Trace.insert(fluo_traces + fluo_chn2_traces)
 
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -639,6 +656,8 @@ class Activity(dj.Computed):
 
         if method == 'suite2p':
             if key['extraction_method'] == 'suite2p_deconvolution':
+                from .readers import suite2p_loader
+
                 data_dir = pathlib.Path(get_suite2p_dir(key))
                 loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -657,6 +676,8 @@ class Activity(dj.Computed):
         elif method == 'caiman':
             if key['extraction_method'] in ('caiman_deconvolution', 'caiman_dff'):
                 attr_mapper = {'caiman_deconvolution': 'spikes', 'caiman_dff': 'dff'}
+
+                from .readers import caiman_loader
 
                 data_dir = pathlib.Path(get_caiman_dir(key))
                 loaded_cm = caiman_loader.CaImAn(data_dir)
