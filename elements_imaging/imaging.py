@@ -7,7 +7,6 @@ import hashlib
 import importlib
 import inspect
 
-from .readers import caiman_loader, suite2p_loader
 from . import scan
 
 schema = dj.schema()
@@ -109,7 +108,7 @@ class ProcessingParamSet(dj.Lookup):
         q_param = cls & {'param_set_hash': param_dict['param_set_hash']}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1('param_set_name')
+            pname = q_param.fetch1('paramset_idx')
             if pname == paramset_idx:  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
@@ -176,6 +175,8 @@ class Processing(dj.Computed):
             if method == 'suite2p':
                 if (scan.ScanInfo & key).fetch1('nrois') > 0:
                     raise NotImplementedError(f'Suite2p ingestion error - Unable to handle ScanImage multi-ROI scanning mode yet')
+                
+                from .readers import suite2p_loader
 
                 data_dir = pathlib.Path(get_suite2p_dir(key))
                 loaded_s2p = suite2p_loader.Suite2p(data_dir)
@@ -186,6 +187,8 @@ class Processing(dj.Computed):
                 output_files = [f.relative_to(root).as_posix() for f in output_files if f.is_file()]
 
             elif method == 'caiman':
+                from .readers import caiman_loader
+
                 data_dir = pathlib.Path(get_caiman_dir(key))
                 loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -277,6 +280,8 @@ class MotionCorrection(dj.Imported):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -348,6 +353,8 @@ class MotionCorrection(dj.Imported):
             self.Summary.insert(summary_imgs)
 
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -454,6 +461,8 @@ class Segmentation(dj.Computed):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -483,6 +492,8 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(cells, ignore_extra_fields=True, allow_direct_insert=True)
         
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -571,6 +582,8 @@ class Fluorescence(dj.Computed):
         method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
 
         if method == 'suite2p':
+            from .readers import suite2p_loader
+
             data_dir = pathlib.Path(get_suite2p_dir(key))
             loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -593,6 +606,8 @@ class Fluorescence(dj.Computed):
             self.Trace.insert(fluo_traces + fluo_chn2_traces)
 
         elif method == 'caiman':
+            from .readers import caiman_loader
+
             data_dir = pathlib.Path(get_caiman_dir(key))
             loaded_cm = caiman_loader.CaImAn(data_dir)
 
@@ -641,6 +656,8 @@ class Activity(dj.Computed):
 
         if method == 'suite2p':
             if key['extraction_method'] == 'suite2p_deconvolution':
+                from .readers import suite2p_loader
+
                 data_dir = pathlib.Path(get_suite2p_dir(key))
                 loaded_s2p = suite2p_loader.Suite2p(data_dir)
 
@@ -659,6 +676,8 @@ class Activity(dj.Computed):
         elif method == 'caiman':
             if key['extraction_method'] in ('caiman_deconvolution', 'caiman_dff'):
                 attr_mapper = {'caiman_deconvolution': 'spikes', 'caiman_dff': 'dff'}
+
+                from .readers import caiman_loader
 
                 data_dir = pathlib.Path(get_caiman_dir(key))
                 loaded_cm = caiman_loader.CaImAn(data_dir)
