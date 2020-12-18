@@ -1,6 +1,6 @@
-# Pipeline for Calcium imaging using ScanImage acquisition software and Suite2p or CaImAn analysis suites
+# Workflow for calcium imaging data acquired with ScanImage software and analyzed with Suite2p or CaImAn
 
-Build a full imaging pipeline using the DataJoint pipeline elements
+A complete imaging workflow can be built using the DataJoint elements:
 + [elements-lab](https://github.com/datajoint/elements-lab)
 + [elements-animal](https://github.com/datajoint/elements-animal)
 + [elements-imaging](https://github.com/datajoint/elements-imaging)
@@ -30,17 +30,15 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 ![assembled_pipeline](images/attached_imaging_erd.svg)
 
-## Installation instruction
+## Installation instructions
 
-### Step 1 - clone this project
+### Step 1 - Clone this project
 
-Clone this repository from [here](https://github.com/datajoint/workflow-imaging)
-
-+ Launch a new terminal and change directory to where you want to clone the repository to
++ Launch a new terminal and change directory to where you want to clone the repository
     ```
     cd C:/Projects
     ```
-+ Clone the repository:
++ Clone the repository
     ```
     git clone https://github.com/datajoint/workflow-imaging 
     ```
@@ -49,19 +47,28 @@ Clone this repository from [here](https://github.com/datajoint/workflow-imaging)
     cd workflow-imaging
     ```
 
-### Step 2 - setup virtual environment
-It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.  If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the conda environment created for the CaImAn installation.
+### Step 2 - Setup a virtual environment
 
-+ Note: if `virtualenv` not yet installed, do `pip install --user virtualenv`*
++ It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
+
++ If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the conda environment created for the CaImAn installation.
+    + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
+
++ You can install with `virtualenv` or `conda`.  Below are the commands for `virtualenv`.
+
++ If `virtualenv` not yet installed, run `pip install --user virtualenv`
+
 + To create a new virtual environment named ***venv***:
     ```
     virtualenv venv
     ```
+
 + To activated the virtual environment:
     + On Windows:
         ```
         .\venv\Scripts\activate
         ```
+
     + On Linux/macOS:
         ```
         source venv/bin/activate
@@ -69,15 +76,14 @@ It is highly recommended (though not strictly required) to create a virtual envi
 
 ### Step 3 - Install this repository
 
-From the root of the cloned repository directory:
-
++ From the root of the cloned repository directory:
+    ```
     pip install .
-
+    ```
 
 ### Step 4 - Configure the ***dj_local_conf.json***
 
-At the root of the repository folder,
- create a new file `dj_local_conf.json` with the following template:
++ At the root of the repository folder, create a new file `dj_local_conf.json` with the following template:
  
 ```json
 {
@@ -91,33 +97,36 @@ At the root of the repository folder,
   "display.show_tuple_count": true,
   "custom": {
       "database.prefix": "neuro_",
-      "imaging_data_dir": "C:/data/imaging_data_dir"
+      "imaging_root_data_dir": "C:/data/imaging_root_data_dir"
     }
 }
 ```
 
-Specify database's `hostname`, `username` and `password` properly. 
++ Specify database's `hostname`, `username` and `password` properly. 
 
-Specify a `database.prefix` to create the schemas.
++ Specify a `database.prefix` to create the schemas.
 
-Setup your data directory following the convention described below.
++ Setup your data directory following the convention described below.
 
 ### Step 5 (optional) - Jupyter Notebook
-If you install this repository in a virtual environment, and would like to use it with Jupyter Notebook, follow the steps below:
 
-Create a kernel for the virtual environment
++ If you install this repository in a virtual environment, and would like to use it with Jupyter Notebook, follow the steps below:
 
++ Create a kernel for the virtual environment
+    ```
     pip install ipykernel
     
     ipython kernel install --name=workflow-imaging
+    ```
 
-At this point the setup/installation of this pipeline is completed. Users can start browsing the example jupyter notebooks for demo usage of the pipeline.
-
++ At this point the setup/installation of this pipeline is completed. Users can start browsing the example jupyter notebooks for demo usage of the pipeline.
+    ```
     jupyter notebook
+    ```
 
 ## Directory structure and file naming convention
 
-The pipeline presented here is designed to work with the directory structure and file naming convention as followed
++ The pipeline presented here is designed to work with the directory structure and file naming convention as followed
 
 ```
 root_data_dir/
@@ -153,8 +162,7 @@ root_data_dir/
  under `custom/imaging_data_dir` variable
 + the ***subject*** directories must match the identifier of your subjects
 + the ***session*** directories must match the following naming convention:
-    
-    
+
     yyyymmdd_HHMMSS (where yyyymmdd_HHMMSS is the datetime of the session)  
     
 + and each containing:
@@ -167,7 +175,7 @@ root_data_dir/
 
 ## Running this pipeline
 
-Once you have your data directory configured with the above convention,
++ Once you have your data directory configured with the above convention,
  populating the pipeline with your data amounts to these 3 steps:
  
 1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify and run:
@@ -183,8 +191,8 @@ Once you have your data directory configured with the above convention,
     python workflow_imaging/populate.py
     ```
     
-For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `prepare.py` with the new information)
++ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `prepare.py` with the new information)
 
-Rerun step 2 and 3 every time new sessions or clustering data become available.
-In fact, step 2 and 3 can be executed as scheduled jobs
- that will automatically process any data newly placed into the ***root_data_dir***
++ Rerun step 2 and 3 every time new sessions or clustering data become available.
+
++ In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the ***root_data_dir***
