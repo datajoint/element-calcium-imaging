@@ -3,18 +3,23 @@ import numpy as np
 
 
 # -------------- Insert new "Subject" --------------
+print('Inserting Subject')
 
 subjects = [{'subject': 'subjectname', 'sex': 'F', 'subject_birth_date': '2020-05-06 15:20:01'}]
 
 subject.Subject.insert(subjects, skip_duplicates=True)
 
 # -------------- Insert new "ProcessingParamSet" for Suite2p --------------
+print('Inserting ProcessingParamSet for Suite2p')
+
 params = np.load('./params/suite2p_default.npy', allow_pickle=True).item()
 
 imaging.ProcessingParamSet.insert_new_params(
     'suite2p', 0, 'Calcium imaging analysis with Suite2p using default Suite2p parameters', params)
 
 # -------------- Insert new "ProcessingParamSet" for CaImAn --------------
+print('Inserting ProcessingParamSet for CaIman')
+
 params = np.load('./params/caiman_2d_default.npy', allow_pickle=True).item()
 
 imaging.ProcessingParamSet.insert_new_params(

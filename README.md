@@ -52,8 +52,9 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 + It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
 
 + If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the conda environment created for the CaImAn installation.
+    + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
 
-+ [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
++ You can install with `virtualenv` or `conda`.  Below are the commands for `virtualenv`.
 
 + If `virtualenv` not yet installed, run `pip install --user virtualenv`
 
