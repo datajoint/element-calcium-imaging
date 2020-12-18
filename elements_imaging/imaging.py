@@ -179,8 +179,8 @@ class Processing(dj.Computed):
                 from .readers import suite2p_loader
 
                 data_dir = pathlib.Path(get_suite2p_dir(key))
-                loaded_s2p = suite2p_loader.Suite2p(data_dir)
-                key = {**key, 'proc_completion_time': loaded_s2p.creation_time, 'proc_curation_time': loaded_s2p.curation_time}
+                loaded_suite2p = suite2p_loader.Suite2p(data_dir)
+                key = {**key, 'proc_completion_time': loaded_suite2p.creation_time, 'proc_curation_time': loaded_suite2p.curation_time}
                 # Insert file(s)
                 root = pathlib.Path(scan.get_imaging_root_data_dir())
                 output_files = data_dir.glob('*')
@@ -283,16 +283,16 @@ class MotionCorrection(dj.Imported):
             from .readers import suite2p_loader
 
             data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_s2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
 
             field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
 
-            align_chn = loaded_s2p.planes[0].alignment_channel
+            align_chn = loaded_suite2p.planes[0].alignment_channel
 
             # ---- iterate through all s2p plane outputs ----
             rigid_mc, nonrigid_mc, nonrigid_blocks = {}, {}, {}
             summary_imgs = []
-            for idx, (plane, s2p) in enumerate(loaded_s2p.planes.items()):
+            for idx, (plane, s2p) in enumerate(loaded_suite2p.planes.items()):
                 # -- rigid motion correction --
                 if idx == 0:
                     rigid_mc = {**key,
@@ -318,7 +318,7 @@ class MotionCorrection(dj.Imported):
                                        'block_depth': 1,
                                        'block_count_y': s2p.ops['nblocks'][0],
                                        'block_count_x': s2p.ops['nblocks'][1],
-                                       'block_count_z': len(loaded_s2p.planes),
+                                       'block_count_z': len(loaded_suite2p.planes),
                                        'outlier_frames': s2p.ops['badframes']}
                     else:
                         nonrigid_mc['outlier_frames'] = np.logical_or(nonrigid_mc['outlier_frames'], s2p.ops['badframes'])
@@ -334,7 +334,7 @@ class MotionCorrection(dj.Imported):
                                                      'block_y': b_y, 'block_x': b_x,
                                                      'block_z': np.full_like(b_x, plane),
                                                      'y_shifts': bshift_y, 'x_shifts': bshift_x,
-                                                     'z_shifts': np.full((len(loaded_s2p.planes), len(bshift_x)), 0),
+                                                     'z_shifts': np.full((len(loaded_suite2p.planes), len(bshift_x)), 0),
                                                      'y_std': np.nanstd(bshift_y), 'x_std': np.nanstd(bshift_x),
                                                      'z_std': np.nan}
 
@@ -464,11 +464,11 @@ class Segmentation(dj.Computed):
             from .readers import suite2p_loader
 
             data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_s2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
 
             # ---- iterate through all s2p plane outputs ----
             masks, cells = [], []
-            for plane, s2p in loaded_s2p.planes.items():
+            for plane, s2p in loaded_suite2p.planes.items():
                 mask_count = len(masks)  # increment mask id from all "plane"
                 for mask_idx, (is_cell, cell_prob, mask_stat) in enumerate(zip(s2p.iscell, s2p.cell_prob, s2p.stat)):
                     masks.append({**key, 'mask': mask_idx + mask_count, 'seg_channel': s2p.segmentation_channel,
@@ -585,11 +585,11 @@ class Fluorescence(dj.Computed):
             from .readers import suite2p_loader
 
             data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_s2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
 
             # ---- iterate through all s2p plane outputs ----
             fluo_traces, fluo_chn2_traces = [], []
-            for s2p in loaded_s2p.planes.values():
+            for s2p in loaded_suite2p.planes.values():
                 mask_count = len(fluo_traces)  # increment mask id from all "plane"
                 for mask_idx, (f, fneu) in enumerate(zip(s2p.F, s2p.Fneu)):
                     fluo_traces.append({**key, 'mask': mask_idx + mask_count,
@@ -659,13 +659,13 @@ class Activity(dj.Computed):
                 from .readers import suite2p_loader
 
                 data_dir = pathlib.Path(get_suite2p_dir(key))
-                loaded_s2p = suite2p_loader.Suite2p(data_dir)
+                loaded_suite2p = suite2p_loader.Suite2p(data_dir)
 
                 self.insert1(key)
 
                 # ---- iterate through all s2p plane outputs ----
                 spikes = []
-                for s2p in loaded_s2p.planes.values():
+                for s2p in loaded_suite2p.planes.values():
                     mask_count = len(spikes)  # increment mask id from all "plane"
                     for mask_idx, spks in enumerate(s2p.spks):
                         spikes.append({**key, 'mask': mask_idx + mask_count,
