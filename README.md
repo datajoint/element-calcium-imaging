@@ -5,7 +5,7 @@ A complete imaging workflow can be built using the DataJoint elements:
 + [elements-animal](https://github.com/datajoint/elements-animal)
 + [elements-imaging](https://github.com/datajoint/elements-imaging)
 
-This repository provides demonstrations for: 
+This repository provides demonstrations for:
 1. Set up a pipeline using different pipeline modules (see [here](workflow_imaging/pipeline.py))
 2. Ingestion of data/metadata based on:
     + predefined file/folder structure and naming convention
@@ -15,8 +15,8 @@ This repository provides demonstrations for:
 
 ## Pipeline Architecture
 
-The Calcium imaging pipeline presented here uses pipeline components from 3 DataJoint pipeline elements, 
-***elements-lab***, ***elements-animal*** and ***elements-imaging***, assembled together to form a fully functional pipeline. 
+The Calcium imaging pipeline presented here uses pipeline components from 3 DataJoint pipeline elements,
+***elements-lab***, ***elements-animal*** and ***elements-imaging***, assembled together to form a fully functional pipeline.
 
 ### elements-lab
 
@@ -40,7 +40,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
     ```
 + Clone the repository
     ```
-    git clone https://github.com/datajoint/workflow-imaging 
+    git clone https://github.com/datajoint/workflow-imaging
     ```
 + Change directory to ***workflow-imaging***
     ```
@@ -84,7 +84,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 ### Step 4 - Configure the ***dj_local_conf.json***
 
 + At the root of the repository folder, create a new file `dj_local_conf.json` with the following template:
- 
+
 ```json
 {
   "database.host": "hostname",
@@ -95,14 +95,15 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
   "display.limit": 7,
   "display.width": 14,
   "display.show_tuple_count": true,
+  "enable_python_native_blobs": true,
   "custom": {
       "database.prefix": "neuro_",
-      "imaging_root_data_dir": "C:/data/imaging_root_data_dir"
+      "imaging_data_dir": "C:/data/imaging_root_data_dir"
     }
 }
 ```
 
-+ Specify database's `hostname`, `username` and `password` properly. 
++ Specify database's `hostname`, `username` and `password` properly.
 
 + Specify a `database.prefix` to create the schemas.
 
@@ -115,7 +116,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 + Create a kernel for the virtual environment
     ```
     pip install ipykernel
-    
+
     ipython kernel install --name=workflow-imaging
     ```
 
@@ -163,12 +164,12 @@ root_data_dir/
 + the ***subject*** directories must match the identifier of your subjects
 + the ***session*** directories must match the following naming convention:
 
-    yyyymmdd_HHMMSS (where yyyymmdd_HHMMSS is the datetime of the session)  
-    
+    yyyymmdd_HHMMSS (where yyyymmdd_HHMMSS is the datetime of the session)
+
 + and each containing:
- 
+
     + all *.tif* files for the scan
-    
+
     + one ***suite2p*** subfolder per session folder, containing the ***Suite2p*** analysis outputs
 
     + one ***caiman*** subfolder per session folder, containing the ***CaImAn*** analysis output (*.hdf5)
@@ -177,20 +178,20 @@ root_data_dir/
 
 + Once you have your data directory configured with the above convention,
  populating the pipeline with your data amounts to these 3 steps:
- 
+
 1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify and run:
     ```
     python workflow_imaging/prepare.py
     ```
 2. Import session data - run:
     ```
-    python workflow_imaging/ingestion.py
+    python workflow_imaging/ingest.py
     ```
 3. Import clustering data and populate downstream analyses - run:
     ```
     python workflow_imaging/populate.py
     ```
-    
+
 + For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `prepare.py` with the new information)
 
 + Rerun step 2 and 3 every time new sessions or clustering data become available.
