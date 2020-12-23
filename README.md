@@ -16,7 +16,7 @@ This repository provides demonstrations for:
 ## Pipeline Architecture
 
 The Calcium imaging pipeline presented here uses pipeline components from 3 DataJoint pipeline elements, 
-***elements-lab***, ***elements-animal*** and ***elements-imaging***, assembled together to form a fully functional pipeline. 
+`elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional pipeline. 
 
 ### elements-lab
 
@@ -42,7 +42,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
     ```
     git clone https://github.com/datajoint/workflow-imaging 
     ```
-+ Change directory to ***workflow-imaging***
++ Change directory to `workflow-imaging`
     ```
     cd workflow-imaging
     ```
@@ -51,14 +51,14 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 + It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
 
-+ If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the conda environment created for the CaImAn installation.
++ If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the `conda` environment created for the CaImAn installation.
     + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
 
 + You can install with `virtualenv` or `conda`.  Below are the commands for `virtualenv`.
 
 + If `virtualenv` not yet installed, run `pip install --user virtualenv`
 
-+ To create a new virtual environment named ***venv***:
++ To create a new virtual environment named `venv`:
     ```
     virtualenv venv
     ```
@@ -81,7 +81,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
     pip install .
     ```
 
-### Step 4 - Configure the ***dj_local_conf.json***
+### Step 4 - Configure the `dj_local_conf.json`
 
 + At the root of the repository folder, create a new file `dj_local_conf.json` with the following template:
  
@@ -106,7 +106,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 + Specify a `database.prefix` to create the schemas.
 
-+ Setup your data directory following the convention described below.
++ Setup your data directory (`imaging_root_data_dir`) following the convention described below.
 
 ### Step 5 (optional) - Jupyter Notebook
 
@@ -126,10 +126,24 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 ## Directory structure and file naming convention
 
-+ The pipeline presented here is designed to work with the directory structure and file naming convention as followed
++ The pipeline presented here is designed to work with the directory structure and file naming convention as described below.
+
++ `imaging_root_data_dir` is configurable in the `dj_local_conf.json`, under the `custom/imaging_root_data_dir` variable
+
++ The `subject` directory names must match the identifiers of your subjects in [workflow_imaging/prepare.py](https://github.com/datajoint/workflow-imaging/blob/dev/workflow_imaging/prepare.py#L8)
+
++ The `session` directories must be named with the datetime `yyyymmdd_HHMMSS` of the session
+    
++ Each `session` directory should contain:
+ 
+    + All `.tif` files for the scan, with any naming convention
+    
+    + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
+
+    + One `caiman` subfolder per `session` folder, containing the `CaImAn` analysis output `.hdf5` file, with any naming convention
 
 ```
-root_data_dir/
+imaging_root_data_dir/
 └───subject1/
 │   └───session0/
 │   │   │   scan_0001.tif
@@ -158,25 +172,9 @@ root_data_dir/
 │   │   ...
 ```
 
-+ ***root_data_dir*** is configurable in the `dj_local_conf.json`,
- under `custom/imaging_data_dir` variable
-+ the ***subject*** directories must match the identifier of your subjects
-+ the ***session*** directories must match the following naming convention:
-
-    yyyymmdd_HHMMSS (where yyyymmdd_HHMMSS is the datetime of the session)  
-    
-+ and each containing:
- 
-    + all *.tif* files for the scan
-    
-    + one ***suite2p*** subfolder per session folder, containing the ***Suite2p*** analysis outputs
-
-    + one ***caiman*** subfolder per session folder, containing the ***CaImAn*** analysis output (*.hdf5)
-
 ## Running this pipeline
 
-+ Once you have your data directory configured with the above convention,
- populating the pipeline with your data amounts to these 3 steps:
++ Once you have your data directory (`imaging_root_data_dir`) configured with the above convention, populating the pipeline with your data amounts to these 3 steps:
  
 1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify and run:
     ```
@@ -191,8 +189,8 @@ root_data_dir/
     python workflow_imaging/populate.py
     ```
     
-+ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed (make sure to modify the `prepare.py` with the new information)
++ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed.  Make sure to modify `prepare.py` with the new information.
 
 + Rerun step 2 and 3 every time new sessions or clustering data become available.
 
-+ In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the ***root_data_dir***
++ In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the `imaging_root_data_dir`
