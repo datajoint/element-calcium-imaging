@@ -95,7 +95,6 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
   "display.limit": 7,
   "display.width": 14,
   "display.show_tuple_count": true,
-  "enable_python_native_blobs": true,
   "custom": {
       "database.prefix": "neuro_",
       "imaging_data_dir": "C:/data/imaging_root_data_dir"
