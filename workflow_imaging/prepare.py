@@ -5,7 +5,7 @@ import numpy as np
 # -------------- Insert new "Subject" --------------
 print('Inserting Subject')
 
-subjects = [{'subject': 'moser_2d', 'sex': 'F', 'subject_birth_date': '2020-05-06 15:20:01'}]
+subjects = [{'subject': 'subject1', 'sex': 'F', 'subject_birth_date': '2020-05-06 15:20:01'}]
 
 subject.Subject.insert(subjects, skip_duplicates=True)
 

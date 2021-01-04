@@ -1,7 +1,7 @@
 import numpy as np
 from workflow_imaging.pipeline import imaging, scan
 
-populate_settings = {'suppress_errors': True, 'display_progress': True}
+populate_settings = {'display_progress': True}
 
 
 def populate():

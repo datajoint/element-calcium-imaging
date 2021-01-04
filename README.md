@@ -97,7 +97,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
   "display.show_tuple_count": true,
   "custom": {
       "database.prefix": "neuro_",
-      "imaging_data_dir": "C:/data/imaging_root_data_dir"
+      "imaging_root_data_dir": "C:/data/imaging_root_data_dir"
     }
 }
 ```
