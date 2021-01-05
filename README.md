@@ -102,7 +102,7 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 }
 ```
 
-+ Specify database's `hostname`, `username` and `password` properly. 
++ Specify database's `hostname`, `username`, and `password` properly. 
 
 + Specify a `database.prefix` to create the schemas.
 
@@ -128,9 +128,9 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
 
 + The pipeline presented here is designed to work with the directory structure and file naming convention as described below.
 
-+ `imaging_root_data_dir` is configurable in the `dj_local_conf.json`, under the `custom/imaging_root_data_dir` variable
++ The `imaging_root_data_dir` directory is configurable in the `dj_local_conf.json`, under the `custom/imaging_root_data_dir` variable
 
-+ The `subject` directory names must match the identifiers of your subjects in [workflow_imaging/prepare.py](https://github.com/datajoint/workflow-imaging/blob/dev/workflow_imaging/prepare.py#L8)
++ The `subject` directory names must match the identifiers of your subjects in [workflow_imaging/prepare.py](https://github.com/datajoint/workflow-imaging/blob/main/workflow_imaging/prepare.py#L8)
 
 + The `session` directories must be named with the datetime `yyyymmdd_HHMMSS` of the session
     
@@ -141,11 +141,12 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
     + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
 
     + One `caiman` subfolder per `session` folder, containing the `CaImAn` analysis output `.hdf5` file, with any naming convention
+    <div class="text-purple"> asdf </div>
 
 ```
 imaging_root_data_dir/
-└───subject1/
-│   └───session0/
+└───<subject1>/                     # Subject name in database
+│   └───<session0>/                 # Session datetime `yyyymmdd_HHMMSS`
 │   │   │   scan_0001.tif
 │   │   │   scan_0002.tif
 │   │   │   scan_0003.tif
@@ -164,11 +165,11 @@ imaging_root_data_dir/
 │   │           │   ...
 │   │   └───caiman/
 │   │       │   analysis_results.hdf5
-│   └───session1/
+│   └───<session1>/                 # Session datetime `yyyymmdd_HHMMSS`
 │   │   │   scan_0001.tif
 │   │   │   scan_0002.tif
 │   │   │   ...
-└───subject2/
+└───<subject2>/                     # Subject name in database
 │   │   ...
 ```
 
