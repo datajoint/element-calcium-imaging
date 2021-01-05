@@ -141,7 +141,6 @@ The Calcium imaging pipeline presented here uses pipeline components from 3 Data
     + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
 
     + One `caiman` subfolder per `session` folder, containing the `CaImAn` analysis output `.hdf5` file, with any naming convention
-    <div class="text-purple"> asdf </div>
 
 ```
 imaging_root_data_dir/
