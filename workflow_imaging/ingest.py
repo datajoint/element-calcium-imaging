@@ -43,7 +43,7 @@ def ingest():
     scan.Scan.insert(scans, skip_duplicates=True)
 
     # populate ScanInfo
-    scan.ScanInfo.populate(reserve_jobs=True, suppress_errors=True, display_progress=True)
+    scan.ScanInfo.populate(suppress_errors=True, display_progress=True)
 
     # ---------- Create ProcessingTask for each scan ----------
 

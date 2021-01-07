@@ -3,7 +3,7 @@ import pathlib
 
 
 def get_imaging_root_data_dir():
-    data_dir = dj.config.get('custom', {}).get('imaging_data_dir', None)
+    data_dir = dj.config.get('custom', {}).get('imaging_root_data_dir', None)
     return pathlib.Path(data_dir) if data_dir else None
 
 
