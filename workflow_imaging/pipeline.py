@@ -31,7 +31,7 @@ schema = dj.schema(db_prefix + 'experiment')
 class Session(dj.Manual):
     definition = """
     -> subject.Subject
-    session_datetime: datetime
+    session_datetime: datetime(3)
     """
 
 
