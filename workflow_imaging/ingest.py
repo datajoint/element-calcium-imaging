@@ -60,9 +60,9 @@ def ingest():
                                   skip_duplicates=True)
 
     # caiman - 3D
-    # imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 2, 'task_mode': 'load'}
-    #                                for sc in (scan.Scan & (scan.ScanInfo & 'ndepths > 1')).fetch('KEY')],
-    #                               skip_duplicates=True)
+    imaging.ProcessingTask.insert([{**sc, 'paramset_idx': 2, 'task_mode': 'load'}
+                                   for sc in (scan.Scan & (scan.ScanInfo & 'ndepths > 1')).fetch('KEY')],
+                                  skip_duplicates=True)
 
 
 if __name__ == '__main__':
