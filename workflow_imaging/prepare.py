@@ -1,12 +1,19 @@
-from workflow_imaging.pipeline import subject, imaging
 import numpy as np
-
+import csv
+from workflow_imaging.pipeline import subject, imaging
 
 # -------------- Insert new "Subject" --------------
 print('Inserting Subject')
 
-subjects = [{'subject': 'subject1', 'sex': 'F', 'subject_birth_date': '2020-05-06 15:20:01'},
-            {'subject': 'subject2', 'sex': 'F', 'subject_birth_date': '2020-11-26 05:12:21'}]
+subjects = []
+with open("./user_data/subjects.csv") as fp:
+    reader = csv.reader(fp, delimiter=",")
+    next(reader, None)  # skip the header
+    [subjects.append(dict(subject                = row[0],
+                          sex                    = row[1],
+                          subject_birth_date     = row[2],
+                          subject_description    = row[3]
+                         )) for row in reader]
 
 subject.Subject.insert(subjects, skip_duplicates=True)
 
