@@ -143,7 +143,6 @@ class ScanInfo(dj.Imported):
     def make(self, key):
         """ Read and store some scan meta information."""
         # Read the scan
-        print('Reading header...')
         scan_filenames = get_scan_image_files(key)
         scan = scanreader.read_scan(scan_filenames)
 
