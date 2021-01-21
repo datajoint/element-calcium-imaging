@@ -9,15 +9,15 @@ This modular element can be flexibly attached downstream to any particular desig
 
 ![elements imaging diagram](images/elements_imaging_diagram.svg)
 
-As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
++ As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
-+ `Scanner` for equipment/device
+     + `Scanner` for equipment/device
 
-+ `Location` as a dependency for `ScanLocation`
+     + `Location` as a dependency for `ScanLocation`
 
 ### Scan
-A `Session` (more specifically an experimental session) may have multiple scans, 
-where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
+
++ A `Session` (more specifically an experimental session) may have multiple scans, where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
 
 + `Scan` - table containing information about the equipment used (e.g. the Scanner information)
 
@@ -55,6 +55,6 @@ where each scan describes a complete 4D dataset (i.e. 3D volume over time) from 
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
 
-## Usage
+## Element usage
 
-See [workflow-imaging](https://github.com/datajoint/workflow-imaging) repository for an example usage of `elements-imaging`.
++ See [workflow-imaging](https://github.com/datajoint/workflow-imaging) repository for an example usage of `elements-imaging`.
