@@ -1,3 +1,3 @@
 subject,session_dir,paramset
-subject1,subject1/session0,0 1
-subject1,subject1/session1,0
+subject1,<imaging_root_data_dir>/subject1/session0,0 1
+subject1,<imaging_root_data_dir>/subject1/session1,0
