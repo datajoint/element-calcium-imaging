@@ -38,8 +38,7 @@ def ingest():
             recording_time = get_scanimage_acq_time(loaded_scan)
             header = parse_scanimage_header(loaded_scan)
             session_key = {'subject': session['subject'], 'session_datetime': recording_time}
-            scanner = header['SI_imagingSystem']
-
+            scanner = header['SI_imagingSystem'].strip('\'')
             if session_key not in Session.proj():
                 scanners.append({'scanner': scanner})
                 sessions.append(session_key)
