@@ -10,13 +10,12 @@ This repository provides demonstrations for:
 2. Ingestion of data/metadata based on:
     + predefined file/folder structure and naming convention
     + predefined directory lookup methods (see [workflow_imaging/paths.py](workflow_imaging/paths.py))
-3. Ingestion of clustering results (built-in routine from the imaging pipeline module)
+3. Ingestion of clustering results (built-in routine from the imaging element)
 
 
 ## Workflow architecture
 
-The Calcium imaging workflow presented here uses components from 3 DataJoint elements,
-`elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional workflow.
+The Calcium imaging workflow presented here uses components from three DataJoint elements, `elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional workflow.
 
 ### elements-lab
 
@@ -32,7 +31,7 @@ The Calcium imaging workflow presented here uses components from 3 DataJoint ele
 
 ## Installation instructions
 
-### Step 1 - Clone this project
+### Step 1 - Clone this repository
 
 + Launch a new terminal and change directory to where you want to clone the repository
     ```
@@ -75,29 +74,34 @@ The Calcium imaging workflow presented here uses components from 3 DataJoint ele
         ```
 
 ### Step 3 - Install this repository
-
 + From the root of the cloned repository directory:
     ```
-    pip install .
+    pip install -e .
     ```
 
-### Step 4 - Configure the `dj_local_conf.json`
+### Step 4 - Jupyter Notebook
++ Register an IPython kernel with Jupyter
+    ```
+    ipython kernel install --name=workflow-imaging
+    ```
+
+### Step 5 - Configure the `dj_local_conf.json`
 
 + At the root of the repository folder, create a new file `dj_local_conf.json` with the following template:
 
 ```json
 {
-  "database.host": "hostname",
-  "database.user": "username",
-  "database.password": "password",
+  "database.host": "<hostname>",
+  "database.user": "<username>",
+  "database.password": "<password>",
   "loglevel": "INFO",
   "safemode": true,
   "display.limit": 7,
   "display.width": 14,
   "display.show_tuple_count": true,
   "custom": {
-      "database.prefix": "neuro_",
-      "imaging_root_data_dir": "C:/data/imaging_root_data_dir"
+      "database.prefix": "<neuro_>",
+      "imaging_root_data_dir": "<C:/data/imaging_root_data_dir>"
     }
 }
 ```
@@ -108,20 +112,9 @@ The Calcium imaging workflow presented here uses components from 3 DataJoint ele
 
 + Setup your data directory (`imaging_root_data_dir`) following the convention described below.
 
-### Step 5 (optional) - Jupyter Notebook
-
-+ If you install this repository in a virtual environment, and would like to use it with Jupyter Notebook, follow the steps below:
-
-+ Create a kernel for the virtual environment
-    ```
-    pip install ipykernel
-
-    ipython kernel install --name=workflow-imaging
-    ```
-
 ### Installation complete
 
-+ At this point the setup of this workflow is completed.
++ At this point the setup of this workflow is complete.
 
 ## Directory structure and file naming convention
 
@@ -131,7 +124,7 @@ The Calcium imaging workflow presented here uses components from 3 DataJoint ele
 
 + The `subject` directory names must match the identifiers of your subjects in [workflow_imaging/prepare.py](https://github.com/datajoint/workflow-imaging/blob/main/workflow_imaging/prepare.py#L8)
 
-+ The `session` directories must be named with the datetime `yyyymmdd_HHMMSS` of the session
++ The `session` directories can have any naming convention
     
 + Each `session` directory should contain:
  
@@ -143,8 +136,8 @@ The Calcium imaging workflow presented here uses components from 3 DataJoint ele
 
 ```
 imaging_root_data_dir/
-└───<subject1>/                     # Subject name in database
-│   └───<session0>/                 # Session datetime `yyyymmdd_HHMMSS`
+└───<subject1>/                     # Subject name in `subjects.csv`
+│   └───<session0>/                 # Session directory in `sessions.csv`
 │   │   │   scan_0001.tif
 │   │   │   scan_0002.tif
 │   │   │   scan_0003.tif
@@ -163,21 +156,24 @@ imaging_root_data_dir/
 │   │           │   ...
 │   │   └───caiman/
 │   │       │   analysis_results.hdf5
-│   └───<session1>/                 # Session datetime `yyyymmdd_HHMMSS`
+│   └───<session1>/                 # Session directory in `sessions.csv`
 │   │   │   scan_0001.tif
 │   │   │   scan_0002.tif
 │   │   │   ...
-└───<subject2>/                     # Subject name in database
+└───<subject2>/                     # Subject name in `subjects.csv`
 │   │   ...
 ```
 
 ## Running this workflow
 
++ See `notebooks/run_workflow.ipynb` for detailed instructions on running this workflow.
+
 + Once you have your data directory (`imaging_root_data_dir`) configured with the above convention, populating the workflow with your data amounts to these 3 steps:
 
-1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify and run:
+1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify:
     ```
-    python workflow_imaging/prepare.py
+    user_data/subjects.csv
+    user_data/sessions.csv
     ```
 2. Import session data - run:
     ```
@@ -188,7 +184,7 @@ imaging_root_data_dir/
     python workflow_imaging/populate.py
     ```
 
-+ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed.  Make sure to modify `prepare.py` with the new information.
++ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed.
 
 + Rerun step 2 and 3 every time new sessions or clustering data become available.
 
@@ -211,17 +207,42 @@ imaging_root_data_dir/
     imaging.ProcessingTask()
     ```
 
-+ If required drop all schemas, the following is the dependency order. 
++ If required to drop all schemas, the following is the dependency order. 
     ```
+    from workflow_imaging.pipeline import *
+
     imaging.schema.drop()
     scan.schema.drop()
     schema.drop()
-    lab.schema.drop()
     subject.schema.drop()
+    lab.schema.drop()
     ```
 
 + For a more in-depth exploration of ingested data, please refer to the following example jupyter notebook.
     ```
     jupyter notebook
-    /notebooks/explore_data.ipynb
+    notebooks/explore_data.ipynb
+    ```
+
+## Development mode installation
+
++ This method allows you to modify the source code for `workflow-imaging`, `elements-imaging`, `elements-animal`, and `elements-lab`.
+
++ Launch a new terminal and change directory to where you want to clone the repositories
+    ```
+    cd C:/Projects
+    ```
++ Clone the repositories
+    ```
+    git clone https://github.com/datajoint/elements-lab
+    git clone https://github.com/datajoint/elements-animal
+    git clone https://github.com/datajoint/elements-imaging
+    git clone https://github.com/datajoint/workflow-imaging
+    ```
++ Install each package with the `-e` option
+    ```
+    pip install -e ./elements-lab
+    pip install -e ./elements-animal
+    pip install -e ./elements-imaging
+    pip install -e ./workflow-imaging
     ```
