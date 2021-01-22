@@ -2,3 +2,4 @@ datajoint==0.13.dev2
 elements-lab @ git+https://github.com/datajoint/elements-lab.git
 elements-animal @ git+https://github.com/datajoint/elements-animal.git
 elements-imaging @ git+https://github.com/datajoint/elements-imaging.git
+ipykernel
