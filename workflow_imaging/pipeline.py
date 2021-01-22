@@ -34,6 +34,12 @@ class Session(dj.Manual):
     session_datetime: datetime(3)
     """
 
+    class Directory(dj.Part):
+        definition = """
+        -> master
+        session_dir: varchar(256)       # Absolute path
+        """
+
 
 @schema
 class Equipment(dj.Manual):
