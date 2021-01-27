@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import pathlib
 
-from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
+from .pipeline import subject, imaging, scan, Session, Equipment
+from .paths import get_imaging_root_data_dir
 
 from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
 
@@ -43,14 +44,16 @@ def ingest():
                 scanners.append({'scanner': scanner})
                 sessions.append(session_key)
                 scans.append({**session_key, 'scan_id': 0, 'scanner': scanner})
-                session_directories.append({**session_key, 'session_dir': session['session_dir']})
+
+                sess_dir_relative = sess_dir.relative_to(pathlib.Path(get_imaging_root_data_dir()))
+                session_directories.append({**session_key, 'session_dir': str(sess_dir_relative)})
                 
                 parameter_set = [int(s) for s in session['paramset'].split(' ')]
                 for param in parameter_set:
                     processing_tasks.append({**session_key, 'scan_id': 0, 'paramset_idx': param, 'task_mode': 'load'})
 
     print(f'\n---- Insert {len(set(val for dic in scanners for val in dic.values()))} entry(s) into experiment.Equipment ----')
-    Equipment.insert(scanners)
+    Equipment.insert(scanners, skip_duplicates=True)
 
     print(f'\n---- Insert {len(sessions)} entry(s) into experiment.Session ----')
     Session.insert(sessions)
