@@ -34,6 +34,12 @@ class Session(dj.Manual):
     session_datetime: datetime(3)
     """
 
+    class Directory(dj.Part):
+        definition = """
+        -> master
+        session_dir: varchar(256)       # Relative path, relative to the `imaging_root_data_dir`
+        """
+
 
 @schema
 class Equipment(dj.Manual):
