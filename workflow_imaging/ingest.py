@@ -50,19 +50,19 @@ def ingest():
                     processing_tasks.append({**session_key, 'scan_id': 0, 'paramset_idx': param, 'task_mode': 'load'})
 
     print(f'\n---- Insert {len(set(val for dic in scanners for val in dic.values()))} entry(s) into experiment.Equipment ----')
-    Equipment.insert(scanners, skip_duplicates=True)
+    Equipment.insert(scanners)
 
     print(f'\n---- Insert {len(sessions)} entry(s) into experiment.Session ----')
-    Session.insert(sessions, skip_duplicates=True)
+    Session.insert(sessions)
     
     print(f'\n---- Insert {len(session_directories)} entry(s) into experiment.Session.Directory ----')
-    Session.Directory.insert(session_directories, skip_duplicates=True)
+    Session.Directory.insert(session_directories)
 
     print(f'\n---- Insert {len(scans)} entry(s) into scan.Scan ----')
-    scan.Scan.insert(scans, skip_duplicates=True)
+    scan.Scan.insert(scans)
 
     print(f'\n---- Insert {len(processing_tasks)} entry(s) into imaging.ProcessingTask ----')
-    imaging.ProcessingTask.insert(processing_tasks, skip_duplicates=True)
+    imaging.ProcessingTask.insert(processing_tasks)
 
     print('\n---- Successfully completed workflow_imaging/ingest.py ----')
 
