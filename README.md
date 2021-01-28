@@ -200,7 +200,7 @@ populating the workflow with your data amounts to these 3 steps:
 
 + In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the `imaging_root_data_dir`.
 
-## Interacting with database and exploring data
+## Interacting with the DataJoint pipeline and exploring data
 
 + Connect to database and import tables
     ```
@@ -228,11 +228,8 @@ populating the workflow with your data amounts to these 3 steps:
     lab.schema.drop()
     ```
 
-+ For a more in-depth exploration of ingested data, please refer to the following example jupyter notebook.
-    ```
-    jupyter notebook
-    notebooks/explore_data.ipynb
-    ```
++ For a more in-depth exploration of ingested data, please refer to the example [notebook](notebooks/explore_workflow.ipynb).
+
 
 ## Development mode installation
 
