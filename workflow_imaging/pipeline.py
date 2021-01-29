@@ -37,6 +37,7 @@ class Session(dj.Manual):
     class Directory(dj.Part):
         definition = """
         -> master
+        ---
         session_dir: varchar(256)       # Relative path, relative to the `imaging_root_data_dir`
         """
 
