@@ -11,8 +11,8 @@ def get_scan_image_files(scan_key):
     # Folder structure: root / subject / session / .tif (raw)
     data_dir = get_imaging_root_data_dir()
 
-    from workflow_imaging.pipeline import Session
-    sess_dir = data_dir / pathlib.Path((Session.Directory & scan_key).fetch1('session_dir'))
+    from .pipeline import Session
+    sess_dir = data_dir / (Session.Directory & scan_key).fetch1('session_dir')
 
     if not sess_dir.exists():
         raise FileNotFoundError(f'Session directory not found ({sess_dir})')

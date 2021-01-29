@@ -15,7 +15,8 @@ This repository provides demonstrations for:
 
 ## Workflow architecture
 
-The Calcium imaging workflow presented here uses components from three DataJoint elements, `elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional workflow.
+The Calcium imaging workflow presented here uses components from three DataJoint elements, 
+`elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional workflow.
 
 ### elements-lab
 
@@ -47,8 +48,7 @@ The Calcium imaging workflow presented here uses components from three DataJoint
     ```
 
 ### Step 2 - Setup a virtual environment
-
-+ It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
+It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
 
 + If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the `conda` environment created for the CaImAn installation.
     + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
@@ -74,10 +74,15 @@ The Calcium imaging workflow presented here uses components from three DataJoint
         ```
 
 ### Step 3 - Install this repository
-+ From the root of the cloned repository directory:
+
+From the root of the cloned repository directory:
     ```
     pip install -e .
     ```
+
+Note: the `-e` flag will install this repository in editable mode, 
+in case there's a need to modify the code (e.g. the `pipeline.py` or `paths.py` scripts). 
+If no such modification required, using `pip install .` is sufficient
 
 ### Step 4 - Jupyter Notebook
 + Register an IPython kernel with Jupyter
@@ -87,7 +92,8 @@ The Calcium imaging workflow presented here uses components from three DataJoint
 
 ### Step 5 - Configure the `dj_local_conf.json`
 
-+ At the root of the repository folder, create a new file `dj_local_conf.json` with the following template:
+At the root of the repository folder, 
+create a new file `dj_local_conf.json` with the following template:
 
 ```json
 {
@@ -118,11 +124,14 @@ The Calcium imaging workflow presented here uses components from three DataJoint
 
 ## Directory structure and file naming convention
 
-+ The workflow presented here is designed to work with the directory structure and file naming convention as described below.
+The workflow presented here is designed to work with the directory structure and file naming convention as described below.
+
+Note: the `imaging-element` is designed to accommodate multiple scans per session, 
+however, in this particular `workflow-imaging`, we take the assumption that there is only ***one scan per session***.
 
 + The `imaging_root_data_dir` directory is configurable in the `dj_local_conf.json`, under the `custom/imaging_root_data_dir` variable
 
-+ The `subject` directory names must match the identifiers of your subjects in [workflow_imaging/prepare.py](https://github.com/datajoint/workflow-imaging/blob/main/workflow_imaging/prepare.py#L8)
++ The `subject` directory names must match the identifiers of your subjects in the [subjects.csv](./user_data/subjects.csv) script
 
 + The `session` directories can have any naming convention
     
@@ -166,31 +175,32 @@ imaging_root_data_dir/
 
 ## Running this workflow
 
-+ See `notebooks/run_workflow.ipynb` for detailed instructions on running this workflow.
+See `notebooks/run_workflow.ipynb` for detailed instructions on running this workflow.
 
-+ Once you have your data directory (`imaging_root_data_dir`) configured with the above convention, populating the workflow with your data amounts to these 3 steps:
+Once you have your data directory (`imaging_root_data_dir`) configured with the above convention, 
+populating the workflow with your data amounts to these 3 steps:
 
-1. Insert meta information (e.g. subject, equipment, Suite2p analysis parameters etc.) - modify:
-    ```
-    user_data/subjects.csv
-    user_data/sessions.csv
-    ```
+1. Insert meta information (e.g. subject, sessions, equipment, Suite2p analysis parameters etc.) - modify:
+    + user_data/subjects.csv
+    + user_data/sessions.csv
+
 2. Import session data - run:
     ```
     python workflow_imaging/ingest.py
     ```
-3. Import clustering data and populate downstream analyses - run:
+   
+3. Import scan data and populate downstream analyses - run:
     ```
     python workflow_imaging/populate.py
     ```
 
-+ For inserting new subjects or new analysis parameters, step 1 needs to be re-executed.
++ For inserting new subjects, sessions or new analysis parameters, step 1 needs to be re-executed.
 
 + Rerun step 2 and 3 every time new sessions or clustering data become available.
 
 + In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the `imaging_root_data_dir`.
 
-## Interacting with database and exploring data
+## Interacting with the DataJoint pipeline and exploring data
 
 + Connect to database and import tables
     ```
@@ -218,15 +228,12 @@ imaging_root_data_dir/
     lab.schema.drop()
     ```
 
-+ For a more in-depth exploration of ingested data, please refer to the following example jupyter notebook.
-    ```
-    jupyter notebook
-    notebooks/explore_data.ipynb
-    ```
++ For a more in-depth exploration of ingested data, please refer to the example [notebook](notebooks/explore_workflow.ipynb).
+
 
 ## Development mode installation
 
-+ This method allows you to modify the source code for `workflow-imaging`, `elements-imaging`, `elements-animal`, and `elements-lab`.
+This method allows you to modify the source code for `workflow-imaging`, `elements-imaging`, `elements-animal`, and `elements-lab`.
 
 + Launch a new terminal and change directory to where you want to clone the repositories
     ```

@@ -4,6 +4,7 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
+
 def populate(display_progress=True):
 
     populate_settings = {'display_progress': display_progress, 'reserve_jobs': False, 'suppress_errors': False}
@@ -30,6 +31,7 @@ def populate(display_progress=True):
     imaging.Activity.populate(**populate_settings)
 
     print('\n---- Successfully completed workflow_imaging/populate.py ----')
+
 
 if __name__ == '__main__':
     populate()

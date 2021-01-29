@@ -1,7 +1,6 @@
 import scanreader
-import numpy as np
-import pandas as pd
 import pathlib
+import csv
 
 from .pipeline import subject, imaging, scan, Session, Equipment
 from .paths import get_imaging_root_data_dir
@@ -9,17 +8,21 @@ from .paths import get_imaging_root_data_dir
 from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
 
 
-def ingest():
+def ingest_subjects():
     # -------------- Insert new "Subject" --------------
-    subjects_pd = pd.read_csv('./user_data/subjects.csv')
-    subjects_dict = subjects_pd.to_dict('records')
+    with open('./user_data/subjects.csv', newline='') as f:
+        subjects_dict = list(csv.DictReader(f, delimiter=','))
 
     print(f'\n---- Insert {len(subjects_dict)} entry(s) into subject.Subject ----')
     subject.Subject.insert(subjects_dict, skip_duplicates=True)
 
+
+def ingest_sessions():
+    root_data_dir = get_imaging_root_data_dir()
+
     # ---------- Insert new "Session" and "Scan" ---------
-    sessions_pd = pd.read_csv('./user_data/sessions.csv', delimiter=',')
-    sessions_dict = sessions_pd.to_dict('records')
+    with open('./user_data/sessions.csv', newline='') as f:
+        sessions_dict = list(csv.DictReader(f, delimiter=','))
 
     # Folder structure: root / subject / session / .tif (raw)
     sessions, scans, scanners = [], [], []
@@ -45,8 +48,7 @@ def ingest():
                 sessions.append(session_key)
                 scans.append({**session_key, 'scan_id': 0, 'scanner': scanner})
 
-                sess_dir_relative = sess_dir.relative_to(pathlib.Path(get_imaging_root_data_dir()))
-                session_directories.append({**session_key, 'session_dir': str(sess_dir_relative)})
+                session_directories.append({**session_key, 'session_dir': sess_dir.relative_to(root_data_dir).as_posix()})
                 
                 parameter_set = [int(s) for s in session['paramset'].split(' ')]
                 for param in parameter_set:
@@ -71,4 +73,5 @@ def ingest():
 
 
 if __name__ == '__main__':
-    ingest()
+    ingest_subjects()
+    ingest_sessions()
