@@ -53,7 +53,7 @@ def ingest_sessions():
                 recording_time = sbx_meta.get('recording_time', None)  #TODO - NOT FOUND
                 scanner = sbx_meta.get('imaging_system', None)  #TODO - NOT FOUND
             except Exception as e:
-                print(f'ScanImage loading error: {scan_filepaths}\n{str(e)}')
+                print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
                 continue
 
         session_key = {'subject': session['subject'], 'session_datetime': recording_time}
