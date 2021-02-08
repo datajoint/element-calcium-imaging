@@ -84,9 +84,9 @@ def get_scan_box_files(scan_key: dict) -> list:
 @schema
 class AcquisitionSoftware(dj.Lookup):
     definition = """  # Name of software used for acquisition of the scans - e.g. ScanImage, ScanBox
-    acq_software: varchar(12)    
+    acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'ScanBox'])
+    contents = zip(['ScanImage', 'ScanBox', 'Miniscope-DAQ-QT'])
 
 
 @schema
@@ -133,6 +133,7 @@ class ScanInfo(dj.Imported):
     nrois                   : tinyint           # number of ROIs (see scanimage's multi ROI imaging)
     x                       : float             # (um) ScanImage's 0 point in the motor coordinate system
     y                       : float             # (um) ScanImage's 0 point in the motor coordinate system
+    z                       : float             # (um) ScanImage's 0 point in the motor coordinate system
     fps                     : float             # (Hz) frames per second - Volumetric Scan Rate 
     bidirectional           : boolean           # true = bidirectional scanning
     usecs_per_line=null     : float             # microseconds per scan line
@@ -179,6 +180,7 @@ class ScanInfo(dj.Imported):
                               ndepths=scan.num_scanning_depths,
                               x=x_zero,
                               y=y_zero,
+                              z=z_zero,
                               fps=scan.fps,
                               bidirectional=scan.is_bidirectional,
                               usecs_per_line=scan.seconds_per_line * 1e6,
@@ -230,6 +232,7 @@ class ScanInfo(dj.Imported):
                               ndepths=sbx_meta['num_planes'],
                               x=x_zero,
                               y=y_zero,
+                              z=z_zero,
                               fps=getattr(sbx_meta, 'frame_rate', -1),  #TODO - NOT FOUND
                               bidirectional=sbx_meta == 'bidirectional',
                               nrois=sbx_meta['num_rois'] if is_multiROI else 0))
@@ -246,7 +249,6 @@ class ScanInfo(dj.Imported):
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
-
         else:
             raise NotImplementedError(f'Loading routine not implemented for {acq_software} acquisition software')
 
