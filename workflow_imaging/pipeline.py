@@ -5,7 +5,8 @@ from elements_imaging import scan, imaging
 
 from elements_lab.lab import Source, Lab, Protocol, User, Location
 
-from .paths import (get_imaging_root_data_dir, get_scan_image_files,
+from .paths import (get_imaging_root_data_dir,
+                    get_scan_image_files, get_scan_box_files,
                     get_suite2p_dir, get_caiman_dir)
 
 

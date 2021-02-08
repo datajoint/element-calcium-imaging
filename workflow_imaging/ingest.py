@@ -1,8 +1,8 @@
 import pathlib
 import csv
 
-from .pipeline import subject, imaging, scan, Session, Equipment
-from .paths import get_imaging_root_data_dir
+from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
+from workflow_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects():
