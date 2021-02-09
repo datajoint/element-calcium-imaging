@@ -10,9 +10,9 @@ def get_imaging_root_data_dir():
 def get_scan_image_files(scan_key):
     # Folder structure: root / subject / session / .tif (raw)
     data_dir = get_imaging_root_data_dir()
-    subj_dir = data_dir / scan_key['subject']
-    sess_datetime_string = scan_key['session_datetime'].strftime('%Y%m%d_%H%M%S')
-    sess_dir = subj_dir / sess_datetime_string
+
+    from .pipeline import Session
+    sess_dir = data_dir / (Session.Directory & scan_key).fetch1('session_dir')
 
     if not sess_dir.exists():
         raise FileNotFoundError(f'Session directory not found ({sess_dir})')
