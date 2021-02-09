@@ -1,5 +1,6 @@
 import pathlib
 import csv
+from datetime import datetime
 
 from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
 from workflow_imaging.paths import get_imaging_root_data_dir
@@ -48,10 +49,10 @@ def ingest_sessions():
         elif acq_software == 'ScanBox':
             import sbxreader
             try:  # attempt to load scanbox
-                sbx_meta = sbxreader.sbx_get_metadata(scan_filepaths[0])
-                sbx_matinfo = sbxreader.sbx_get_info(scan_filepaths[0])
-                recording_time = sbx_meta.get('recording_time', None)  #TODO - NOT FOUND
-                scanner = sbx_meta.get('imaging_system', None)  #TODO - NOT FOUND
+                sbx_fp = pathlib.Path(scan_filepaths[0])
+                sbx_meta = sbxreader.sbx_get_metadata(sbx_fp)
+                recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)  # read from file when scanbox support this
+                scanner = sbx_meta.get('imaging_system', None)
             except Exception as e:
                 print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
                 continue

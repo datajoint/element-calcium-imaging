@@ -3,6 +3,7 @@ from elements_animal import subject
 from elements_lab import lab
 from elements_imaging import scan, imaging
 
+
 from elements_lab.lab import Source, Lab, Protocol, User, Location
 
 from .paths import (get_imaging_root_data_dir,
