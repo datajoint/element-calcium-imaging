@@ -233,7 +233,7 @@ class ScanInfo(dj.Imported):
                               x=x_zero,
                               y=y_zero,
                               z=z_zero,
-                              fps=getattr(sbx_meta, 'frame_rate', -1),  #TODO - NOT FOUND
+                              fps=sbx_meta['frame_rate'],
                               bidirectional=sbx_meta == 'bidirectional',
                               nrois=sbx_meta['num_rois'] if is_multiROI else 0))
             # Insert Field(s)
