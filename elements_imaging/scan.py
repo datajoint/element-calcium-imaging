@@ -224,7 +224,7 @@ class ScanInfo(dj.Imported):
                 raise NotImplementedError('Loading routine not implemented for ScanBox multiROI scan mode')
 
             # Insert in ScanInfo
-            x_zero, y_zero, z_zero = sbx_meta['stage_pos']  # motor x, y, z at ScanImage's 0
+            x_zero, y_zero, z_zero = sbx_meta['stage_pos'] 
             self.insert1(dict(key,
                               nfields=sbx_meta['num_fields'] if is_multiROI else sbx_meta['num_planes'],
                               nchannels=sbx_meta['num_channels'],
