@@ -100,7 +100,7 @@ class PlaneSuite2p:
     @property
     def F(self):
         if self._F is None:
-            fp = self.fpath / 'fneu.npy'
+            fp = self.fpath / 'F.npy'
             self._F = np.load(fp) if fp.exists() else []
         return self._F
 
