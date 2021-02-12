@@ -2,8 +2,8 @@ import pathlib
 import csv
 from datetime import datetime
 
-from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
-from workflow_imaging.paths import get_imaging_root_data_dir
+from .pipeline import subject, imaging, scan, Session, Equipment
+from .paths import get_imaging_root_data_dir
 
 
 def ingest_subjects():
@@ -14,6 +14,7 @@ def ingest_subjects():
     print(f'\n---- Insert {len(input_subjects)} entry(s) into subject.Subject ----')
     subject.Subject.insert(input_subjects, skip_duplicates=True)
 
+    print('\n---- Successfully completed ingest_subjects ----')
 
 def ingest_sessions():
     root_data_dir = get_imaging_root_data_dir()
@@ -28,6 +29,8 @@ def ingest_sessions():
 
     for session in input_sessions:
         sess_dir = pathlib.Path(session['session_dir'])
+        acq_software = None
+        recording_time = None
         # search for either ScanImage or ScanBox files (in that order)
         for scan_pattern, scan_type in zip(['*.tif', '*.sbx'], ['ScanImage', 'ScanBox']):
             scan_filepaths = [fp.as_posix() for fp in sess_dir.glob(scan_pattern)]
@@ -52,7 +55,7 @@ def ingest_sessions():
                 sbx_fp = pathlib.Path(scan_filepaths[0])
                 sbx_meta = sbxreader.sbx_get_metadata(sbx_fp)
                 recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)  # read from file when scanbox support this
-                scanner = sbx_meta.get('imaging_system', None)
+                scanner = sbx_meta.get('imaging_system', 'ScanBox')
             except Exception as e:
                 print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
                 continue
@@ -84,7 +87,7 @@ def ingest_sessions():
     print(f'\n---- Insert {len(processing_tasks)} entry(s) into imaging.ProcessingTask ----')
     imaging.ProcessingTask.insert(processing_tasks)
 
-    print('\n---- Successfully completed workflow_imaging/ingest.py ----')
+    print('\n---- Successfully completed ingest_sessions ----')
 
 
 if __name__ == '__main__':
