@@ -21,7 +21,7 @@ def get_scan_image_files(scan_key):
     if tiff_filepaths:
         return tiff_filepaths
     else:
-        raise FileNotFoundError(f'No tiff file found in {sess_dir}')
+        raise FileNotFoundError(f'No ScanImage file (.tif) found in {sess_dir}')
 
 
 def get_scan_box_files(scan_key):
@@ -38,8 +38,23 @@ def get_scan_box_files(scan_key):
     if sbx_filepaths:
         return sbx_filepaths
     else:
-        raise FileNotFoundError(f'No .sbx file found in {sess_dir}')
+        raise FileNotFoundError(f'No ScanBox file (.sbx) found in {sess_dir}')
 
+def get_miniscope_daq_file(scan_key):
+    # Folder structure: root / subject / session / .json
+    data_dir = get_imaging_root_data_dir()
+
+    from .pipeline import Session
+    sess_dir = data_dir / (Session.Directory & scan_key).fetch1('session_dir')
+
+    if not sess_dir.exists():
+        raise FileNotFoundError(f'Session directory not found ({sess_dir})')
+
+    ma_filepaths = [fp.as_posix() for fp in sess_dir.glob('*.json')]
+    if ma_filepaths:
+        return ma_filepaths[0]
+    else:
+        raise FileNotFoundError(f'No Miniscope-DAQ file (.json) found in {sess_dir}')
 
 def get_suite2p_dir(processing_task_key):
     # Folder structure: root / subject / session / suite2p / plane / suite2p_ops.npy
@@ -71,6 +86,6 @@ def get_caiman_dir(processing_task_key):
     caiman_dir = sess_dir / 'caiman'
 
     if not caiman_dir.exists():
-        raise FileNotFoundError('CaImAn directory not found at {}'.format(caiman_dir))
+        raise FileNotFoundError(f'CaImAn directory not found at {caiman_dir}')
 
     return caiman_dir
