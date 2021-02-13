@@ -89,3 +89,23 @@ def get_caiman_dir(processing_task_key):
         raise FileNotFoundError(f'CaImAn directory not found at {caiman_dir}')
 
     return caiman_dir
+
+
+def get_miniscope_analysis_dir(processing_task_key):
+    # Folder structure: root / subject / session / miniscope_analysis / *.mat
+    data_dir = get_imaging_root_data_dir()
+
+    from .pipeline import Session
+    sess_dir = data_dir / (Session.Directory & processing_task_key).fetch1('session_dir')
+
+    if not sess_dir.exists():
+        raise FileNotFoundError(f'Session directory not found ({sess_dir})')
+
+    miniscope_analysis_dir = sess_dir / 'miniscope_analysis'
+
+    if not miniscope_analysis_dir.exists():
+        raise FileNotFoundError(f'Miniscope Analysis directory not found at {miniscope_analysis_dir}')
+
+    return miniscope_analysis_dir
+
+    
