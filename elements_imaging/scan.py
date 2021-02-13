@@ -36,6 +36,10 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                     Retrieve the list of ScanBox files (*.sbx) associated with a given Scan
                     :param scan_key: key of a Scan
                     :return: list of ScanBox files' full file-paths
+                + get_miniscope_daq_file(scan_key: dict) -> str
+                    Retrieve the Miniscope DAQ file (*.json) associated with a given Scan
+                    :param scan_key: key of a Scan
+                    :return: Miniscope DAQ file full file-path
     """
 
     if isinstance(linking_module, str):
@@ -78,6 +82,13 @@ def get_scan_box_files(scan_key: dict) -> list:
     """
     return _linking_module.get_scan_box_files(scan_key)
 
+def get_miniscope_daq_file(scan_key: dict) -> str:
+    """
+    Retrieve the Miniscope DAQ file (*.json) associated with a given Scan
+    :param scan_key: key of a Scan
+    :return: Miniscope DAQ file full file-path
+    """
+    return _linking_module.get_miniscope_daq_file(scan_key)
 
 # ----------------------------- Table declarations ----------------------
 
@@ -86,7 +97,7 @@ class AcquisitionSoftware(dj.Lookup):
     definition = """  # Name of software used for acquisition of the scans - e.g. ScanImage, ScanBox
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'ScanBox', 'Miniscope-DAQ-QT'])
+    contents = zip(['ScanImage', 'ScanBox', 'Miniscope-DAQ'])
 
 
 @schema
@@ -212,6 +223,7 @@ class ScanInfo(dj.Imported):
                                         field_z=z_zero + scan.scanning_depths[plane_idx],
                                         delay_image=scan.field_offsets[plane_idx])
                                    for plane_idx in range(scan.num_scanning_depths)])
+
         elif acq_software == 'ScanBox':
             import sbxreader
             # Read the scan
@@ -249,6 +261,41 @@ class ScanInfo(dj.Imported):
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
+
+        elif acq_software == 'Miniscope-DAQ':
+            import json
+            # Read configuration file (.json)
+            scan_filepath = get_miniscope_daq_file(key)
+            with open(scan_filepath) as config_file:
+                data = json.load(config_file)
+
+            # Insert in ScanInfo
+            self.insert1(dict(key,
+                              nfields=, # TODO
+                              nchannels=, # TODO
+                              nframes=, # TODO
+                              ndepths=, # TODO
+                              x=, # TODO
+                              y=, # TODO
+                              z=, # TODO
+                              fps=float(data['devices']['miniscopes']['miniscopeDeviceName']['frameRate'].replace('FPS', '')),
+                              bidirectional=False, # TODO: correct for all miniscopes?
+                              usecs_per_line=, # TODO: remove?
+                              fill_fraction=, # TODO: remove?
+                              nrois=0)) # TODO: correct for all miniscopes?
+
+            # Insert Field(s)
+            self.Field.insert([dict(key,
+                                    field_idx=plane_idx, # TODO: 0, or are multiple depths possible?
+                                    px_height=, # TODO
+                                    px_width=, # TODO
+                                    um_height=, # TODO
+                                    um_width=, # TODO
+                                    field_x=, # TODO
+                                    field_y=, # TODO
+                                    field_z=, # TODO
+                                    delay_image=) # TODO
+                                for plane_idx in range(num_scanning_depths)]) # TODO: 1, or are multiple depths possible?
         else:
             raise NotImplementedError(f'Loading routine not implemented for {acq_software} acquisition software')
 
