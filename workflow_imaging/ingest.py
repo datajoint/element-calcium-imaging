@@ -61,7 +61,7 @@ def ingest_sessions():
                 continue
 
         session_key = {'subject': session['subject'], 'session_datetime': recording_time}
-        if session_key not in Session.proj():
+        if session_key not in Session():
             scanners.append({'scanner': scanner})
             sessions.append(session_key)
             scans.append({**session_key, 'scan_id': 0, 'scanner': scanner, 'acq_software': acq_software})
