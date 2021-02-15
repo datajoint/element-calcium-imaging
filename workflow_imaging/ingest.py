@@ -16,6 +16,7 @@ def ingest_subjects():
 
     print('\n---- Successfully completed ingest_subjects ----')
 
+
 def ingest_sessions():
     root_data_dir = get_imaging_root_data_dir()
 
@@ -38,6 +39,10 @@ def ingest_sessions():
                 acq_software = scan_type
                 break
 
+        if acq_software is None:
+            print(f'Unable to identify scan files from the supported acquisition softwares (ScanImage, ScanBox)')
+            continue
+
         if acq_software == 'ScanImage':
             import scanreader
             from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
@@ -59,6 +64,8 @@ def ingest_sessions():
             except Exception as e:
                 print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
                 continue
+        else:
+            raise NotImplementedError(f'Processing scan from acquisition software of type {acq_software} is not yet implemented')
 
         session_key = {'subject': session['subject'], 'session_datetime': recording_time}
         if session_key not in Session():
