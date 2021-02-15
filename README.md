@@ -84,13 +84,20 @@ Note: the `-e` flag will install this repository in editable mode,
 in case there's a need to modify the code (e.g. the `pipeline.py` or `paths.py` scripts). 
 If no such modification required, using `pip install .` is sufficient
 
-### Step 4 - Jupyter Notebook
+### Step 4 - Install `sbxreader` module
+
++ If you are planning on working with data acquired with the ScanBox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
+    ```
+    pip install sbxreader
+    ```
+
+### Step 5 - Jupyter Notebook
 + Register an IPython kernel with Jupyter
     ```
     ipython kernel install --name=workflow-imaging
     ```
 
-### Step 5 - Configure the `dj_local_conf.json`
+### Step 6 - Configure the `dj_local_conf.json`
 
 At the root of the repository folder, 
 create a new file `dj_local_conf.json` with the following template:
@@ -248,8 +255,8 @@ This method allows you to modify the source code for `workflow-imaging`, `elemen
     ```
 + Install each package with the `-e` option
     ```
+    pip install -e ./workflow-imaging
     pip install -e ./elements-lab
     pip install -e ./elements-animal
     pip install -e ./elements-imaging
-    pip install -e ./workflow-imaging
     ```
