@@ -265,9 +265,9 @@ class ScanInfo(dj.Imported):
         elif acq_software == 'Miniscope-DAQ':
             import json
             # Read configuration file (.json)
-            scan_filepath = get_miniscope_daq_file(key)
-            with open(scan_filepath) as config_file:
-                data = json.load(config_file)
+            scan_meta_filepath = get_miniscope_daq_file(key)
+            with open(scan_meta_filepath) as config_file:
+                miniscope_daq_meta = json.load(config_file)
 
             # Insert in ScanInfo
             self.insert1(dict(key,
@@ -278,7 +278,7 @@ class ScanInfo(dj.Imported):
                               x=, # TODO
                               y=, # TODO
                               z=, # TODO
-                              fps=float(data['devices']['miniscopes']['miniscopeDeviceName']['frameRate'].replace('FPS', '')),
+                              fps=float(miniscope_daq_meta['devices']['miniscopes']['miniscopeDeviceName']['frameRate'].replace('FPS', '')),
                               bidirectional=False, # TODO: correct for all miniscopes?
                               usecs_per_line=, # TODO: remove?
                               fill_fraction=, # TODO: remove?
