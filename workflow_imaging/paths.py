@@ -1,5 +1,6 @@
 import datajoint as dj
 import pathlib
+import json
 
 
 def get_imaging_root_data_dir():
@@ -50,11 +51,14 @@ def get_miniscope_daq_file(scan_key):
     if not sess_dir.exists():
         raise FileNotFoundError(f'Session directory not found ({sess_dir})')
 
-    ma_filepaths = [fp.as_posix() for fp in sess_dir.glob('*.json')]
-    if ma_filepaths:
-        return ma_filepaths[0]
-    else:
-        raise FileNotFoundError(f'No Miniscope-DAQ file (.json) found in {sess_dir}')
+    for fp in sess_dir.glob('*.json'): # Read Miniscope-DAQ file (.json)
+        with open(fp) as config_file:
+            miniscope_daq_meta = json.load(config_file)
+        if 'directoryStructure' in miniscope_daq_meta:
+            return fp.as_posix()
+    
+    raise FileNotFoundError(f'No Miniscope-DAQ file (.json) found in {sess_dir}')
+
 
 def get_suite2p_dir(processing_task_key):
     # Folder structure: root / subject / session / suite2p / plane / suite2p_ops.npy

@@ -2,8 +2,8 @@ import pathlib
 import csv
 from datetime import datetime
 
-from .pipeline import subject, imaging, scan, Session, Equipment
-from .paths import get_imaging_root_data_dir
+from workflow_imaging.pipeline import subject, imaging, scan, Session, Equipment
+from workflow_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects():
@@ -61,16 +61,19 @@ def ingest_sessions():
                 continue
         elif acq_software == 'Miniscope-DAQ':
             import json
-            try: # Read Miniscope-DAQ file (.json)
-                with open(scan_filepaths[0]) as config_file:
-                    data = json.load(config_file)
-                recording_time = data['directoryStructure']['date'] + data['directoryStructure']['time'] # TODO: format as datetime
-                scanner = data['devices']['miniscopes']['miniscopeDeviceName']['deviceType']
-            except Exception as e:
-                print(f'Miniscope-DAQ loading error: {scan_filepaths}\n{str(e)}')
+            for fp in sess_dir.glob('*.json'): # Read Miniscope-DAQ file (.json)
+                with open(fp) as config_file:
+                    miniscope_daq_meta = json.load(config_file)
+                if 'directoryStructure' in miniscope_daq_meta:
+                    try:
+                        recording_time = miniscope_daq_meta['directoryStructure']['date'] + miniscope_daq_meta['directoryStructure']['time'] # TODO: format as datetime
+                        scanner = miniscope_daq_meta['devices']['miniscopes']['miniscopeDeviceName']['deviceType']
+                        break
+                    except Exception as e:
+                        print(f'Miniscope-DAQ loading error: {scan_filepaths}\n{str(e)}')
 
         session_key = {'subject': session['subject'], 'session_datetime': recording_time}
-        if session_key not in Session.proj():
+        if session_key not in Session:
             scanners.append({'scanner': scanner})
             sessions.append(session_key)
             scans.append({**session_key, 'scan_id': 0, 'scanner': scanner, 'acq_software': acq_software})
