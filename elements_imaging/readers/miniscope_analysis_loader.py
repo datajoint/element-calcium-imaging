@@ -3,6 +3,7 @@ import h5py
 from datetime import datetime
 import os
 import pathlib
+import scipy
 
 _required_mat_ms_fields = ['Options',
                            'meanFrame',
@@ -18,12 +19,12 @@ class MiniscopeAnalysis:
      Parse the Miniscope Analysis output files
      Miniscope Analysis repository:     https://github.com/etterguillaume/MiniscopeAnalysis
      Expecting the following objects:
-     - 'SFP.mat':                       Segmentations
+     - 'SFP.mat':                       Spatial footprints of the cells found while performing CNMFE extraction.
      - 'ms.mat':
-     - 'ms[Options]':                   Input parameters
+     - 'ms[Options]':                   Parameters used to perform CNMFE.
      - 'ms[meanFrame]':
-     - 'ms[CorrProj]':
-     - 'ms[PeaktoNoiseProj]':
+     - 'ms[CorrProj]':                  Correlation projection from the CNMFE.  Displays which pixels are correlated together and suggests the location of your cells.
+     - 'ms[PeaktoNoiseProj]':           Peak-to-noise ratio of the correlation projection.  Gives you an idea of most prominent cells in your recording.
      - 'ms[RawTraces]':
      - 'ms[FiltTraces]':
      - 'ms[DeconvolvedTraces]':
@@ -45,10 +46,10 @@ class MiniscopeAnalysis:
 
           # ---- Initialize Miniscope Analysis results ----
           self.params = self.mat_ms['Options']
-          self.ref_image = None                                # TODO
-          self.average_image = self.mat_ms['meanFrame']        # TODO
-          self.correlation_map = self.mat_ms['CorrProj']       # TODO
-          self.max_proj_image = self.mat_ms['PeaktoNoiseProj'] # TODO
+          self.ref_image = None
+          self.average_image = self.mat_ms['meanFrame']
+          self.correlation_image = self.mat_ms['CorrProj']
+          self.max_proj_image = None
           self._masks = None
 
           # ---- Metainfo ----
@@ -71,22 +72,21 @@ class MiniscopeAnalysis:
 
      def extract_masks(self):
           masks = []
-          for i in range(np.shape(self.mat_ms['ms']['Centroids'])[1]): # TODO: determine mapping between centroids and traces
-               center_z = 0 # TODO
-               weights = # TODO
-               xpix = # TODO
-               ypix = # TODO
-               zpix = np.full(len(weights), center_z) # TODO
-
+          for i in range(int(self.mat_ms['ms']['numNeurons'][0,0])):
+               center_y, center_x = scipy.ndimage.measurements.center_of_mass(self.mat_sfp[i,:,:])
+               center_z = 0
+               xpix, ypix, weights = scipy.sparse.find(self.mat_sfp[i,:,:])
+               zpix = np.full(len(weights), center_z)
+ 
                masks.append({'mask_id': i,
                               'mask_npix': len(weights), 
-                              'mask_weights': weights,
-                              'mask_center_x': self.mat_ms['ms']['Centroids'][0,i], 
-                              'mask_center_y': self.mat_ms['ms']['Centroids'][1,i], 
+                              'mask_center_x': center_x,
+                              'mask_center_y': center_y,
                               'mask_center_z': center_z,
                               'mask_xpix': xpix, 
                               'mask_ypix': ypix, 
                               'mask_zpix': zpix,
+                              'mask_weights': weights,
                               'raw_trace': self.mat_ms['ms']['RawTraces'][i,:],
                               'dff': self.mat_ms['ms']['FiltTraces'][i,:],
                               'spikes': self.mat_ms['ms']['DeconvolvedTraces'][i,:]})
