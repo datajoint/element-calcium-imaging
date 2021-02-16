@@ -89,7 +89,7 @@ def get_miniscope_analysis_dir(processing_task_key: dict) -> str:
 @schema
 class ProcessingMethod(dj.Lookup):
     definition = """
-    processing_method: char(12)
+    processing_method: char(24)
     ---
     processing_method_desc: varchar(1000)
     """
@@ -473,7 +473,7 @@ class MotionCorrection(dj.Imported):
             summary_imgs.append({**mc_key,
                                  'ref_image': loaded_miniscope_analysis.ref_image,
                                  'average_image': loaded_miniscope_analysis.average_image,
-                                 'correlation_image': loaded_miniscope_analysis.correlation_map,
+                                 'correlation_image': loaded_miniscope_analysis.correlation_image,
                                  'max_proj_image': loaded_miniscope_analysis.max_proj_image})
 
             self.insert1({**key, 'mc_channel': loaded_miniscope_analysis.alignment_channel})
@@ -504,7 +504,7 @@ class Segmentation(dj.Computed):
         mask_xpix                : longblob           # x coordinates in pixels
         mask_ypix                : longblob           # y coordinates in pixels      
         mask_zpix                : longblob           # z coordinates in pixels        
-        mask_weights             : longblob           # weights of the mask at the indices above in column major (Fortran) order
+        mask_weights             : longblob           # weights of the mask at the indices above
         """
 
     def make(self, key):
@@ -612,7 +612,7 @@ class Segmentation(dj.Computed):
 @schema
 class MaskClassificationMethod(dj.Lookup):
     definition = """
-    mask_classification_method: varchar(32)
+    mask_classification_method: varchar(48)
     """
 
     contents = zip(['suite2p_default_classifier',
@@ -734,7 +734,7 @@ class ActivityExtractionMethod(dj.Lookup):
     extraction_method: varchar(32)
     """
 
-    contents = zip(['suite2p_deconvolution', 'caiman_deconvolution', 'caiman_dff', 'miniscope_analysis'])
+    contents = zip(['suite2p_deconvolution', 'caiman_deconvolution', 'caiman_dff', 'miniscope_analysis_deconvolution', 'miniscope_analysis_dff'])
 
 
 @schema
