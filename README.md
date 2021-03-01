@@ -7,7 +7,7 @@ This modular element can be flexibly attached downstream to any particular desig
 
 ## Element architecture
 
-![elements imaging diagram](images/elements_imaging_diagram.svg)
+![elements imaging diagram](images/attached_imaging_element.png)
 
 + As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
