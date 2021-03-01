@@ -28,7 +28,7 @@ The Calcium imaging workflow presented here uses components from three DataJoint
 
 ### elements-imaging
 
-![elements_imaging](images/attached_imaging_element.png)
+![elements_imaging](images/attached_imaging_element.svg)
 
 ## Installation instructions
 
