@@ -141,12 +141,12 @@ class ProcessingTask(dj.Manual):
     -> Session
     -> ProcessingParamSet
     scan_ids: varchar(16)  # list of the scan_id associated with this ProcessingTask (delimited by '_' for example)
-    ---
+    ---    
     task_mode='load': enum('load', 'trigger')  # 'load': load computed analysis results, 'trigger': trigger computation
     processing_output_dir: varchar(255)        #  output directory relative to root data directory
     """
 
-    class ScanMembers(dj.Part):
+    class MemberScan(dj.Part):
         definition = """
         -> master
         -> scan.Scan
@@ -162,6 +162,18 @@ class Processing(dj.Computed):
     proc_start_time=null     : datetime  # execution time of this processing task (not available if analysis triggering is NOT required)
     proc_curation_time=null  : datetime  # time of lastest curation (modification to the file) on this result set
     """
+
+    class Field(dj.Part):
+        definition = """
+        field_idx           : int
+        """
+
+    class MemberField(dj.Part):
+        definition = """
+        -> master.Field
+        -> Processing.MemberScan
+        -> scan.ScanInfo.Field
+        """
 
     # Run processing only on Scan with ScanInfo inserted
     @property
@@ -258,9 +270,9 @@ class MotionCorrection(dj.Imported):
         """
 
     class Summary(dj.Part):
-        definition = """ # summary images for each field and channel after corrections
+        definition = """  # summary images for each field and channel after corrections
         -> master
-        -> scan.ScanInfo.Field
+        -> Processing.Field
         ---
         ref_image                    : longblob      # image used as alignment template
         average_image                : longblob      # mean of registered frames
