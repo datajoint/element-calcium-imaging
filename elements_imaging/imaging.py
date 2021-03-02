@@ -160,7 +160,7 @@ class Processing(dj.Computed):
     ---
     proc_completion_time     : datetime  # time of generation of this set of processed, segmented results
     proc_start_time=null     : datetime  # execution time of this processing task (not available if analysis triggering is NOT required)
-    proc_curation_time=null  : datetime  # time of lastest curation (modification to the file) on this result set
+    proc_curation_time=null  : datetime  # time of latest curation (modification to the file) on this result set
     """
 
     class Field(dj.Part):
