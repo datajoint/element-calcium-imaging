@@ -201,6 +201,7 @@ class Curation(dj.Manual):
         if key not in Processing():
             raise ValueError(f'No corresponding entry in Clustering available for: {key}; do `Processing.populate(key)`')
 
+        output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
         method, loaded_result = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
@@ -225,7 +226,7 @@ class Curation(dj.Manual):
 @schema
 class MotionCorrection(dj.Imported):
     definition = """ 
-    -> Curation
+    -> Processing
     ---
     -> scan.Channel.proj(mc_channel='channel')              # channel used for motion correction in this processing task
     """
@@ -285,7 +286,7 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
-        method, loaded_result = get_loader_result(key, Curation)
+        method, loaded_result = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
             loaded_suite2p = loaded_result
@@ -440,7 +441,7 @@ class MotionCorrection(dj.Imported):
 @schema
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
-    -> MotionCorrection    
+    -> Curation    
     """
 
     class Mask(dj.Part):
