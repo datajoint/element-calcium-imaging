@@ -194,7 +194,7 @@ class Curation(dj.Manual):
     curation_note='': varchar(2000)  
     """
 
-    def create1_from_clustering_task(self, key, is_curated=False, curation_note=''):
+    def create1_from_processing_task(self, key, is_curated=False, curation_note=''):
         """
         A convenient function to create a new corresponding "Curation" for a particular "ClusteringTask"
         """
