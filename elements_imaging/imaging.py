@@ -26,17 +26,14 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
          required dependencies to activate the `imaging` element:
             Upstream tables:
                 + Session: parent table to ProbeInsertion, typically identifying a recording session
-                + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
-                + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
             Functions:
-                + get_caiman_dir(processing_task_key: dict) -> str
-                    Retrieve the CaImAn output directory for a given ProcessingTask
-                    :param processing_task_key: a dictionary of one ProcessingTask
-                    :return: a string for full path to the resulting CaImAn output directory
-                + get_suite2p_dir(processing_task_key: dict) -> str
-                    Retrieve the Suite2p output directory for a given ProcessingTask
-                    :param processing_task_key: a dictionary of one ProcessingTask
-                    :return: a string for full path to the resulting Suite2p output directory
+                + get_imaging_root_data_dir() -> str
+                    Retrieve the root data directory - e.g. containing all subject/sessions data
+                    :return: a string for full path to the root data directory
+                + get_session_directory(session_key: dict) -> str
+                    Retrieve the session directory containing the recorded scan data for a given Session
+                    :param session_key: a dictionary of one Session `key`
+                    :return: a string for full path to the session directory
     """
 
     if isinstance(linking_module, str):
@@ -54,22 +51,23 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
 
 # -------------- Functions required by the elements-imaging  --------------
 
-def get_caiman_dir(processing_task_key: dict) -> str:
+def get_imaging_root_data_dir() -> str:
     """
-    Retrieve the CaImAn output directory for a given ProcessingTask
-    :param processing_task_key: a dictionary of one ProcessingTask
-    :return: a string for full path to the resulting CaImAn output directory
+    get_imaging_root_data_dir() -> str
+        Retrieve the root data directory - e.g. containing all subject/sessions data
+        :return: a string for full path to the root data directory
     """
-    return _linking_module.get_caiman_dir(processing_task_key)
+    return _linking_module.get_imaging_root_data_dir()
 
 
-def get_suite2p_dir(processing_task_key: dict) -> str:
+def get_session_directory(session_key: dict) -> str:
     """
-    Retrieve the Suite2p output directory for a given ProcessingTask
-    :param processing_task_key: a dictionary of one ProcessingTask
-    :return: a string for full path to the resulting Suite2p output directory
+    get_session_directory(session_key: dict) -> str
+        Retrieve the session directory containing the recorded scan data for a given Session
+        :param session_key: a dictionary of one Session `key`
+        :return: a string for full path to the session directory
     """
-    return _linking_module.get_suite2p_dir(processing_task_key)
+    return _linking_module.get_session_directory(session_key)
 
 # -------------- Table declarations --------------
 
@@ -143,7 +141,8 @@ class ProcessingTask(dj.Manual):
     -> scan.Scan
     -> ProcessingParamSet
     ---
-    task_mode='load': enum('load', 'trigger')  # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
 
@@ -152,16 +151,8 @@ class Processing(dj.Computed):
     definition = """
     -> ProcessingTask
     ---
-    proc_completion_time     : datetime  # time of generation of this set of processed, segmented results
-    proc_start_time=null     : datetime  # execution time of this processing task (not available if analysis triggering is NOT required)
-    proc_curation_time=null  : datetime  # time of lastest curation (modification to the file) on this result set
+    processing_time     : datetime  # time of generation of this set of processed, segmented results
     """
-
-    class ProcessingOutputFile(dj.Part):
-        definition = """
-        -> master
-        file_path: varchar(255)  # filepath relative to root data directory
-        """
 
     # Run processing only on Scan with ScanInfo inserted
     @property
@@ -169,46 +160,64 @@ class Processing(dj.Computed):
         return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
-        method, task_mode = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method', 'task_mode')
+        task_mode = (ProcessingTask & key).fetch1('task_mode')
+        method, loaded_result = get_loader_result(key, ProcessingTask)
 
         if task_mode == 'load':
             if method == 'suite2p':
                 if (scan.ScanInfo & key).fetch1('nrois') > 0:
                     raise NotImplementedError(f'Suite2p ingestion error - Unable to handle ScanImage multi-ROI scanning mode yet')
-                
-                from .readers import suite2p_loader
-
-                data_dir = pathlib.Path(get_suite2p_dir(key))
-                loaded_suite2p = suite2p_loader.Suite2p(data_dir)
-                key = {**key, 'proc_completion_time': loaded_suite2p.creation_time, 'proc_curation_time': loaded_suite2p.curation_time}
-                # Insert file(s)
-                root = pathlib.Path(scan.get_imaging_root_data_dir())
-                output_files = data_dir.glob('*')
-                output_files = [f.relative_to(root).as_posix() for f in output_files if f.is_file()]
-
+                loaded_suite2p = loaded_result
+                key = {**key, 'processing_time': loaded_suite2p.creation_time}
             elif method == 'caiman':
-                from .readers import caiman_loader
-
-                data_dir = pathlib.Path(get_caiman_dir(key))
-                loaded_caiman = caiman_loader.CaImAn(data_dir)
-
-                key = {**key, 'proc_completion_time': loaded_caiman.creation_time,
-                              'proc_curation_time': loaded_caiman.curation_time}
-
-                # Insert file(s)
-                root = pathlib.Path(scan.get_imaging_root_data_dir())
-                output_files = [loaded_caiman.caiman_fp.relative_to(root).as_posix()]
+                loaded_caiman = loaded_result
+                key = {**key, 'processing_time': loaded_caiman.creation_time}
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
-
-            self.insert1(key)
-            self.ProcessingOutputFile.insert([{**key, 'file_path': f} for f in output_files], ignore_extra_fields=True)
-
         elif task_mode == 'trigger':
-            start_time = datetime.now()
-            # trigger Suite2p or CaImAn here
-            # wait for completion, then insert with "completion_time", "start_time", no "curation_time"
-            return
+            raise NotImplementedError(f'Automatic triggering of {method} analysis is not yet supported')
+        else:
+            raise ValueError(f'Unknown task mode: {task_mode}')
+
+        self.insert1(key)
+
+
+@schema
+class Curation(dj.Manual):
+    definition = """
+    -> Processing
+    curation_id: int
+    ---
+    curation_time: datetime             # time of generation of this set of curated results 
+    curation_output_dir: varchar(255)   # output directory of the curated results, relative to root data directory
+    manual_curation: bool               # has manual curation been performed on this result?
+    curation_note='': varchar(2000)  
+    """
+
+    def create1_from_clustering_task(self, key, is_curated=False, curation_note=''):
+        """
+        A convenient function to create a new corresponding "Curation" for a particular "ClusteringTask"
+        """
+        if key not in Processing():
+            raise ValueError(f'No corresponding entry in Clustering available for: {key}; do `Processing.populate(key)`')
+
+        method, loaded_result = get_loader_result(key, ProcessingTask)
+
+        if method == 'suite2p':
+            loaded_suite2p = loaded_result
+            curation_time = loaded_suite2p.creation_time
+        elif method == 'caiman':
+            loaded_caiman = loaded_result
+            curation_time = loaded_caiman.creation_time
+        else:
+            raise NotImplementedError('Unknown method: {}'.format(method))
+
+        # Synthesize curation_id
+        curation_id = dj.U().aggr(self & key, n='ifnull(max(curation_id)+1,1)').fetch1('n')
+        self.insert1({**key, 'curation_id': curation_id,
+                      'curation_time': curation_time, 'curation_output_dir': output_dir,
+                      'manual_curation': is_curated,
+                      'curation_note': curation_note})
 
 
 # -------------- Motion Correction --------------
@@ -216,7 +225,7 @@ class Processing(dj.Computed):
 @schema
 class MotionCorrection(dj.Imported):
     definition = """ 
-    -> Processing
+    -> Curation
     ---
     -> scan.Channel.proj(mc_channel='channel')              # channel used for motion correction in this processing task
     """
@@ -276,14 +285,10 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
-
-        method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
+        method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
-            from .readers import suite2p_loader
-
-            data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = loaded_result
 
             field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
 
@@ -353,13 +358,10 @@ class MotionCorrection(dj.Imported):
             self.Summary.insert(summary_imgs)
 
         elif method == 'caiman':
-            from .readers import caiman_loader
-
-            data_dir = pathlib.Path(get_caiman_dir(key))
-            loaded_caiman = caiman_loader.CaImAn(data_dir)
+            loaded_caiman = loaded_result
 
             self.insert1({**key, 'mc_channel': loaded_caiman.alignment_channel})
-            
+
             is3D = loaded_caiman.params.motion['is3D']
             # -- rigid motion correction --
             if not loaded_caiman.params.motion['pw_rigid']:
@@ -458,13 +460,10 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
-        method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
+        method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
-            from .readers import suite2p_loader
-
-            data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = loaded_result
 
             # ---- iterate through all s2p plane outputs ----
             masks, cells = [], []
@@ -492,10 +491,7 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(cells, ignore_extra_fields=True, allow_direct_insert=True)
         
         elif method == 'caiman':
-            from .readers import caiman_loader
-
-            data_dir = pathlib.Path(get_caiman_dir(key))
-            loaded_caiman = caiman_loader.CaImAn(data_dir)
+            loaded_caiman = loaded_result
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
             params = (ProcessingParamSet * ProcessingTask & key).fetch1('params')
@@ -516,7 +512,7 @@ class Segmentation(dj.Computed):
                 if loaded_caiman.cnmf.estimates.idx_components is not None:
                     if mask['mask_id'] in loaded_caiman.cnmf.estimates.idx_components:
                         cells.append({**key, 'mask_classification_method': 'caiman_default_classifier',
-                                    'mask': mask['mask_id'], 'mask_type': 'soma'})
+                                      'mask': mask['mask_id'], 'mask_type': 'soma'})
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
@@ -579,13 +575,10 @@ class Fluorescence(dj.Computed):
         """
 
     def make(self, key):
-        method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
+        method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
-            from .readers import suite2p_loader
-
-            data_dir = pathlib.Path(get_suite2p_dir(key))
-            loaded_suite2p = suite2p_loader.Suite2p(data_dir)
+            loaded_suite2p = loaded_result
 
             # ---- iterate through all s2p plane outputs ----
             fluo_traces, fluo_chn2_traces = [], []
@@ -606,10 +599,7 @@ class Fluorescence(dj.Computed):
             self.Trace.insert(fluo_traces + fluo_chn2_traces)
 
         elif method == 'caiman':
-            from .readers import caiman_loader
-
-            data_dir = pathlib.Path(get_caiman_dir(key))
-            loaded_caiman = caiman_loader.CaImAn(data_dir)
+            loaded_caiman = loaded_result
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
             params = (ProcessingParamSet * ProcessingTask & key).fetch1('params')
@@ -651,18 +641,11 @@ class Activity(dj.Computed):
         """
 
     def make(self, key):
-
-        method = (ProcessingParamSet * ProcessingTask & key).fetch1('processing_method')
+        method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
             if key['extraction_method'] == 'suite2p_deconvolution':
-                from .readers import suite2p_loader
-
-                data_dir = pathlib.Path(get_suite2p_dir(key))
-                loaded_suite2p = suite2p_loader.Suite2p(data_dir)
-
-                self.insert1(key)
-
+                loaded_suite2p = loaded_result
                 # ---- iterate through all s2p plane outputs ----
                 spikes = []
                 for s2p in loaded_suite2p.planes.values():
@@ -671,16 +654,15 @@ class Activity(dj.Computed):
                         spikes.append({**key, 'mask': mask_idx + mask_count,
                                        'fluo_channel': 0,
                                        'activity_trace': spks})
+
+                self.insert1(key)
                 self.Trace.insert(spikes)
                 
         elif method == 'caiman':
+            loaded_caiman = loaded_result
+
             if key['extraction_method'] in ('caiman_deconvolution', 'caiman_dff'):
                 attr_mapper = {'caiman_deconvolution': 'spikes', 'caiman_dff': 'dff'}
-
-                from .readers import caiman_loader
-
-                data_dir = pathlib.Path(get_caiman_dir(key))
-                loaded_caiman = caiman_loader.CaImAn(data_dir)
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
                 params = (ProcessingParamSet * ProcessingTask & key).fetch1('params')
@@ -698,6 +680,35 @@ class Activity(dj.Computed):
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
 # ---------------- HELPER FUNCTIONS ----------------
+
+
+_table_attribute_mapper = {'ProcessingTask': 'processing_output_dir',
+                           'Curation': 'curation_output_dir'}
+
+
+def get_loader_result(key, table):
+    """
+    Retrieve the loaded processed imaging results from the loader (e.g. suite2p, caiman, etc.)
+        :param key: the `key` to one entry of ProcessingTask or Curation
+        :param table: the class defining the table to retrieve the loaded results from (e.g. ProcessingTask, Curation)
+        :return: a loader object of the loaded results (e.g. suite2p.Suite2p, caiman.CaImAn, etc.)
+    """
+    method, output_dir = (ProcessingParamSet * table & key).fetch1(
+        'processing_method', _table_attribute_mapper[table.__name__])
+
+    root_dir = pathlib.Path(get_imaging_root_data_dir())
+    output_dir = root_dir / output_dir
+
+    if method == 'suite2p':
+        from .readers import suite2p_loader
+        loaded_output = suite2p_loader.Suite2p(output_dir)
+    elif method == 'caiman':
+        from .readers import caiman_loader
+        loaded_output = caiman_loader.CaImAn(output_dir)
+    else:
+        raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
+
+    return method, loaded_output
 
 
 def dict_to_uuid(key):
