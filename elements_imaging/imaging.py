@@ -146,8 +146,8 @@ class ProcessingTask(dj.Manual):
     task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
-    class MemberScan(dj.Part):
-        definition = """
+    class Scan(dj.Part):
+        definition = """ the scan.Scan(s) used in this processing task
         -> master
         -> scan.Scan
         """
@@ -163,13 +163,13 @@ class Processing(dj.Computed):
 
     class Field(dj.Part):
         definition = """
-        field_idx           : int
+        processing_field_idx: int
         """
 
     class MemberField(dj.Part):
-        definition = """
+        definition = """ The field(s) from scan.ScanInfo.Field that define Processing.Field
         -> master.Field
-        -> Processing.MemberScan
+        -> ProcessingTask.Scan
         -> scan.ScanInfo.Field
         """
 
@@ -179,6 +179,35 @@ class Processing(dj.Computed):
         return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
+        """
+        For multi-scan processing, the scans are concatenated in time only.
+        All the scans must have identical scan.ScanInfo - i.e. scanning from the same region with the same acquisition setup
+        """
+        # --- Scan(s) verification and entry generation for Field and MemberField
+        # Check ScanInfo: ensure all scans have identical scan_info
+        attrs = ['nfields', 'ndepths', 'nframes', 'fps', 'x', 'y', 'z']
+        scan_keys, *scans_info = (ProcessingTask.Scan * scan.ScanInfo & key).fetch('KEY', *attrs, order_by='scan_id')
+        for attr, attr_val in zip(scans_info, attrs):
+            if np.any(attr_val != attr_val[0]):
+                raise ValueError(f'Multi-scan processing error: {attr} from the specified scan(s) are not identical')
+        # Check ScanInfo.Field: ensure all scans have the identical scan_info
+        attrs = ['px_height', 'px_width', 'field_x', 'field_y', 'field_z']
+        scan_key = scan_keys[0]  # using the first scan as reference
+
+        fields, member_fields = [], []
+        for field_key in (scan.ScanInfo.Field & scan_key).fetch('KEY'):
+            field_keys, *field_info = (ProcessingTask.Scan * scan.ScanInfo.Field & key
+                                               & {'field_idx': field_key['field_idx']}).fetch('KEY', *attrs)
+            for attr, attr_val in zip(field_info, attrs):
+                if np.any(attr_val != attr_val[0]):
+                    raise ValueError(f'Multi-scan processing error: {attr} from field {field_key["field_idx"]}'
+                                     f' from the specified scan(s) are not identical')
+
+            processing_field_key = {**key, 'processing_field_idx': field_key['field_idx']}
+            fields.append(processing_field_key)
+            member_fields.extend([{**processing_field_key, **k} for k in field_keys])
+
+        # --- Load/trigger analysis ---
         task_mode = (ProcessingTask & key).fetch1('task_mode')
         method, loaded_result = get_loader_result(key, ProcessingTask)
 
@@ -199,6 +228,8 @@ class Processing(dj.Computed):
             raise ValueError(f'Unknown task mode: {task_mode}')
 
         self.insert1(key)
+        self.Field.insert(fields)
+        self.MemberField.insert1(member_fields)
 
 
 @schema
@@ -438,13 +469,18 @@ class MotionCorrection(dj.Imported):
                 self.Block.insert(nonrigid_blocks)
 
             # -- summary images --
-            field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
+            field_keys = {}
+            for field_key in (Processing.Field * Processing.MemberField
+                              * scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z'):
+                if field_key['processing_field_idx'] not in field_keys:
+                    field_keys[field_key['processing_field_idx']] = field_key
+
             summary_imgs = [{**key, **fkey, 'ref_image': ref_image,
                              'average_image': ave_img,
                              'correlation_image': corr_img,
                              'max_proj_image': max_img}
                             for fkey, ref_image, ave_img, corr_img, max_img in zip(
-                    field_keys,
+                    field_keys.values(),
                     loaded_caiman.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['reference_image'][...][np.newaxis, ...],
                     loaded_caiman.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['average_image'][...][np.newaxis, ...],
                     loaded_caiman.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['correlation_image'][...][np.newaxis, ...],
