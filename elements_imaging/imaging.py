@@ -25,7 +25,7 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
         :param linking_module: a module name or a module containing the
          required dependencies to activate the `imaging` element:
             Upstream tables:
-                + Session: parent table to ProbeInsertion, typically identifying a recording session
+                + Session: parent table to Scan, typically identifying a recording session
             Functions:
                 + get_imaging_root_data_dir() -> str
                     Retrieve the root data directory - e.g. containing all subject/sessions data
