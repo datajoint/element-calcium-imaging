@@ -441,7 +441,9 @@ class MotionCorrection(dj.Imported):
 @schema
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
-    -> Curation    
+    -> Curation
+    ---
+    -> MotionCorrection    
     """
 
     class Mask(dj.Part):
@@ -461,6 +463,8 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
+        mc_key = (MotionCorrection & key).fetch1('KEY')
+
         method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
@@ -484,7 +488,7 @@ class Segmentation(dj.Computed):
                         cells.append({**key, 'mask_classification_method': 'suite2p_default_classifier',
                                       'mask': mask_idx + mask_count, 'mask_type': 'soma', 'confidence': cell_prob})
 
-            self.insert1(key)
+            self.insert1({**key, **mc_key})
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
@@ -515,7 +519,7 @@ class Segmentation(dj.Computed):
                         cells.append({**key, 'mask_classification_method': 'caiman_default_classifier',
                                       'mask': mask['mask_id'], 'mask_type': 'soma'})
 
-            self.insert1(key)
+            self.insert1({**key, **mc_key})
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
