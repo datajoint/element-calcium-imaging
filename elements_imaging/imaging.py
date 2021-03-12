@@ -196,10 +196,10 @@ class Curation(dj.Manual):
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=''):
         """
-        A convenient function to create a new corresponding "Curation" for a particular "ClusteringTask"
+        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
         """
         if key not in Processing():
-            raise ValueError(f'No corresponding entry in Clustering available for: {key}; do `Processing.populate(key)`')
+            raise ValueError(f'No corresponding entry in Processing available for: {key}; do `Processing.populate(key)`')
 
         output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
         method, loaded_result = get_loader_result(key, ProcessingTask)
