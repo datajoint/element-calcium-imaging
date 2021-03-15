@@ -1,15 +1,30 @@
-# DataJoint Element - Functional Calcium Imaging
-This repository features DataJoint pipeline design for functional Calcium imaging, with `ScanImage` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
+# DataJoint Element - Calcium Imaging
 
-The element presented here is not a complete workflow by itself, but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
++ `elements-imaging` features a DataJoint pipeline design for functional calcium imaging.
 
-This modular element can be flexibly attached downstream to any particular design of experiment session, thus assembling a fully functional calcium imaging workflow.
++ `elements-imaging` supports the following acquisition systems:
+     + `ScanImage`
+     + `Scanbox`
+
++ `elements-imaging` supports the following analysis tools:
+     + [Suite2p](https://github.com/MouseLand/suite2p)
+     + [CaImAn](https://github.com/flatironinstitute/CaImAn)
+
++ `elements-imaging` is not a complete workflow by itself, but rather a modular design of tables and dependencies specific to the functional calcium imaging workflow. 
+
++ `elements-imaging` can be flexibly attached downstream to any particular design of experiment session, thus assembling a fully functional calcium imaging workflow.
+
+## Element usage
+
++ See the [workflow-imaging](https://github.com/datajoint/workflow-imaging) repository for an example usage of `elements-imaging`.
+
++ See the [datajoint-elements](https://github.com/datajoint/datajoint-elements) repository for a detailed description of the DataJoint elements and workflows.
 
 ## Element architecture
 
 ![elements imaging diagram](images/elements_imaging_diagram.svg)
 
-+ As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
++ As the diagram depicts, `elements-imaging` starts immediately downstream from `Session`, and also requires some notion of:
 
      + `Scanner` for equipment/device
 
@@ -29,9 +44,9 @@ This modular element can be flexibly attached downstream to any particular desig
 
      + For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
 
-### Preprocessing - Motion Correction
+### Motion correction
 
-+ `MotionCorrection` - table containing the motion correction information performed on a scan
++ `MotionCorrection` - motion correction information performed on a scan
 
 + `MotionCorrection.RigidMotionCorrection` - details of the rigid motion correction (e.g. shifting in x, y) at a per `ScanInfo.Field` level
 
@@ -39,7 +54,7 @@ This modular element can be flexibly attached downstream to any particular desig
 
 + `MotionCorrection.Summary` - summary images for each `ScanInfo.Field` after motion correction (e.g. average image, correlation image)
     
-### Preprocessing - Segmentation
+### Segmentation
 
 + `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
  
@@ -47,14 +62,10 @@ This modular element can be flexibly attached downstream to any particular desig
 
 + `MaskClassification` - classification of `Segmentation.Mask` into different type (e.g. soma, axon, dendrite, artifact, etc.)
 
-### Neural activity 
+### Neural activity extraction
 
 + `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
 
 + `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
-
-## Element usage
-
-+ See [workflow-imaging](https://github.com/datajoint/workflow-imaging) repository for an example usage of `elements-imaging`.
