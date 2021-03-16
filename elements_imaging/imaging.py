@@ -92,6 +92,7 @@ class ProcessingMethod(dj.Lookup):
     processing_method: char(24)
     ---
     processing_method_desc: varchar(1000)
+    package_version=null: varchar(16)
     """
 
     contents = [('suite2p', 'suite2p analysis suite'),
@@ -112,8 +113,9 @@ class ProcessingParamSet(dj.Lookup):
     """
 
     @classmethod
-    def insert_new_params(cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict):
+    def insert_new_params(cls, processing_method: str, package_version: str, paramset_idx: int, paramset_desc: str, params: dict):
         param_dict = {'processing_method': processing_method,
+                      'package_version': package_version,
                       'paramset_idx': paramset_idx,
                       'paramset_desc': paramset_desc,
                       'params': params,
