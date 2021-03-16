@@ -353,9 +353,11 @@ class MotionCorrection(dj.Imported):
                                      'max_proj_image': s2p.max_proj_image})
 
             self.insert1({**key, 'mc_channel': align_chn})
-            self.RigidMotionCorrection.insert1(rigid_mc)
-            self.NonRigidMotionCorrection.insert1(nonrigid_mc)
-            self.Block.insert(nonrigid_blocks.values())
+            if rigid_mc:
+                self.RigidMotionCorrection.insert1(rigid_mc)
+            if nonrigid_mc:
+                self.NonRigidMotionCorrection.insert1(nonrigid_mc)
+                self.Block.insert(nonrigid_blocks.values())
             self.Summary.insert(summary_imgs)
 
         elif method == 'caiman':
