@@ -30,10 +30,6 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
                 + get_imaging_root_data_dir() -> str
                     Retrieve the root data directory - e.g. containing all subject/sessions data
                     :return: a string for full path to the root data directory
-                + get_session_directory(session_key: dict) -> str
-                    Retrieve the session directory containing the recorded scan data for a given Session
-                    :param session_key: a dictionary of one Session `key`
-                    :return: a string for full path to the session directory
     """
 
     if isinstance(linking_module, str):
@@ -59,15 +55,6 @@ def get_imaging_root_data_dir() -> str:
     """
     return _linking_module.get_imaging_root_data_dir()
 
-
-def get_session_directory(session_key: dict) -> str:
-    """
-    get_session_directory(session_key: dict) -> str
-        Retrieve the session directory containing the recorded scan data for a given Session
-        :param session_key: a dictionary of one Session `key`
-        :return: a string for full path to the session directory
-    """
-    return _linking_module.get_session_directory(session_key)
 
 # -------------- Table declarations --------------
 
