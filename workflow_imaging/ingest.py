@@ -30,18 +30,15 @@ def ingest_sessions():
 
     for session in input_sessions:
         sess_dir = pathlib.Path(session['session_dir'])
-        acq_software = None
-        recording_time = None
+
         # search for either ScanImage or ScanBox files (in that order)
         for scan_pattern, scan_type in zip(['*.tif', '*.sbx'], ['ScanImage', 'ScanBox']):
             scan_filepaths = [fp.as_posix() for fp in sess_dir.glob(scan_pattern)]
             if len(scan_filepaths):
                 acq_software = scan_type
                 break
-
-        if acq_software is None:
-            print(f'Unable to identify scan files from the supported acquisition softwares (ScanImage, ScanBox)')
-            continue
+        else:
+            raise FileNotFoundError(f'Unable to identify scan files from the supported acquisition softwares (ScanImage, ScanBox) at: {sess_dir}')
 
         if acq_software == 'ScanImage':
             import scanreader
@@ -75,10 +72,6 @@ def ingest_sessions():
 
             session_directories.append({**session_key, 'session_dir': sess_dir.relative_to(root_data_dir).as_posix()})
 
-            parameter_set = [int(s) for s in session['paramset'].split(' ')]
-            for param in parameter_set:
-                processing_tasks.append({**session_key, 'scan_id': 0, 'paramset_idx': param, 'task_mode': 'load'})
-
     print(f'\n---- Insert {len(set(val for dic in scanners for val in dic.values()))} entry(s) into experiment.Equipment ----')
     Equipment.insert(scanners, skip_duplicates=True)
 
@@ -90,9 +83,6 @@ def ingest_sessions():
 
     print(f'\n---- Insert {len(scans)} entry(s) into scan.Scan ----')
     scan.Scan.insert(scans)
-
-    print(f'\n---- Insert {len(processing_tasks)} entry(s) into imaging.ProcessingTask ----')
-    imaging.ProcessingTask.insert(processing_tasks)
 
     print('\n---- Successfully completed ingest_sessions ----')
 
