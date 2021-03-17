@@ -9,7 +9,7 @@ def test_generate_pipeline(pipeline):
     # test elements connection from lab, subject to Session
     assert subject_tbl.full_table_name == subject.Subject.full_table_name
 
-    # test elements connection from Session to probe, ephys
+    # test elements connection from Session to scan, imaging
     session_tbl, equipment_tbl, _ = scan.Scan.parents(as_objects=True)
     assert session_tbl.full_table_name == Session.full_table_name
     assert equipment_tbl.full_table_name == Equipment.full_table_name
