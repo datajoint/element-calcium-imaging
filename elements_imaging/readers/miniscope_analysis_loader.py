@@ -74,18 +74,14 @@ class MiniscopeAnalysis:
           masks = []
           for i in range(int(self.mat_ms['ms']['numNeurons'][0,0])):
                center_y, center_x = scipy.ndimage.measurements.center_of_mass(self.mat_sfp[i,:,:])
-               center_z = 0
                xpix, ypix, weights = scipy.sparse.find(self.mat_sfp[i,:,:])
-               zpix = np.full(len(weights), center_z)
- 
+                
                masks.append({'mask_id': i,
                               'mask_npix': len(weights), 
                               'mask_center_x': center_x,
                               'mask_center_y': center_y,
-                              'mask_center_z': center_z,
                               'mask_xpix': xpix, 
                               'mask_ypix': ypix, 
-                              'mask_zpix': zpix,
                               'mask_weights': weights,
                               'raw_trace': self.mat_ms['ms']['RawTraces'][i,:],
                               'dff': self.mat_ms['ms']['FiltTraces'][i,:],

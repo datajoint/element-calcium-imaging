@@ -502,10 +502,10 @@ class Segmentation(dj.Computed):
         mask_npix                : int                # number of pixels in ROIs
         mask_center_x            : int                # center x coordinate in pixel
         mask_center_y            : int                # center y coordinate in pixel
-        mask_center_z            : int                # center z coordinate in pixel
+        mask_center_z=null       : int                # center z coordinate in pixel
         mask_xpix                : longblob           # x coordinates in pixels
         mask_ypix                : longblob           # y coordinates in pixels      
-        mask_zpix                : longblob           # z coordinates in pixels        
+        mask_zpix=null           : longblob           # z coordinates in pixels        
         mask_weights             : longblob           # weights of the mask at the indices above
         """
 
@@ -598,10 +598,8 @@ class Segmentation(dj.Computed):
                               'mask_npix': mask['mask_npix'],
                               'mask_center_x': mask['mask_center_x'],
                               'mask_center_y': mask['mask_center_y'],
-                              'mask_center_z': mask['mask_center_z'],
                               'mask_xpix': mask['mask_xpix'],
                               'mask_ypix': mask['mask_ypix'],
-                              'mask_zpix': mask['mask_zpix'],
                               'mask_weights': mask['mask_weights']})
 
             self.insert1(key)
