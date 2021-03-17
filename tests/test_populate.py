@@ -91,78 +91,78 @@ def test_motion_correction_populate_suite2p_3D(processing, pipeline, testdata_pa
     assert x_shifts.shape == (nfields, nframes)
 
 
-def test_segmentation_populate_suite2p_2D(curation, pipeline, testdata_paths):
+def test_segmentation_populate_suite2p_2D(curations, pipeline, testdata_paths):
     _, _, imaging, scan, _, _, _ = pipeline
 
     rel_path = testdata_paths['suite2p_2d']
-    curation_key = (imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+    curations_key = (imaging.curations & f'curations_output_dir LIKE "%{rel_path}"').fetch1('KEY')
 
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    imaging.Segmentation.populate(curations_key)
+    imaging.Fluorescence.populate(curations_key)
+    imaging.Activity.populate(curations_key)
 
-    assert len(imaging.Segmentation.Mask & curation_key) == 57
+    assert len(imaging.Segmentation.Mask & curations_key) == 57
 
-    assert len(imaging.MaskClassification.MaskType & curation_key
+    assert len(imaging.MaskClassification.MaskType & curations_key
                & 'mask_classification_method = "suite2p_default_classifier"'
                & 'mask_type = "soma"') == 27
 
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 57
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 57
-    assert len(imaging.Activity.Trace & curation_key
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 57
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 57
+    assert len(imaging.Activity.Trace & curations_key
                & 'fluo_channel = 0' & 'extraction_method = "suite2p_deconvolution"') == 57
 
-    nframes = (scan.ScanInfo & curation_key).fetch1('nframes')
-    f, fneu = (imaging.Fluorescence.Trace & curation_key
+    nframes = (scan.ScanInfo & curations_key).fetch1('nframes')
+    f, fneu = (imaging.Fluorescence.Trace & curations_key
                & 'fluo_channel = 0' & 'mask = 0').fetch1('fluorescence', 'neuropil_fluorescence')
     assert len(f) == len(fneu) == nframes
 
 
-def test_segmentation_populate_suite2p_3D(curation, pipeline, testdata_paths):
+def test_segmentation_populate_suite2p_3D(curations, pipeline, testdata_paths):
     _, _, imaging, scan, _, _, _ = pipeline
 
     rel_path = testdata_paths['suite2p_3d_a']
-    curation_key = (imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+    curations_key = (imaging.curations & f'curations_output_dir LIKE "%{rel_path}"').fetch1('KEY')
 
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    imaging.Segmentation.populate(curations_key)
+    imaging.Fluorescence.populate(curations_key)
+    imaging.Activity.populate(curations_key)
 
-    assert len(imaging.Segmentation.Mask & curation_key) == 1174
+    assert len(imaging.Segmentation.Mask & curations_key) == 1174
 
-    assert len(imaging.MaskClassification.MaskType & curation_key
+    assert len(imaging.MaskClassification.MaskType & curations_key
                & 'mask_classification_method = "suite2p_default_classifier"'
                & 'mask_type = "soma"') == 432
 
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 1174
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 1174
-    assert len(imaging.Activity.Trace & curation_key
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 1174
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 1174
+    assert len(imaging.Activity.Trace & curations_key
                & 'fluo_channel = 0' & 'extraction_method = "suite2p_deconvolution"') == 1174
 
-    nframes = (scan.ScanInfo & curation_key).fetch1('nframes')
-    f, fneu = (imaging.Fluorescence.Trace & curation_key
+    nframes = (scan.ScanInfo & curations_key).fetch1('nframes')
+    f, fneu = (imaging.Fluorescence.Trace & curations_key
                & 'fluo_channel = 0' & 'mask = 0').fetch1('fluorescence', 'neuropil_fluorescence')
     assert len(f) == len(fneu) == nframes
 
     rel_path = testdata_paths['suite2p_3d_b']
-    curation_key = (imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+    curations_key = (imaging.curations & f'curations_output_dir LIKE "%{rel_path}"').fetch1('KEY')
 
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    imaging.Segmentation.populate(curations_key)
+    imaging.Fluorescence.populate(curations_key)
+    imaging.Activity.populate(curations_key)
 
-    assert len(imaging.Segmentation.Mask & curation_key) == 6636
+    assert len(imaging.Segmentation.Mask & curations_key) == 6636
 
-    assert len(imaging.MaskClassification.MaskType & curation_key
+    assert len(imaging.MaskClassification.MaskType & curations_key
                & 'mask_classification_method = "suite2p_default_classifier"'
                & 'mask_type = "soma"') == 2910
 
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 6636
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 6636
-    assert len(imaging.Activity.Trace & curation_key
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 6636
+    assert len(imaging.Fluorescence.Trace & curations_key & 'fluo_channel = 0') == 6636
+    assert len(imaging.Activity.Trace & curations_key
                & 'fluo_channel = 0' & 'extraction_method = "suite2p_deconvolution"') == 6636
 
-    nframes = (scan.ScanInfo & curation_key).fetch1('nframes')
-    f, fneu = (imaging.Fluorescence.Trace & curation_key
+    nframes = (scan.ScanInfo & curations_key).fetch1('nframes')
+    f, fneu = (imaging.Fluorescence.Trace & curations_key
                & 'fluo_channel = 0' & 'mask = 0').fetch1('fluorescence', 'neuropil_fluorescence')
     assert len(f) == len(fneu) == nframes

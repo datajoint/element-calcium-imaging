@@ -37,11 +37,11 @@ def pipeline():
 def subjects_csv():
     """ Create a 'subjects.csv' file"""
     input_subjects = pd.DataFrame(columns=['subject', 'sex', 'subject_birth_date', 'subject_description'])
-    input_subjects.subject = ['subject1', 'subject2', 'JC015']
+    input_subjects.subject = ['subject1', 'subject2', 'subject3']
     input_subjects.sex = ['F', 'M', 'F']
     input_subjects.subject_birth_date = ['2020-01-01 00:00:01', '2020-01-01 00:00:01',
                                          '2020-01-01 00:00:01']
-    input_subjects.subject_description = ['91760', '90853', 'sbx']
+    input_subjects.subject_description = ['91760', '90853', 'sbx-JC015']
 
     subjects_csv_fp = pathlib.Path('./tests/user_data/subjects.csv')
 
@@ -67,13 +67,13 @@ def sessions_csv():
     sessions_dirs = ['U24/workflow_imaging_data/subject1/20200609_170519',
                      'U24/workflow_imaging_data/subject1/20200609_171646',
                      'U24/workflow_imaging_data/subject2/20200420_1843959',
-                     'U24/workflow_imaging_data/JC015/210107_run00_orientation_8dir']
+                     'U24/workflow_imaging_data/subject3/210107_run00_orientation_8dir']
 
     input_sessions = pd.DataFrame(columns=['subject', 'session_dir'])
     input_sessions.subject = ['subject1',
                               'subject1',
                               'subject2',
-                              'JC015']
+                              'subject3']
     input_sessions.session_dir = [(root_dir / sess_dir).as_posix() for sess_dir in sessions_dirs]
 
     sessions_csv_fp = pathlib.Path('./tests/user_data/sessions.csv')
