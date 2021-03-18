@@ -20,6 +20,12 @@
 
 + See the [datajoint-elements](https://github.com/datajoint/datajoint-elements) repository for a detailed description of the DataJoint elements and workflows.
 
+## Element validation
+
++ The following scientists have volunteered their time to validate `elements-imaging`:
+     + (Person, Lab, Institution, Acquisition system, Analysis package)
+     + 
+
 ## Element architecture
 
 ![elements imaging diagram](images/elements_imaging_diagram.svg)
