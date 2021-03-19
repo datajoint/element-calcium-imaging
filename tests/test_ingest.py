@@ -15,9 +15,10 @@ def test_ingest_sessions(pipeline, sessions_csv, ingest_sessions):
     assert len(Session()) == 4
     assert len(scan.Scan()) == 4
 
-    sess = sessions_csv.iloc[3]
+    sessions, _ = sessions_csv
+    sess = sessions.iloc[3]
     sess_dir = pathlib.Path(sess.session_dir).relative_to(get_imaging_root_data_dir())
-    assert (Session.Directory & {'subject': sess.subject}).fetch1('session_dir') == sess_dir.as_posix()
+    assert (Session.Directory & {'subject': sess.name}).fetch1('session_dir') == sess_dir.as_posix()
 
 
 def test_paramset_insert(suite2p_paramset, caiman2D_paramset, caiman3D_paramset, pipeline):

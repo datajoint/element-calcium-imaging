@@ -6,9 +6,9 @@ from .pipeline import subject, imaging, scan, Session, Equipment
 from .paths import get_imaging_root_data_dir
 
 
-def ingest_subjects():
+def ingest_subjects(subject_csv_fp='./user_data/subjects.csv'):
     # -------------- Insert new "Subject" --------------
-    with open('./user_data/subjects.csv', newline='') as f:
+    with open(subject_csv_fp, newline='') as f:
         input_subjects = list(csv.DictReader(f, delimiter=','))
 
     print(f'\n---- Insert {len(input_subjects)} entry(s) into subject.Subject ----')
@@ -17,11 +17,11 @@ def ingest_subjects():
     print('\n---- Successfully completed ingest_subjects ----')
 
 
-def ingest_sessions():
+def ingest_sessions(session_csv_fp='./user_data/sessions.csv'):
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
-    with open('./user_data/sessions.csv', newline='') as f:
+    with open(session_csv_fp, newline='') as f:
         input_sessions = list(csv.DictReader(f, delimiter=','))
 
     # Folder structure: root / subject / session / .tif (raw)
@@ -31,8 +31,10 @@ def ingest_sessions():
         sess_dir = pathlib.Path(session['session_dir'])
 
         # search for either ScanImage or ScanBox files (in that order)
-        for scan_pattern, scan_type in zip(['*.tif', '*.sbx'], ['ScanImage', 'ScanBox']):
-            scan_filepaths = [fp.as_posix() for fp in sess_dir.glob(scan_pattern)]
+        for scan_pattern, scan_type, glob_func in zip(['*.tif', '*.sbx'],
+                                                      ['ScanImage', 'ScanBox'],
+                                                      [sess_dir.glob, sess_dir.rglob]):
+            scan_filepaths = [fp.as_posix() for fp in glob_func(scan_pattern)]
             if len(scan_filepaths):
                 acq_software = scan_type
                 break

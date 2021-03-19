@@ -42,12 +42,12 @@ def subjects_csv():
     input_subjects.subject_birth_date = ['2020-01-01 00:00:01', '2020-01-01 00:00:01',
                                          '2020-01-01 00:00:01']
     input_subjects.subject_description = ['91760', '90853', 'sbx-JC015']
+    input_subjects = input_subjects.set_index('subject')
 
     subjects_csv_fp = pathlib.Path('./tests/user_data/subjects.csv')
-
     input_subjects.to_csv(subjects_csv_fp)  # write csv file
 
-    yield input_subjects
+    yield input_subjects, subjects_csv_fp
 
     subjects_csv_fp.unlink()  # delete csv file after use
 
@@ -55,7 +55,8 @@ def subjects_csv():
 @pytest.fixture
 def ingest_subjects(pipeline, subjects_csv):
     from workflow_imaging.ingest import ingest_subjects
-    ingest_subjects()
+    _, subjects_csv_fp = subjects_csv
+    ingest_subjects(subjects_csv_fp)
     return
 
 
@@ -75,12 +76,12 @@ def sessions_csv():
                               'subject2',
                               'subject3']
     input_sessions.session_dir = [(root_dir / sess_dir).as_posix() for sess_dir in sessions_dirs]
+    input_sessions = input_sessions.set_index('subject')
 
     sessions_csv_fp = pathlib.Path('./tests/user_data/sessions.csv')
-
     input_sessions.to_csv(sessions_csv_fp)  # write csv file
 
-    yield input_sessions
+    yield input_sessions, sessions_csv_fp
 
     sessions_csv_fp.unlink()  # delete csv file after use
 
@@ -88,7 +89,8 @@ def sessions_csv():
 @pytest.fixture
 def ingest_sessions(ingest_subjects, sessions_csv):
     from workflow_imaging.ingest import ingest_sessions
-    ingest_sessions()
+    _, sessions_csv_fp = sessions_csv
+    ingest_sessions(sessions_csv_fp)
     return
 
 
