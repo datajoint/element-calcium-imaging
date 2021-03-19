@@ -634,6 +634,14 @@ class Activity(dj.Computed):
         activity_trace: longblob  # 
         """
 
+    @property
+    def key_source(self):
+        suite2p_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                      & 'processing_method = "suite2p"' & 'extraction_method LIKE "suite2p%"')
+        caiman_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                     & 'processing_method = "caiman"' & 'extraction_method LIKE "caiman%"')
+        return suite2p_ks.proj() + caiman_ks.proj()
+
     def make(self, key):
         method, loaded_result = get_loader_result(key, Curation)
 
