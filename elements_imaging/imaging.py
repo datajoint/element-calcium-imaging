@@ -457,10 +457,8 @@ class MotionCorrection(dj.Imported):
             # -- summary images --
             mc_key = (scan.ScanInfo.Field * ProcessingTask & key).fetch1('KEY')
             summary_imgs.append({**mc_key,
-                                 'ref_image': loaded_miniscope_analysis.ref_image,
                                  'average_image': loaded_miniscope_analysis.average_image,
-                                 'correlation_image': loaded_miniscope_analysis.correlation_image,
-                                 'max_proj_image': loaded_miniscope_analysis.max_proj_image})
+                                 'correlation_image': loaded_miniscope_analysis.correlation_image})
 
             self.insert1({**key, 'mc_channel': loaded_miniscope_analysis.alignment_channel})
             self.Summary.insert(summary_imgs)

@@ -46,10 +46,8 @@ class MiniscopeAnalysis:
 
           # ---- Initialize Miniscope Analysis results ----
           self.params = self.mat_ms['Options']
-          self.ref_image = None
           self.average_image = self.mat_ms['meanFrame']
           self.correlation_image = self.mat_ms['CorrProj']
-          self.max_proj_image = None
           self._masks = None
 
           # ---- Metainfo ----
