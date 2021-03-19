@@ -134,7 +134,7 @@ class ProcessingTask(dj.Manual):
     """
 
     class Scan(dj.Part):
-        definition = """ the scan.Scan(s) used in this processing task
+        definition = """ # the scan.Scan(s) used in this processing task
         -> master
         -> scan.Scan
         """
@@ -154,12 +154,12 @@ class Processing(dj.Computed):
         and each scan has 5 fields, these 5 fields should be identical between the 3 scans.
         Thus, there will be a total of 5 processing fields for such ProcessingTask.
         """
-        definition = """ The field(s) to be processed
+        definition = """ # The field(s) to be processed
         processing_field_idx: int
         """
 
     class MemberField(dj.Part):
-        definition = """ The field(s) from scan.ScanInfo.Field that define one Processing.Field
+        definition = """ # The field(s) from scan.ScanInfo.Field that define one Processing.Field
         -> master.Field
         -> ProcessingTask.Scan
         -> scan.ScanInfo.Field
