@@ -30,10 +30,6 @@ def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, 
                 + get_imaging_root_data_dir() -> str
                     Retrieve the root data directory - e.g. containing all subject/sessions data
                     :return: a string for full path to the root data directory
-                + get_session_directory(session_key: dict) -> str
-                    Retrieve the session directory containing the recorded scan data for a given Session
-                    :param session_key: a dictionary of one Session `key`
-                    :return: a string for full path to the session directory
     """
 
     if isinstance(linking_module, str):
@@ -59,15 +55,6 @@ def get_imaging_root_data_dir() -> str:
     """
     return _linking_module.get_imaging_root_data_dir()
 
-
-def get_session_directory(session_key: dict) -> str:
-    """
-    get_session_directory(session_key: dict) -> str
-        Retrieve the session directory containing the recorded scan data for a given Session
-        :param session_key: a dictionary of one Session `key`
-        :return: a string for full path to the session directory
-    """
-    return _linking_module.get_session_directory(session_key)
 
 # -------------- Table declarations --------------
 
@@ -246,10 +233,10 @@ class Curation(dj.Manual):
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=''):
         """
-        A convenient function to create a new corresponding "Curation" for a particular "ClusteringTask"
+        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
         """
         if key not in Processing():
-            raise ValueError(f'No corresponding entry in Clustering available for: {key}; do `Processing.populate(key)`')
+            raise ValueError(f'No corresponding entry in Processing available for: {key}; do `Processing.populate(key)`')
 
         output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
         method, loaded_result = get_loader_result(key, ProcessingTask)
@@ -403,9 +390,11 @@ class MotionCorrection(dj.Imported):
                                      'max_proj_image': s2p.max_proj_image})
 
             self.insert1({**key, 'mc_channel': align_chn})
-            self.RigidMotionCorrection.insert1(rigid_mc)
-            self.NonRigidMotionCorrection.insert1(nonrigid_mc)
-            self.Block.insert(nonrigid_blocks.values())
+            if rigid_mc:
+                self.RigidMotionCorrection.insert1(rigid_mc)
+            if nonrigid_mc:
+                self.NonRigidMotionCorrection.insert1(nonrigid_mc)
+                self.Block.insert(nonrigid_blocks.values())
             self.Summary.insert(summary_imgs)
 
         elif method == 'caiman':
@@ -496,7 +485,9 @@ class MotionCorrection(dj.Imported):
 @schema
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
-    -> Curation    
+    -> Curation
+    ---
+    -> MotionCorrection    
     """
 
     class Mask(dj.Part):
@@ -516,6 +507,8 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
+        mc_key = (MotionCorrection & key).fetch1('KEY')
+
         method, loaded_result = get_loader_result(key, Curation)
 
         if method == 'suite2p':
@@ -539,7 +532,7 @@ class Segmentation(dj.Computed):
                         cells.append({**key, 'mask_classification_method': 'suite2p_default_classifier',
                                       'mask': mask_idx + mask_count, 'mask_type': 'soma', 'confidence': cell_prob})
 
-            self.insert1(key)
+            self.insert1({**key, **mc_key})
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
@@ -570,7 +563,7 @@ class Segmentation(dj.Computed):
                         cells.append({**key, 'mask_classification_method': 'caiman_default_classifier',
                                       'mask': mask['mask_id'], 'mask_type': 'soma'})
 
-            self.insert1(key)
+            self.insert1({**key, **mc_key})
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
@@ -695,6 +688,14 @@ class Activity(dj.Computed):
         ---
         activity_trace: longblob  # 
         """
+
+    @property
+    def key_source(self):
+        suite2p_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                      & 'processing_method = "suite2p"' & 'extraction_method LIKE "suite2p%"')
+        caiman_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                     & 'processing_method = "caiman"' & 'extraction_method LIKE "caiman%"')
+        return suite2p_ks.proj() + caiman_ks.proj()
 
     def make(self, key):
         method, loaded_result = get_loader_result(key, Curation)
