@@ -284,7 +284,7 @@ class MotionCorrection(dj.Imported):
 
             # ---- iterate through all s2p plane outputs ----
             rigid_mc, nonrigid_mc, nonrigid_blocks = {}, {}, {}
-            summary_imgs = []
+            summary_images = []
             for idx, (plane, s2p) in enumerate(loaded_suite2p.planes.items()):
                 # -- rigid motion correction --
                 if idx == 0:
@@ -333,11 +333,11 @@ class MotionCorrection(dj.Imported):
 
                 # -- summary images --
                 mc_key = (scan.ScanInfo.Field * ProcessingTask & key & field_keys[plane]).fetch1('KEY')
-                summary_imgs.append({**mc_key,
-                                     'ref_image': s2p.ref_image,
-                                     'average_image': s2p.mean_image,
-                                     'correlation_image': s2p.correlation_map,
-                                     'max_proj_image': s2p.max_proj_image})
+                summary_images.append({**mc_key,
+                                       'ref_image': s2p.ref_image,
+                                       'average_image': s2p.mean_image,
+                                       'correlation_image': s2p.correlation_map,
+                                       'max_proj_image': s2p.max_proj_image})
 
             self.insert1({**key, 'mc_channel': align_chn})
             if rigid_mc:
@@ -345,7 +345,7 @@ class MotionCorrection(dj.Imported):
             if nonrigid_mc:
                 self.NonRigidMotionCorrection.insert1(nonrigid_mc)
                 self.Block.insert(nonrigid_blocks.values())
-            self.Summary.insert(summary_imgs)
+            self.Summary.insert(summary_images)
 
         elif method == 'caiman':
             loaded_caiman = loaded_result
@@ -409,17 +409,17 @@ class MotionCorrection(dj.Imported):
 
             # -- summary images --
             field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
-            summary_imgs = [{**key, **fkey, 'ref_image': ref_image,
-                             'average_image': ave_img,
-                             'correlation_image': corr_img,
-                             'max_proj_image': max_img}
-                            for fkey, ref_image, ave_img, corr_img, max_img in zip(
+            summary_images = [{**key, **fkey, 'ref_image': ref_image,
+                               'average_image': ave_img,
+                               'correlation_image': corr_img,
+                               'max_proj_image': max_img}
+                              for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
                     loaded_caiman.motion_correction['reference_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['reference_image'][...][np.newaxis, ...],
                     loaded_caiman.motion_correction['average_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['average_image'][...][np.newaxis, ...],
                     loaded_caiman.motion_correction['correlation_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['correlation_image'][...][np.newaxis, ...],
                     loaded_caiman.motion_correction['max_image'].transpose(2, 0, 1) if is3D else loaded_caiman.motion_correction['max_image'][...][np.newaxis, ...])]
-            self.Summary.insert(summary_imgs)
+            self.Summary.insert(summary_images)
 
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
@@ -636,11 +636,11 @@ class Activity(dj.Computed):
 
     @property
     def key_source(self):
-        suite2p_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
-                      & 'processing_method = "suite2p"' & 'extraction_method LIKE "suite2p%"')
-        caiman_ks = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
-                     & 'processing_method = "caiman"' & 'extraction_method LIKE "caiman%"')
-        return suite2p_ks.proj() + caiman_ks.proj()
+        suite2p_key_source = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                              & 'processing_method = "suite2p"' & 'extraction_method LIKE "suite2p%"')
+        caiman_key_source = (Fluorescence * ActivityExtractionMethod * ProcessingParamSet.proj('processing_method')
+                             & 'processing_method = "caiman"' & 'extraction_method LIKE "caiman%"')
+        return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
         method, loaded_result = get_loader_result(key, Curation)
