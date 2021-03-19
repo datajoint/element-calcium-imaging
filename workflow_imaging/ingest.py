@@ -25,8 +25,7 @@ def ingest_sessions():
         input_sessions = list(csv.DictReader(f, delimiter=','))
 
     # Folder structure: root / subject / session / .tif (raw)
-    sessions, scans, scanners = [], [], []
-    session_directories, processing_tasks = [], []
+    sessions, session_directories, scans, scanners = [], [], [], []
 
     for session in input_sessions:
         sess_dir = pathlib.Path(session['session_dir'])
