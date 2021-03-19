@@ -28,7 +28,7 @@
 
 ## Element architecture
 
-![elements imaging diagram](images/elements_imaging_diagram.svg)
+![elements imaging diagram](images/attached_imaging_element.svg)
 
 + As the diagram depicts, `elements-imaging` starts immediately downstream from `Session`, and also requires some notion of:
 

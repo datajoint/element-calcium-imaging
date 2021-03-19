@@ -9,9 +9,25 @@ _suite2p_ftypes = ('ops', 'Fneu', 'Fneu_chan2', 'F', 'F_chan2', 'iscell', 'spks'
 
 class Suite2p:
     """
-    Wraper class containing all suite2p outputs from one suite2p analysis routine.
+    Wrapper class containing all suite2p outputs from one suite2p analysis routine.
     This includes outputs from the individual plane, with plane indexing starting from 0
     Plane index of -1 indicates a suite2p "combined" outputs from all planes, thus saved in the "planes_combined" attribute
+
+    A 'suite2p_dir' example:
+
+        -- suite2p_dir
+          -- plane0
+             -- ops.npy
+             -- F.npy
+             -- ...
+          -- plane1
+             -- ops.npy
+             -- F.npy
+             -- ...
+          -- combined
+             -- ops.npy
+             -- F.npy
+             -- ...
     """
 
     def __init__(self, suite2p_dir):
