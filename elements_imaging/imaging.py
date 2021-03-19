@@ -155,6 +155,7 @@ class Processing(dj.Computed):
         Thus, there will be a total of 5 processing fields for such ProcessingTask.
         """
         definition = """ # The field(s) to be processed
+        -> master
         processing_field_idx: int
         """
 
