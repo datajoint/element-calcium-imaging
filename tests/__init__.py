@@ -99,10 +99,10 @@ def testdata_paths():
     return {
         'scanimage_2d': 'subject1/20200609_171646',
         'scanimage_3d': 'subject2/20200420_1843959',
-        'scanbox_3d': 'JC015/210107_run00_orientation_8dir',
+        'scanbox_3d': 'subject3/210107_run00_orientation_8dir',
         'suite2p_2d': 'subject1/20200609_171646/suite2p',
         'suite2p_3d_a': 'subject2/20200420_1843959/suite2p',
-        'suite2p_3d_b': 'JC015/210107_run00_orientation_8dir/suite2p',
+        'suite2p_3d_b': 'subject3/210107_run00_orientation_8dir/suite2p',
         'caiman_2d': 'subject1/20200609_170519/caiman'
     }
 
@@ -624,13 +624,13 @@ def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_par
 
 @pytest.fixture
 def processing(processing_tasks, pipeline):
-    _, _, ephys, _, _, _, _ = pipeline
+    _, _, imaging, _, _, _, _ = pipeline
 
-    ephys.Processing.populate()
+    imaging.Processing.populate()
 
     yield
 
-    ephys.Processing.delete()
+    imaging.Processing.delete()
 
 
 @pytest.fixture
