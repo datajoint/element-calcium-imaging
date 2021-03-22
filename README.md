@@ -1,6 +1,7 @@
-# Workflow for calcium imaging data acquired with ScanImage, ScanBox, or Miniscope-DAQ software and analyzed with Suite2p, CaImAn, or Miniscope Analysis
+# DataJoint Workflow - Calcium Imaging
+Workflow for calcium imaging data acquired with ScanImage or ScanBox software and analyzed with Suite2p or CaImAn
 
-A complete imaging workflow can be built using the DataJoint elements:
+A complete `workflow-imaging` can be built using the DataJoint elements:
 + [elements-lab](https://github.com/datajoint/elements-lab)
 + [elements-animal](https://github.com/datajoint/elements-animal)
 + [elements-imaging](https://github.com/datajoint/elements-imaging)
@@ -17,7 +18,7 @@ This repository provides demonstrations for:
 
 ## Workflow architecture
 
-The Calcium imaging workflow presented here uses components from three DataJoint elements, 
+The calcium imaging workflow presented here uses components from three DataJoint elements, 
 `elements-lab`, `elements-animal` and `elements-imaging`, assembled together to form a fully functional workflow.
 
 ### elements-lab
