@@ -4,14 +4,16 @@ from datetime import datetime
 from collections import OrderedDict
 
 
-_suite2p_ftypes = ('ops', 'Fneu', 'Fneu_chan2', 'F', 'F_chan2', 'iscell', 'spks', 'stat', 'redcell')
+_suite2p_ftypes = ('ops', 'Fneu', 'Fneu_chan2', 'F', 'F_chan2',
+                   'iscell', 'spks', 'stat', 'redcell')
 
 
 class Suite2p:
     """
     Wrapper class containing all suite2p outputs from one suite2p analysis routine.
     This includes outputs from the individual plane, with plane indexing starting from 0
-    Plane index of -1 indicates a suite2p "combined" outputs from all planes, thus saved in the "planes_combined" attribute
+    Plane index of -1 indicates a suite2p "combined" outputs from all planes,
+     thus saved in the "planes_combined" attribute
 
     A 'suite2p_dir' example:
 
@@ -36,7 +38,8 @@ class Suite2p:
         ops_filepaths = list(self.suite2p_dir.rglob('*ops.npy'))
 
         if not len(ops_filepaths):
-            raise FileNotFoundError('Suite2p output result files not found at {}'.format(suite2p_dir))
+            raise FileNotFoundError(
+                'Suite2p output result files not found at {}'.format(suite2p_dir))
 
         self.planes = {}
         self.planes_combined = None
@@ -75,12 +78,14 @@ class PlaneSuite2p:
         # ---- Verify dataset exists ----
         ops_fp = self.fpath / 'ops.npy'
         if not ops_fp.exists():
-            raise FileNotFoundError('No "ops.npy" found. Invalid suite2p plane folder: {}'.format(self.fpath))
+            raise FileNotFoundError(
+                'No "ops.npy" found. Invalid suite2p plane folder: {}'.format(self.fpath))
         self.creation_time = datetime.fromtimestamp(ops_fp.stat().st_ctime)
 
         iscell_fp = self.fpath / 'iscell.npy'
         if not iscell_fp.exists():
-            raise FileNotFoundError('No "iscell.npy" found. Invalid suite2p plane folder: {}'.format(self.fpath))
+            raise FileNotFoundError(
+                'No "iscell.npy" found. Invalid suite2p plane folder: {}'.format(self.fpath))
         self.curation_time = datetime.fromtimestamp(iscell_fp.stat().st_ctime)
 
         # ---- Initialize attributes ----
@@ -88,7 +93,8 @@ class PlaneSuite2p:
             setattr(self, '_{}'.format(s2p_type), None)
         self._cell_prob = None
 
-        self.plane_idx = -1 if self.fpath.name == 'combined' else int(self.fpath.name.replace('plane', ''))
+        self.plane_idx = (-1 if self.fpath.name == 'combined'
+                          else int(self.fpath.name.replace('plane', '')))
 
     # ---- load core files ----
 
