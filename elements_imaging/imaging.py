@@ -550,6 +550,10 @@ class Segmentation(dj.Computed):
     -> MotionCorrection    
     """
 
+    @property
+    def key_source(self):
+        return Curation & MotionCorrection
+
     class Mask(dj.Part):
         definition = """ # A mask produced by segmentation.
         -> master
@@ -565,6 +569,8 @@ class Segmentation(dj.Computed):
         mask_zpix       : longblob  # z coordinates in pixels        
         mask_weights    : longblob  # weights of the mask at the indices above
         """
+
+
 
     def make(self, key):
         motion_correction_key = (MotionCorrection & key).fetch1('KEY')
