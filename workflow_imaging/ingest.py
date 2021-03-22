@@ -6,9 +6,9 @@ from .pipeline import subject, imaging, scan, Session, Equipment
 from .paths import get_imaging_root_data_dir
 
 
-def ingest_subjects(subject_csv_fp='./user_data/subjects.csv'):
+def ingest_subjects(subject_csv_path='./user_data/subjects.csv'):
     # -------------- Insert new "Subject" --------------
-    with open(subject_csv_fp, newline='') as f:
+    with open(subject_csv_path, newline= '') as f:
         input_subjects = list(csv.DictReader(f, delimiter=','))
 
     print(f'\n---- Insert {len(input_subjects)} entry(s) into subject.Subject ----')
@@ -17,11 +17,11 @@ def ingest_subjects(subject_csv_fp='./user_data/subjects.csv'):
     print('\n---- Successfully completed ingest_subjects ----')
 
 
-def ingest_sessions(session_csv_fp='./user_data/sessions.csv'):
+def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
-    with open(session_csv_fp, newline='') as f:
+    with open(session_csv_path, newline= '') as f:
         input_sessions = list(csv.DictReader(f, delimiter=','))
 
     # Folder structure: root / subject / session / .tif (raw)

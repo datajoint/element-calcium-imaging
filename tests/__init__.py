@@ -16,8 +16,10 @@ def dj_config():
     dj.config.load('./dj_local_conf.json')
     dj.config['safemode'] = False
     dj.config['custom'] = {
-        'database.prefix': os.environ.get('DATABASE_PREFIX', dj.config['custom']['database.prefix']),
-        'imaging_root_data_dir': os.environ.get('IMAGING_ROOT_DATA_DIR', dj.config['custom']['imaging_root_data_dir'])
+        'database.prefix': os.environ.get('DATABASE_PREFIX',
+                                          dj.config['custom']['database.prefix']),
+        'imaging_root_data_dir': os.environ.get('IMAGING_ROOT_DATA_DIR',
+                                                dj.config['custom']['imaging_root_data_dir'])
     }
     return
 
@@ -26,9 +28,13 @@ def dj_config():
 def pipeline():
     from workflow_imaging import pipeline
 
-    yield (pipeline.subject, pipeline.lab, pipeline.imaging,
-           pipeline.scan, pipeline.Session, pipeline.Equipment,
-           pipeline.get_imaging_root_data_dir)
+    yield {'subject': pipeline.subject,
+           'lab': pipeline.lab,
+           'imaging': pipeline.imaging,
+           'scan': pipeline.scan,
+           'Session': pipeline.Session,
+           'Equipment': pipeline.Equipment,
+           'get_imaging_root_data_dir': pipeline.get_imaging_root_data_dir}
 
     pipeline.subject.Subject.delete()
 
@@ -36,7 +42,9 @@ def pipeline():
 @pytest.fixture
 def subjects_csv():
     """ Create a 'subjects.csv' file"""
-    input_subjects = pd.DataFrame(columns=['subject', 'sex', 'subject_birth_date', 'subject_description'])
+    input_subjects = pd.DataFrame(columns=['subject', 'sex',
+                                           'subject_birth_date',
+                                           'subject_description'])
     input_subjects.subject = ['subject1', 'subject2', 'subject3']
     input_subjects.sex = ['F', 'M', 'F']
     input_subjects.subject_birth_date = ['2020-01-01 00:00:01', '2020-01-01 00:00:01',
@@ -44,19 +52,19 @@ def subjects_csv():
     input_subjects.subject_description = ['91760', '90853', 'sbx-JC015']
     input_subjects = input_subjects.set_index('subject')
 
-    subjects_csv_fp = pathlib.Path('./tests/user_data/subjects.csv')
-    input_subjects.to_csv(subjects_csv_fp)  # write csv file
+    subjects_csv_path = pathlib.Path('./tests/user_data/subjects.csv')
+    input_subjects.to_csv(subjects_csv_path)  # write csv file
 
-    yield input_subjects, subjects_csv_fp
+    yield input_subjects, subjects_csv_path
 
-    subjects_csv_fp.unlink()  # delete csv file after use
+    subjects_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
 def ingest_subjects(pipeline, subjects_csv):
     from workflow_imaging.ingest import ingest_subjects
-    _, subjects_csv_fp = subjects_csv
-    ingest_subjects(subjects_csv_fp)
+    _, subjects_csv_path = subjects_csv
+    ingest_subjects(subjects_csv_path)
     return
 
 
@@ -75,22 +83,23 @@ def sessions_csv():
                               'subject1',
                               'subject2',
                               'subject3']
-    input_sessions.session_dir = [(root_dir / sess_dir).as_posix() for sess_dir in sessions_dirs]
+    input_sessions.session_dir = [(root_dir / sess_dir).as_posix()
+                                  for sess_dir in sessions_dirs]
     input_sessions = input_sessions.set_index('subject')
 
-    sessions_csv_fp = pathlib.Path('./tests/user_data/sessions.csv')
-    input_sessions.to_csv(sessions_csv_fp)  # write csv file
+    sessions_csv_path = pathlib.Path('./tests/user_data/sessions.csv')
+    input_sessions.to_csv(sessions_csv_path)  # write csv file
 
-    yield input_sessions, sessions_csv_fp
+    yield input_sessions, sessions_csv_path
 
-    sessions_csv_fp.unlink()  # delete csv file after use
+    sessions_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
 def ingest_sessions(ingest_subjects, sessions_csv):
     from workflow_imaging.ingest import ingest_sessions
-    _, sessions_csv_fp = sessions_csv
-    ingest_sessions(sessions_csv_fp)
+    _, sessions_csv_path = sessions_csv
+    ingest_sessions(sessions_csv_path)
     return
 
 
@@ -109,7 +118,7 @@ def testdata_paths():
 
 @pytest.fixture
 def suite2p_paramset(pipeline):
-    _, _, imaging, _, _, _, _ = pipeline
+    imaging = pipeline['imaging']
 
     params_suite2p = {'look_one_level_down': 0.0,
                       'fast_disk': [],
@@ -175,7 +184,8 @@ def suite2p_paramset(pipeline):
 
     # doing the insert here as well, since most of the test will require this paramset inserted
     imaging.ProcessingParamSet.insert_new_params(
-        'suite2p', 0, 'Calcium imaging analysis with Suite2p using default Suite2p parameters', params_suite2p)
+        'suite2p', 0, 'Calcium imaging analysis with'
+                      ' Suite2p using default Suite2p parameters', params_suite2p)
 
     yield params_suite2p
 
@@ -184,7 +194,7 @@ def suite2p_paramset(pipeline):
 
 @pytest.fixture
 def caiman2D_paramset(pipeline):
-    _, _, imaging, _, _, _, _ = pipeline
+    imaging = pipeline['imaging']
 
     params_caiman_2d = {'fnames': None,
                         'dims': None,
@@ -375,7 +385,8 @@ def caiman2D_paramset(pipeline):
                         'reuse_model': False}
 
     imaging.ProcessingParamSet.insert_new_params(
-        'caiman', 1, 'Calcium imaging analysis with CaImAn using default CaImAn parameters for 2d planar images',
+        'caiman', 1, 'Calcium imaging analysis with'
+                     ' CaImAn using default CaImAn parameters for 2d planar images',
         params_caiman_2d)
 
     yield params_caiman_2d
@@ -385,7 +396,7 @@ def caiman2D_paramset(pipeline):
 
 @pytest.fixture
 def caiman3D_paramset(pipeline):
-    _, _, imaging, _, _, _, _ = pipeline
+    imaging = pipeline['imaging']
 
     params_caiman_3d = {'fnames': None,
                         'dims': None,
@@ -576,7 +587,8 @@ def caiman3D_paramset(pipeline):
                         'reuse_model': False}
 
     imaging.ProcessingParamSet.insert_new_params(
-        'caiman', 2, 'Calcium imaging analysis with CaImAn using default CaImAn parameters for 3d volumetric images',
+        'caiman', 2, 'Calcium imaging analysis with'
+                     ' CaImAn using default CaImAn parameters for 3d volumetric images',
         params_caiman_3d)
 
     yield params_caiman_3d
@@ -586,7 +598,7 @@ def caiman3D_paramset(pipeline):
 
 @pytest.fixture
 def scan_info(pipeline, ingest_sessions):
-    _, _, _, scan, _, _, _ = pipeline
+    scan = pipeline['scan']
 
     scan.ScanInfo.populate()
 
@@ -597,7 +609,9 @@ def scan_info(pipeline, ingest_sessions):
 
 @pytest.fixture
 def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_paramset, scan_info):
-    _, _, imaging, scan, _, _, get_ephys_root_data_dir = pipeline
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+    get_imaging_root_data_dir = pipeline['get_imaging_root_data_dir']
 
     root_dir = pathlib.Path(get_imaging_root_data_dir())
     for scan_key in (scan.Scan & scan.ScanInfo - imaging.ProcessingTask).fetch('KEY'):
@@ -624,7 +638,7 @@ def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_par
 
 @pytest.fixture
 def processing(processing_tasks, pipeline):
-    _, _, imaging, _, _, _, _ = pipeline
+    imaging = pipeline['imaging']
 
     imaging.Processing.populate()
 
@@ -635,7 +649,7 @@ def processing(processing_tasks, pipeline):
 
 @pytest.fixture
 def curations(processing, pipeline):
-    _, _, imaging, _, _, _, _ = pipeline
+    imaging = pipeline['imaging']
 
     for key in (imaging.ProcessingTask - imaging.Curation).fetch('KEY'):
         imaging.Curation().create1_from_processing_task(key)

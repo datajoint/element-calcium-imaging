@@ -4,7 +4,11 @@ from . import (dj_config, pipeline, subjects_csv, ingest_subjects, sessions_csv,
 
 
 def test_generate_pipeline(pipeline):
-    subject, _, imaging, scan, Session, Equipment, _ = pipeline
+    subject = pipeline['subject']
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+    Session = pipeline['Session']
+    Equipment = pipeline['Equipment']
 
     subject_tbl, *_ = Session.parents(as_objects=True)
 
