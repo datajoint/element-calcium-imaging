@@ -103,7 +103,7 @@ def process_scanimage_tiff(scan_filenames, output_dir='./'):
     from skimage.external.tifffile import imsave
     import scanreader
 
-    # ============ CaImAn multi-channel multi-plane tiff file ==============
+    # ------------ CaImAn multi-channel multi-plane tiff file ------------
     for scan_filename in tqdm(scan_filenames):
         scan = scanreader.read_scan(scan_filename)
         cm_movie = cm.load(scan_filename)
