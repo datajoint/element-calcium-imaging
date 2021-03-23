@@ -14,7 +14,7 @@ schema = dj.schema()
 _linking_module = None
 
 
-def activate(imaging_schema_name,  *, scan_schema_name=None,
+def activate(imaging_schema_name, scan_schema_name=None, *,
              create_schema=True, create_tables=True, linking_module=None):
     """
     activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
