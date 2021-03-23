@@ -9,7 +9,7 @@ This modular element can be flexibly attached downstream to
 any particular design of experiment session, thus assembling 
 a fully functional calcium imaging workflow.
 
-For background and development progess, see [here](./Background.md).
+See [Background](Background.md) for the background information and development timeline.
 
 ## Element architecture
 
