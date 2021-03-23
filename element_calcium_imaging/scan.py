@@ -15,11 +15,11 @@ _linking_module = None
 def activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
-        :param scan_schema_name: schema name on the database server to activate the `scan` element
+        :param scan_schema_name: schema name on the database server to activate the `scan` module
         :param create_schema: when True (default), create schema in the database if it does not yet exist.
         :param create_tables: when True (default), create tables in the database if they do not yet exist.
         :param linking_module: a module name or a module containing the
-         required dependencies to activate the `scan` element:
+         required dependencies to activate the `scan` module:
             Upstream tables:
                 + Session: parent table to Scan, typically identifying a recording session
                 + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
@@ -51,7 +51,7 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
 
 
-# -------------- Functions required by the elements-imaging  ---------------
+# -------------- Functions required by the element-calcium-imaging  ---------------
 
 
 def get_imaging_root_data_dir() -> str:
