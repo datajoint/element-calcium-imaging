@@ -1,30 +1,15 @@
-# DataJoint Element - Calcium Imaging
+# DataJoint Element - Functional Calcium Imaging
+This repository features DataJoint pipeline design for functional Calcium imaging, 
+with `ScanImage` or `ScanBox` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
 
-+ `elements-imaging` features a DataJoint pipeline design for functional calcium imaging.
+The element presented here is not a complete workflow by itself,
+ but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
 
-+ `elements-imaging` supports the following acquisition systems:
-     + `ScanImage`
-     + `Scanbox`
+This modular element can be flexibly attached downstream to 
+any particular design of experiment session, thus assembling 
+a fully functional calcium imaging workflow.
 
-+ `elements-imaging` supports the following analysis tools:
-     + [Suite2p](https://github.com/MouseLand/suite2p)
-     + [CaImAn](https://github.com/flatironinstitute/CaImAn)
-
-+ `elements-imaging` is not a complete workflow by itself, but rather a modular design of tables and dependencies specific to the functional calcium imaging workflow. 
-
-+ `elements-imaging` can be flexibly attached downstream to any particular design of experiment session, thus assembling a fully functional calcium imaging workflow.
-
-## Element usage
-
-+ See the [workflow-imaging](https://github.com/datajoint/workflow-imaging) repository for an example usage of `elements-imaging`.
-
-+ See the [datajoint-elements](https://github.com/datajoint/datajoint-elements) repository for a detailed description of the DataJoint elements and workflows.
-
-## Element validation
-
-+ The following scientists have volunteered their time to validate `elements-imaging`:
-     + (Person, Lab, Institution, Acquisition system, Analysis package)
-     + 
+See [Background](Background.md) for the background information and development timeline.
 
 ## Element architecture
 
@@ -75,3 +60,8 @@
 + `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
+
+## Element usage
+
++ See [workflow-calcium-imaging](https://github.com/datajoint/workflow-calcium-imaging) 
+repository for an example usage of `element-calcium-imaging`.

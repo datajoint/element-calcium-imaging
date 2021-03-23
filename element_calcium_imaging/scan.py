@@ -15,11 +15,11 @@ _linking_module = None
 def activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
-        :param scan_schema_name: schema name on the database server to activate the `scan` element
+        :param scan_schema_name: schema name on the database server to activate the `scan` module
         :param create_schema: when True (default), create schema in the database if it does not yet exist.
         :param create_tables: when True (default), create tables in the database if they do not yet exist.
         :param linking_module: a module name or a module containing the
-         required dependencies to activate the `scan` element:
+         required dependencies to activate the `scan` module:
             Upstream tables:
                 + Session: parent table to Scan, typically identifying a recording session
                 + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
@@ -44,7 +44,8 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
 
     if isinstance(linking_module, str):
         linking_module = importlib.import_module(linking_module)
-    assert inspect.ismodule(linking_module), "The argument 'dependency' must be a module's name or a module"
+    assert inspect.ismodule(linking_module),\
+        "The argument 'dependency' must be a module's name or a module"
 
     global _linking_module
     _linking_module = linking_module
@@ -54,7 +55,7 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
 
 
-# -------------- Functions required by the elements-imaging  ---------------
+# -------------- Functions required by the element-calcium-imaging  ---------------
 
 
 def get_imaging_root_data_dir() -> str:
@@ -94,7 +95,7 @@ def get_miniscope_daq_file(scan_key: dict) -> str:
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of software used for acquisition of the scans - e.g. ScanImage, ScanBox
+    definition = """  # Name of acquisition software - e.g. ScanImage, ScanBox
     acq_software: varchar(24)    
     """
     contents = zip(['ScanImage', 'ScanBox', 'Miniscope-DAQ'])
@@ -137,33 +138,33 @@ class ScanInfo(dj.Imported):
     definition = """ # general data about the reso/meso scans, from ScanImage header
     -> Scan
     ---
-    nfields                 : tinyint           # number of fields
-    nchannels               : tinyint           # number of channels
-    ndepths                 : int               # Number of scanning depths (planes)
-    nframes                 : int               # number of recorded frames
-    nrois                   : tinyint           # number of ROIs (see scanimage's multi ROI imaging)
-    x                       : float             # (um) ScanImage's 0 point in the motor coordinate system
-    y                       : float             # (um) ScanImage's 0 point in the motor coordinate system
-    z                       : float             # (um) ScanImage's 0 point in the motor coordinate system
-    fps                     : float             # (Hz) frames per second - Volumetric Scan Rate 
-    bidirectional           : boolean           # true = bidirectional scanning
-    usecs_per_line=null     : float             # microseconds per scan line
-    fill_fraction=null      : float             # raster scan temporal fill fraction (see scanimage)
+    nfields              : tinyint   # number of fields
+    nchannels            : tinyint   # number of channels
+    ndepths              : int       # Number of scanning depths (planes)
+    nframes              : int       # number of recorded frames
+    nrois                : tinyint   # number of ROIs (see scanimage's multi ROI imaging)
+    x                    : float     # (um) ScanImage's 0 point in the motor coordinate system
+    y                    : float     # (um) ScanImage's 0 point in the motor coordinate system
+    z                    : float     # (um) ScanImage's 0 point in the motor coordinate system
+    fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
+    bidirectional        : boolean   # true = bidirectional scanning
+    usecs_per_line=null  : float     # microseconds per scan line
+    fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
     """
 
     class Field(dj.Part):
         definition = """ # field-specific scan information
         -> master
-        field_idx           : int
+        field_idx         : int
         ---
-        px_height           : smallint      # height in pixels
-        px_width            : smallint      # width in pixels
-        um_height=null      : float         # height in microns
-        um_width=null       : float         # width in microns
-        field_x             : float         # (um) center of field in the motor coordinate system
-        field_y             : float         # (um) center of field in the motor coordinate system
-        field_z             : float         # (um) relative depth of field
-        delay_image=null    : longblob      # (ms) delay between the start of the scan and pixels in this field
+        px_height         : smallint  # height in pixels
+        px_width          : smallint  # width in pixels
+        um_height=null    : float     # height in microns
+        um_width=null     : float     # width in microns
+        field_x           : float     # (um) center of field in the motor coordinate system
+        field_y           : float     # (um) center of field in the motor coordinate system
+        field_z           : float     # (um) relative depth of field
+        delay_image=null  : longblob  # (ms) delay between the start of the scan and pixels in this field
         """
 
     class ScanFile(dj.Part):
@@ -233,12 +234,14 @@ class ScanInfo(dj.Imported):
             is_multiROI = bool(sbx_matinfo.mesoscope.enabled)  # currently not handling "multiROI" ingestion
 
             if is_multiROI:
-                raise NotImplementedError('Loading routine not implemented for ScanBox multiROI scan mode')
+                raise NotImplementedError(
+                    'Loading routine not implemented for ScanBox multiROI scan mode')
 
             # Insert in ScanInfo
             x_zero, y_zero, z_zero = sbx_meta['stage_pos'] 
             self.insert1(dict(key,
-                              nfields=sbx_meta['num_fields'] if is_multiROI else sbx_meta['num_planes'],
+                              nfields=sbx_meta['num_fields']
+                              if is_multiROI else sbx_meta['num_planes'],
                               nchannels=sbx_meta['num_channels'],
                               nframes=sbx_meta['num_frames'],
                               ndepths=sbx_meta['num_planes'],
@@ -255,8 +258,10 @@ class ScanInfo(dj.Imported):
                                         field_idx=plane_idx,
                                         px_height=px_height,
                                         px_width=px_width,
-                                        um_height=px_height * sbx_meta['um_per_pixel_y'] if sbx_meta['um_per_pixel_y'] else None,
-                                        um_width=px_width * sbx_meta['um_per_pixel_x'] if sbx_meta['um_per_pixel_x'] else None,
+                                        um_height=px_height * sbx_meta['um_per_pixel_y']
+                                        if sbx_meta['um_per_pixel_y'] else None,
+                                        um_width=px_width * sbx_meta['um_per_pixel_x']
+                                        if sbx_meta['um_per_pixel_x'] else None,
                                         field_x=x_zero,
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
@@ -286,7 +291,8 @@ class ScanInfo(dj.Imported):
                                    px_height=frame[0], 
                                    px_width=frame[1]))
         else:
-            raise NotImplementedError(f'Loading routine not implemented for {acq_software} acquisition software')
+            raise NotImplementedError(
+                f'Loading routine not implemented for {acq_software} acquisition software')
 
         # Insert file(s)
         root = pathlib.Path(get_imaging_root_data_dir())
