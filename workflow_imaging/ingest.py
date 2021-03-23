@@ -32,7 +32,7 @@ def ingest_sessions():
         acq_software = None
         recording_time = None
         # search for either ScanImage, ScanBox, or Miniscope-DAQ files (in that order)
-        for scan_pattern, scan_type in zip(['*.tif', '*.sbx', '*.json'], ['ScanImage', 'ScanBox', 'Miniscope-DAQ']):
+        for scan_pattern, scan_type in zip(['*.tif', '*.sbx'], ['ScanImage', 'ScanBox']):
             scan_filepaths = [fp.as_posix() for fp in sess_dir.glob(scan_pattern)]
             if len(scan_filepaths):
                 acq_software = scan_type
@@ -59,18 +59,6 @@ def ingest_sessions():
             except Exception as e:
                 print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
                 continue
-        elif acq_software == 'Miniscope-DAQ':
-            import json
-            for fp in sess_dir.glob('*.json'): # Read Miniscope-DAQ file (.json)
-                with open(fp) as config_file:
-                    miniscope_daq_meta = json.load(config_file)
-                if 'directoryStructure' in miniscope_daq_meta:
-                    try:
-                        recording_time = miniscope_daq_meta['directoryStructure']['date'] + miniscope_daq_meta['directoryStructure']['time'] # TODO: format as datetime
-                        scanner = miniscope_daq_meta['devices']['miniscopes']['miniscopeDeviceName']['deviceType']
-                        break
-                    except Exception as e:
-                        print(f'Miniscope-DAQ loading error: {scan_filepaths}\n{str(e)}')
 
         session_key = {'subject': session['subject'], 'session_datetime': recording_time}
         if session_key not in Session:
