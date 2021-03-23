@@ -262,40 +262,29 @@ class ScanInfo(dj.Imported):
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
 
-        elif acq_software == 'Miniscope-DAQ':
-            import json
-            # Read configuration file (.json)
-            scan_meta_filepath = get_miniscope_daq_file(key)
-            with open(scan_meta_filepath) as config_file:
-                miniscope_daq_meta = json.load(config_file)
+        elif acq_software == 'Miniscope-DAQ-V3':
+            import cv2
+            scan_filepaths = get_miniscope_daq_file(key)
+            video = cv2.VideoCapture(scan_filepaths)
+            fps = video.get(cv2.CAP_PROP_FPS) # TODO: Verify correct value
+            ret, frame = video.read()
+            print(np.shape(frame))# TODO: Verify correct order
 
             # Insert in ScanInfo
             self.insert1(dict(key,
-                              nfields=, # TODO
-                              nchannels=, # TODO
-                              nframes=, # TODO
-                              ndepths=, # TODO
-                              x=, # TODO
-                              y=, # TODO
-                              z=, # TODO
-                              fps=float(miniscope_daq_meta['devices']['miniscopes']['miniscopeDeviceName']['frameRate'].replace('FPS', '')),
-                              bidirectional=False, # TODO: correct for all miniscopes?
-                              usecs_per_line=, # TODO: remove?
-                              fill_fraction=, # TODO: remove?
-                              nrois=0)) # TODO: correct for all miniscopes?
+                              nfields=1,
+                              nchannels=1,
+                              nframes=, # TODO: extract from timestamps.dat and count how many frames for cam 0.
+                              ndepths=1,
+                              fps=fps,
+                              bidirectional=False,
+                              nrois=0))
 
             # Insert Field(s)
-            self.Field.insert([dict(key,
-                                    field_idx=plane_idx, # TODO: 0, or are multiple depths possible?
-                                    px_height=, # TODO
-                                    px_width=, # TODO
-                                    um_height=, # TODO
-                                    um_width=, # TODO
-                                    field_x=, # TODO
-                                    field_y=, # TODO
-                                    field_z=, # TODO
-                                    delay_image=) # TODO
-                                for plane_idx in range(num_scanning_depths)]) # TODO: 1, or are multiple depths possible?
+            self.Field.insert(dict(key,
+                                   field_idx=0, 
+                                   px_height=frame[0], 
+                                   px_width=frame[1]))
         else:
             raise NotImplementedError(f'Loading routine not implemented for {acq_software} acquisition software')
 
