@@ -1,10 +1,12 @@
 import datajoint as dj
-from elements_animal import subject
-from elements_lab import lab
-from elements_imaging import scan, imaging
+from element_animal import subject
+from element_lab import lab
+from element_session import session
+from element_calcium_imaging import scan, imaging
 
-
-from elements_lab.lab import Source, Lab, Protocol, User, Location
+from element_lab.lab import Source, Lab, Protocol, User, Location, Project
+from element_animal.subject import Subject
+from element_session.session import Session
 
 from .paths import (get_imaging_root_data_dir,
                     get_scan_image_files, get_scan_box_files)
@@ -16,34 +18,18 @@ if 'custom' not in dj.config:
 db_prefix = dj.config['custom'].get('database.prefix', '')
 
 
-# ------------- Activate "lab" and "subject" schema -------------
+# ------------- Activate "lab", "subject", "session" schema -------------
 
 lab.activate(db_prefix + 'lab')
 
 subject.activate(db_prefix + 'subject', linking_module=__name__)
 
+session.activate(db_prefix + 'session', linking_module=__name__)
 
-# ------------- Declare tables Session and Equipment for use in elements_imaging -------------
-
-schema = dj.schema(db_prefix + 'experiment')
-
-
-@schema
-class Session(dj.Manual):
-    definition = """
-    -> subject.Subject
-    session_datetime: datetime(3)
-    """
-
-    class Directory(dj.Part):
-        definition = """
-        -> master
-        ---
-        session_dir: varchar(256)       # Relative path, relative to the `imaging_root_data_dir`
-        """
+# ------------- Declare table Equipment for use in element_calcium_imaging -------------
 
 
-@schema
+@lab.schema
 class Equipment(dj.Manual):
     definition = """
     scanner: varchar(32) 

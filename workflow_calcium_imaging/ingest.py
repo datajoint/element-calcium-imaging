@@ -2,7 +2,7 @@ import pathlib
 import csv
 from datetime import datetime
 
-from .pipeline import subject, imaging, scan, Session, Equipment
+from .pipeline import subject, imaging, scan, session, Equipment
 from .paths import get_imaging_root_data_dir
 
 
@@ -25,10 +25,10 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
         input_sessions = list(csv.DictReader(f, delimiter=','))
 
     # Folder structure: root / subject / session / .tif (raw)
-    sessions, session_directories, scans, scanners = [], [], [], []
+    session_list, session_dir_list, scan_list, scanner_list = [], [], [], []
 
-    for session in input_sessions:
-        sess_dir = pathlib.Path(session['session_dir'])
+    for sess in input_sessions:
+        sess_dir = pathlib.Path(sess['session_dir'])
 
         # search for either ScanImage or ScanBox files (in that order)
         for scan_pattern, scan_type, glob_func in zip(['*.tif', '*.sbx'],
@@ -43,7 +43,7 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
 
         if acq_software == 'ScanImage':
             import scanreader
-            from elements_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
+            from element_calcium_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
             try:  # attempt to read .tif as a scanimage file
                 loaded_scan = scanreader.read_scan(scan_filepaths)
                 recording_time = get_scanimage_acq_time(loaded_scan)
@@ -65,25 +65,23 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
         else:
             raise NotImplementedError(f'Processing scan from acquisition software of type {acq_software} is not yet implemented')
 
-        session_key = {'subject': session['subject'], 'session_datetime': recording_time}
-        if session_key not in Session():
-            scanners.append({'scanner': scanner})
-            sessions.append(session_key)
-            scans.append({**session_key, 'scan_id': 0, 'scanner': scanner, 'acq_software': acq_software})
+        session_key = {'subject': sess['subject'], 'session_datetime': recording_time}
+        if session_key not in session.Session():
+            scanner_list.append({'scanner': scanner})
+            session_list.append(session_key)
+            scan_list.append({**session_key, 'scan_id': 0, 'scanner': scanner, 'acq_software': acq_software})
 
-            session_directories.append({**session_key, 'session_dir': sess_dir.relative_to(root_data_dir).as_posix()})
+            session_dir_list.append({**session_key, 'session_dir': sess_dir.relative_to(root_data_dir).as_posix()})
 
-    print(f'\n---- Insert {len(set(val for dic in scanners for val in dic.values()))} entry(s) into experiment.Equipment ----')
-    Equipment.insert(scanners, skip_duplicates=True)
+    print(f'\n---- Insert {len(set(val for dic in scanner_list for val in dic.values()))} entry(s) into experiment.Equipment ----')
+    Equipment.insert(scanner_list, skip_duplicates=True)
 
-    print(f'\n---- Insert {len(sessions)} entry(s) into experiment.Session ----')
-    Session.insert(sessions)
-    
-    print(f'\n---- Insert {len(session_directories)} entry(s) into experiment.Session.Directory ----')
-    Session.Directory.insert(session_directories)
+    print(f'\n---- Insert {len(session_list)} entry(s) into session.Session ----')
+    session.Session.insert(session_list)
+    session.SessionDirectory.insert(session_dir_list)
 
-    print(f'\n---- Insert {len(scans)} entry(s) into scan.Scan ----')
-    scan.Scan.insert(scans)
+    print(f'\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----')
+    scan.Scan.insert(scan_list)
 
     print('\n---- Successfully completed ingest_sessions ----')
 

@@ -1,4 +1,3 @@
-import numpy as np
 from workflow_calcium_imaging.pipeline import imaging, scan
 import warnings
 

@@ -1,4 +1,4 @@
-# run tests: pytest -sv --cov-report term-missing --cov=workflow-ephys -p no:warnings
+# run tests: pytest -sv --cov-report term-missing --cov=workflow-calcium-imaging -p no:warnings
 
 import os
 import pytest
@@ -32,7 +32,7 @@ def pipeline():
            'lab': pipeline.lab,
            'imaging': pipeline.imaging,
            'scan': pipeline.scan,
-           'Session': pipeline.Session,
+           'session': pipeline.session,
            'Equipment': pipeline.Equipment,
            'get_imaging_root_data_dir': pipeline.get_imaging_root_data_dir}
 

@@ -14,22 +14,22 @@ def test_ingest_subjects(pipeline, ingest_subjects):
 
 def test_ingest_sessions(pipeline, sessions_csv, ingest_sessions):
     scan = pipeline['scan']
-    Session = pipeline['Session']
+    session = pipeline['session']
     get_imaging_root_data_dir = pipeline['get_imaging_root_data_dir']
 
-    assert len(Session()) == 4
+    assert len(session.Session()) == 4
     assert len(scan.Scan()) == 4
 
     sessions, _ = sessions_csv
     sess = sessions.iloc[3]
     sess_dir = pathlib.Path(sess.session_dir).relative_to(get_imaging_root_data_dir())
-    assert (Session.Directory
+    assert (session.SessionDirectory
             & {'subject': sess.name}).fetch1('session_dir') == sess_dir.as_posix()
 
 
 def test_paramset_insert(suite2p_paramset, caiman2D_paramset, caiman3D_paramset, pipeline):
     imaging = pipeline['imaging']
-    from elements_imaging.imaging import dict_to_uuid
+    from element_calcium_imaging.imaging import dict_to_uuid
 
     method, desc, paramset_hash = (imaging.ProcessingParamSet & {'paramset_idx': 0}).fetch1(
         'processing_method', 'paramset_desc', 'param_set_hash')
