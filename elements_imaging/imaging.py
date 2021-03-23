@@ -86,7 +86,6 @@ class ProcessingMethod(dj.Lookup):
     processing_method: char(24)
     ---
     processing_method_desc: varchar(1000)
-    package_version=null: varchar(16)
     """
 
     contents = [('suite2p', 'suite2p analysis suite'),
@@ -104,6 +103,7 @@ class ProcessingParamSet(dj.Lookup):
     param_set_hash: uuid
     unique index (param_set_hash)
     params: longblob  # dictionary of all applicable parameters
+    package_version=null: varchar(16)
     """
 
     @classmethod
