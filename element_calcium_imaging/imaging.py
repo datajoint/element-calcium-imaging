@@ -18,13 +18,13 @@ def activate(imaging_schema_name,  *, scan_schema_name=None,
              create_schema=True, create_tables=True, linking_module=None):
     """
     activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
-        :param imaging_schema_name: schema name on the database server to activate the `imaging` element
-        :param scan_schema_name: schema name on the database server to activate the `scan` element
-         - may be omitted if the `scan` element is already activated
+        :param imaging_schema_name: schema name on the database server to activate the `imaging` module
+        :param scan_schema_name: schema name on the database server to activate the `scan` module
+         - may be omitted if the `scan` module is already activated
         :param create_schema: when True (default), create schema in the database if it does not yet exist.
         :param create_tables: when True (default), create tables in the database if they do not yet exist.
         :param linking_module: a module name or a module containing the
-         required dependencies to activate the `imaging` element:
+         required dependencies to activate the `imaging` module:
             Upstream tables:
                 + Session: parent table to Scan, typically identifying a recording session
             Functions:
@@ -47,7 +47,7 @@ def activate(imaging_schema_name,  *, scan_schema_name=None,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
 
 
-# -------------- Functions required by the elements-imaging  --------------
+# -------------- Functions required by the element-calcium-imaging  --------------
 
 def get_imaging_root_data_dir() -> str:
     """
@@ -222,7 +222,7 @@ class MotionCorrection(dj.Imported):
     definition = """ 
     -> Processing
     ---
-    -> scan.Channel.proj(alignment_channel='channel') # channel used for motion correction in this processing task
+    -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
 
     class RigidMotionCorrection(dj.Part):
@@ -290,7 +290,7 @@ class MotionCorrection(dj.Imported):
 
             field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
 
-            alignment_channel = loaded_suite2p.planes[0].alignment_channel
+            motion_correct_channel = loaded_suite2p.planes[0].alignment_channel
 
             # ---- iterate through all s2p plane outputs ----
             rigid_correction, nonrigid_correction, nonrigid_blocks = {}, {}, {}
@@ -365,7 +365,7 @@ class MotionCorrection(dj.Imported):
                                        'correlation_image': s2p.correlation_map,
                                        'max_proj_image': s2p.max_proj_image})
 
-            self.insert1({**key, 'alignment_channel': alignment_channel})
+            self.insert1({**key, 'motion_correct_channel': motion_correct_channel})
             if rigid_correction:
                 self.RigidMotionCorrection.insert1(rigid_correction)
             if nonrigid_correction:
@@ -376,7 +376,7 @@ class MotionCorrection(dj.Imported):
         elif method == 'caiman':
             loaded_caiman = loaded_result
 
-            self.insert1({**key, 'alignment_channel': loaded_caiman.alignment_channel})
+            self.insert1({**key, 'motion_correct_channel': loaded_caiman.alignment_channel})
 
             is3D = loaded_caiman.params.motion['is3D']
             # -- rigid motion correction --
