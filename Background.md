@@ -1,7 +1,7 @@
 # Calcium Imaging Element
 
 ## Description of modality, user population 
-Over the past two decades, in vivo two-photon  laser-scanning imaging of calcium signals 
+Over the past two decades, in vivo two-photon laser-scanning imaging of calcium signals 
 has evolved into a mainstream modality for neurophysiology experiments to record population activity in intact neural circuits. 
 The tools for signal acquisition and analysis continue to evolve but common patterns and elements of standardization have emerged.
 
@@ -69,16 +69,8 @@ different labs may opt to perform processing/segmentation on a concatenated set 
 To this end, we have extended the Calcium Imaging Element and provided a design version capable of supporting a multi-scan processing scheme.
 
 ## Alpha release: Validation sites
-+ Anne Churchland Lab (UCLA) - Joao Couto, James Roach
-    + The lab uses ScanBox software for data acquisition, and data processing is performed with Suite2p package
-    + Multiple scans are collected per session, and the processing are done on the concatenated dataset from several scans - we have extended the Calcium Imaging Element and provided a design version to support this multi-scan processing scheme
-    + The lab uses local institutional resource for data infrastructure and hosting
-    + Repository: (private repository)
-+ BrainCoGs (Princeton) - Efthymia (Mika) Diamanti, Alvaro Luna  
-    + The lab collects mesoscale imaging data using ScanImage acquisition software and Suite2p for data processing steps. A DataJoint pipeline for animal, lab and behavior management has been developed as part of the U19. A MATLAB-based DataJoint pipeline for Calcium imaging has also been developed previously, supporting analysis routines built in-house. The lab is in need of a parallel pipeline supporting Suite2p, an ideal opportunity to adopt the Calcium Imaging Element.
-    + In a training workshop conducted by DataJoint NEURO on 3/01- 03. The Calcium Imaging Element was adopted, connected to an existing BrainCoGs project pipeline. The ingestion routine was successfully validated on the existing dataset (acquired with ScanImage) and Suite2p outputs.
-    + The lab uses local institutional resource for data infrastructure and hosting
-    + Repository: https://github.com/BrainCOGS/U19-pipeline_python
++ Anne Churchland Lab (UCLA)
++ BrainCoGs (Princeton)
 
 ## Beta release
 As the validation progresses, we expect to produce a beta version of the workflow for users to adopt independently by May 1, 2021.
