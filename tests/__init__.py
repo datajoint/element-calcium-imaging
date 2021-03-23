@@ -8,7 +8,7 @@ import datajoint as dj
 import importlib
 import numpy as np
 
-from workflow_imaging.paths import get_imaging_root_data_dir
+from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +26,7 @@ def dj_config():
 
 @pytest.fixture
 def pipeline():
-    from workflow_imaging import pipeline
+    from workflow_calcium_imaging import pipeline
 
     yield {'subject': pipeline.subject,
            'lab': pipeline.lab,
@@ -62,7 +62,7 @@ def subjects_csv():
 
 @pytest.fixture
 def ingest_subjects(pipeline, subjects_csv):
-    from workflow_imaging.ingest import ingest_subjects
+    from workflow_calcium_imaging.ingest import ingest_subjects
     _, subjects_csv_path = subjects_csv
     ingest_subjects(subjects_csv_path)
     return
@@ -97,7 +97,7 @@ def sessions_csv():
 
 @pytest.fixture
 def ingest_sessions(ingest_subjects, sessions_csv):
-    from workflow_imaging.ingest import ingest_sessions
+    from workflow_calcium_imaging.ingest import ingest_sessions
     _, sessions_csv_path = sessions_csv
     ingest_sessions(sessions_csv_path)
     return

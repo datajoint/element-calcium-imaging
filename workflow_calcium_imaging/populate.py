@@ -1,5 +1,5 @@
 import numpy as np
-from workflow_imaging.pipeline import imaging, scan
+from workflow_calcium_imaging.pipeline import imaging, scan
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -30,7 +30,7 @@ def populate(display_progress=True):
     print('\n---- Populate imaging.Activity ----')
     imaging.Activity.populate(**populate_settings)
 
-    print('\n---- Successfully completed workflow_imaging/populate.py ----')
+    print('\n---- Successfully completed workflow_calcium_imaging/populate.py ----')
 
 
 if __name__ == '__main__':
