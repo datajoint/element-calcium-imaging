@@ -14,9 +14,10 @@ schema = dj.schema()
 _linking_module = None
 
 
-def activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, create_tables=True, linking_module=None):
+def activate(imaging_schema_name,  *, scan_schema_name=None,
+             create_schema=True, create_tables=True, linking_module=None):
     """
-    activate(imaging_schema_name, scan_schema_name=None, *, create_schema=True, create_tables=True, linking_module=None)
+    activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
         :param imaging_schema_name: schema name on the database server to activate the `imaging` element
         :param scan_schema_name: schema name on the database server to activate the `scan` element
          - may be omitted if the `scan` element is already activated
