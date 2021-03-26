@@ -1,6 +1,6 @@
-datajoint==0.13.dev4
-datajoint-connection-hub
-elements-lab @ git+https://github.com/datajoint/elements-lab.git
-elements-animal @ git+https://github.com/datajoint/elements-animal.git
-elements-imaging @ git+https://github.com/datajoint/elements-imaging.git
+datajoint>=0.13.dev7
+element-calcium-imaging @ git+https://github.com/datajoint/element-calcium-imaging.git
+element-lab @ git+https://github.com/datajoint/element-lab.git
+element-animal @ git+https://github.com/datajoint/element-animal.git
+element-session @ git+https://github.com/datajoint/element-session.git
 ipykernel
