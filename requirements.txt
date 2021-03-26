@@ -1,4 +1,4 @@
-datajoint>=0.13.dev7
+datajoint>=0.13
 element-calcium-imaging @ git+https://github.com/datajoint/element-calcium-imaging.git
 element-lab @ git+https://github.com/datajoint/element-lab.git
 element-animal @ git+https://github.com/datajoint/element-animal.git
