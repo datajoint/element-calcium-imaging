@@ -1,0 +1,36 @@
+version: "2.4"
+x-net: &net
+  networks:
+      - main
+services:
+  db:
+    <<: *net
+    image: datajoint/mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=simple
+  workflow_calcium_imaging:
+    <<: *net
+    build:
+      context: .
+    image: workflow_calcium_imaging:v0.0.0
+    environment:
+      - DJ_HOST=db
+      - DJ_USER=root
+      - DJ_PASS=simple
+      - IMAGING_ROOT_DATA_DIR=/main/test_data
+      - DATABASE_PREFIX=test_
+    command:
+      - bash
+      - -c
+      - |
+        echo "------ INTEGRATION TESTS ------"
+        pytest -sv --cov-report term-missing --cov=workflow-calcium-imaging -p no:warnings
+        tail -f /dev/null
+    volumes:
+      - ${TEST_DATA_DIR}:/main/test_data
+      - ./apt_requirements.txt:/tmp/apt_requirements.txt
+    depends_on:
+      db:
+        condition: service_healthy
+networks:
+  main:

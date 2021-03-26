@@ -5,21 +5,25 @@ import pytest
 import pandas as pd
 import pathlib
 import datajoint as dj
-import importlib
 import numpy as np
 
 from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
+test_user_data_dir = pathlib.Path('./tests/user_data')
+test_user_data_dir.mkdir(exist_ok=True)
+
+
 @pytest.fixture(autouse=True)
 def dj_config():
-    dj.config.load('./dj_local_conf.json')
+    if pathlib.Path('./dj_local_conf.json').exists():
+        dj.config.load('./dj_local_conf.json')
     dj.config['safemode'] = False
     dj.config['custom'] = {
-        'database.prefix': os.environ.get('DATABASE_PREFIX',
-                                          dj.config['custom']['database.prefix']),
-        'imaging_root_data_dir': os.environ.get('IMAGING_ROOT_DATA_DIR',
-                                                dj.config['custom']['imaging_root_data_dir'])
+        'database.prefix': (os.environ.get('DATABASE_PREFIX')
+                            or dj.config['custom']['database.prefix']),
+        'imaging_root_data_dir': (os.environ.get('IMAGING_ROOT_DATA_DIR')
+                                  or dj.config['custom']['imaging_root_data_dir'])
     }
     return
 
