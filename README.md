@@ -15,7 +15,7 @@ See [Background](Background.md) for the background information and development t
 
 ![elements imaging diagram](images/attached_imaging_element.svg)
 
-+ As the diagram depicts, `elements-imaging` starts immediately downstream from `Session`, and also requires some notion of:
++ As the diagram depicts, `elements-calcium-imaging` starts immediately downstream from `Session`, and also requires some notion of:
 
      + `Scanner` for equipment/device
 
