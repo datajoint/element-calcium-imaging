@@ -15,7 +15,7 @@ See [Background](Background.md) for the background information and development t
 
 ![elements imaging diagram](images/attached_imaging_element.svg)
 
-+ As the diagram depicts, `elements-calcium-imaging` starts immediately downstream from `Session`, and also requires some notion of:
++ As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
      + `Scanner` for equipment/device
 
@@ -35,7 +35,7 @@ See [Background](Background.md) for the background information and development t
 
      + For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
 
-### Motion correction
+### Preprocessing - Motion Correction
 
 + `MotionCorrection` - motion correction information performed on a scan
 
@@ -45,7 +45,7 @@ See [Background](Background.md) for the background information and development t
 
 + `MotionCorrection.Summary` - summary images for each `ScanInfo.Field` after motion correction (e.g. average image, correlation image)
     
-### Segmentation
+### Preprocessing - Segmentation
 
 + `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
  
