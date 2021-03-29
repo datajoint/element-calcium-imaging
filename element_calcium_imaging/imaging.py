@@ -64,7 +64,7 @@ def get_imaging_root_data_dir() -> str:
 @schema
 class ProcessingMethod(dj.Lookup):
     definition = """
-    processing_method: char(24)
+    processing_method: char(8)
     ---
     processing_method_desc: varchar(1000)
     """

@@ -36,10 +36,6 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                     Retrieve the list of ScanBox files (*.sbx) associated with a given Scan
                     :param scan_key: key of a Scan
                     :return: list of ScanBox files' full file-paths
-                + get_miniscope_daq_file(scan_key: dict) -> str
-                    Retrieve the Miniscope DAQ file (*.json) associated with a given Scan
-                    :param scan_key: key of a Scan
-                    :return: Miniscope DAQ file full file-path
     """
 
     if isinstance(linking_module, str):
@@ -83,22 +79,16 @@ def get_scan_box_files(scan_key: dict) -> list:
     """
     return _linking_module.get_scan_box_files(scan_key)
 
-def get_miniscope_daq_file(scan_key: dict) -> str:
-    """
-    Retrieve the Miniscope DAQ file (*.json) associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: Miniscope DAQ file full file-path
-    """
-    return _linking_module.get_miniscope_daq_file(scan_key)
 
 # ----------------------------- Table declarations ----------------------
+
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
     definition = """  # Name of acquisition software - e.g. ScanImage, ScanBox
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'ScanBox', 'Miniscope-DAQ'])
+    contents = zip(['ScanImage', 'ScanBox'])
 
 
 @schema
@@ -267,29 +257,6 @@ class ScanInfo(dj.Imported):
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
 
-        elif acq_software == 'Miniscope-DAQ-V3':
-            import cv2
-            scan_filepaths = get_miniscope_daq_file(key)
-            video = cv2.VideoCapture(scan_filepaths)
-            fps = video.get(cv2.CAP_PROP_FPS) # TODO: Verify correct value
-            ret, frame = video.read()
-            print(np.shape(frame))# TODO: Verify correct order
-
-            # Insert in ScanInfo
-            self.insert1(dict(key,
-                              nfields=1,
-                              nchannels=1,
-                              nframes=, # TODO: extract from timestamps.dat and count how many frames for cam 0.
-                              ndepths=1,
-                              fps=fps,
-                              bidirectional=False,
-                              nrois=0))
-
-            # Insert Field(s)
-            self.Field.insert(dict(key,
-                                   field_idx=0, 
-                                   px_height=frame[0], 
-                                   px_width=frame[1]))
         else:
             raise NotImplementedError(
                 f'Loading routine not implemented for {acq_software} acquisition software')
