@@ -28,7 +28,6 @@ services:
         tail -f /dev/null
     volumes:
       - ${TEST_DATA_DIR}:/main/test_data
-      - ./apt_requirements.txt:/tmp/apt_requirements.txt
     depends_on:
       db:
         condition: service_healthy
