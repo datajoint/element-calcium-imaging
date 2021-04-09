@@ -1,5 +1,3 @@
-__author__ = "DataJoint NEURO"
-__date__ = "December 15, 2020"
-__version__ = "0.0.1"
+import datajoint as dj
 
-__all__ = ['__author__', '__version__', '__date__']
+dj.config['enable_python_native_blobs'] = True

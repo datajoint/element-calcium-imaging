@@ -190,29 +190,31 @@ class ScanInfo(dj.Imported):
 
             # Insert Field(s)
             if scan.is_multiROI:
-                self.Field.insert([dict(key,
-                                        field_idx=field_id,
-                                        px_height=scan.field_heights[field_id],
-                                        px_width=scan.field_widths[field_id],
-                                        um_height=scan.field_heights_in_microns[field_id],
-                                        um_width=scan.field_widths_in_microns[field_id],
-                                        field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x),
-                                        field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y),
-                                        field_z=z_zero + scan.fields[field_id].depth,
-                                        delay_image=scan.field_offsets[field_id])
-                                   for field_id in range(scan.num_fields)])
+                self.Field.insert([
+                    dict(key,
+                         field_idx=field_id,
+                         px_height=scan.field_heights[field_id],
+                         px_width=scan.field_widths[field_id],
+                         um_height=scan.field_heights_in_microns[field_id],
+                         um_width=scan.field_widths_in_microns[field_id],
+                         field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x),
+                         field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y),
+                         field_z=z_zero + scan.fields[field_id].depth,
+                         delay_image=scan.field_offsets[field_id])
+                    for field_id in range(scan.num_fields)])
             else:
-                self.Field.insert([dict(key,
-                                        field_idx=plane_idx,
-                                        px_height=scan.image_height,
-                                        px_width=scan.image_width,
-                                        um_height=getattr(scan, 'image_height_in_microns', None),
-                                        um_width=getattr(scan, 'image_width_in_microns', None),
-                                        field_x=x_zero,
-                                        field_y=y_zero,
-                                        field_z=z_zero + scan.scanning_depths[plane_idx],
-                                        delay_image=scan.field_offsets[plane_idx])
-                                   for plane_idx in range(scan.num_scanning_depths)])
+                self.Field.insert([
+                    dict(key,
+                         field_idx=plane_idx,
+                         px_height=scan.image_height,
+                         px_width=scan.image_width,
+                         um_height=getattr(scan, 'image_height_in_microns', None),
+                         um_width=getattr(scan, 'image_width_in_microns', None),
+                         field_x=x_zero,
+                         field_y=y_zero,
+                         field_z=z_zero + scan.scanning_depths[plane_idx],
+                         delay_image=scan.field_offsets[plane_idx])
+                    for plane_idx in range(scan.num_scanning_depths)])
         elif acq_software == 'ScanBox':
             import sbxreader
             # Read the scan
