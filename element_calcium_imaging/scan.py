@@ -154,6 +154,7 @@ class ScanInfo(dj.Imported):
         field_y           : float     # (um) center of field in the motor coordinate system
         field_z           : float     # (um) relative depth of field
         delay_image=null  : longblob  # (ms) delay between the start of the scan and pixels in this field
+        roi=null          : int       # the scanning roi (as recorded in the acquisition software) containing this field - only relevant to mesoscale scans
         """
 
     class ScanFile(dj.Part):
@@ -200,7 +201,8 @@ class ScanInfo(dj.Imported):
                          field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x),
                          field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y),
                          field_z=z_zero + scan.fields[field_id].depth,
-                         delay_image=scan.field_offsets[field_id])
+                         delay_image=scan.field_offsets[field_id],
+                         roi=scan.field_rois[field_id][0])
                     for field_id in range(scan.num_fields)])
             else:
                 self.Field.insert([
