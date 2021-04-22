@@ -356,7 +356,6 @@ class MotionCorrection(dj.Imported):
                 self.NonRigidMotionCorrection.insert1(nonrigid_correction)
                 self.Block.insert(nonrigid_blocks.values())
             self.Summary.insert(summary_images)
-
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
@@ -381,7 +380,6 @@ class MotionCorrection(dj.Imported):
                     'outlier_frames': None}
 
                 self.RigidMotionCorrection.insert1(rigid_correction)
-
             # -- non-rigid motion correction --
             else:
                 nonrigid_correction = {
@@ -459,7 +457,6 @@ class MotionCorrection(dj.Imported):
                     if is3D else caiman_dataset.motion_correction[
                         'max_image'][...][np.newaxis, ...])]
             self.Summary.insert(summary_images)
-
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
@@ -538,7 +535,6 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(cells,
                                                    ignore_extra_fields=True,
                                                    allow_direct_insert=True)
-        
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
@@ -578,7 +574,6 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(cells,
                                                    ignore_extra_fields=True,
                                                    allow_direct_insert=True)
-
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
@@ -659,7 +654,6 @@ class Fluorescence(dj.Computed):
 
             self.insert1(key)
             self.Trace.insert(fluo_traces + fluo_chn2_traces)
-
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
@@ -733,7 +727,6 @@ class Activity(dj.Computed):
 
                 self.insert1(key)
                 self.Trace.insert(spikes)
-                
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
@@ -753,7 +746,6 @@ class Activity(dj.Computed):
                         'activity_trace': mask[attr_mapper[key['extraction_method']]]})
                 self.insert1(key)
                 self.Trace.insert(activities)
-
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
