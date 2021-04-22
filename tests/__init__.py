@@ -14,11 +14,11 @@ from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 test_user_data_dir = pathlib.Path('./tests/user_data')
 test_user_data_dir.mkdir(exist_ok=True)
 
-sessions_dirs = ['U24/workflow_imaging_data/subject0/session1',
-                 'U24/workflow_imaging_data/subject1/20200609_170519',
-                 'U24/workflow_imaging_data/subject1/20200609_171646',
-                 'U24/workflow_imaging_data/subject2/20200420_1843959',
-                 'U24/workflow_imaging_data/subject3/210107_run00_orientation_8dir']
+sessions_dirs = ['subject0/session1',
+                 'subject1/20200609_170519',
+                 'subject1/20200609_171646',
+                 'subject2/20200420_1843959',
+                 'subject3/210107_run00_orientation_8dir']
 
 # ------------------- FIXTURES -------------------
 
