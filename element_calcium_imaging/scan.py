@@ -6,6 +6,7 @@ import datajoint as dj
 import pathlib
 import importlib
 import inspect
+from . import find_root_directory
 
 schema = dj.schema()
 
@@ -25,9 +26,9 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                 + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
                 + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
             Functions:
-                + get_imaging_root_data_dir() -> str
-                    Retrieve the full path for the root data directory (e.g. the mounted drive)
-                    :return: a string with full path to the root data directory
+                + get_imaging_root_data_dir() -> list
+                    Retrieve the full path for the root data directory - e.g. containing the imaging recording files or analysis results for all subject/sessions.
+                    :return: a string (or list of string) for full path to the root data directory
                 + get_scan_image_files(scan_key: dict) -> list
                     Retrieve the list of ScanImage files associated with a given Scan
                     :param scan_key: key of a Scan
@@ -56,8 +57,17 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
 
 def get_imaging_root_data_dir() -> str:
     """
-    Retrieve the full path for the root data directory (e.g. the mounted drive)
-    :return: a string with full path to the root data directory
+    All data paths, directories in DataJoint Elements are recommended to be stored as
+    relative paths, with respect to some user-configured "root" directory,
+     which varies from machine to machine (e.g. different mounted drive locations)
+
+    get_imaging_root_data_dir() -> list
+        This user-provided function retrieves the possible root data directories
+         containing the imaging data for all subjects/sessions
+         (e.g. acquired ScanImage raw files,
+         output files from processing routines, etc.)
+        :return: a string for full path to the imaging root data directory,
+         or list of strings for possible root data directories
     """
     return _linking_module.get_imaging_root_data_dir()
 
@@ -263,6 +273,7 @@ class ScanInfo(dj.Imported):
                 f'Loading routine not implemented for {acq_software} acquisition software')
 
         # Insert file(s)
-        root = pathlib.Path(get_imaging_root_data_dir())
-        scan_files = [pathlib.Path(f).relative_to(root).as_posix() for f in scan_filepaths]
+        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
+
+        scan_files = [pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths]
         self.ScanFile.insert([{**key, 'file_path': f} for f in scan_files])

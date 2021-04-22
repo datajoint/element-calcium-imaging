@@ -7,7 +7,8 @@ import hashlib
 import importlib
 import inspect
 
-from . import scan
+from . import scan, find_full_path
+from .scan import get_imaging_root_data_dir
 
 schema = dj.schema()
 
@@ -25,12 +26,7 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
         :param create_tables: when True (default), create tables in the database if they do not yet exist.
         :param linking_module: a module name or a module containing the
          required dependencies to activate the `imaging` module:
-            Upstream tables:
-                + Session: parent table to Scan, typically identifying a recording session
-            Functions:
-                + get_imaging_root_data_dir() -> str
-                    Retrieve the root data directory - e.g. containing all subject/sessions data
-                    :return: a string for full path to the root data directory
+         + all that are required by the `scan` module
     """
 
     if isinstance(linking_module, str):
@@ -45,18 +41,6 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
                   create_tables=create_tables, linking_module=linking_module)
     schema.activate(imaging_schema_name, create_schema=create_schema,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
-
-
-# -------------- Functions required by the element-calcium-imaging  --------------
-
-def get_imaging_root_data_dir() -> str:
-    """
-    get_imaging_root_data_dir() -> str
-        Retrieve the root data directory - e.g. containing all subject/sessions data
-        :return: a string for full path to the root data directory
-    """
-    return _linking_module.get_imaging_root_data_dir()
-
 
 # -------------- Table declarations --------------
 
@@ -792,8 +776,7 @@ def get_loader_result(key, table):
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         'processing_method', _table_attribute_mapper[table.__name__])
 
-    root_dir = pathlib.Path(get_imaging_root_data_dir())
-    output_dir = root_dir / output_dir
+    output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
 
     if method == 'suite2p':
         from .readers import suite2p_loader
