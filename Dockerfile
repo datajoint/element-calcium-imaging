@@ -1,15 +1,20 @@
-FROM datajoint/djlab:py3.7-debian
+FROM ninai/pipeline:base
 
-RUN mkdir /main/workflow-calcium-imaging
+RUN mkdir /main && mkdir /main/workflow-calcium-imaging
 
 WORKDIR /main/workflow-calcium-imaging
 
-#RUN conda config --set channel_priority flexible
-#RUN conda update conda && conda install -c conda-forge caiman
+RUN pip3 install --upgrade pip
 
-RUN pip install sbxreader
+# Install CaImAn latest version
+#RUN pip3 install git+https://github.com/flatironinstitute/CaImAn
 
+# Install CaImAn dependencies
+RUN pip3 install pynwb holoviews
+
+# Workflow
 RUN git clone https://github.com/ttngu207/workflow-calcium-imaging.git .
 
-RUN pip install .
-RUN pip install -r requirements_test.txt
+RUN pip3 install sbxreader
+RUN pip3 install .
+RUN pip3 install -r requirements_test.txt

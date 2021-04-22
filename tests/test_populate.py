@@ -22,6 +22,7 @@ def test_scan_info_populate_scanimage_2D(testdata_paths, pipeline, scan_info):
 
 def test_scan_info_populate_scanimage_3D(testdata_paths, pipeline, scan_info):
     scan = pipeline['scan']
+
     rel_path = testdata_paths['scanimage_3d']
     scan_key = (scan.ScanInfo & (scan.ScanInfo.ScanFile
                                  & f'file_path LIKE "%{rel_path}%"')).fetch1('KEY')
@@ -32,6 +33,22 @@ def test_scan_info_populate_scanimage_3D(testdata_paths, pipeline, scan_info):
     assert nchannels == 2
     assert ndepths == 3
     assert nframes == 2000
+
+
+def test_scan_info_populate_scanimage_multiROI(testdata_paths, pipeline, scan_info):
+    scan = pipeline['scan']
+
+    rel_path = testdata_paths['scanimage_multiroi']
+    scan_key = (scan.ScanInfo & (scan.ScanInfo.ScanFile
+                                 & f'file_path LIKE "%{rel_path}%"')).fetch1('KEY')
+    nfields, nchannels, ndepths, nframes, nrois = (scan.ScanInfo & scan_key).fetch1(
+        'nfields', 'nchannels', 'ndepths', 'nframes', 'nrois')
+
+    assert nfields == 3
+    assert nchannels == 1
+    assert ndepths == 1
+    assert nframes == 12000
+    assert nrois == 3
 
 
 def test_scan_info_populate_scanbox_3D(testdata_paths, pipeline, scan_info):
