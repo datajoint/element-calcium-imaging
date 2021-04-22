@@ -1,8 +1,10 @@
 import numpy as np
 
-from . import (dj_config, pipeline, subjects_csv, ingest_subjects,
+from . import (dj_config, pipeline, test_data,
+               subjects_csv, ingest_subjects,
                sessions_csv, ingest_sessions,
-               testdata_paths, suite2p_paramset, caiman2D_paramset, caiman3D_paramset,
+               testdata_paths, suite2p_paramset,
+               caiman2D_paramset, caiman3D_paramset,
                scan_info, processing_tasks, processing, curations)
 
 

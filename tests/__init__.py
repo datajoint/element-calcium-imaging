@@ -9,9 +9,18 @@ import numpy as np
 
 from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
+# ------------------- SOME CONSTANTS -------------------
 
 test_user_data_dir = pathlib.Path('./tests/user_data')
 test_user_data_dir.mkdir(exist_ok=True)
+
+sessions_dirs = ['U24/workflow_imaging_data/subject0/session1',
+                 'U24/workflow_imaging_data/subject1/20200609_170519',
+                 'U24/workflow_imaging_data/subject1/20200609_171646',
+                 'U24/workflow_imaging_data/subject2/20200420_1843959',
+                 'U24/workflow_imaging_data/subject3/210107_run00_orientation_8dir']
+
+# ------------------- FIXTURES -------------------
 
 
 @pytest.fixture(autouse=True)
@@ -25,6 +34,37 @@ def dj_config():
         'imaging_root_data_dir': (os.environ.get('IMAGING_ROOT_DATA_DIR')
                                   or dj.config['custom']['imaging_root_data_dir'])
     }
+    return
+
+
+@pytest.fixture(autouse=True)
+def test_data(dj_config):
+    test_data_dir = pathlib.Path(dj.config['custom']['imaging_root_data_dir'])
+
+    test_data_exists = np.all([(test_data_dir / p).exists() for p in sessions_dirs])
+
+    if not test_data_exists:
+        try:
+            dj.config['custom'].update({
+                'djarchive.client.endpoint': os.environ['DJARCHIVE_CLIENT_ENDPOINT'],
+                'djarchive.client.bucket': os.environ['DJARCHIVE_CLIENT_BUCKET'],
+                'djarchive.client.access_key': os.environ['DJARCHIVE_CLIENT_ACCESSKEY'],
+                'djarchive.client.secret_key': os.environ['DJARCHIVE_CLIENT_SECRETKEY']
+            })
+        except KeyError as e:
+            raise FileNotFoundError(
+                f'Test data not available at {test_data_dir}.'
+                f'\nAttempting to download from DJArchive,'
+                f' but no credentials found in environment variables.'
+                f'\nError: {str(e)}')
+
+        import djarchive_client
+        client = djarchive_client.client()
+        workflow_version = workflow_calcium_imaging.version.__version__
+
+        client.download('workflow-calcium-ephys-test-set',
+                        workflow_version.replace('.', '_'),
+                        str(test_data_dir), create_target=False)
     return
 
 
@@ -74,15 +114,9 @@ def ingest_subjects(pipeline, subjects_csv):
 
 
 @pytest.fixture
-def sessions_csv():
+def sessions_csv(test_data):
     """ Create a 'sessions.csv' file"""
     root_dir = pathlib.Path(get_imaging_root_data_dir())
-
-    sessions_dirs = ['U24/workflow_imaging_data/subject0/session1',
-                     'U24/workflow_imaging_data/subject1/20200609_170519',
-                     'U24/workflow_imaging_data/subject1/20200609_171646',
-                     'U24/workflow_imaging_data/subject2/20200420_1843959',
-                     'U24/workflow_imaging_data/subject3/210107_run00_orientation_8dir']
 
     input_sessions = pd.DataFrame(columns=['subject', 'session_dir'])
     input_sessions.subject = ['subject0',
