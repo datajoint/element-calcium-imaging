@@ -127,6 +127,7 @@ class Processing(dj.Computed):
     -> ProcessingTask
     ---
     processing_time     : datetime  # time of generation of this set of processed, segmented results
+    package_version=''  : varchar(16)
     """
 
     # Run processing only on Scan with ScanInfo inserted
