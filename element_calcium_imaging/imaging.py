@@ -112,7 +112,7 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    definition = """  #  
+    definition = """  # Manual table for defining a processing task ready to be run
     -> scan.Scan
     -> ProcessingParamSet
     ---
@@ -123,7 +123,7 @@ class ProcessingTask(dj.Manual):
 
 @schema
 class Processing(dj.Computed):
-    definition = """
+    definition = """  # Processing Procedure
     -> ProcessingTask
     ---
     processing_time     : datetime  # time of generation of this set of processed, segmented results
@@ -162,7 +162,7 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation is also included here)
+    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation can also be included here)
     -> Processing
     curation_id: int
     ---
@@ -205,7 +205,7 @@ class Curation(dj.Manual):
 @schema
 class MotionCorrection(dj.Imported):
     definition = """  #  Results of motion correction performed on the imaging data
-    -> Processing
+    -> Curation
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
@@ -342,7 +342,7 @@ class MotionCorrection(dj.Imported):
                                 'z_std': np.nan}
 
                 # -- summary images --
-                motion_correction_key = (scan.ScanInfo.Field * ProcessingTask
+                motion_correction_key = (scan.ScanInfo.Field * Curation
                                          & key & field_keys[plane]).fetch1('KEY')
                 summary_images.append({**motion_correction_key,
                                        'ref_image': s2p.ref_image,
@@ -468,13 +468,7 @@ class MotionCorrection(dj.Imported):
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
     -> Curation
-    ---
-    -> MotionCorrection   
     """
-
-    @property
-    def key_source(self):
-        return Curation & MotionCorrection
 
     class Mask(dj.Part):
         definition = """ # A mask produced by segmentation.
@@ -493,8 +487,6 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
-        motion_correction_key = (MotionCorrection & key).fetch1('KEY')
-
         method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == 'suite2p':
@@ -525,7 +517,7 @@ class Segmentation(dj.Computed):
                             'mask': mask_idx + mask_count,
                             'mask_type': 'soma', 'confidence': cell_prob})
 
-            self.insert1({**key, **motion_correction_key})
+            self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:
@@ -564,7 +556,7 @@ class Segmentation(dj.Computed):
                             'mask_classification_method': 'caiman_default_classifier',
                             'mask': mask['mask_id'], 'mask_type': 'soma'})
 
-            self.insert1({**key, **motion_correction_key})
+            self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
 
             if cells:

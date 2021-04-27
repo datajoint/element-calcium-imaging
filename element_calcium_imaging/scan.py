@@ -58,7 +58,7 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
 def get_imaging_root_data_dir() -> str:
     """
     All data paths, directories in DataJoint Elements are recommended to be stored as
-    relative paths, with respect to some user-configured "root" directory,
+    relative paths (posix format), with respect to some user-configured "root" directory,
      which varies from machine to machine (e.g. different mounted drive locations)
 
     get_imaging_root_data_dir() -> list
