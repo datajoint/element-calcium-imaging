@@ -22,9 +22,8 @@ In all there are perhaps on the order of 3000 two-photon setups globally but the
 + ThorImageLS
 + ScanBox
 
-Vidrio’s ScanImage is the data acquisition software for two types of home-built scanning two-photon systems: 
-based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version. 
-They have about 200 active paid licenses. 
+Vidrio’s [ScanImage](https://docs.scanimage.org/) is the data acquisition software for two types of home-built scanning two-photon systems, 
+either based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version. 
 Thorlabs also provides their own acquisition software - ThorImageLS (probably half of the systems).
 
 ## Preprocessing toolchain: development teams
