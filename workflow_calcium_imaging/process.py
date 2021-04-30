@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def populate(display_progress=True):
+def run(display_progress=True):
 
     populate_settings = {'display_progress': display_progress,
                          'reserve_jobs': False,
@@ -35,4 +35,4 @@ def populate(display_progress=True):
 
 
 if __name__ == '__main__':
-    populate()
+    run()
