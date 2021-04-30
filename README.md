@@ -19,17 +19,17 @@ This repository provides demonstrations for:
 The Calcium imaging workflow presented here uses pipeline components from 4 DataJoint Elements, 
 `element-lab`, `element-animal`, `element-session` and `element-calcium-imaging`, assembled together to form a fully functional workflow. 
 
-### elements-lab
+### element-lab
 
-![element-lab](images/elements_lab_diagram.svg)
+![element-lab](https://github.com/datajoint/element-lab/raw/main/images/element_lab_diagram.svg)
 
-### elements-animal
+### element-animal
 
-![element-animal](images/elements_subject_diagram.svg)
+![element-animal](https://github.com/datajoint/element-animal/blob/main/images/subject_diagram.svg)
 
-### elements-imaging
+### assembled with element-calcium-imaging
 
-![element_calcium_imaging](images/attached_imaging_element.svg)
+![element_calcium_imaging](images/attached_calcium_imaging_element.svg)
 
 ## Installation instructions
 
