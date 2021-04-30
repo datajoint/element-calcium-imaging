@@ -6,7 +6,9 @@ warnings.filterwarnings('ignore')
 
 def populate(display_progress=True):
 
-    populate_settings = {'display_progress': display_progress, 'reserve_jobs': False, 'suppress_errors': False}
+    populate_settings = {'display_progress': display_progress,
+                         'reserve_jobs': False,
+                         'suppress_errors': False}
 
     print('\n---- Populate scan.ScanInfo ----')
     scan.ScanInfo.populate(**populate_settings)
