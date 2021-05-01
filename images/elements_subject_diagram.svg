@@ -1,334 +1,0 @@
-<svg height="256pt" viewBox="0.00 0.00 1593.00 256.00" width="1593pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 252)">
-<title>%3</title>
-<polygon fill="white" points="-4,4 -4,-252 1589,-252 1589,4 -4,4" stroke="none"/>
-<!-- Subject.Line -->
-<g class="node" id="node1"><title>Subject.Line</title>
-<g id="a_node1"><a xlink:title="→ Subject------------------------------→ Line">
-<polygon fill="none" points="1017.5,-169 946.5,-169 946.5,-150 1017.5,-150 1017.5,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="982" y="-157">Subject.Line</text>
-</a>
-</g>
-</g>
-<!-- Subject -->
-<g class="node" id="node2"><title>Subject</title>
-<g id="a_node2"><a xlink:title="subject              ------------------------------sex                  subject_birth_date   subject_desc=&quot;&quot;      ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="587,-248 531,-248 531,-213 587,-213 587,-248" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="start" text-decoration="underline" x="539" y="-228.4">Subject</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.Line -->
-<g class="edge" id="edge1"><title>Subject-&gt;Subject.Line</title>
-<path d="M587.37,-227.637C650.833,-223.02 808.76,-209.026 937,-177 945.073,-174.984 953.706,-172.025 961.229,-169.168" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Subject.Lab -->
-<g class="node" id="node4"><title>Subject.Lab</title>
-<g id="a_node4"><a xlink:title="→ Subject→ Lab------------------------------subject_alias=&quot;&quot;     ">
-<polygon fill="none" points="276,-169 208,-169 208,-150 276,-150 276,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="242" y="-157">Subject.Lab</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.Lab -->
-<g class="edge" id="edge2"><title>Subject-&gt;Subject.Lab</title>
-<path d="M530.826,-225.319C481.532,-217.712 376.634,-200.225 290,-177 281.659,-174.764 272.67,-171.822 264.751,-169.042" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Subject.Strain -->
-<g class="node" id="node5"><title>Subject.Strain</title>
-<g id="a_node5"><a xlink:title="→ Subject------------------------------→ Strain">
-<polygon fill="none" points="78,-169 0,-169 0,-150 78,-150 78,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="39" y="-157">Subject.Strain</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.Strain -->
-<g class="edge" id="edge3"><title>Subject-&gt;Subject.Strain</title>
-<path d="M530.982,-228.534C457.364,-225.534 252.718,-214.22 87,-177 78.2303,-175.03 68.8288,-172.011 60.6913,-169.091" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- SubjectCaging -->
-<g class="node" id="node6"><title>SubjectCaging</title>
-<g id="a_node6"><a xlink:title="→ Subjectcaging_datetime      ------------------------------→ Cage→ User">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="190,-177 96,-177 96,-142 190,-142 190,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="start" text-decoration="underline" x="104" y="-157.4">SubjectCaging</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;SubjectCaging -->
-<g class="edge" id="edge4"><title>Subject-&gt;SubjectCaging</title>
-<path d="M530.748,-226.758C469.709,-220.533 321.162,-203.763 199,-177 196.129,-176.371 193.19,-175.673 190.234,-174.929" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Zygosity -->
-<g class="node" id="node7"><title>Zygosity</title>
-<g id="a_node7"><a xlink:title="→ Subject→ Allele------------------------------zygosity             ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="1306.5,-177 1247.5,-177 1247.5,-142 1306.5,-142 1306.5,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="1277" y="-156.4">Zygosity</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Zygosity -->
-<g class="edge" id="edge5"><title>Subject-&gt;Zygosity</title>
-<path d="M587.243,-228.529C699.132,-224.497 1111.34,-207.821 1238,-177 1241,-176.27 1244.07,-175.335 1247.09,-174.283" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- BreedingPair.Father -->
-<g class="node" id="node11"><title>BreedingPair.Father</title>
-<g id="a_node11"><a xlink:title="→ BreedingPair------------------------------→ Subject">
-<polygon fill="none" points="1115.5,-98 1012.5,-98 1012.5,-79 1115.5,-79 1115.5,-98" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="1064" y="-86">BreedingPair.Father</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;BreedingPair.Father -->
-<g class="edge" id="edge6"><title>Subject-&gt;BreedingPair.Father</title>
-<path d="M530.869,-227.042C464.777,-220.283 308.974,-198.057 361,-142 405.1,-94.4837 857.745,-89.6583 1012.47,-89.4065" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- BreedingPair.Mother -->
-<g class="node" id="node13"><title>BreedingPair.Mother</title>
-<g id="a_node13"><a xlink:title="→ BreedingPair→ Subject">
-<polygon fill="none" points="1238.5,-98 1133.5,-98 1133.5,-79 1238.5,-79 1238.5,-98" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="1186" y="-86">BreedingPair.Mother</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;BreedingPair.Mother -->
-<g class="edge" id="edge7"><title>Subject-&gt;BreedingPair.Mother</title>
-<path d="M536.54,-212.988C513.755,-194.312 484.541,-163.683 505,-142 552.28,-91.8903 1055.98,-116.915 1124,-106 1135.55,-104.147 1148.05,-101.038 1158.79,-98.0158" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- SubjectDeath -->
-<g class="node" id="node14"><title>SubjectDeath</title>
-<g id="a_node14"><a xlink:title="→ Subject------------------------------death_date           ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="457.5,-177 370.5,-177 370.5,-142 457.5,-142 457.5,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="414" y="-156.4">SubjectDeath</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;SubjectDeath -->
-<g class="edge" id="edge8"><title>Subject-&gt;SubjectDeath</title>
-<path d="M530.698,-216.032C507.292,-204.894 473.946,-189.026 448.89,-177.103" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- SubjectLitter -->
-<g class="node" id="node15"><title>SubjectLitter</title>
-<g id="a_node15"><a xlink:title="→ Subject------------------------------→ Litter">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="787,-35 705,-35 705,-0 787,-0 787,-35" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="746" y="-14.4">SubjectLitter</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;SubjectLitter -->
-<g class="edge" id="edge9"><title>Subject-&gt;SubjectLitter</title>
-<path d="M530.846,-228.258C462.841,-224.205 298.679,-207.539 347,-142 390.3,-83.2703 612.105,-40.5557 704.998,-24.9714" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Subject.Protocol -->
-<g class="node" id="node20"><title>Subject.Protocol</title>
-<g id="a_node20"><a xlink:title="→ Subject→ Protocol">
-<polygon fill="none" points="603.5,-169 514.5,-169 514.5,-150 603.5,-150 603.5,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="559" y="-157">Subject.Protocol</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.Protocol -->
-<g class="edge" id="edge10"><title>Subject-&gt;Subject.Protocol</title>
-<path d="M559,-212.797C559,-199.077 559,-180.185 559,-169.265" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- GenotypeTest -->
-<g class="node" id="node21"><title>GenotypeTest</title>
-<g id="a_node21"><a xlink:title="→ Subject→ Sequencegenotype_test_id     ------------------------------test_result          ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="1124.5,-177 1035.5,-177 1035.5,-142 1124.5,-142 1124.5,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="start" text-decoration="underline" x="1043.5" y="-157.4">GenotypeTest</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;GenotypeTest -->
-<g class="edge" id="edge11"><title>Subject-&gt;GenotypeTest</title>
-<path d="M587.182,-228.147C660.301,-224.247 861.824,-211.007 1026,-177 1029.07,-176.364 1032.22,-175.629 1035.38,-174.83" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Subject.User -->
-<g class="node" id="node23"><title>Subject.User</title>
-<g id="a_node23"><a xlink:title="→ Subject→ User">
-<polygon fill="none" points="694.5,-169 621.5,-169 621.5,-150 694.5,-150 694.5,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="658" y="-157">Subject.User</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.User -->
-<g class="edge" id="edge12"><title>Subject-&gt;Subject.User</title>
-<path d="M582.713,-212.973C602.505,-199.178 629.929,-180.064 645.631,-169.121" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- SubjectCullMethod -->
-<g class="node" id="node24"><title>SubjectCullMethod</title>
-<g id="a_node24"><a xlink:title="→ Subject------------------------------cull_method          ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="827,-177 713,-177 713,-142 827,-142 827,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="770" y="-156.4">SubjectCullMethod</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;SubjectCullMethod -->
-<g class="edge" id="edge13"><title>Subject-&gt;SubjectCullMethod</title>
-<path d="M587.019,-220.337C620.65,-209.34 677.691,-190.686 719.162,-177.125" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Subject.Source -->
-<g class="node" id="node26"><title>Subject.Source</title>
-<g id="a_node26"><a xlink:title="→ Subject------------------------------→ Source">
-<polygon fill="none" points="928.5,-169 845.5,-169 845.5,-150 928.5,-150 928.5,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="887" y="-157">Subject.Source</text>
-</a>
-</g>
-</g>
-<!-- Subject&#45;&gt;Subject.Source -->
-<g class="edge" id="edge14"><title>Subject-&gt;Subject.Source</title>
-<path d="M587.171,-225.36C637.53,-217.694 746.132,-199.957 836,-177 844.836,-174.743 854.381,-171.796 862.797,-169.018" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Line.Allele -->
-<g class="node" id="node3"><title>Line.Allele</title>
-<g id="a_node3"><a xlink:title="→ Line→ Allele">
-<polygon fill="none" points="1387,-169 1325,-169 1325,-150 1387,-150 1387,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="1356" y="-157">Line.Allele</text>
-</a>
-</g>
-</g>
-<!-- Allele.Sequence -->
-<g class="node" id="node8"><title>Allele.Sequence</title>
-<g id="a_node8"><a xlink:title="→ Allele→ Sequence">
-<polygon fill="none" points="1492.5,-169 1405.5,-169 1405.5,-150 1492.5,-150 1492.5,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="1449" y="-157">Allele.Sequence</text>
-</a>
-</g>
-</g>
-<!-- Sequence -->
-<g class="node" id="node9"><title>Sequence</title>
-<g id="a_node9"><a xlink:title="sequence             ------------------------------base_pairs=&quot;&quot;        sequence_desc=&quot;&quot;     ">
-<polygon fill="#000000" fill-opacity="0.125490" points="1410,-248 1350,-248 1350,-213 1410,-213 1410,-248" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="1358" y="-229">Sequence</text>
-</a>
-</g>
-</g>
-<!-- Sequence&#45;&gt;Allele.Sequence -->
-<g class="edge" id="edge15"><title>Sequence-&gt;Allele.Sequence</title>
-<path d="M1396.7,-212.797C1410.42,-199.077 1429.31,-180.185 1440.23,-169.265" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Sequence&#45;&gt;GenotypeTest -->
-<g class="edge" id="edge16"><title>Sequence-&gt;GenotypeTest</title>
-<path d="M1349.58,-215.856C1346.71,-214.804 1343.82,-213.83 1341,-213 1251.42,-186.636 1224.83,-198.686 1134,-177 1130.95,-176.272 1127.82,-175.467 1124.67,-174.618" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Cage -->
-<g class="node" id="node10"><title>Cage</title>
-<g id="a_node10"><a xlink:title="cage                 ------------------------------cage_purpose=&quot;&quot;      ">
-<polygon fill="#000000" fill-opacity="0.125490" points="162.5,-248 123.5,-248 123.5,-213 162.5,-213 162.5,-248" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="131.5" y="-229">Cage</text>
-</a>
-</g>
-</g>
-<!-- Cage&#45;&gt;SubjectCaging -->
-<g class="edge" id="edge17"><title>Cage-&gt;SubjectCaging</title>
-<path d="M143,-212.797C143,-201.949 143,-187.867 143,-177.049" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Strain -->
-<g class="node" id="node12"><title>Strain</title>
-<g id="a_node12"><a xlink:title="strain               ------------------------------strain_standard_name strain_desc=&quot;&quot;       ">
-<polygon fill="#000000" fill-opacity="0.125490" points="60,-248 18,-248 18,-213 60,-213 60,-248" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="26" y="-229">Strain</text>
-</a>
-</g>
-</g>
-<!-- Strain&#45;&gt;Subject.Strain -->
-<g class="edge" id="edge18"><title>Strain-&gt;Subject.Strain</title>
-<path d="M39,-212.797C39,-199.077 39,-180.185 39,-169.265" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Allele -->
-<g class="node" id="node16"><title>Allele</title>
-<g id="a_node16"><a xlink:title="allele               ------------------------------allele_standard_name=&quot;&quot; ">
-<polygon fill="#000000" fill-opacity="0.125490" points="1469.5,-248 1428.5,-248 1428.5,-213 1469.5,-213 1469.5,-248" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="1436.5" y="-229">Allele</text>
-</a>
-</g>
-</g>
-<!-- Allele&#45;&gt;Line.Allele -->
-<g class="edge" id="edge19"><title>Allele-&gt;Line.Allele</title>
-<path d="M1428.36,-214.187C1409.63,-200.291 1382.69,-180.305 1367.52,-169.049" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Allele&#45;&gt;Zygosity -->
-<g class="edge" id="edge20"><title>Allele-&gt;Zygosity</title>
-<path d="M1428.25,-217.506C1425.19,-215.908 1422.04,-214.356 1419,-213 1374.71,-193.247 1361.24,-194.456 1316,-177 1312.98,-175.836 1309.85,-174.584 1306.73,-173.31" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Allele&#45;&gt;Allele.Sequence -->
-<g class="edge" id="edge21"><title>Allele-&gt;Allele.Sequence</title>
-<path d="M1449,-212.797C1449,-199.077 1449,-180.185 1449,-169.265" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Allele.Source -->
-<g class="node" id="node25"><title>Allele.Source</title>
-<g id="a_node25"><a xlink:title="→ Allele------------------------------→ Sourcesource_identifier=&quot;&quot; source_url=&quot;&quot;        expression_data_url=&quot;&quot; ">
-<polygon fill="none" points="1585,-169 1511,-169 1511,-150 1585,-150 1585,-169" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="1548" y="-157">Allele.Source</text>
-</a>
-</g>
-</g>
-<!-- Allele&#45;&gt;Allele.Source -->
-<g class="edge" id="edge22"><title>Allele-&gt;Allele.Source</title>
-<path d="M1469.51,-215.203C1489.45,-201.308 1519.07,-180.663 1535.64,-169.117" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Litter -->
-<g class="node" id="node17"><title>Litter</title>
-<g id="a_node17"><a xlink:title="→ BreedingPairlitter_birth_date    ------------------------------num_of_pups          litter_notes=&quot;&quot;      ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="1299.5,-106 1256.5,-106 1256.5,-71 1299.5,-71 1299.5,-106" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="start" text-decoration="underline" x="1264.5" y="-86.4">Litter</text>
-</a>
-</g>
-</g>
-<!-- Litter&#45;&gt;SubjectLitter -->
-<g class="edge" id="edge23"><title>Litter-&gt;SubjectLitter</title>
-<path d="M1256.5,-74.368C1253.71,-73.059 1250.84,-71.8883 1248,-71 1162.18,-44.1219 891.281,-26.5954 787.246,-20.7028" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Weaning -->
-<g class="node" id="node18"><title>Weaning</title>
-<g id="a_node18"><a xlink:title="→ Litter------------------------------weaning_date         num_of_male          num_of_female        weaning_notes=&quot;&quot;     ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="1309.5,-35 1246.5,-35 1246.5,-0 1309.5,-0 1309.5,-35" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="1278" y="-14.4">Weaning</text>
-</a>
-</g>
-</g>
-<!-- Litter&#45;&gt;Weaning -->
-<g class="edge" id="edge24"><title>Litter-&gt;Weaning</title>
-<path d="M1278,-70.797C1278,-59.9485 1278,-45.8669 1278,-35.0492" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- Line -->
-<g class="node" id="node19"><title>Line</title>
-<g id="a_node19"><a xlink:title="line                 ------------------------------line_desc=&quot;&quot;         target_phenotype=&quot;&quot;  is_active            ">
-<polygon fill="#000000" fill-opacity="0.125490" points="1331.5,-248 1296.5,-248 1296.5,-213 1331.5,-213 1331.5,-248" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="1304.5" y="-229">Line</text>
-</a>
-</g>
-</g>
-<!-- Line&#45;&gt;Subject.Line -->
-<g class="edge" id="edge25"><title>Line-&gt;Subject.Line</title>
-<path d="M1296.22,-227.383C1250.69,-221.72 1126.43,-204.744 1026,-177 1018.29,-174.871 1010.04,-171.954 1002.79,-169.164" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Line&#45;&gt;Line.Allele -->
-<g class="edge" id="edge26"><title>Line-&gt;Line.Allele</title>
-<path d="M1324.17,-212.797C1332.52,-199.077 1344.02,-180.185 1350.66,-169.265" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- BreedingPair -->
-<g class="node" id="node22"><title>BreedingPair</title>
-<g id="a_node22"><a xlink:title="→ Linebreeding_pair        ------------------------------bp_start_date=null   bp_end_date=null     bp_desc=&quot;&quot;           ">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="1229,-177 1143,-177 1143,-142 1229,-142 1229,-177" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="start" text-decoration="underline" x="1151" y="-157.4">BreedingPair</text>
-</a>
-</g>
-</g>
-<!-- Line&#45;&gt;BreedingPair -->
-<g class="edge" id="edge27"><title>Line-&gt;BreedingPair</title>
-<path d="M1296.47,-220.051C1276,-209.015 1241.76,-190.559 1216.82,-177.114" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- BreedingPair&#45;&gt;BreedingPair.Father -->
-<g class="edge" id="edge28"><title>BreedingPair-&gt;BreedingPair.Father</title>
-<path d="M1156.78,-141.973C1132.39,-128.178 1098.59,-109.064 1079.24,-98.1206" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="2"/>
-</g>
-<!-- BreedingPair&#45;&gt;BreedingPair.Mother -->
-<g class="edge" id="edge29"><title>BreedingPair-&gt;BreedingPair.Mother</title>
-<path d="M1186,-141.797C1186,-128.077 1186,-109.185 1186,-98.2652" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- BreedingPair&#45;&gt;Litter -->
-<g class="edge" id="edge30"><title>BreedingPair-&gt;Litter</title>
-<path d="M1208.27,-141.797C1222.84,-130.869 1241.79,-116.66 1256.25,-105.811" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-</g>
-</svg>
