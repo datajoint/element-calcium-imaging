@@ -145,7 +145,7 @@ however, in this particular `workflow-calcium-imaging`, we take the assumption t
     
 + Each `session` directory should contain:
  
-    + All `.tif` or `.sbx` or `.json` files for the scan, with any naming convention
+    + All `.tif` or `.sbx` files for the scan, with any naming convention
     
     + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
 
