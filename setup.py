@@ -10,9 +10,9 @@ long_description = """"
 # Workflow for calcium imaging data acquired with ScanImage software and analyzed with Suite2p or CaImAn.
 
 Build a complete imaging workflow using the DataJoint elements
-+ [elements-lab](https://github.com/datajoint/elements-lab)
-+ [elements-animal](https://github.com/datajoint/elements-animal)
-+ [elements-imaging](https://github.com/datajoint/elements-imaging)
++ [elements-lab](https://github.com/datajoint/element-lab)
++ [elements-animal](https://github.com/datajoint/element-animal)
++ [element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging)
 """
 
 with open(path.join(here, 'requirements.txt')) as f:
