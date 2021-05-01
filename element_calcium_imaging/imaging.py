@@ -67,14 +67,12 @@ class ProcessingParamSet(dj.Lookup):
     param_set_hash: uuid
     unique index (param_set_hash)
     params: longblob  # dictionary of all applicable parameters
-    package_version=null: varchar(16)
     """
 
     @classmethod
     def insert_new_params(cls, processing_method: str, paramset_idx: int,
                           paramset_desc: str, params: dict):
         param_dict = {'processing_method': processing_method,
-                      'package_version': package_version,
                       'paramset_idx': paramset_idx,
                       'paramset_desc': paramset_desc,
                       'params': params,
