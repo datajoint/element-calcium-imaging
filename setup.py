@@ -22,14 +22,14 @@ with open(path.join(here, pkg_name, 'version.py')) as f:
     exec(f.read())
 
 setup(
-    name='workflow-imaging',
+    name='workflow-calcium-imaging',
     version=__version__,
     description="Calcium imaging workflow using the DataJoint elements",
     long_description=long_description,
     author='DataJoint NEURO',
     author_email='info@vathes.com',
     license='MIT',
-    url='https://github.com/datajoint/workflow-imaging',
+    url='https://github.com/datajoint/workflow-calcium-imaging',
     keywords='neuroscience datajoint calcium-imaging',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=requirements,
