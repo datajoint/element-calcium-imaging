@@ -1,5 +1,5 @@
 # DataJoint Workflow - Calcium Imaging
-Workflow for calcium imaging data acquired with ScanImage or ScanBox software and analyzed with Suite2p or CaImAn
+Workflow for calcium imaging data acquired with `ScanImage` or `ScanBox` software and processed with `Suite2p` or `CaImAn`.
 
 A complete imaging workflow can be built using the DataJoint elements:
 + [element-lab](https://github.com/datajoint/element-lab)
@@ -13,9 +13,6 @@ This repository provides demonstrations for:
     + predefined file/folder structure and naming convention
     + predefined directory lookup methods (see [workflow_calcium_imaging/paths.py](workflow_calcium_imaging/paths.py))
 3. Ingestion of clustering results (built-in routine from the imaging element)
-
-+ This workflow provides support for calcium imaging data acquired with the `ScanImage`, `ScanBox`, or `Miniscope-DAQ` systems.  And for data processed with `Suite2p`, `CaImAn`, or `Miniscope Analysis`.
-    + Note the [`Miniscope Analysis`](https://github.com/etterguillaume/MiniscopeAnalysis) package is not currently maintained.
 
 ## Workflow architecture
 
@@ -37,8 +34,6 @@ The Calcium imaging workflow presented here uses pipeline components from 4 Data
 ## Installation instructions
 
 ### Step 1 - Clone this repository
-
-+ It is recommended to fork this repository and install a clone of your fork.
 
 + Launch a new terminal and change directory to where you want to clone the repository
     ```
@@ -155,8 +150,6 @@ however, in this particular `workflow-calcium-imaging`, we take the assumption t
     + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
 
     + One `caiman` subfolder per `session` folder, containing the `CaImAn` analysis output `.hdf5` file, with any naming convention
-
-    + One `miniscope_analysis` subfolder per `session` folder, containing the `Miniscope Analysis` output `ms.mat` and `SFP.mat` files
 
 ```
 imaging_root_data_dir/
