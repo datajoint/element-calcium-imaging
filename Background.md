@@ -51,7 +51,7 @@ These teams include:
 ## Pipeline Development
 Through our interviews and direct collaboration on the precursor projects, 
 we identified the common motifs to create the Calcium ImagingElement 
-with the repository hosted at https://github.com/datajoint/elements-imaging.
+with the repository hosted at https://github.com/datajoint/element-calcium-imaging.
 
 Major features of the Calcium Imaging Element include:
 + Pipeline architecture defining:
