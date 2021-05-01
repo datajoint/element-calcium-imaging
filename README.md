@@ -19,17 +19,17 @@ This repository provides demonstrations for:
 The Calcium imaging workflow presented here uses pipeline components from 4 DataJoint Elements, 
 `element-lab`, `element-animal`, `element-session` and `element-calcium-imaging`, assembled together to form a fully functional workflow. 
 
-### elements-lab
+### element-lab
 
-![element-lab](images/elements_lab_diagram.svg)
+![element-lab](https://github.com/datajoint/element-lab/raw/main/images/element_lab_diagram.svg)
 
-### elements-animal
+### element-animal
 
-![element-animal](images/elements_subject_diagram.svg)
+![element-animal](https://github.com/datajoint/element-animal/blob/main/images/subject_diagram.svg)
 
-### elements-imaging
+### assembled with element-calcium-imaging
 
-![element_calcium_imaging](images/attached_imaging_element.svg)
+![element_calcium_imaging](images/attached_calcium_imaging_element.svg)
 
 ## Installation instructions
 
@@ -239,7 +239,9 @@ populating the workflow with your data amounts to these 3 steps:
 + For a more in-depth exploration of ingested data, please refer to the example [notebook](notebooks/explore_workflow.ipynb).
 
 
-## Development mode installation
+## Developer Guide
+
+### Development mode installation
 
 This method allows you to modify the source code for `workflow-calcium-imaging`, 
 `element-calcium-imaging`, `element-animal`, `element-session`, and `element-lab`.
@@ -264,3 +266,19 @@ This method allows you to modify the source code for `workflow-calcium-imaging`,
     pip install -e ./element-animal
     pip install -e ./element-calcium-imaging
     ```
+  
+### Running tests
+
+1. Download the test dataset to your local machine 
+(note the directory where the dataset is saved at - e.g. `/tmp/testset`)
+
+2. Create an `.env` file with the following content:
+
+    > TEST_DATA_DIR=/tmp/testset
+    
+    (replace `/tmp/testset` with the directory where you have the test dataset downloaded to)
+    
+3. Run:
+
+    
+    docker-compose -f docker-compose-test.yaml up --build 

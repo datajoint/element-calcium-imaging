@@ -1,114 +1,0 @@
-<svg height="114pt" viewBox="0.00 0.00 422.50 114.00" width="423pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 110)">
-<title>%3</title>
-<polygon fill="white" points="-4,4 -4,-110 418.5,-110 418.5,4 -4,4" stroke="none"/>
-<!-- UserRole -->
-<g class="node" id="node1"><title>UserRole</title>
-<g id="a_node1"><a xlink:title="user_role            ">
-<polygon fill="#000000" fill-opacity="0.125490" points="136.5,-106 80.5,-106 80.5,-71 136.5,-71 136.5,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="88.5" y="-87">UserRole</text>
-</a>
-</g>
-</g>
-<!-- LabMembership -->
-<g class="node" id="node6"><title>LabMembership</title>
-<g id="a_node6"><a xlink:title="→ Lab→ User------------------------------→ [nullable] UserRole">
-<polygon fill="#000000" fill-opacity="0.125490" points="157.5,-35 71.5,-35 71.5,-0 157.5,-0 157.5,-35" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="middle" x="114.5" y="-15">LabMembership</text>
-</a>
-</g>
-</g>
-<!-- UserRole&#45;&gt;LabMembership -->
-<g class="edge" id="edge1"><title>UserRole-&gt;LabMembership</title>
-<path d="M109.952,-70.797C110.896,-59.9485 112.12,-45.8669 113.061,-35.0492" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Lab -->
-<g class="node" id="node2"><title>Lab</title>
-<g id="a_node2"><a xlink:title="lab                  ------------------------------institution          address              time_zone            ">
-<polygon fill="#000000" fill-opacity="0.125490" points="56,-106 21,-106 21,-71 56,-71 56,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="30.5" y="-87">Lab</text>
-</a>
-</g>
-</g>
-<!-- Lab&#45;&gt;LabMembership -->
-<g class="edge" id="edge2"><title>Lab-&gt;LabMembership</title>
-<path d="M56.127,-71.4966C68.1418,-60.5883 84.0146,-46.1775 96.1752,-35.137" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Location -->
-<g class="node" id="node7"><title>Location</title>
-<g id="a_node7"><a xlink:title="→ Lablocation             ------------------------------location_desc=&quot;&quot;     ">
-<polygon fill="#000000" fill-opacity="0.125490" points="53,-35 0,-35 0,-0 53,-0 53,-35" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="8" y="-16">Location</text>
-</a>
-</g>
-</g>
-<!-- Lab&#45;&gt;Location -->
-<g class="edge" id="edge3"><title>Lab-&gt;Location</title>
-<path d="M35.5951,-70.797C33.7084,-59.9485 31.2595,-45.8669 29.3781,-35.0492" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Source -->
-<g class="node" id="node3"><title>Source</title>
-<g id="a_node3"><a xlink:title="source               ------------------------------source_name          contact_details=&quot;&quot;   source_desc=&quot;&quot;       ">
-<polygon fill="#000000" fill-opacity="0.125490" points="322,-106 275,-106 275,-71 322,-71 322,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="283" y="-87">Source</text>
-</a>
-</g>
-</g>
-<!-- ProjectUser -->
-<g class="node" id="node4"><title>ProjectUser</title>
-<g id="a_node4"><a xlink:title="→ Project→ User">
-<polygon fill="#00ff00" fill-opacity="0.188235" points="253.5,-35 175.5,-35 175.5,-0 253.5,-0 253.5,-35" stroke="#00ff00" stroke-opacity="0.188235"/>
-<text fill="darkgreen" font-family="arial" font-size="12.00" text-anchor="middle" x="214.5" y="-14.4">ProjectUser</text>
-</a>
-</g>
-</g>
-<!-- User -->
-<g class="node" id="node5"><title>User</title>
-<g id="a_node5"><a xlink:title="user                 ------------------------------user_email=&quot;&quot;        user_cellphone=&quot;&quot;    ">
-<polygon fill="#000000" fill-opacity="0.125490" points="192,-106 155,-106 155,-71 192,-71 192,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="163" y="-87">User</text>
-</a>
-</g>
-</g>
-<!-- User&#45;&gt;ProjectUser -->
-<g class="edge" id="edge4"><title>User-&gt;ProjectUser</title>
-<path d="M183.425,-70.797C189.871,-59.9485 198.238,-45.8669 204.666,-35.0492" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- User&#45;&gt;LabMembership -->
-<g class="edge" id="edge5"><title>User-&gt;LabMembership</title>
-<path d="M159.218,-70.797C149.941,-59.9485 137.901,-45.8669 128.651,-35.0492" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- Protocol -->
-<g class="node" id="node8"><title>Protocol</title>
-<g id="a_node8"><a xlink:title="protocol             ------------------------------→ ProtocolTypeprotocol_desc=&quot;&quot;     ">
-<polygon fill="#000000" fill-opacity="0.125490" points="404,-35 351,-35 351,-0 404,-0 404,-35" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="359" y="-16">Protocol</text>
-</a>
-</g>
-</g>
-<!-- Project -->
-<g class="node" id="node9"><title>Project</title>
-<g id="a_node9"><a xlink:title="project              ------------------------------project_desc=&quot;&quot;      ">
-<polygon fill="#000000" fill-opacity="0.125490" points="257,-106 210,-106 210,-71 257,-71 257,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="218" y="-87">Project</text>
-</a>
-</g>
-</g>
-<!-- Project&#45;&gt;ProjectUser -->
-<g class="edge" id="edge6"><title>Project-&gt;ProjectUser</title>
-<path d="M228.901,-70.797C225.913,-59.9485 222.036,-45.8669 219.057,-35.0492" fill="none" stroke="#000000" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-<!-- ProtocolType -->
-<g class="node" id="node10"><title>ProtocolType</title>
-<g id="a_node10"><a xlink:title="protocol_type        ">
-<polygon fill="#000000" fill-opacity="0.125490" points="414.5,-106 340.5,-106 340.5,-71 414.5,-71 414.5,-106" stroke="none"/>
-<text font-family="arial" font-size="10.00" text-anchor="start" text-decoration="underline" x="348.5" y="-87">ProtocolType</text>
-</a>
-</g>
-</g>
-<!-- ProtocolType&#45;&gt;Protocol -->
-<g class="edge" id="edge7"><title>ProtocolType-&gt;Protocol</title>
-<path d="M377.5,-70.797C377.5,-59.9485 377.5,-45.8669 377.5,-35.0492" fill="none" stroke="#000000" stroke-dasharray="5,2" stroke-opacity="0.250980" stroke-width="0.75"/>
-</g>
-</g>
-</svg>

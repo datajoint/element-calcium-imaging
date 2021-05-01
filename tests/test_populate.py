@@ -1,8 +1,10 @@
 import numpy as np
 
-from . import (dj_config, pipeline, subjects_csv, ingest_subjects,
+from . import (dj_config, pipeline, test_data,
+               subjects_csv, ingest_subjects,
                sessions_csv, ingest_sessions,
-               testdata_paths, suite2p_paramset, caiman2D_paramset, caiman3D_paramset,
+               testdata_paths, suite2p_paramset,
+               caiman2D_paramset, caiman3D_paramset,
                scan_info, processing_tasks, processing, curations)
 
 
@@ -22,6 +24,7 @@ def test_scan_info_populate_scanimage_2D(testdata_paths, pipeline, scan_info):
 
 def test_scan_info_populate_scanimage_3D(testdata_paths, pipeline, scan_info):
     scan = pipeline['scan']
+
     rel_path = testdata_paths['scanimage_3d']
     scan_key = (scan.ScanInfo & (scan.ScanInfo.ScanFile
                                  & f'file_path LIKE "%{rel_path}%"')).fetch1('KEY')
@@ -32,6 +35,22 @@ def test_scan_info_populate_scanimage_3D(testdata_paths, pipeline, scan_info):
     assert nchannels == 2
     assert ndepths == 3
     assert nframes == 2000
+
+
+def test_scan_info_populate_scanimage_multiROI(testdata_paths, pipeline, scan_info):
+    scan = pipeline['scan']
+
+    rel_path = testdata_paths['scanimage_multiroi']
+    scan_key = (scan.ScanInfo & (scan.ScanInfo.ScanFile
+                                 & f'file_path LIKE "%{rel_path}%"')).fetch1('KEY')
+    nfields, nchannels, ndepths, nframes, nrois = (scan.ScanInfo & scan_key).fetch1(
+        'nfields', 'nchannels', 'ndepths', 'nframes', 'nrois')
+
+    assert nfields == 3
+    assert nchannels == 1
+    assert ndepths == 1
+    assert nframes == 12000
+    assert nrois == 3
 
 
 def test_scan_info_populate_scanbox_3D(testdata_paths, pipeline, scan_info):
@@ -53,54 +72,55 @@ def test_processing_populate(processing, pipeline):
     assert len(imaging.Processing()) == 5
 
 
-def test_motion_correction_populate_suite2p_2D(processing, pipeline, testdata_paths):
+def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_paths):
     imaging = pipeline['imaging']
     scan = pipeline['scan']
 
     rel_path = testdata_paths['suite2p_2d']
-    processing_key = (imaging.ProcessingTask
-                      & f'processing_output_dir LIKE "%{rel_path}"').fetch1('KEY')
-    imaging.MotionCorrection.populate(processing_key)
+    curation_key = (imaging.Curation
+                    & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
 
-    assert len(imaging.MotionCorrection.Block & processing_key) == 9
+    imaging.MotionCorrection.populate(curation_key)
+
+    assert len(imaging.MotionCorrection.Block & curation_key) == 9
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
-                & processing_key).fetch1('x_shifts')
+                & curation_key).fetch1('x_shifts')
     assert len(x_shifts) == (scan.ScanInfo
-                             & processing_key).fetch1('nframes')
+                             & curation_key).fetch1('nframes')
 
-    ave_img = (imaging.MotionCorrection.Summary & processing_key).fetch1('average_image')
-    img_width, img_height = (scan.ScanInfo.Field & processing_key).fetch1(
+    ave_img = (imaging.MotionCorrection.Summary & curation_key).fetch1('average_image')
+    img_width, img_height = (scan.ScanInfo.Field & curation_key).fetch1(
         'px_width', 'px_height')
     assert ave_img.shape == (img_height, img_width)
 
 
-def test_motion_correction_populate_suite2p_3D(processing, pipeline, testdata_paths):
+def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_paths):
     imaging = pipeline['imaging']
     scan = pipeline['scan']
-
+    # test-set A
     rel_path = testdata_paths['suite2p_3d_a']
-    processing_key = (imaging.ProcessingTask
-                      & f'processing_output_dir LIKE "%{rel_path}"').fetch1('KEY')
-    imaging.MotionCorrection.populate(processing_key)
+    curation_key = (imaging.Curation
+                    & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+    imaging.MotionCorrection.populate(curation_key)
 
-    assert len(imaging.MotionCorrection.Block & processing_key) == 36
+    assert len(imaging.MotionCorrection.Block & curation_key) == 36
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
-                & processing_key).fetch1('x_shifts')
-    nfields, nframes = (scan.ScanInfo & processing_key).fetch1('nfields', 'nframes')
+                & curation_key).fetch1('x_shifts')
+    nfields, nframes = (scan.ScanInfo & curation_key).fetch1('nfields', 'nframes')
     assert x_shifts.shape == (nfields, nframes)
-
+    # test-set B
     rel_path = testdata_paths['suite2p_3d_b']
-    processing_key = (imaging.ProcessingTask
-                      & f'processing_output_dir LIKE "%{rel_path}"').fetch1('KEY')
-    imaging.MotionCorrection.populate(processing_key)
+    curation_key = (imaging.Curation
+                    & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+    imaging.MotionCorrection.populate(curation_key)
 
-    assert len(imaging.MotionCorrection.Block & processing_key) == 54
+    assert len(imaging.MotionCorrection.Block & curation_key) == 54
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
-                & processing_key).fetch1('x_shifts')
-    nfields, nframes = (scan.ScanInfo & processing_key).fetch1('nfields', 'nframes')
+                & curation_key).fetch1('x_shifts')
+    nfields, nframes = (scan.ScanInfo & curation_key).fetch1('nfields', 'nframes')
     assert x_shifts.shape == (nfields, nframes)
 
 

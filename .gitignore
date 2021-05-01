@@ -115,3 +115,6 @@ dj_local_conf_old.json
 **/.#*
 docker-compose.yml
 Diagram.ipynb
+
+# docker
+.env
