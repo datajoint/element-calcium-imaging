@@ -26,6 +26,7 @@ setup(
     version=__version__,
     description="Calcium imaging workflow using the DataJoint elements",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author='DataJoint NEURO',
     author_email='info@vathes.com',
     license='MIT',
