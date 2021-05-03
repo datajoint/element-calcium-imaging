@@ -270,10 +270,10 @@ class MotionCorrection(dj.Imported):
     def make(self, key):
         method, imaging_dataset = get_loader_result(key, Curation)
 
+        field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
+
         if method == 'suite2p':
             suite2p_dataset = imaging_dataset
-
-            field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
 
             motion_correct_channel = suite2p_dataset.planes[0].alignment_channel
 
@@ -363,8 +363,8 @@ class MotionCorrection(dj.Imported):
             self.insert1({**key, 'motion_correct_channel': caiman_dataset.alignment_channel})
 
             is3D = caiman_dataset.params.motion['is3D']
-            # -- rigid motion correction --
             if not caiman_dataset.params.motion['pw_rigid']:
+                # -- rigid motion correction --
                 rigid_correction = {
                     **key,
                     'x_shifts': caiman_dataset.motion_correction['shifts_rig'][:, 0],
@@ -381,8 +381,8 @@ class MotionCorrection(dj.Imported):
                     'outlier_frames': None}
 
                 self.RigidMotionCorrection.insert1(rigid_correction)
-            # -- non-rigid motion correction --
             else:
+                # -- non-rigid motion correction --
                 nonrigid_correction = {
                     **key,
                     'block_height': (caiman_dataset.params.motion['strides'][0]
@@ -437,7 +437,6 @@ class MotionCorrection(dj.Imported):
                 self.Block.insert(nonrigid_blocks)
 
             # -- summary images --
-            field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
             summary_images = [
                 {**key, **fkey, 'ref_image': ref_image,
                  'average_image': ave_img,
