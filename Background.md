@@ -20,7 +20,7 @@ In all there are perhaps on the order of 3000 two-photon setups globally but the
 ### Software
 + ScanImage
 + ThorImageLS
-+ ScanBox
++ Scanbox
 
 Vidrio’s [ScanImage](https://docs.scanimage.org/) is the data acquisition software for two types of home-built scanning two-photon systems, 
 either based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version. 
@@ -58,7 +58,7 @@ Major features of the Calcium Imaging Element include:
     + Calcium-imaging scanning metadata, also compatible with mesoscale imaging and multi-ROI scanning mode
     + Tables for all processing steps: motion correction, segmentation, cell spatial footprint, fluorescence trace extraction, spike inference and cell classification
     + Store/track/manage different curations of the segmentation results
-+ Ingestion support for data acquired with ScanImage and ScanBox acquisition systems
++ Ingestion support for data acquired with ScanImage and Scanbox acquisition systems
 + Ingestion support for processing outputs from both Suite2p and CaImAn analysis suites
 + Sample data and complete test suite for quality assurance
 

@@ -34,9 +34,9 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
                     :param scan_key: key of a Scan
                     :return: list of ScanImage files' full file-paths
                 + get_scan_box_files(scan_key: dict) -> list
-                    Retrieve the list of ScanBox files (*.sbx) associated with a given Scan
+                    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
                     :param scan_key: key of a Scan
-                    :return: list of ScanBox files' full file-paths
+                    :return: list of Scanbox files' full file-paths
     """
 
     if isinstance(linking_module, str):
@@ -83,9 +83,9 @@ def get_scan_image_files(scan_key: dict) -> list:
 
 def get_scan_box_files(scan_key: dict) -> list:
     """
-    Retrieve the list of ScanBox files (*.sbx) associated with a given Scan
+    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
     :param scan_key: key of a Scan
-    :return: list of ScanBox files' full file-paths
+    :return: list of Scanbox files' full file-paths
     """
     return _linking_module.get_scan_box_files(scan_key)
 
@@ -95,10 +95,10 @@ def get_scan_box_files(scan_key: dict) -> list:
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, ScanBox
+    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'ScanBox'])
+    contents = zip(['ScanImage', 'Scanbox'])
 
 
 @schema
@@ -228,7 +228,7 @@ class ScanInfo(dj.Imported):
                          field_z=z_zero + scan.scanning_depths[plane_idx],
                          delay_image=scan.field_offsets[plane_idx])
                     for plane_idx in range(scan.num_scanning_depths)])
-        elif acq_software == 'ScanBox':
+        elif acq_software == 'Scanbox':
             import sbxreader
             # Read the scan
             scan_filepaths = get_scan_box_files(key)
@@ -238,7 +238,7 @@ class ScanInfo(dj.Imported):
 
             if is_multiROI:
                 raise NotImplementedError(
-                    'Loading routine not implemented for ScanBox multiROI scan mode')
+                    'Loading routine not implemented for Scanbox multiROI scan mode')
 
             # Insert in ScanInfo
             x_zero, y_zero, z_zero = sbx_meta['stage_pos'] 
