@@ -1,5 +1,5 @@
 # DataJoint Workflow - Calcium Imaging
-Workflow for calcium imaging data acquired with `ScanImage` or `ScanBox` software and processed with `Suite2p` or `CaImAn`.
+Workflow for calcium imaging data acquired with `ScanImage` or `Scanbox` software and processed with `Suite2p` or `CaImAn`.
 
 A complete imaging workflow can be built using the DataJoint elements:
 + [element-lab](https://github.com/datajoint/element-lab)
@@ -87,7 +87,7 @@ If no such modification required, using `pip install .` is sufficient
 
 ### Step 4 - Install `sbxreader` module
 
-+ If you are planning on working with data acquired with the ScanBox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
++ If you are planning on working with data acquired with the Scanbox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
     ```
     pip install sbxreader
     ```
