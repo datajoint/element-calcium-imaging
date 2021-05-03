@@ -568,13 +568,13 @@ class Segmentation(dj.Computed):
                                                    ignore_extra_fields=True,
                                                    allow_direct_insert=True)
         else:
-            raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
+            raise NotImplementedError(f'Unknown/unimplemented method: {method}')
 
 
 @schema
 class MaskClassificationMethod(dj.Lookup):
     definition = """
-    mask_classification_method: varchar(32)
+    mask_classification_method: varchar(48)
     """
 
     contents = zip(['suite2p_default_classifier',
@@ -663,6 +663,7 @@ class Fluorescence(dj.Computed):
 
             self.insert1(key)
             self.Trace.insert(fluo_traces)
+        
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
