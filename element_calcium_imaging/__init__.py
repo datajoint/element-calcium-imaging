@@ -13,7 +13,8 @@ def find_full_path(root_directories, relative_path):
         :return: root_directory (pathlib.Path object)
     """
     relative_path = pathlib.Path(relative_path)
-# If the relative_path is an absolute path
+    
+    # If the relative_path is an absolute path
     if relative_path.exists():
         return relative_path
 

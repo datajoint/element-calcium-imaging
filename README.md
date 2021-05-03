@@ -1,6 +1,6 @@
 # DataJoint Element - Functional Calcium Imaging
 This repository features DataJoint pipeline design for functional Calcium imaging, 
-with `ScanImage` or `ScanBox` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
+with `ScanImage` or `Scanbox` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
 
 The element presented here is not a complete workflow by itself,
  but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
@@ -37,7 +37,7 @@ See [Background](Background.md) for the background information and development t
 
 ### Preprocessing - Motion Correction
 
-+ `MotionCorrection` - table containing the motion correction information performed on a scan
++ `MotionCorrection` - motion correction information performed on a scan
 
 + `MotionCorrection.RigidMotionCorrection` - details of the rigid motion correction (e.g. shifting in x, y) at a per `ScanInfo.Field` level
 
@@ -53,7 +53,7 @@ See [Background](Background.md) for the background information and development t
 
 + `MaskClassification` - classification of `Segmentation.Mask` into different type (e.g. soma, axon, dendrite, artifact, etc.)
 
-### Neural activity 
+### Neural activity extraction
 
 + `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
 
