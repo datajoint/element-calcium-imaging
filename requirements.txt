@@ -4,4 +4,3 @@ pyfftw
 imreg_dft
 sklearn
 h5py
-scanreader @ git+https://github.com/atlab/scanreader.git#egg=scanreader
