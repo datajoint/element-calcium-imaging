@@ -76,8 +76,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      TWINE_USERNAME: ${{secrets.twine_test_username}}
-      TWINE_PASSWORD: ${{secrets.twine_test_password}}
+      TWINE_USERNAME: ${{secrets.twine_username}}
+      TWINE_PASSWORD: ${{secrets.twine_password}}
     outputs:
       release_upload_url: ${{steps.create_gh_release.outputs.upload_url}}
     steps:
@@ -122,7 +122,7 @@ jobs:
           docker load < "image-${{env.PKG_NAME}}-${PKG_VERSION}-py3.8-alpine.tar.gz"
           docker-compose -f docker-compose-build.yaml run \
             -e TWINE_USERNAME=${TWINE_USERNAME} -e TWINE_PASSWORD=${TWINE_PASSWORD} element \
-            sh -lc "pip install twine && python -m twine upload --repository testpypi dist/*"
+            sh -lc "pip install twine && python -m twine upload dist/*"
       - name: Determine pip artifact paths
         run: |
           echo "PKG_WHEEL_PATH=$(ls dist/${PKG_NAME}-*.whl)" >> $GITHUB_ENV
