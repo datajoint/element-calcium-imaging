@@ -9,8 +9,6 @@ COPY --chown=dja:anaconda ./requirements.txt ./setup.py \
     /main/
 COPY --chown=dja:anaconda ./${PKG_NAME} /main/${PKG_NAME}
 RUN \
-    echo git > /tmp/apk_requirements.txt && \
-    /entrypoint.sh echo && \
     cd /main && \
     pip install . && \
     rm -R /main/*
