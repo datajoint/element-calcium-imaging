@@ -270,7 +270,7 @@ class MotionCorrection(dj.Imported):
     def make(self, key):
         method, imaging_dataset = get_loader_result(key, Curation)
 
-        field_keys = (scan.ScanInfo.Field & key).fetch('KEY', order_by='field_z')
+        field_keys, _ = (scan.ScanInfo.Field & key).fetch('KEY', 'field_z', order_by='field_z')
 
         if method == 'suite2p':
             suite2p_dataset = imaging_dataset
