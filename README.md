@@ -1,4 +1,5 @@
-# Workflow for calcium imaging data acquired with ScanImage software and analyzed with Suite2p or CaImAn
+# DataJoint Workflow - Calcium Imaging
+Workflow for calcium imaging data acquired with `ScanImage` or `Scanbox` software and processed with `Suite2p` or `CaImAn`.
 
 A complete imaging workflow can be built using the DataJoint elements:
 + [element-lab](https://github.com/datajoint/element-lab)
@@ -12,7 +13,6 @@ This repository provides demonstrations for:
     + predefined file/folder structure and naming convention
     + predefined directory lookup methods (see [workflow_calcium_imaging/paths.py](workflow_calcium_imaging/paths.py))
 3. Ingestion of clustering results (built-in routine from the imaging element)
-
 
 ## Workflow architecture
 
@@ -49,7 +49,7 @@ The Calcium imaging workflow presented here uses pipeline components from 4 Data
     ```
 
 ### Step 2 - Setup a virtual environment
-It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
++ It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
 
 + If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the `conda` environment created for the CaImAn installation.
     + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
@@ -87,7 +87,7 @@ If no such modification required, using `pip install .` is sufficient
 
 ### Step 4 - Install `sbxreader` module
 
-+ If you are planning on working with data acquired with the ScanBox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
++ If you are planning on working with data acquired with the Scanbox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
     ```
     pip install sbxreader
     ```
@@ -145,7 +145,7 @@ however, in this particular `workflow-calcium-imaging`, we take the assumption t
     
 + Each `session` directory should contain:
  
-    + All `.tif` files for the scan, with any naming convention
+    + All `.tif` or `.sbx` files for the scan, with any naming convention
     
     + One `suite2p` subfolder per `session` folder, containing the `Suite2p` analysis outputs
 
@@ -202,9 +202,9 @@ populating the workflow with your data amounts to these 3 steps:
     python workflow_calcium_imaging/populate.py
     ```
 
-+ For inserting new subjects, sessions or new analysis parameters, step 1 needs to be re-executed.
++ For inserting new subjects, sessions or new analysis parameters, step 1 needs to be repeated.
 
-+ Rerun step 2 and 3 every time new sessions or clustering data become available.
++ Rerun step 2 and 3 every time new sessions or processed data becomes available.
 
 + In fact, step 2 and 3 can be executed as scheduled jobs that will automatically process any data newly placed into the `imaging_root_data_dir`.
 

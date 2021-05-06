@@ -1,5 +1,2 @@
 subject,session_dir
-subject1,F:\U24\workflow_imaging_data\subject1\20200609_170519
-subject1,F:\U24\workflow_imaging_data\subject1\20200609_171646
-subject2,F:\U24\workflow_imaging_data\subject2\20200420_1843959
-subject3,F:\U24\workflow_imaging_data\subject3\210107_run00_orientation_8dir
+subject3,/tmp/example_data/subject3/210107_run00_orientation_8dir
