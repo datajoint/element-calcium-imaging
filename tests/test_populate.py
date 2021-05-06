@@ -82,6 +82,9 @@ def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_pat
 
     imaging.MotionCorrection.populate(curation_key)
 
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'suite2p'
+
     assert len(imaging.MotionCorrection.Block & curation_key) == 9
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
@@ -104,6 +107,9 @@ def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_pat
                     & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
     imaging.MotionCorrection.populate(curation_key)
 
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'suite2p'
+
     assert len(imaging.MotionCorrection.Block & curation_key) == 36
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
@@ -116,12 +122,40 @@ def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_pat
                     & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
     imaging.MotionCorrection.populate(curation_key)
 
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'suite2p'
+
     assert len(imaging.MotionCorrection.Block & curation_key) == 54
 
     x_shifts = (imaging.MotionCorrection.RigidMotionCorrection
                 & curation_key).fetch1('x_shifts')
     nfields, nframes = (scan.ScanInfo & curation_key).fetch1('nfields', 'nframes')
     assert x_shifts.shape == (nfields, nframes)
+
+
+def test_motion_correction_populate_caiman_2D(curations, pipeline, testdata_paths):
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+
+    rel_path = testdata_paths['caiman_2d']
+    curation_key = (imaging.Curation
+                    & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'caiman'
+
+    imaging.MotionCorrection.populate(curation_key)
+
+    assert len(imaging.MotionCorrection.Block & curation_key) == 25
+
+    x_shifts, y_shifts = (imaging.MotionCorrection.Block
+                          & curation_key & 'block_id = 0').fetch1('x_shifts', 'y_shifts')
+    assert len(x_shifts) == (scan.ScanInfo & curation_key).fetch1('nframes')
+
+    ave_img = (imaging.MotionCorrection.Summary & curation_key).fetch1('average_image')
+    img_width, img_height = (scan.ScanInfo.Field & curation_key).fetch1(
+        'px_width', 'px_height')
+    assert ave_img.shape == (img_height, img_width)
 
 
 def test_segmentation_populate_suite2p_2D(curations, pipeline, testdata_paths):
@@ -136,6 +170,9 @@ def test_segmentation_populate_suite2p_2D(curations, pipeline, testdata_paths):
     imaging.Segmentation.populate(curation_key)
     imaging.Fluorescence.populate(curation_key)
     imaging.Activity.populate(curation_key)
+
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'suite2p'
 
     assert len(imaging.Segmentation.Mask & curation_key) == 57
 
@@ -166,6 +203,9 @@ def test_segmentation_populate_suite2p_3D(curations, pipeline, testdata_paths):
     imaging.Segmentation.populate(curation_key)
     imaging.Fluorescence.populate(curation_key)
     imaging.Activity.populate(curation_key)
+
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'suite2p'
 
     assert len(imaging.Segmentation.Mask & curation_key) == 1174
 
@@ -207,3 +247,33 @@ def test_segmentation_populate_suite2p_3D(curations, pipeline, testdata_paths):
                & 'fluo_channel = 0' & 'mask = 0').fetch1(
         'fluorescence', 'neuropil_fluorescence')
     assert len(f) == len(fneu) == nframes
+
+
+def test_segmentation_populate_caiman_2D(curations, pipeline, testdata_paths):
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+
+    rel_path = testdata_paths['caiman_2d']
+    curation_key = (imaging.Curation
+                    & f'curation_output_dir LIKE "%{rel_path}"').fetch1('KEY')
+
+    imaging.MotionCorrection.populate(curation_key)
+    imaging.Segmentation.populate(curation_key)
+    imaging.Fluorescence.populate(curation_key)
+    imaging.Activity.populate(curation_key)
+
+    assert (imaging.Curation * imaging.ProcessingParamSet
+            & curation_key).fetch1('processing_method') == 'caiman'
+
+    assert len(imaging.Segmentation.Mask & curation_key) == 14
+
+    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 14
+    assert len(imaging.Activity.Trace & curation_key
+               & 'fluo_channel = 0' & 'extraction_method = "caiman_deconvolution"') == 14
+    assert len(imaging.Activity.Trace & curation_key
+               & 'fluo_channel = 0' & 'extraction_method = "caiman_dff"') == 14
+
+    nframes = (scan.ScanInfo & curation_key).fetch1('nframes')
+    f = (imaging.Fluorescence.Trace & curation_key
+         & 'fluo_channel = 0' & 'mask = 1').fetch1('fluorescence')
+    assert len(f) == nframes
