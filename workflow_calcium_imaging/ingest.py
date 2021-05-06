@@ -30,16 +30,16 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
     for sess in input_sessions:
         sess_dir = pathlib.Path(sess['session_dir'])
 
-        # search for either ScanImage or ScanBox files (in that order)
+        # search for either ScanImage or Scanbox files (in that order)
         for scan_pattern, scan_type, glob_func in zip(['*.tif', '*.sbx'],
-                                                      ['ScanImage', 'ScanBox'],
+                                                      ['ScanImage', 'Scanbox'],
                                                       [sess_dir.glob, sess_dir.rglob]):
             scan_filepaths = [fp.as_posix() for fp in glob_func(scan_pattern)]
             if len(scan_filepaths):
                 acq_software = scan_type
                 break
         else:
-            raise FileNotFoundError(f'Unable to identify scan files from the supported acquisition softwares (ScanImage, ScanBox) at: {sess_dir}')
+            raise FileNotFoundError(f'Unable to identify scan files from the supported acquisition softwares (ScanImage, Scanbox) at: {sess_dir}')
 
         if acq_software == 'ScanImage':
             import scanreader
@@ -52,15 +52,15 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
             except Exception as e:
                 print(f'ScanImage loading error: {scan_filepaths}\n{str(e)}')
                 continue
-        elif acq_software == 'ScanBox':
+        elif acq_software == 'Scanbox':
             import sbxreader
             try:  # attempt to load scanbox
                 sbx_fp = pathlib.Path(scan_filepaths[0])
                 sbx_meta = sbxreader.sbx_get_metadata(sbx_fp)
                 recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)  # read from file when scanbox support this
-                scanner = sbx_meta.get('imaging_system', 'ScanBox')
+                scanner = sbx_meta.get('imaging_system', 'Scanbox')
             except Exception as e:
-                print(f'ScanBox loading error: {scan_filepaths}\n{str(e)}')
+                print(f'Scanbox loading error: {scan_filepaths}\n{str(e)}')
                 continue
         else:
             raise NotImplementedError(f'Processing scan from acquisition software of type {acq_software} is not yet implemented')
