@@ -61,20 +61,27 @@ See [Background](Background.md) for the background information and development t
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
 
+## Installation
+
+```
+pip install element-calcium-imaging
+```
+
+If you already have an older version of ***element-calcium-imaging*** installed using `pip`, upgrade with
+```
+pip install --upgrade element-calcium-imaging
+```
+    
+    
+A separate dependency is required: [***scanreader***](https://github.com/atlab/scanreader), to install:
+```
+pip install git+https://github.com/atlab/scanreader.git
+```
+
 ## Element usage
 
 + See [workflow-calcium-imaging](https://github.com/datajoint/workflow-calcium-imaging) 
 repository for an example usage of `element-calcium-imaging`.
 
-## Installation
 
-To install this element:
-
-    pip install element-calcium-imaging
-    
-    
-A separate dependency is required: [***scanreader***](https://github.com/atlab/scanreader), to install:
-
-
-    pip install git+https://github.com/atlab/scanreader.git
     
