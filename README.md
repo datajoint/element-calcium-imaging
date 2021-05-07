@@ -13,7 +13,7 @@ See [Background](Background.md) for the background information and development t
 
 ## Element architecture
 
-![elements imaging diagram](images/attached_imaging_element.svg)
+![element-calcium-imaging diagram](images/attached_calcium_imaging_element.svg)
 
 + As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
@@ -65,3 +65,16 @@ See [Background](Background.md) for the background information and development t
 
 + See [workflow-calcium-imaging](https://github.com/datajoint/workflow-calcium-imaging) 
 repository for an example usage of `element-calcium-imaging`.
+
+## Installation
+
+To install this element:
+
+    pip install element-calcium-imaging
+    
+    
+A separate dependency is required: [***scanreader***](https://github.com/atlab/scanreader), to install:
+
+
+    pip install git+https://github.com/atlab/scanreader.git
+    
