@@ -13,7 +13,7 @@ See [Background](Background.md) for the background information and development t
 
 ## Element architecture
 
-![element-calcium-imaging diagram](images/attached_calcium_imaging_element.svg)
+![element-calcium-imaging diagram](images/element_calcium_imaging_diagram.svg)
 
 + As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
