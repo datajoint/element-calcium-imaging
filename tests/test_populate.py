@@ -146,11 +146,9 @@ def test_motion_correction_populate_caiman_2D(curations, pipeline, testdata_path
 
     imaging.MotionCorrection.populate(curation_key)
 
-    assert len(imaging.MotionCorrection.Block & curation_key) == 25
-
-    x_shifts, y_shifts = (imaging.MotionCorrection.Block
-                          & curation_key & 'block_id = 0').fetch1('x_shifts', 'y_shifts')
-    assert len(x_shifts) == (scan.ScanInfo & curation_key).fetch1('nframes')
+    x_shifts, y_shifts = (imaging.MotionCorrection.RigidMotionCorrection
+                          & curation_key).fetch1('x_shifts', 'y_shifts')
+    assert len(x_shifts) == len(y_shifts) == (scan.ScanInfo & curation_key).fetch1('nframes')
 
     ave_img = (imaging.MotionCorrection.Summary & curation_key).fetch1('average_image')
     img_width, img_height = (scan.ScanInfo.Field & curation_key).fetch1(
@@ -265,13 +263,15 @@ def test_segmentation_populate_caiman_2D(curations, pipeline, testdata_paths):
     assert (imaging.Curation * imaging.ProcessingParamSet
             & curation_key).fetch1('processing_method') == 'caiman'
 
-    assert len(imaging.Segmentation.Mask & curation_key) == 14
-
-    assert len(imaging.Fluorescence.Trace & curation_key & 'fluo_channel = 0') == 14
-    assert len(imaging.Activity.Trace & curation_key
-               & 'fluo_channel = 0' & 'extraction_method = "caiman_deconvolution"') == 14
-    assert len(imaging.Activity.Trace & curation_key
-               & 'fluo_channel = 0' & 'extraction_method = "caiman_dff"') == 14
+    assert len(imaging.Segmentation.Mask & curation_key) == 30
+    assert len(imaging.Fluorescence.Trace * imaging.MaskClassification.MaskType
+               & curation_key & 'fluo_channel = 0') == 21
+    assert len(imaging.Activity.Trace * imaging.MaskClassification.MaskType
+               & curation_key & 'fluo_channel = 0'
+               & 'extraction_method = "caiman_deconvolution"') == 21
+    assert len(imaging.Activity.Trace * imaging.MaskClassification.MaskType
+               & curation_key & 'fluo_channel = 0'
+               & 'extraction_method = "caiman_dff"') == 21
 
     nframes = (scan.ScanInfo & curation_key).fetch1('nframes')
     f = (imaging.Fluorescence.Trace & curation_key
