@@ -84,7 +84,7 @@ celerybeat-schedule
 *.sage.py
 
 # dotenv
-./.env
+.env
 
 # virtualenv
 .venv
@@ -112,4 +112,4 @@ dj_local_conf_old.json
 **/*~
 **/#*#
 **/.#*
-docker-compose.yml
+docker-compose.y*ml

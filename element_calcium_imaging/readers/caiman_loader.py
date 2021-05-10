@@ -40,6 +40,11 @@ class CaImAn:
             with h5py.File(fp, 'r') as h5f:
                 if all(s in h5f for s in _required_hdf5_fields):
                     self.caiman_fp = fp
+                    break
+        else:
+            raise FileNotFoundError(
+                'No CaImAn analysis output file found at {}'
+                ' containg all required fields ({})'.format(caiman_dir, _required_hdf5_fields))
 
         # ---- Initialize CaImAn's results ----
         self.cnmf = cm.source_extraction.cnmf.cnmf.load_CNMF(self.caiman_fp)
@@ -98,7 +103,7 @@ class CaImAn:
         return masks
 
 
-def process_scanimage_tiff(scan_filenames, output_dir='./'):
+def _process_scanimage_tiff(scan_filenames, output_dir='./'):
     """
     Read ScanImage TIFF - reshape into volumetric data based on scanning depths and channels
     Save new TIFF files for each channel - with shape (frame x height x width x depth)
@@ -106,7 +111,7 @@ def process_scanimage_tiff(scan_filenames, output_dir='./'):
     from skimage.external.tifffile import imsave
     import scanreader
 
-    # ============ CaImAn multi-channel multi-plane tiff file ==============
+    # ------------ CaImAn multi-channel multi-plane tiff file ------------
     for scan_filename in tqdm(scan_filenames):
         scan = scanreader.read_scan(scan_filename)
         cm_movie = cm.load(scan_filename)
@@ -130,12 +135,15 @@ def process_scanimage_tiff(scan_filenames, output_dir='./'):
         fname = pathlib.Path(scan_filename).stem
 
         for chn_idx in range(scan.num_channels):
-            chn_vol = vol_timeseries[:, :, :, 0, :].transpose(3, 1, 2, 0)  # (frame x height x width x depth)
+            if scan.num_scanning_depths == 1:
+                chn_vol = vol_timeseries[0, :, :, chn_idx, :].squeeze().transpose(2, 0, 1)  # (frame x height x width)
+            else:
+                chn_vol = vol_timeseries[:, :, :, chn_idx, :].transpose(3, 1, 2, 0)  # (frame x height x width x depth)
             save_fp = output_dir / '{}_chn{}.tif'.format(fname, chn_idx)
             imsave(save_fp.as_posix(), chn_vol)
 
 
-def save_mc(mc, caiman_fp, is3D):
+def _save_mc(mc, caiman_fp, is3D):
     """
     DataJoint Imaging Element - CaImAn Integration
     Run these commands after the CaImAn analysis has completed.
@@ -203,7 +211,7 @@ def save_mc(mc, caiman_fp, is3D):
             if is3D else mc.total_template_els
     else:
         h5g.require_dataset("shifts_rig", shape=np.shape(mc.shifts_rig),
-                            data=mc.shifts_rig, dtype=mc.shifts_rig[0].dtype)
+                            data=mc.shifts_rig, dtype=mc.shifts_rig[0][0].dtype)
         h5g.require_dataset("coord_shifts_rig", shape=np.shape(grid),
                             data=grid, dtype=type(grid[0][0]))
         reference_image = np.tile(mc.total_template_rig, (1, 1, correlation_image.shape[-1]))\

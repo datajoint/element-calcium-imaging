@@ -1,0 +1,147 @@
+name: Development
+on:
+  pull_request:
+  push:
+    tags:
+      - '*.*.*'
+jobs:
+  test-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get changelog entry
+        id: changelog_reader
+        uses: guzman-raphael/changelog-reader-action@v5
+        with:
+          path: ./CHANGELOG.md
+      - name: Verify changelog parsing
+        env:
+          TAG_NAME: ${{steps.changelog_reader.outputs.version}}
+          RELEASE_NAME: Release ${{steps.changelog_reader.outputs.version}}
+          BODY: ${{steps.changelog_reader.outputs.changes}}
+          PRERELEASE: ${{steps.changelog_reader.outputs.status == 'prereleased'}}
+          DRAFT: ${{steps.changelog_reader.outputs.status == 'unreleased'}}
+        run: |
+          echo "TAG_NAME=${TAG_NAME}"
+          echo "RELEASE_NAME=${RELEASE_NAME}"
+          echo "BODY=${BODY}"
+          echo "PRERELEASE=${PRERELEASE}"
+          echo "DRAFT=${DRAFT}"
+  build:
+    needs: test-changelog
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - py_ver: 3.8
+            distro: alpine
+            image: djbase
+    env:
+      PY_VER: ${{matrix.py_ver}}
+      DISTRO: ${{matrix.distro}}
+      IMAGE: ${{matrix.image}}
+      DOCKER_CLIENT_TIMEOUT: "120"
+      COMPOSE_HTTP_TIMEOUT: "120"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile image
+        run: |
+          export PKG_NAME=$(python3 -c "print([p for p in __import__('setuptools').find_packages() if '.' not in p][0])")
+          export PKG_VERSION=$(cat ${PKG_NAME}/version.py | awk -F\' '/__version__ = / {print $2}')
+          export HOST_UID=$(id -u)
+          docker-compose -f docker-compose-build.yaml up --exit-code-from element --build
+          IMAGE=$(docker images --filter "reference=datajoint/${PKG_NAME}*" \
+            --format "{{.Repository}}")
+          TAG=$(docker images --filter "reference=datajoint/${PKG_NAME}*" --format "{{.Tag}}")
+          docker save "${IMAGE}:${TAG}" | \
+            gzip > "image-${PKG_NAME}-${PKG_VERSION}-py${PY_VER}-${DISTRO}.tar.gz"
+          echo "PKG_NAME=${PKG_NAME}" >> $GITHUB_ENV
+          echo "PKG_VERSION=${PKG_VERSION}" >> $GITHUB_ENV
+      - name: Add image artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-${{env.PKG_NAME}}-${{env.PKG_VERSION}}-py${{matrix.py_ver}}-${{matrix.distro}}
+          path: "image-${{env.PKG_NAME}}-${{env.PKG_VERSION}}-py${{matrix.py_ver}}-\
+            ${{matrix.distro}}.tar.gz"
+          retention-days: 1
+      - if: matrix.py_ver == '3.8' && matrix.distro == 'alpine'
+        name: Add pip artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pip-${{env.PKG_NAME}}-${{env.PKG_VERSION}}
+          path: dist
+          retention-days: 1
+  publish-release:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      TWINE_USERNAME: ${{secrets.twine_username}}
+      TWINE_PASSWORD: ${{secrets.twine_password}}
+    outputs:
+      release_upload_url: ${{steps.create_gh_release.outputs.upload_url}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Determine package version
+        run: |
+          PKG_NAME=$(python3 -c "print([p for p in __import__('setuptools').find_packages() if '.' not in p][0])")
+          SDIST_PKG_NAME=$(echo ${PKG_NAME} | sed 's|_|-|g')
+          PKG_VERSION=$(cat ${PKG_NAME}/version.py | awk -F\' '/__version__ = / {print $2}')
+          echo "PKG_NAME=${PKG_NAME}" >> $GITHUB_ENV
+          echo "PKG_VERSION=${PKG_VERSION}" >> $GITHUB_ENV
+          echo "SDIST_PKG_NAME=${SDIST_PKG_NAME}" >> $GITHUB_ENV
+      - name: Get changelog entry
+        id: changelog_reader
+        uses: guzman-raphael/changelog-reader-action@v5
+        with:
+          path: ./CHANGELOG.md
+          version: ${{env.PKG_VERSION}}
+      - name: Create GH release
+        id: create_gh_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{steps.changelog_reader.outputs.version}}
+          release_name: Release ${{steps.changelog_reader.outputs.version}}
+          body: ${{steps.changelog_reader.outputs.changes}}
+          prerelease: ${{steps.changelog_reader.outputs.status == 'prereleased'}}
+          draft: ${{steps.changelog_reader.outputs.status == 'unreleased'}}
+      - name: Fetch image artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: image-${{env.PKG_NAME}}-${{env.PKG_VERSION}}-py3.8-alpine
+      - name: Fetch pip artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: pip-${{env.PKG_NAME}}-${{env.PKG_VERSION}}
+          path: dist
+      - name: Publish pip release
+        run: |
+          export HOST_UID=$(id -u)
+          docker load < "image-${{env.PKG_NAME}}-${PKG_VERSION}-py3.8-alpine.tar.gz"
+          docker-compose -f docker-compose-build.yaml run \
+            -e TWINE_USERNAME=${TWINE_USERNAME} -e TWINE_PASSWORD=${TWINE_PASSWORD} element \
+            sh -lc "pip install twine && python -m twine upload dist/*"
+      - name: Determine pip artifact paths
+        run: |
+          echo "PKG_WHEEL_PATH=$(ls dist/${PKG_NAME}-*.whl)" >> $GITHUB_ENV
+          echo "PKG_SDIST_PATH=$(ls dist/${SDIST_PKG_NAME}-*.tar.gz)" >> $GITHUB_ENV
+      - name: Upload pip wheel asset to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_gh_release.outputs.upload_url}}
+          asset_path: ${{env.PKG_WHEEL_PATH}}
+          asset_name: pip-${{env.PKG_NAME}}-${{env.PKG_VERSION}}.whl
+          asset_content_type: application/zip
+      - name: Upload pip sdist asset to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_gh_release.outputs.upload_url}}
+          asset_path: ${{env.PKG_SDIST_PATH}}
+          asset_name: pip-${{env.SDIST_PKG_NAME}}-${{env.PKG_VERSION}}.tar.gz
+          asset_content_type: application/gzip

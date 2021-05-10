@@ -1,0 +1,26 @@
+# PY_VER=3.8 IMAGE=djbase DISTRO=alpine PKG_NAME=$(python -c "print([p for p in __import__('setuptools').find_packages() if '.' not in p][0])") PKG_VERSION=$(cat ${PKG_NAME}/version.py | awk -F\' '/__version__/ {print $2}') HOST_UID=$(id -u) docker-compose -f docker-compose-build.yaml up --exit-code-from element --build
+#
+# Intended for updating dependencies and docker image.
+# Used to build release artifacts.
+version: "2.4"
+services:
+  element:
+    build:
+      context: .
+      args:
+        - PY_VER
+        - DISTRO
+        - IMAGE
+        - PKG_NAME
+        - PKG_VERSION
+    image: datajoint/${PKG_NAME}:${PKG_VERSION}
+    user: ${HOST_UID}:anaconda
+    volumes:
+      - .:/main
+    command:
+      - sh
+      - -lc
+      - |
+        set -e
+        rm -R build dist *.egg-info || echo "No prev build"
+        python setup.py bdist_wheel sdist
