@@ -43,11 +43,11 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
 
         if acq_software == 'ScanImage':
             import scanreader
-            from element_calcium_imaging.readers import get_scanimage_acq_time, parse_scanimage_header
+            from element_data_loader import scanimage_loader
             try:  # attempt to read .tif as a scanimage file
                 loaded_scan = scanreader.read_scan(scan_filepaths)
-                recording_time = get_scanimage_acq_time(loaded_scan)
-                header = parse_scanimage_header(loaded_scan)
+                recording_time = scanimage_loader.get_scanimage_acq_time(loaded_scan)
+                header = scanimage_loader.parse_scanimage_header(loaded_scan)
                 scanner = header['SI_imagingSystem'].strip('\'')
             except Exception as e:
                 print(f'ScanImage loading error: {scan_filepaths}\n{str(e)}')
