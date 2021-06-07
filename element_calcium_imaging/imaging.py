@@ -148,9 +148,7 @@ class Processing(dj.Computed):
                 key = {**key, 'processing_time': suite2p_dataset.creation_time}
             elif method == 'caiman':
                 caiman_dataset = imaging_dataset
-                key = {**key, 
-                       'processing_time': caiman_dataset.creation_time,
-                       'package_version': caiman_dataset.package_version}
+                key = {**key, 'processing_time': caiman_dataset.creation_time}
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
