@@ -115,7 +115,7 @@ class ProcessingTask(dj.Manual):
     definition = """  # Manual table for defining a processing task ready to be run
     -> Session
     -> ProcessingParamSet
-    scan_ids: varchar(16)  # list of the scan_id associated with this ProcessingTask (delimited by '_' for example)
+    processing_task_id: int  
     ---    
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
     task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
@@ -168,19 +168,20 @@ class Processing(dj.Computed):
         # --- Scan(s) verification and entry generation for Field and MemberField
         # Check ScanInfo: ensure all scans have identical scan_info
         attrs = ['nfields', 'ndepths', 'nframes', 'fps', 'x', 'y', 'z']
-        scan_keys, *scans_info = (ProcessingTask.Scan * scan.ScanInfo & key).fetch('KEY', *attrs, order_by='scan_id')
-        for attr, attr_val in zip(scans_info, attrs):
+        scan_keys, *scans_info = (ProcessingTask.Scan * scan.ScanInfo & key).fetch(
+            'KEY', *attrs, order_by='scan_id')
+        for attr, attr_val in zip(attrs, scans_info):
             if np.any(attr_val != attr_val[0]):
                 raise ValueError(f'Multi-scan processing error: {attr} from the specified scan(s) are not identical')
-        # Check ScanInfo.Field: ensure all scans have the identical scan_info
+
+        # Check ScanInfo.Field: ensure all scans have the identical fields
         attrs = ['px_height', 'px_width', 'field_x', 'field_y', 'field_z']
         scan_key = scan_keys[0]  # using the first scan as reference
-
         fields, member_fields = [], []
         for field_key in (scan.ScanInfo.Field & scan_key).fetch('KEY'):
             field_keys, *field_info = (ProcessingTask.Scan * scan.ScanInfo.Field & key
-                                               & {'field_idx': field_key['field_idx']}).fetch('KEY', *attrs)
-            for attr, attr_val in zip(field_info, attrs):
+                                       & {'field_idx': field_key['field_idx']}).fetch('KEY', *attrs)
+            for attr, attr_val in zip(attrs, field_info):
                 if np.any(attr_val != attr_val[0]):
                     raise ValueError(f'Multi-scan processing error: {attr} from field {field_key["field_idx"]}'
                                      f' from the specified scan(s) are not identical')
@@ -213,7 +214,7 @@ class Processing(dj.Computed):
 
         self.insert1(key)
         self.Field.insert(fields)
-        self.MemberField.insert1(member_fields)
+        self.MemberField.insert(member_fields)
 
 
 @schema
@@ -398,9 +399,9 @@ class MotionCorrection(dj.Imported):
                                 'z_std': np.nan}
 
                 # -- summary images --
-                motion_correction_key = (scan.ScanInfo.Field * Curation
-                                         & key & field_keys[plane]).fetch1('KEY')
-                summary_images.append({**motion_correction_key,
+                field_key = (Processing.Field & (Processing.MemberField * Curation
+                                                 & key & field_keys[plane])).fetch1('KEY')
+                summary_images.append({**key, **field_key,
                                        'ref_image': s2p.ref_image,
                                        'average_image': s2p.mean_image,
                                        'correlation_image': s2p.correlation_map,
@@ -494,18 +495,19 @@ class MotionCorrection(dj.Imported):
 
             # -- summary images --
             field_keys = {}
-            for field_key, _ in (Processing.Field * Processing.MemberField
-                              * scan.ScanInfo.Field & key).fetch('KEY', 'field_z', order_by='field_z'):
+            for field_key, _ in zip(*(
+                    Processing.Field * Processing.MemberField
+                    * scan.ScanInfo.Field & key).fetch('KEY', 'field_z', order_by='field_z')):
                 if field_key['processing_field_idx'] not in field_keys:
                     field_keys[field_key['processing_field_idx']] = field_key
                     
             summary_images = [
-                {**key, **fkey, 'ref_image': ref_image,
+                {**key, **field_key, 'ref_image': ref_image,
                  'average_image': ave_img,
                  'correlation_image': corr_img,
                  'max_proj_image': max_img}
-                for fkey, ref_image, ave_img, corr_img, max_img in zip(
-                    field_keys,
+                for field_key, ref_image, ave_img, corr_img, max_img in zip(
+                    field_keys.values(),
                     caiman_dataset.motion_correction['reference_image'].transpose(2, 0, 1)
                     if is3D else caiman_dataset.motion_correction[
                         'reference_image'][...][np.newaxis, ...],
@@ -518,7 +520,7 @@ class MotionCorrection(dj.Imported):
                     caiman_dataset.motion_correction['max_image'].transpose(2, 0, 1)
                     if is3D else caiman_dataset.motion_correction[
                         'max_image'][...][np.newaxis, ...])]
-            self.Summary.insert(summary_images)
+            self.Summary.insert(summary_images, ignore_extra_fields=True)
         else:
             raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
