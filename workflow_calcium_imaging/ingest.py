@@ -54,10 +54,10 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv'):
                 continue
         elif acq_software == 'Scanbox':
             import sbxreader
-            try:  # attempt to load scanbox
+            try:  # attempt to load Scanbox
                 sbx_fp = pathlib.Path(scan_filepaths[0])
                 sbx_meta = sbxreader.sbx_get_metadata(sbx_fp)
-                recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)  # read from file when scanbox support this
+                recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)  # read from file when Scanbox support this
                 scanner = sbx_meta.get('imaging_system', 'Scanbox')
             except Exception as e:
                 print(f'Scanbox loading error: {scan_filepaths}\n{str(e)}')

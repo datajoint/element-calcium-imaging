@@ -20,6 +20,8 @@ sessions_dirs = ['subject0/session1',
                  'subject2/20200420_1843959',
                  'subject3/210107_run00_orientation_8dir']
 
+is_multi_scan_processing = False
+
 # ------------------- FIXTURES -------------------
 
 
@@ -59,8 +61,10 @@ def test_data(dj_config):
                 f'\nError: {str(e)}')
 
         import djarchive_client
+        from workflow_calcium_imaging import version
+
         client = djarchive_client.client()
-        workflow_version = workflow_calcium_imaging.version.__version__
+        workflow_version = version.__version__
 
         client.download('workflow-calcium-ephys-test-set',
                         workflow_version.replace('.', '_'),
@@ -71,6 +75,9 @@ def test_data(dj_config):
 @pytest.fixture
 def pipeline():
     from workflow_calcium_imaging import pipeline
+
+    global is_multi_scan_processing
+    is_multi_scan_processing = 'processing_task_id' in pipeline.imaging.ProcessingTask.heading.names
 
     yield {'subject': pipeline.subject,
            'lab': pipeline.lab,
@@ -240,11 +247,9 @@ def caiman2D_paramset(pipeline):
 
     params_caiman_2d = {'fnames': None,
                         'dims': None,
-                        'fr': 30,
                         'decay_time': 0.4,
                         'dxy': (1, 1),
                         'var_name_hdf5': 'mov',
-                        'caiman_version': '1.8.5',
                         'last_commit': 'GITW-a99c03c9cb221e802ec71aacfb988257810c8c4a',
                         'mmap_F': None,
                         'mmap_C': None,
@@ -254,7 +259,7 @@ def caiman2D_paramset(pipeline):
                                                 [0, 1, 1, 1, 0],
                                                 [1, 1, 1, 1, 1],
                                                 [0, 1, 1, 1, 0],
-                                                [0, 0, 1, 0, 0]], dtype = 'int32'),
+                                                [0, 0, 1, 0, 0]], dtype='int32'),
                         'extract_cc': True,
                         'maxthr': 0.1,
                         'medw': None,
@@ -442,11 +447,9 @@ def caiman3D_paramset(pipeline):
 
     params_caiman_3d = {'fnames': None,
                         'dims': None,
-                        'fr': 30,
                         'decay_time': 0.4,
                         'dxy': (1, 1),
                         'var_name_hdf5': 'mov',
-                        'caiman_version': '1.8.5',
                         'last_commit': 'GITW-a99c03c9cb221e802ec71aacfb988257810c8c4a',
                         'mmap_F': None,
                         'mmap_C': None,
@@ -651,27 +654,59 @@ def scan_info(pipeline, ingest_sessions):
 
 @pytest.fixture
 def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_paramset, scan_info):
+    global is_multi_scan_processing
+
     imaging = pipeline['imaging']
     scan = pipeline['scan']
+    session = pipeline['session']
     get_imaging_root_data_dir = pipeline['get_imaging_root_data_dir']
-
     root_dir = pathlib.Path(get_imaging_root_data_dir())
-    for scan_key in (scan.Scan & scan.ScanInfo - imaging.ProcessingTask).fetch('KEY'):
-        scan_file = root_dir / (scan.ScanInfo.ScanFile & scan_key).fetch('file_path')[0]
-        recording_dir = scan_file.parent
-        # suite2p
-        suite2p_dir = recording_dir / 'suite2p'
-        if suite2p_dir.exists():
-            imaging.ProcessingTask.insert1({**scan_key,
-                                            'paramset_idx': 0,
-                                            'processing_output_dir': suite2p_dir.as_posix()})
-        # caiman
-        caiman_dir = recording_dir / 'caiman'
-        if caiman_dir.exists():
-            is_3D = (scan.ScanInfo & scan_key).fetch1('ndepths') > 1
-            imaging.ProcessingTask.insert1({**scan_key,
-                                            'paramset_idx': 1 if not is_3D else 2,
-                                            'processing_output_dir': caiman_dir.as_posix()})
+
+    if is_multi_scan_processing:
+        for session_key in (session.Session & scan.ScanInfo - imaging.ProcessingTask).fetch(
+                'KEY'):
+            scan_file = root_dir / (scan.ScanInfo.ScanFile & session_key).fetch('file_path')[0]
+            recording_dir = scan_file.parent
+            # suite2p
+            suite2p_dir = recording_dir / 'suite2p'
+            if suite2p_dir.exists():
+                processing_key = {**session_key,
+                                  'paramset_idx': 0,
+                                  'processing_task_id': 0}
+                imaging.ProcessingTask.insert1({**processing_key,
+                                                'processing_output_dir': suite2p_dir.as_posix()})
+                imaging.ProcessingTask.Scan.insert(
+                    {**processing_key, **scan_key}
+                    for scan_key in (scan.Scan & session_key).fetch('KEY'))
+            # caiman
+            caiman_dir = recording_dir / 'caiman'
+            if caiman_dir.exists():
+                is_3D = (scan.ScanInfo & session_key).fetch('ndepths')[0] > 1
+                processing_key = {**session_key,
+                                  'paramset_idx': 1 if not is_3D else 2,
+                                  'processing_task_id': 0}
+                imaging.ProcessingTask.insert1({**processing_key,
+                                                'processing_output_dir': caiman_dir.as_posix()})
+                imaging.ProcessingTask.Scan.insert(
+                    {**processing_key, **scan_key}
+                    for scan_key in (scan.Scan & session_key).fetch('KEY'))
+    else:
+        for scan_key in (scan.Scan & scan.ScanInfo - imaging.ProcessingTask).fetch('KEY'):
+            scan_file = root_dir / (scan.ScanInfo.ScanFile & scan_key).fetch('file_path')[0]
+            recording_dir = scan_file.parent
+            # suite2p
+            suite2p_dir = recording_dir / 'suite2p'
+            if suite2p_dir.exists():
+                imaging.ProcessingTask.insert1({**scan_key,
+                                                'paramset_idx': 0,
+                                                'processing_output_dir': suite2p_dir.as_posix()})
+            # caiman
+            caiman_dir = recording_dir / 'caiman'
+            if caiman_dir.exists():
+                is_3D = (scan.ScanInfo & scan_key).fetch1('ndepths') > 1
+                imaging.ProcessingTask.insert1({**scan_key,
+                                                'paramset_idx': 1 if not is_3D else 2,
+                                                'processing_output_dir': caiman_dir.as_posix()})
 
     yield
 
