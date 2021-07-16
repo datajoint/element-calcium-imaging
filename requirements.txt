@@ -3,4 +3,3 @@ scipy
 pyfftw
 imreg_dft
 sklearn
-element-data-loader @ git+https://github.com/datajoint/element-data-loader.git
