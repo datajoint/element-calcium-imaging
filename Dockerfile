@@ -13,20 +13,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install git
 RUN apt install git-all -y
 
-# Install Scanreader
-RUN pip install git+https://github.com/atlab/scanreader.git
-
-# Install Scanbox reader
-RUN pip install sbxreader
-
 # Install CaImAn dependencies
-RUN pip install -r https://raw.githubusercontent.com/flatironinstitute/CaImAn/master/requirements.txt
+RUN pip install "element-data-loader[caiman_requirements] @ git+https://github.com/kabilar/element-data-loader" # TODO update with datajoint repo
 
-# Install cv2 dependencies
-RUN apt install ffmpeg libsm6 libxext6  -y
-
-# Install CaImAn
-RUN pip install git+https://github.com/flatironinstitute/CaImAn
+# Install CaImAn, Suite2p, Scanreader, Scanbox reader
+RUN pip install --ignore-installed "element-data-loader[sbxreader,scanreader,caiman,suite2p] @ git+https://github.com/kabilar/element-data-loader" # TODO update with datajoint repo
 
 # Install otumat depedency
 RUN pip install cryptography==3.3.2
