@@ -51,9 +51,6 @@ The Calcium imaging workflow presented here uses pipeline components from 4 Data
 ### Step 2 - Setup a virtual environment
 + It is highly recommended (though not strictly required) to create a virtual environment to run the pipeline.
 
-+ If you are planning on running CaImAn from within this pipeline, you can install this pipeline within the `conda` environment created for the CaImAn installation.
-    + [CaImAn installation instructions](https://caiman.readthedocs.io/en/master/Installation.html)
-
 + You can install with `virtualenv` or `conda`.  Below are the commands for `virtualenv`.
 
 + If `virtualenv` not yet installed, run `pip install --user virtualenv`
@@ -85,11 +82,41 @@ Note: the `-e` flag will install this repository in editable mode,
 in case there's a need to modify the code (e.g. the `pipeline.py` or `paths.py` scripts). 
 If no such modification required, using `pip install .` is sufficient
 
-### Step 4 - Install `sbxreader` module
+### Step 4 - Install `element-data-loader`
 
-+ If you are planning on working with data acquired with the Scanbox system, you will need to install the [sbxreader](https://github.com/jcouto/sbxreader) module.
++ `element-data-loader` contains the scripts to load data for `element-calcium-imaging` and `workflow-calcium-imaging`.
+
++ `element-data-loader` is a dependency of `element-calcium-imaging` and `workflow-calcium-imaging`, however it is not contained within `requirements.txt`.
+
++ `element-data-loader` can also be used to install packages used for reading acquired data (e.g. `scanreader`) and running analysis (e.g. `CaImAn`).
+
++ If your `workflow-calcium-imaging` uses these packages, you should install them when you install `element-data-loader`.
+
++ Install `element-data-loader` with `scanreader`
     ```
-    pip install sbxreader
+    pip install "element-data-loader[scanreader] @ git+https://github.com/datajoint/element-data-loader"
+    ```
+
++ Install `element-data-loader` with `sbxreader`
+    ```
+    pip install "element-data-loader[sbxreader] @ git+https://github.com/datajoint/element-data-loader"
+    ```
+
++ Install `element-data-loader` with `Suite2p`
+    ```
+    pip install "element-data-loader[suite2p] @ git+https://github.com/datajoint/element-data-loader"
+    ```
+
++ Install `element-data-loader` with `CaImAn` requires two separate commands
+    ```
+    pip install "element-data-loader[caiman_requirements] @ git+https://github.com/datajoint/element-data-loader"
+    pip install "element-data-loader[caiman] @ git+https://github.com/datajoint/element-data-loader"
+    ```
+
++ Install `element-data-loader` with multiple packages
+    ```
+    pip install "element-data-loader[caiman_requirements] @ git+https://github.com/datajoint/element-data-loader"
+    pip install "element-data-loader[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-data-loader"
     ```
 
 ### Step 5 - Jupyter Notebook
