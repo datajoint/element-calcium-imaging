@@ -63,20 +63,52 @@ See [Background](Background.md) for the background information and development t
 
 ## Installation
 
-```
-pip install element-calcium-imaging
-```
++ Install `element-calcium-imaging`
+     ```
+     pip install element-calcium-imaging
+     ```
 
-If you already have an older version of ***element-calcium-imaging*** installed using `pip`, upgrade with
-```
-pip install --upgrade element-calcium-imaging
-```
-    
-    
-A separate dependency is required: [***scanreader***](https://github.com/atlab/scanreader), to install:
-```
-pip install git+https://github.com/atlab/scanreader.git
-```
++ Upgrade `element-calcium-imaging` previously installed with `pip`
+     ```
+     pip install --upgrade element-calcium-imaging
+     ```
+
++ Install `element-data-loader`
+
+     + `element-data-loader` contains the scripts to load data for `element-calcium-imaging`.
+
+     + `element-data-loader` is a dependency of `element-calcium-imaging`, however it is not contained within `requirements.txt`.
+
+     + `element-data-loader` can also be used to install packages used for reading acquired data (e.g. `scanreader`) and running analysis (e.g. `CaImAn`).
+
+     + If your workflow uses these packages, you should install them when you install `element-data-loader`.
+
+     + Install `element-data-loader` with `scanreader`
+          ```
+          pip install "element-data-loader[scanreader] @ git+https://github.com/datajoint/element-data-loader"
+          ```
+
+     + Install `element-data-loader` with `sbxreader`
+          ```
+          pip install "element-data-loader[sbxreader] @ git+https://github.com/datajoint/element-data-loader"
+          ```
+
+     + Install `element-data-loader` with `Suite2p`
+          ```
+          pip install "element-data-loader[suite2p] @ git+https://github.com/datajoint/element-data-loader"
+          ```
+
+     + Install `element-data-loader` with `CaImAn` requires two separate commands
+          ```
+          pip install "element-data-loader[caiman_requirements] @ git+https://github.com/datajoint/element-data-loader"
+          pip install "element-data-loader[caiman] @ git+https://github.com/datajoint/element-data-loader"
+          ```
+
+     + Install `element-data-loader` with multiple packages
+          ```
+          pip install "element-data-loader[caiman_requirements] @ git+https://github.com/datajoint/element-data-loader"
+          pip install "element-data-loader[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-data-loader"
+          ```
 
 ## Element usage
 
