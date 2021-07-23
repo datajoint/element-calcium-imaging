@@ -75,7 +75,7 @@ See [Background](Background.md) for the background information and development t
 
 + Install `element-data-loader`
 
-     + `element-data-loader` contains the scripts to load data for `element-calcium-imaging`.
+     + `element-data-loader` contains data loading utilities for `element-calcium-imaging`.
 
      + `element-data-loader` is a dependency of `element-calcium-imaging`, however it is not contained within `requirements.txt`, therefore, must be installed in addition to the installation of the `element-calcium-imaging`. 
 
