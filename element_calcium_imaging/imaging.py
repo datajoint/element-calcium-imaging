@@ -764,10 +764,10 @@ def get_loader_result(key, table):
     output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
 
     if method == 'suite2p':
-        from .readers import suite2p_loader
+        from element_data_loader import suite2p_loader
         loaded_dataset = suite2p_loader.Suite2p(output_dir)
     elif method == 'caiman':
-        from .readers import caiman_loader
+        from element_data_loader import caiman_loader
         loaded_dataset = caiman_loader.CaImAn(output_dir)
     else:
         raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))

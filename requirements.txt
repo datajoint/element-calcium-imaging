@@ -1,6 +1,1 @@
-datajoint
-scipy
-pyfftw
-imreg_dft
-sklearn
-h5py
+datajoint>=0.13.0
