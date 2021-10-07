@@ -6,8 +6,9 @@ import uuid
 import hashlib
 import importlib
 import inspect
+from element_data_loader.utils import find_root_directory, find_full_path, dict_to_uuid
 
-from . import scan, find_full_path
+from . import scan
 from .scan import get_imaging_root_data_dir
 
 schema = dj.schema()
@@ -774,13 +775,3 @@ def get_loader_result(key, table):
 
     return method, loaded_dataset
 
-
-def dict_to_uuid(key):
-    """
-    Given a dictionary `key`, returns a hash string as UUID
-    """
-    hashed = hashlib.md5()
-    for k, v in sorted(key.items()):
-        hashed.update(str(k).encode())
-        hashed.update(str(v).encode())
-    return uuid.UUID(hex=hashed.hexdigest())
