@@ -137,7 +137,7 @@ class Processing(dj.Computed):
 
     def make(self, key):
         task_mode = (ProcessingTask & key).fetch1('task_mode')
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)  # TODO: Figure out the format of imaging_dataset.
 
         if task_mode == 'load':
             if method == 'suite2p':
@@ -152,6 +152,22 @@ class Processing(dj.Computed):
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
+            if method == 'suite2p':
+                try:
+                    import suite2p
+                    print("Suite2p found")
+                except:
+                    pass # TODO: Throw an exception message and stop the process.
+                    
+
+                suite_ops = suite2p.default_ops()  # This is a dictionary of default ops parameters.
+                suite_user_ops = (ProcessingTask & key).fetch1('ProcessingParamSet', as_dict=True)
+                suite_ops.update(suite_user_ops)
+
+                # TODO: figure out ops_ and db_. The run_s2p is available at https://suite2p.readthedocs.io/en/latest/_modules/suite2p/run_s2p.html
+                # suite2p_dataset = run_s2p(ops=ops_, db=db_)
+
+            # TODO: The line below will be removed.
             raise NotImplementedError(f'Automatic triggering of {method} analysis'
                                       f' is not yet supported')
         else:
