@@ -1,11 +1,12 @@
 import datajoint as dj
 import numpy as np
-import pathlib
-from datetime import datetime
+import os
 import uuid
-import hashlib
-import importlib
 import inspect
+import hashlib
+import posixpath
+import importlib
+# from datetime import datetime
 
 from . import scan, find_full_path
 from .scan import get_imaging_root_data_dir
@@ -37,7 +38,7 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
     global _linking_module
     _linking_module = linking_module
 
-    scan.activate(scan_schema_name, create_schema=create_schema,	
+    scan.activate(scan_schema_name, create_schema=create_schema,
                   create_tables=create_tables, linking_module=linking_module)
     schema.activate(imaging_schema_name, create_schema=create_schema,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
@@ -137,9 +138,9 @@ class Processing(dj.Computed):
 
     def make(self, key):
         task_mode = (ProcessingTask & key).fetch1('task_mode')
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)  # TODO: Figure out the format of imaging_dataset.
-
+        
         if task_mode == 'load':
+            method, imaging_dataset = get_loader_result(key, ProcessingTask)
             if method == 'suite2p':
                 if (scan.ScanInfo & key).fetch1('nrois') > 0:
                     raise NotImplementedError(f'Suite2p ingestion error - Unable to handle'
@@ -152,24 +153,22 @@ class Processing(dj.Computed):
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
+            method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method') 
             if method == 'suite2p':
-                try:
-                    import suite2p
-                    print("Suite2p found")
-                except:
-                    pass # TODO: Throw an exception message and stop the process.
-                    
+                import suite2p
 
-                suite_ops = suite2p.default_ops()  # This is a dictionary of default ops parameters.
-                suite_user_ops = (ProcessingTask & key).fetch1('ProcessingParamSet', as_dict=True)
-                suite_ops.update(suite_user_ops)
+                suite_ops = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
+                db = {}
 
-                # TODO: figure out ops_ and db_. The run_s2p is available at https://suite2p.readthedocs.io/en/latest/_modules/suite2p/run_s2p.html
-                # suite2p_dataset = run_s2p(ops=ops_, db=db_)
+                db['data_path'] = posixpath.dirname((ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')[0])
+                db['data_path'] = [os.path.join(dj.config['custom']['imaging_root_data_dir'], db['data_path'])]  # Suite2p requires data_path to be a list.
 
-            # TODO: The line below will be removed.
-            raise NotImplementedError(f'Automatic triggering of {method} analysis'
-                                      f' is not yet supported')
+                _ = suite2p.run_s2p(ops=suite_ops, db=db)  # Run suite2p
+
+                _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                suite2p_dataset = imaging_dataset
+                key = {**key, 'processing_time': suite2p_dataset.creation_time}
+
         else:
             raise ValueError(f'Unknown task mode: {task_mode}')
 
