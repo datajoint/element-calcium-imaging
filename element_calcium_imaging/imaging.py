@@ -4,6 +4,7 @@ import uuid
 import inspect
 import hashlib
 import importlib
+from pathlib import Path
 # from datetime import datetime
 
 from . import scan, find_full_path
@@ -155,14 +156,14 @@ class Processing(dj.Computed):
             if method == 'suite2p':
                 import suite2p
 
-                suite_ops = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
-                suite_ops['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
-
-                db = {}                
-                db['data_path'] = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')[0]
-                db['data_path'] = [find_full_path(get_imaging_root_data_dir(), db['data_path']).as_posix()]  # Suite2p requires data_path to be a list.
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
+                suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
+                suite2p_params['save_path0'] = (get_imaging_root_data_dir() / Path(suite2p_params['save_path0'])).as_posix()
+ 
+                suite2p_paths = {'data_path': (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')[0]}
+                suite2p_paths['data_path'] = [find_full_path(get_imaging_root_data_dir(), suite2p_paths['data_path']).parent.as_posix()]  # Suite2p requires data_path to be a list.
                 
-                _ = suite2p.run_s2p(ops=suite_ops, db=db)  # Run suite2p
+                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
 
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 suite2p_dataset = imaging_dataset
