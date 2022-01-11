@@ -158,12 +158,14 @@ class Processing(dj.Computed):
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
-                suite2p_params['save_path0'] = (get_imaging_root_data_dir() / Path(suite2p_params['save_path0'])).as_posix()
- 
+                suite2p_params['save_path0'] = find_full_path(get_imaging_root_data_dir(), suite2p_params['save_path0']).as_posix()
+
                 tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
                 tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
-                suite2p_paths = {'data_path': [tiff_files[0].parent.as_posix()],
-                                            'tiff_list': [f.as_posix() for f in tiff_files]}
+                suite2p_paths = {
+                    'data_path': [tiff_files[0].parent.as_posix()],
+                    'tiff_list': [f.as_posix() for f in tiff_files]
+                }
                 
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
 
