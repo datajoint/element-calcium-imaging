@@ -1,11 +1,11 @@
 import datajoint as dj
 import numpy as np
-import pathlib
-from datetime import datetime
 import uuid
+import inspect
 import hashlib
 import importlib
-import inspect
+from pathlib import Path
+# from datetime import datetime
 
 from . import scan, find_full_path
 from .scan import get_imaging_root_data_dir
@@ -37,7 +37,7 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
     global _linking_module
     _linking_module = linking_module
 
-    scan.activate(scan_schema_name, create_schema=create_schema,	
+    scan.activate(scan_schema_name, create_schema=create_schema,
                   create_tables=create_tables, linking_module=linking_module)
     schema.activate(imaging_schema_name, create_schema=create_schema,
                     create_tables=create_tables, add_objects=_linking_module.__dict__)
@@ -137,9 +137,9 @@ class Processing(dj.Computed):
 
     def make(self, key):
         task_mode = (ProcessingTask & key).fetch1('task_mode')
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
-
+        
         if task_mode == 'load':
+            method, imaging_dataset = get_loader_result(key, ProcessingTask)
             if method == 'suite2p':
                 if (scan.ScanInfo & key).fetch1('nrois') > 0:
                     raise NotImplementedError(f'Suite2p ingestion error - Unable to handle'
@@ -152,8 +152,27 @@ class Processing(dj.Computed):
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
-            raise NotImplementedError(f'Automatic triggering of {method} analysis'
-                                      f' is not yet supported')
+            method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method') 
+            if method == 'suite2p':
+                import suite2p
+
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
+                suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
+                suite2p_params['save_path0'] = find_full_path(get_imaging_root_data_dir(), suite2p_params['save_path0']).as_posix()
+
+                tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
+                tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
+                suite2p_paths = {
+                    'data_path': [tiff_files[0].parent.as_posix()],
+                    'tiff_list': [f.as_posix() for f in tiff_files]
+                }
+                
+                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
+
+                _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                suite2p_dataset = imaging_dataset
+                key = {**key, 'processing_time': suite2p_dataset.creation_time}
+
         else:
             raise ValueError(f'Unknown task mode: {task_mode}')
 
