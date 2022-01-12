@@ -5,7 +5,7 @@ software and processed with `Suite2p` or `CaImAn`.
 
 A complete calcium imaging workflow can be built using the DataJoint Elements.
 + [element-lab](https://github.com/datajoint/element-lab)
-+ [element-animal](https://github.com/datajoint/element-animal)
++ [element-subject](https://github.com/datajoint/element-subject)
 + [element-session](https://github.com/datajoint/element-session)
 + [element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging)
 
@@ -20,7 +20,7 @@ convention, and directory lookup methods (see
 ## Workflow architecture
 
 The calcium imaging workflow presented here uses components from 4 DataJoint 
-Elements (`element-lab`, `element-animal`, `element-session`, 
+Elements (`element-lab`, `element-subject`, `element-session`, 
 `element-calcium-imaging`) assembled together to form a fully functional 
 workflow. 
 
@@ -29,10 +29,10 @@ workflow.
 ![element-lab](
 https://github.com/datajoint/element-lab/raw/main/images/element_lab_diagram.svg)
 
-### element-animal
+### element-subject
 
-![element-animal](
-https://github.com/datajoint/element-animal/blob/main/images/subject_diagram.svg)
+![element-subject](
+https://github.com/datajoint/element-subject/blob/main/images/subject_diagram.svg)
 
 ### assembled with element-calcium-imaging
 
