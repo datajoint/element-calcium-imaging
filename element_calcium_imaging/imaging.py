@@ -4,10 +4,9 @@ import uuid
 import inspect
 import hashlib
 import importlib
-from pathlib import Path
-# from datetime import datetime
+from element_interface.utils import find_full_path, dict_to_uuid
 
-from . import scan, find_full_path
+from . import scan
 from .scan import get_imaging_root_data_dir
 
 schema = dj.schema()
@@ -780,26 +779,16 @@ def get_loader_result(key, table):
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         'processing_method', _table_attribute_mapper[table.__name__])
 
-    output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+    output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
 
     if method == 'suite2p':
-        from element_data_loader import suite2p_loader
-        loaded_dataset = suite2p_loader.Suite2p(output_dir)
+        from element_interface import suite2p_loader
+        loaded_dataset = suite2p_loader.Suite2p(output_path)
     elif method == 'caiman':
-        from element_data_loader import caiman_loader
-        loaded_dataset = caiman_loader.CaImAn(output_dir)
+        from element_interface import caiman_loader
+        loaded_dataset = caiman_loader.CaImAn(output_path)
     else:
         raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 
     return method, loaded_dataset
 
-
-def dict_to_uuid(key):
-    """
-    Given a dictionary `key`, returns a hash string as UUID
-    """
-    hashed = hashlib.md5()
-    for k, v in sorted(key.items()):
-        hashed.update(str(k).encode())
-        hashed.update(str(v).encode())
-    return uuid.UUID(hex=hashed.hexdigest())
