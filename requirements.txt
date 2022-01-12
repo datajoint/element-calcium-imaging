@@ -1,6 +1,6 @@
 datajoint>=0.13.0
 element-calcium-imaging==0.1.0b0
 element-lab==0.1.0b0
-element-subject==0.1.0b0
+element-subject==0.1.0b1
 element-session==0.1.0b0
 ipykernel==6.0.1
