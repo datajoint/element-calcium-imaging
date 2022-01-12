@@ -6,7 +6,7 @@ import uuid
 import hashlib
 import importlib
 import inspect
-from element_data_loader.utils import find_root_directory, find_full_path, dict_to_uuid
+from element_interface.utils import find_full_path, dict_to_uuid
 
 from . import scan
 from .scan import get_imaging_root_data_dir
@@ -762,14 +762,14 @@ def get_loader_result(key, table):
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         'processing_method', _table_attribute_mapper[table.__name__])
 
-    output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+    output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
 
     if method == 'suite2p':
-        from element_data_loader import suite2p_loader
-        loaded_dataset = suite2p_loader.Suite2p(output_dir)
+        from element_interface import suite2p_loader
+        loaded_dataset = suite2p_loader.Suite2p(output_path)
     elif method == 'caiman':
-        from element_data_loader import caiman_loader
-        loaded_dataset = caiman_loader.CaImAn(output_dir)
+        from element_interface import caiman_loader
+        loaded_dataset = caiman_loader.CaImAn(output_path)
     else:
         raise NotImplementedError('Unknown/unimplemented method: {}'.format(method))
 

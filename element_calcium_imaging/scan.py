@@ -1,19 +1,16 @@
-"""
-ScanImage scans
-"""
-
 import datajoint as dj
 import pathlib
 import importlib
 import inspect
-from . import find_root_directory
+from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
 
 _linking_module = None
 
 
-def activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None):
+def activate(scan_schema_name, *, 
+             create_schema=True, create_tables=True, linking_module=None):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
         :param scan_schema_name: schema name on the database server to activate the `scan` module
@@ -47,13 +44,13 @@ def activate(scan_schema_name, *, create_schema=True, create_tables=True, linkin
     global _linking_module
     _linking_module = linking_module
 
-    # activate
-    schema.activate(scan_schema_name, create_schema=create_schema,
-                    create_tables=create_tables, add_objects=_linking_module.__dict__)
+    schema.activate(scan_schema_name, 
+                    create_schema=create_schema,
+                    create_tables=create_tables, 
+                    add_objects=_linking_module.__dict__)
 
 
-# -------------- Functions required by the element-calcium-imaging  ---------------
-
+# Functions required by element-calcium-imaging  -------------------------------
 
 def get_imaging_root_data_dir() -> str:
     """
@@ -109,9 +106,6 @@ class Channel(dj.Lookup):
     contents = zip(range(5))
 
 
-# ------------ ScanImage's scan ------------
-
-
 @schema
 class Scan(dj.Manual):
     definition = """    
@@ -135,7 +129,7 @@ class ScanLocation(dj.Manual):
 
 @schema
 class ScanInfo(dj.Imported):
-    definition = """ # general data about the reso/meso scans, from ScanImage header
+    definition = """ # general data about the reso/meso scans from header
     -> Scan
     ---
     nfields              : tinyint   # number of fields
@@ -275,7 +269,9 @@ class ScanInfo(dj.Imported):
                 f'Loading routine not implemented for {acq_software} acquisition software')
 
         # Insert file(s)
-        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
+        root_dir = find_root_directory(get_imaging_root_data_dir(), 
+                                       scan_filepaths[0])
 
-        scan_files = [pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths]
+        scan_files = [pathlib.Path(f).relative_to(root_dir).as_posix() 
+                      for f in scan_filepaths]
         self.ScanFile.insert([{**key, 'file_path': f} for f in scan_files])
