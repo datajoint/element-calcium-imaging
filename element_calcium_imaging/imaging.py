@@ -4,7 +4,6 @@ import uuid
 import inspect
 import hashlib
 import importlib
-import inspect
 from element_interface.utils import find_full_path, dict_to_uuid
 
 from . import scan
