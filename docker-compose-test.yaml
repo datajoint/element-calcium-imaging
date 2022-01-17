@@ -12,7 +12,7 @@ services:
     <<: *net
     build:
       context: .
-    image: workflow_calcium_imaging:v0.0.0
+    image: workflow_calcium_imaging:0.1.1
     environment:
       - DJ_HOST=db
       - DJ_USER=root
