@@ -11,7 +11,7 @@ long_description = """"
 
 Build a complete imaging workflow using the DataJoint elements
 + [element-lab](https://github.com/datajoint/element-lab)
-+ [element-subject](https://github.com/datajoint/element-subject)
++ [element-animal](https://github.com/datajoint/element-animal)
 + [element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging)
 """
 
