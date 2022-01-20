@@ -152,7 +152,6 @@ class Processing(dj.Computed):
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
             method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method')
-            print('method:', method)
             if method == 'suite2p':
                 import suite2p
 
