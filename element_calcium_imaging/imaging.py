@@ -151,7 +151,8 @@ class Processing(dj.Computed):
             else:
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
-            method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method') 
+            method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method')
+            print('method:', method)
             if method == 'suite2p':
                 import suite2p
 
@@ -171,6 +172,24 @@ class Processing(dj.Computed):
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 suite2p_dataset = imaging_dataset
                 key = {**key, 'processing_time': suite2p_dataset.creation_time}
+
+            elif method == 'caiman':
+                from .readers.run_caiman import run_caiman
+
+                tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
+                tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
+                tiff_files = [f.as_posix() for f in tiff_files]
+                
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
+                sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch('fps')
+                output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
+                output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+                
+                run_caiman(file_paths=tiff_files, parameters=params, sampling_rate=sampling_rate, output_dir=output_dir)
+
+                _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                caiman_dataset = imaging_dataset
+                key = {**key, 'processing_time': caiman_dataset.creation_time}
 
         else:
             raise ValueError(f'Unknown task mode: {task_mode}')
