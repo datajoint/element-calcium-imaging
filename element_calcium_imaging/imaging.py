@@ -176,8 +176,7 @@ class Processing(dj.Computed):
                 from element_interface.run_caiman import run_caiman
 
                 tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
-                tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
-                tiff_files = [f.as_posix() for f in tiff_files]
+                tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file).as_posix() for tiff_file in tiff_files]
 
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('fps')
