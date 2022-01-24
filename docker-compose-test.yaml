@@ -8,7 +8,7 @@ services:
     image: datajoint/mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=simple
-  workflow_calcium_imaging:
+  workflow:
     <<: *net
     build:
       context: .
