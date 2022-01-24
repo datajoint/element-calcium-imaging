@@ -185,7 +185,7 @@ class Processing(dj.Computed):
 
                 ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('ndepths')
 
-                is3D = True if ndepths > 1 else False
+                is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError('Caiman pipeline is not capable of analyzing 3D scans at the moment.')
                 run_caiman(file_paths=tiff_files, parameters=params, sampling_rate=sampling_rate, output_dir=output_dir, is3D=is3D)
