@@ -193,7 +193,7 @@ class Processing(dj.Computed):
 
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
-                key = {**key, 'processing_time': caiman_dataset.creation_time}
+                key['processing_time'] = caiman_dataset.creation_time
 
         else:
             raise ValueError(f'Unknown task mode: {task_mode}')
