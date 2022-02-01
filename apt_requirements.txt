@@ -1,1 +1,6 @@
-../apt_requirements.txt
+git
+gcc
+g++
+ffmpeg
+libsm6
+libxext6
