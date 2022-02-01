@@ -1,11 +1,10 @@
-import numpy as np
-
+import shutil
 from . import (dj_config, pipeline, test_data,
                subjects_csv, ingest_subjects,
                sessions_csv, ingest_sessions,
                testdata_paths, suite2p_paramset,
                caiman2D_paramset, caiman3D_paramset,
-               scan_info,
+               scan_info, trigger_processing_suite2p_2D,
                processing_tasks,
                processing, curations)
 
@@ -71,7 +70,20 @@ def test_scan_info_populate_scanbox_3D(testdata_paths, pipeline, scan_info):
 
 def test_processing_populate(processing, pipeline):
     imaging = pipeline['imaging']
+    
     assert len(imaging.Processing()) == 5
+
+
+def test_processing_populate_trigger_suite2p_2D(trigger_processing_suite2p_2D, pipeline):
+    imaging = pipeline['imaging']
+    assert len(imaging.Processing()) == 1
+
+    from element_interface.suite2p_loader import Suite2p
+    get_imaging_root_data_dir = pipeline['get_imaging_root_data_dir']
+    suite2p_dir = (get_imaging_root_data_dir() / 'demo/subject1_20200609DT170519_0_0/suite2p').as_posix()
+    Suite2p(suite2p_dir)
+
+    shutil.rmtree(get_imaging_root_data_dir() / 'demo')
 
 
 def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_paths):
