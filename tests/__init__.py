@@ -751,16 +751,6 @@ def processing(processing_tasks, pipeline):
     imaging.Processing.delete()
 
 
-#@pytest.fixture
-#def processing_trigger(trigger_processing_suite2p_2D, pipeline):
-#    imaging = pipeline['imaging']
-
-#    imaging.Processing.populate()
-
-#    yield
-
-#    imaging.Processing.delete()
-
 
 @pytest.fixture
 def curations(processing, pipeline):
