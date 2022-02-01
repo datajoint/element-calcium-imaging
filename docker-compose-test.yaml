@@ -28,7 +28,7 @@ services:
       - -c
       - |
         echo "------ INTEGRATION TESTS ------"
-        pytest -sv --cov-report term-missing --cov=workflow-calcium-imaging -p no:warnings
+        pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging -p no:warnings
         tail -f /dev/null
     volumes:
       - ${TEST_DATA_DIR}:/main/test_data
