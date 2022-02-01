@@ -1,4 +1,4 @@
-# docker-compose -f docker-compose-test.yaml up --build -d
+# docker-compose -f docker-compose-test.yaml up --build
 # docker-compose -f docker-compose-test.yaml down
 
 version: "2.4"
