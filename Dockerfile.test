@@ -1,0 +1,44 @@
+FROM datajoint/djbase:py3.9-debian-fcd8909
+
+USER anaconda:anaconda
+
+# Install C++ compilers for CaImAn
+COPY ./workflow-calcium-imaging/apt_requirements.txt /tmp/
+RUN /entrypoint.sh echo "Installed dependencies."
+
+WORKDIR /main/workflow-calcium-imaging
+
+# Option 1 - Install DataJoint's remote fork of the workflow and elements
+# RUN git clone https://github.com/datajoint/workflow-calcium-imaging /main/workflow-calcium-imaging
+# RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://github.com/datajoint/element-interface"
+
+# Option 2 - Install user's remote fork of element and workflow
+#            or and unreleased version of the element
+RUN pip install -b trigger_caiman git+https://github.com/tdincer/element-calcium-imaging.git
+RUN git clone https://github.com/tdincer/workflow-calcium-imaging.git /main/workflow-calcium-imaging
+RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://github.com/tdincer/element-interface"
+
+# Option 3 - Install user's local fork of element and workflow
+# RUN mkdir /main/element-calcium-imaging
+# COPY --chown=anaconda:anaconda ./element-calcium-imaging /main/element-calcium-imaging
+# RUN pip install /main/element-calcium-imaging
+# COPY --chown=anaconda:anaconda ./workflow-calcium-imaging /main/workflow-calcium-imaging
+# RUN pip install /main/element-interface
+# COPY --chown=anaconda:anaconda ./workflow-interface /main/workflow-interface
+# RUN rm -f /main/workflow-calcium-imaging/dj_local_conf.json
+ 
+
+# Install the workflow
+RUN pip install /main/workflow-calcium-imaging
+RUN pip install -r /main/workflow-calcium-imaging/requirements_test.txt
+
+# Install Caiman
+WORKDIR /main
+RUN git clone --branch master https://github.com/vathes/CaImAn
+WORKDIR /main/CaImAn
+RUN conda install -n base -c conda-forge -y mamba
+RUN /bin/bash -c 'mamba env update --n base --file environment.yml' 
+# Suite2p complains if np.__version__ != 1.21
+RUN pip install numpy==1.21
+RUN pip install .
+WORKDIR /main/workflow-calcium-imaging
