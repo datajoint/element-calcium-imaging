@@ -90,7 +90,7 @@ def get_processed_root_data_dir() -> str:
     if hasattr(_linking_module, 'get_processed_root_data_dir'):
         return _linking_module.get_processed_root_data_dir()
     else:
-        return get_ephys_root_data_dir()[0]
+        return get_imaging_root_data_dir()[0]
 
 
 def get_scan_image_files(scan_key: dict) -> list:
