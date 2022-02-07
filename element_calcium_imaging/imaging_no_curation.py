@@ -1,5 +1,6 @@
 import datajoint as dj
 import numpy as np
+import pathlib
 import uuid
 import inspect
 import hashlib
@@ -118,6 +119,17 @@ class ProcessingTask(dj.Manual):
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
     task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
+    
+    @classmethod
+    def auto_generate_entries(cls, scan_key, processing_output_dir, task_mode):
+        """
+        Method to auto-generate ProcessingTask entries for a particular Scan.
+        ProcessingParamSet is inferred from ....?
+        """
+        session_dir = (_linking_module.scan.Scan() * _linking_module.session.SessionDirectory() & scan_key).fetch1('session_dir')
+        processing_output_dir = (get_processed_root_data_dir() / session_dir).as_posix()
+
+        cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode':task_mode})
 
 
 @schema
