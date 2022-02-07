@@ -1,6 +1,5 @@
 import datajoint as dj
 import numpy as np
-import pathlib
 import uuid
 import inspect
 import hashlib
@@ -120,17 +119,6 @@ class ProcessingTask(dj.Manual):
     task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
-    @classmethod
-    def auto_generate_entries(cls, scan_key, processing_output_dir, task_mode):
-        """
-        Method to auto-generate ProcessingTask entries for a particular Scan.
-        ProcessingParamSet is inferred from ....?
-        """
-        session_dir = (_linking_module.scan.Scan() * _linking_module.session.SessionDirectory() & scan_key).fetch1('session_dir')
-        processing_output_dir = (get_processed_root_data_dir() / session_dir).as_posix()
-
-        cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode':task_mode})
-
 
 @schema
 class Processing(dj.Computed):
@@ -212,52 +200,12 @@ class Processing(dj.Computed):
         self.insert1(key)
 
 
-@schema
-class Curation(dj.Manual):
-    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation can also be included here)
-    -> Processing
-    curation_id: int
-    ---
-    curation_time: datetime             # time of generation of this set of curated results 
-    curation_output_dir: varchar(255)   # output directory of the curated results, relative to root data directory
-    manual_curation: bool               # has manual curation been performed on this result?
-    curation_note='': varchar(2000)  
-    """
-
-    def create1_from_processing_task(self, key, is_curated=False, curation_note=''):
-        """
-        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
-        """
-        if key not in Processing():
-            raise ValueError(f'No corresponding entry in Processing available for: {key};'
-                             f' do `Processing.populate(key)`')
-
-        output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
-
-        if method == 'suite2p':
-            suite2p_dataset = imaging_dataset
-            curation_time = suite2p_dataset.creation_time
-        elif method == 'caiman':
-            caiman_dataset = imaging_dataset
-            curation_time = caiman_dataset.creation_time
-        else:
-            raise NotImplementedError('Unknown method: {}'.format(method))
-
-        # Synthesize curation_id
-        curation_id = dj.U().aggr(self & key, n='ifnull(max(curation_id)+1,1)').fetch1('n')
-        self.insert1({**key, 'curation_id': curation_id,
-                      'curation_time': curation_time, 'curation_output_dir': output_dir,
-                      'manual_curation': is_curated,
-                      'curation_note': curation_note})
-
-
 # -------------- Motion Correction --------------
 
 @schema
 class MotionCorrection(dj.Imported):
     definition = """  #  Results of motion correction performed on the imaging data
-    -> Curation
+    -> Processing
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
@@ -320,7 +268,7 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch('KEY', 'field_z', order_by='field_z')
 
@@ -394,7 +342,7 @@ class MotionCorrection(dj.Imported):
                                 'z_std': np.nan}
 
                 # -- summary images --
-                motion_correction_key = (scan.ScanInfo.Field * Curation
+                motion_correction_key = (scan.ScanInfo.Field * Processing
                                          & key & field_keys[plane]).fetch1('KEY')
                 summary_images.append({**motion_correction_key,
                                        'ref_image': s2p.ref_image,
@@ -518,7 +466,7 @@ class MotionCorrection(dj.Imported):
 @schema
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
-    -> Curation
+    -> Processing
     """
 
     class Mask(dj.Part):
@@ -538,7 +486,7 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
             suite2p_dataset = imaging_dataset
@@ -672,7 +620,7 @@ class Fluorescence(dj.Computed):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
             suite2p_dataset = imaging_dataset
@@ -756,7 +704,7 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
             if key['extraction_method'] == 'suite2p_deconvolution':
