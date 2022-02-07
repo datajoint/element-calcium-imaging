@@ -87,15 +87,39 @@ def get_scan_box_files(scan_key: dict) -> list:
     return _linking_module.get_scan_box_files(scan_key)
 
 
+def get_session_directory(session_key: dict) -> str:
+    """
+    get_session_directory(session_key: dict) -> str
+        Retrieve the session directory containing the
+        calcium imaging data for a given Session
+        :param session_key: a dictionary of one Session `key`
+        :return: a string for relative or full path to the session directory
+    """
+    return _linking_module.get_session_directory(session_key)
+
+
+def get_nd2_files(scan_key: dict) -> list:
+    """
+    Retrieve the list of Nikon files (*.nd2) associated with a given Scan
+    :param scan_key: key of a Scan
+    :return: list of Nikon files' full file-paths
+    """
+    return _linking_module.get_nd2_files(scan_key)
+
+
+def get_processed_root_data_dir():
+    data_dir = dj.config.get('custom', {}).get('imaging_processed_data_dir', None)
+    return pathlib.Path(data_dir) if data_dir else None
+
 # ----------------------------- Table declarations ----------------------
 
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox
+    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'Scanbox'])
+    contents = zip(['ScanImage', 'Scanbox', 'NIS'])
 
 
 @schema
@@ -116,6 +140,36 @@ class Scan(dj.Manual):
     -> AcquisitionSoftware  
     scan_notes='' : varchar(4095)         # free-notes
     """
+
+    @classmethod
+    def auto_generate_scan(cls, session_key):
+        """
+        Method to auto-generate Scan entries for a particular session.
+        Acquisition software (acq_software) is inferrerd from the scan file suffixes, if not provided as an argument.
+        An existing Equipment (scanner) has to be provided as an argument.
+        """
+        # Find the session directory of a given session key
+        session_dir = find_full_path(get_imaging_root_data_dir(), get_session_directory(session_key))
+
+        scanner = _linking_module.Equipment().fetch1('scanner')
+        if not scanner:
+            raise ValueError('No scanner is found in the Equipment table!')
+
+        softwares = {'*.nd2': 'NIS', '*.tif': 'ScanImage', '*.sbx': 'Scanbox'}
+
+        # Determine the acquisition software assuming that all scan files in the session directory have the same suffix
+        for suffix in softwares:
+            image_filepaths = session_dir.rglob(suffix)
+            if image_filepaths:
+                acq_software = softwares[suffix]
+                break
+            else:
+                raise FileNotFoundError(
+                f'Calcium imaging data not found!'
+                f' No NIS, ScanImage, or ScanBox files found in: {session_dir}')
+        
+        # Insert in Scan
+        cls.insert1({**session_key, 'scan_id': 0, 'acq_software': acq_software, 'scanner': scanner})
 
 
 @schema
@@ -193,7 +247,6 @@ class ScanInfo(dj.Imported):
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
                               nrois=scan.num_rois if scan.is_multiROI else 0))
-
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
@@ -263,7 +316,46 @@ class ScanInfo(dj.Imported):
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
+        elif acq_software == 'Nikon':
+            import nd2
+            # Read the scan
+            scan_filepaths = get_nd2_files(key)
+            nd2_file = nd2.ND2File(scan_filepaths[0])
+            sizes = nd2_file.sizes
+            voxel_size = nd2_file.voxel_size()
+            attr = nd2_file.attributes
+            metadata = nd2_file.meta
+            experiment = nd2_file.experiment
+            custom_data = nd2_file.custom_data
+            is_multiROI = False  # MultiROI to be implemented later
 
+            # Insert in ScanInfo
+            self.insert1(dict(key,
+                              nfields=sizes['P'] if 'P' in sizes.keys() else 1,
+                              nchannels=attr.channelCouunt,
+                              nframes=metadata.contents.frameCount,
+                              ndepths=sizes['Z'] if 'Z' in sizes.keys() else 1,
+                              x=None,
+                              y=None,
+                              z=None,
+                              fps=1000 / experiment[0].parameters.periods[0].periodDiff.avg,
+                              bidirectional=bool(custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
+                              nrois=None))
+
+            # MultiROI to be implemented later
+
+            # Insert in Field
+            if not is_multiROI:
+                self.Field.insert([dict(key,
+                                        field_idx=plane_idx,
+                                        px_height=attr.heightPx,
+                                        px_width=attr.widthPx,
+                                        um_height=attr.heightPx * voxel_size.y,
+                                        um_width=attr.widthPx * voxel_size.x,
+                                        field_x=None,  # for now
+                                        field_y=None,  # for now
+                                        field_z=None)  # for now
+                                   for plane_idx in range(sizes['Z'] if 'Z' in sizes.keys() else 1)])
         else:
             raise NotImplementedError(
                 f'Loading routine not implemented for {acq_software} acquisition software')

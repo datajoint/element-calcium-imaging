@@ -1,5 +1,6 @@
 import datajoint as dj
 import numpy as np
+import pathlib
 import uuid
 import inspect
 import hashlib
@@ -7,7 +8,8 @@ import importlib
 from element_interface.utils import find_full_path, dict_to_uuid
 
 from . import scan
-from .scan import get_imaging_root_data_dir
+from .scan import get_imaging_root_data_dir, get_processed_root_data_dir
+
 
 schema = dj.schema()
 
@@ -119,6 +121,17 @@ class ProcessingTask(dj.Manual):
     task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
+    @classmethod
+    def auto_generate_entries(cls, scan_key, processing_output_dir, task_mode):
+        """
+        Method to auto-generate ProcessingTask entries for a particular Scan.
+        ProcessingParamSet is inferred from ....?
+        """
+        session_dir = (_linking_module.scan.Scan() * _linking_module.session.SessionDirectory() & scan_key).fetch1('session_dir')
+        processing_output_dir = (get_processed_root_data_dir() / session_dir).as_posix()
+
+        cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode':task_mode})
+
 
 @schema
 class Processing(dj.Computed):
@@ -186,7 +199,7 @@ class Processing(dj.Computed):
 
                 ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('ndepths')
 
-                is3D = True if ndepths > 1 else False
+                is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError('Caiman pipeline is not capable of analyzing 3D scans at the moment.')
                 run_caiman(file_paths=tiff_files, parameters=params, sampling_rate=sampling_rate, output_dir=output_dir, is3D=is3D)
