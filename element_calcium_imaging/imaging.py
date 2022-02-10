@@ -181,7 +181,7 @@ class Processing(dj.Computed):
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
-                suite2p_params['save_path0'] = find_full_path(get_imaging_root_data_dir(), suite2p_params['save_path0']).as_posix()
+                suite2p_params['save_path0'] = find_full_path(get_processed_root_data_dir(), suite2p_params['save_path0']).as_posix()
 
                 tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
                 tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
@@ -205,7 +205,7 @@ class Processing(dj.Computed):
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('fps')
                 output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
-                output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+                output_dir = find_full_path(get_processed_root_data_dir(), output_dir).as_posix()
 
                 ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('ndepths')
 
