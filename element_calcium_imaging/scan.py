@@ -365,7 +365,7 @@ class ScanInfo(dj.Imported):
             # Insert in ScanInfo
             self.insert1(dict(key,
                               nfields=sizes['P'] if 'P' in sizes.keys() else 1,
-                              nchannels=attr.channelCouunt,
+                              nchannels=attr.channelCount,
                               nframes=metadata.contents.frameCount,
                               ndepths=sizes['Z'] if 'Z' in sizes.keys() else 1,
                               x=None,
