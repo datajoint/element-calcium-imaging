@@ -357,7 +357,7 @@ class ScanInfo(dj.Imported):
             sizes = nd2_file.sizes
             voxel_size = nd2_file.voxel_size()
             attr = nd2_file.attributes
-            metadata = nd2_file.meta
+            metadata = nd2_file.metadata
             experiment = nd2_file.experiment
             custom_data = nd2_file.custom_data
             is_multiROI = False  # MultiROI to be implemented later
