@@ -141,7 +141,7 @@ class ProcessingTask(dj.Manual):
             processing_method = paramset_idx['processing_method'][i]
             processing_output_dir = (get_processed_root_data_dir() / relative_scan_dir / f'{processing_method}_{paramset_idx}').as_posix()
 
-            cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode': task_mode})
+            cls.insert1({**scan_key, 'paramset_idx':paramset_idx, 'processing_output_dir': processing_output_dir, 'task_mode': task_mode})
 
 
 @schema
