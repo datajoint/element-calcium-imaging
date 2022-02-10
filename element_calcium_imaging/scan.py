@@ -368,12 +368,12 @@ class ScanInfo(dj.Imported):
                               nchannels=attr.channelCount,
                               nframes=metadata.contents.frameCount,
                               ndepths=sizes['Z'] if 'Z' in sizes.keys() else 1,
-                              x=None,
-                              y=None,
-                              z=None,
+                              x=0,
+                              y=0,
+                              z=0,
                               fps=1000 / experiment[0].parameters.periods[0].periodDiff.avg,
                               bidirectional=bool(custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
-                              nrois=None))
+                              nrois=0))
 
             # MultiROI to be implemented later
 
@@ -385,9 +385,9 @@ class ScanInfo(dj.Imported):
                                         px_width=attr.widthPx,
                                         um_height=attr.heightPx * voxel_size.y,
                                         um_width=attr.widthPx * voxel_size.x,
-                                        field_x=None,  # for now
-                                        field_y=None,  # for now
-                                        field_z=None)  # for now
+                                        field_x=0,  # for now
+                                        field_y=0,  # for now
+                                        field_z=0)  # for now
                                    for plane_idx in range(sizes['Z'] if 'Z' in sizes.keys() else 1)])
         else:
             raise NotImplementedError(
