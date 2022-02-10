@@ -349,7 +349,7 @@ class ScanInfo(dj.Imported):
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
-        elif acq_software == 'Nikon':
+        elif acq_software == 'NIS':
             import nd2
             # Read the scan
             scan_filepaths = get_nd2_files(key)
