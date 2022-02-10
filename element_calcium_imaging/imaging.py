@@ -8,7 +8,7 @@ import importlib
 from element_interface.utils import find_full_path, dict_to_uuid
 
 from . import scan
-from .scan import get_imaging_root_data_dir, get_processed_root_data_dir
+from .scan import get_imaging_root_data_dir, get_processed_root_data_dir, get_scan_image_files, get_scan_box_files, get_nd2_files
 
 schema = dj.schema()
 
@@ -62,7 +62,7 @@ class ProcessingParamSet(dj.Lookup):
     definition = """  #  Parameter set used for processing of calcium imaging data
     paramset_idx:  smallint
     ---
-    -> ProcessingMethod    
+    -> ProcessingMethod
     paramset_desc: varchar(128)
     param_set_hash: uuid
     unique index (param_set_hash)
@@ -121,15 +121,27 @@ class ProcessingTask(dj.Manual):
     """
 
     @classmethod
-    def auto_generate_entries(cls, scan_key, processing_output_dir, task_mode):
+    def auto_generate_entries(cls, scan_key, task_mode):
         """
         Method to auto-generate ProcessingTask entries for a particular Scan.
-        ProcessingParamSet is inferred from ....?
         """
-        session_dir = (_linking_module.scan.Scan() * _linking_module.session.SessionDirectory() & scan_key).fetch1('session_dir')
-        processing_output_dir = (get_processed_root_data_dir() / session_dir).as_posix()
 
-        cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode':task_mode})
+        image_locators = [get_scan_image_files, get_scan_box_files, get_nd2_files]
+        for image_locator in image_locators:
+            try:
+                relative_scan_dir = pathlib.Path(image_locator(scan_key)[0]).relative_to(get_imaging_root_data_dir()).parent
+            except:
+                pass
+            if relative_scan_dir:
+                break
+        
+        paramset_idxs = ProcessingParamSet.fetch('KEY')
+
+        for i, paramset_idx in enumerate(paramset_idxs):
+            processing_method = paramset_idx['processing_method'][i]
+            processing_output_dir = (get_processed_root_data_dir() / relative_scan_dir / f'{processing_method}_{paramset_idx}').as_posix()
+
+            cls.insert1({**scan_key, 'processing_output_dir': processing_output_dir, 'task_mode': task_mode})
 
 
 @schema
