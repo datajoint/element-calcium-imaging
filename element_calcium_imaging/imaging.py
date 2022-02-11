@@ -2,6 +2,7 @@ import datajoint as dj
 import numpy as np
 import pathlib
 import uuid
+import os
 import inspect
 import hashlib
 import importlib
@@ -123,25 +124,23 @@ class ProcessingTask(dj.Manual):
     @classmethod
     def auto_generate_entries(cls, scan_key, task_mode):
         """
-        Method to auto-generate ProcessingTask entries for a particular Scan.
+        Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
         """
 
-        image_locators = [get_scan_image_files, get_scan_box_files, get_nd2_files]
-        for image_locator in image_locators:
-            try:
-                relative_scan_dir = pathlib.Path(image_locator(scan_key)[0]).relative_to(get_imaging_root_data_dir()).parent
-            except:
-                pass
-            if relative_scan_dir:
-                break
-        
-        paramset_idxs = ProcessingParamSet.fetch('KEY')
+        image_locators = {'NIS': get_nd2_files, 'ScanImage': get_scan_image_files, 'Scanbox': get_scan_box_files}
+        image_locator = image_locators[(scan.Scan & scan_key).fetch('acq_software')[0]]
 
-        for i, paramset_idx in enumerate(paramset_idxs):
-            processing_method = paramset_idx['processing_method'][i]
-            processing_output_dir = (get_processed_root_data_dir() / relative_scan_dir / f'{processing_method}_{paramset_idx}').as_posix()
+        relative_scan_dir = pathlib.Path(image_locator(scan_key)[0]).parent.relative_to(get_imaging_root_data_dir()[0])
+        paramset_key = ProcessingParamSet.fetch1()
 
-            cls.insert1({**scan_key, 'paramset_idx':paramset_idx, 'processing_output_dir': processing_output_dir, 'task_mode': task_mode})
+        processing_output_dir = (
+            get_processed_root_data_dir() / relative_scan_dir / 
+            f'{paramset_key["processing_method"]}_{paramset_key["paramset_idx"]}'
+            ).as_posix()
+
+        cls.insert1({
+            **scan_key, 'paramset_idx':paramset_key['paramset_idx'],
+            'processing_output_dir': processing_output_dir, 'task_mode': task_mode})
 
 
 @schema
@@ -176,18 +175,29 @@ class Processing(dj.Computed):
                 raise NotImplementedError('Unknown method: {}'.format(method))
         elif task_mode == 'trigger':
             method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method')
+
+            if get_processed_root_data_dir():
+                processed_root_data_dir = get_processed_root_data_dir
+            else:
+                processed_root_data_dir = get_imaging_root_data_dir
+
             if method == 'suite2p':
                 import suite2p
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
-                suite2p_params['save_path0'] = find_full_path(get_processed_root_data_dir(), suite2p_params['save_path0']).as_posix()
+                suite2p_params['save_path0'] = find_full_path(processed_root_data_dir(), suite2p_params['save_path0']).as_posix()
 
-                tiff_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
-                tiff_files = [find_full_path(get_imaging_root_data_dir(), tiff_file) for tiff_file in tiff_files]
+                image_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
+                image_files = [find_full_path(get_imaging_root_data_dir(), image_file) for image_file in image_files]
+
+                input_format = pathlib.Path(image_files[0]).suffix
+                suite2p_params['input_format'] = input_format[1:]
+                print('input_format:', suite2p_params['input_format'])
+                
                 suite2p_paths = {
-                    'data_path': [tiff_files[0].parent.as_posix()],
-                    'tiff_list': [f.as_posix() for f in tiff_files]
+                    'data_path': [image_files[0].parent.as_posix()],
+                    'tiff_list': [f.as_posix() for f in image_files]
                 }
 
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
@@ -205,7 +215,7 @@ class Processing(dj.Computed):
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('fps')
                 output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
-                output_dir = find_full_path(get_processed_root_data_dir(), output_dir).as_posix()
+                output_dir = find_full_path(processed_root_data_dir(), output_dir).as_posix()
 
                 ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('ndepths')
 

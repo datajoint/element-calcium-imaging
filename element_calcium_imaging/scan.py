@@ -9,7 +9,7 @@ schema = dj.schema()
 _linking_module = None
 
 
-def activate(scan_schema_name, *, 
+def activate(scan_schema_name, *,
              create_schema=True, create_tables=True, linking_module=None):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
@@ -129,11 +129,7 @@ def get_nd2_files(scan_key: dict) -> list:
     :return: list of Nikon files' full file-paths
     """
     return _linking_module.get_nd2_files(scan_key)
-
-
-def get_processed_root_data_dir():
-    data_dir = dj.config.get('custom', {}).get('imaging_processed_data_dir', None)
-    return pathlib.Path(data_dir) if data_dir else None
+    
 
 # ----------------------------- Table declarations ----------------------
 
@@ -354,25 +350,19 @@ class ScanInfo(dj.Imported):
             # Read the scan
             scan_filepaths = get_nd2_files(key)
             nd2_file = nd2.ND2File(scan_filepaths[0])
-            sizes = nd2_file.sizes
-            voxel_size = nd2_file.voxel_size()
-            attr = nd2_file.attributes
-            metadata = nd2_file.metadata
-            experiment = nd2_file.experiment
-            custom_data = nd2_file.custom_data
             is_multiROI = False  # MultiROI to be implemented later
 
             # Insert in ScanInfo
             self.insert1(dict(key,
-                              nfields=sizes['P'] if 'P' in sizes.keys() else 1,
-                              nchannels=attr.channelCount,
-                              nframes=metadata.contents.frameCount,
-                              ndepths=sizes['Z'] if 'Z' in sizes.keys() else 1,
+                              nfields=nd2_file.sizes.get('P', 1),
+                              nchannels=nd2_file.attributes.channelCount,
+                              nframes=nd2_file.metadata.contents.frameCount,
+                              ndepths=nd2_file.sizes.get('Z', 1),
                               x=0,
                               y=0,
                               z=0,
-                              fps=1000 / experiment[0].parameters.periods[0].periodDiff.avg,
-                              bidirectional=bool(custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
+                              fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
+                              bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
                               nrois=0))
 
             # MultiROI to be implemented later
@@ -381,14 +371,14 @@ class ScanInfo(dj.Imported):
             if not is_multiROI:
                 self.Field.insert([dict(key,
                                         field_idx=plane_idx,
-                                        px_height=attr.heightPx,
-                                        px_width=attr.widthPx,
-                                        um_height=attr.heightPx * voxel_size.y,
-                                        um_width=attr.widthPx * voxel_size.x,
+                                        px_height=nd2_file.attributes.heightPx,
+                                        px_width=nd2_file.attributes.widthPx,
+                                        um_height=nd2_file.attributes.heightPx * nd2_file.voxel_size().y,
+                                        um_width=nd2_file.attributes.widthPx * nd2_file.voxel_size().x,
                                         field_x=0,  # for now
                                         field_y=0,  # for now
                                         field_z=0)  # for now
-                                   for plane_idx in range(sizes['Z'] if 'Z' in sizes.keys() else 1)])
+                                   for plane_idx in range(nd2_file.sizes.get('Z', 1))])
         else:
             raise NotImplementedError(
                 f'Loading routine not implemented for {acq_software} acquisition software')
