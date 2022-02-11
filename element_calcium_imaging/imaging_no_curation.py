@@ -176,17 +176,12 @@ class Processing(dj.Computed):
         elif task_mode == 'trigger':
             method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method')
 
-            if get_processed_root_data_dir():
-                processed_root_data_dir = get_processed_root_data_dir
-            else:
-                processed_root_data_dir = get_imaging_root_data_dir
-
             if method == 'suite2p':
                 import suite2p
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 suite2p_params['save_path0'] = (ProcessingTask & key).fetch1('processing_output_dir')
-                suite2p_params['save_path0'] = find_full_path(processed_root_data_dir(), suite2p_params['save_path0']).as_posix()
+                suite2p_params['save_path0'] = find_full_path(get_processed_root_data_dir(), suite2p_params['save_path0']).as_posix()
 
                 image_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
                 image_files = [find_full_path(get_imaging_root_data_dir(), image_file) for image_file in image_files]
@@ -215,7 +210,7 @@ class Processing(dj.Computed):
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('fps')
                 output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
-                output_dir = find_full_path(processed_root_data_dir(), output_dir).as_posix()
+                output_dir = find_full_path(get_processed_root_data_dir(), output_dir).as_posix()
 
                 ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('ndepths')
 
