@@ -161,9 +161,9 @@ class ScanInfo(dj.Imported):
     ndepths              : int       # Number of scanning depths (planes)
     nframes              : int       # number of recorded frames
     nrois                : tinyint   # number of ROIs (see scanimage's multi ROI imaging)
-    x                    : float     # (um) ScanImage's 0 point in the motor coordinate system
-    y                    : float     # (um) ScanImage's 0 point in the motor coordinate system
-    z                    : float     # (um) ScanImage's 0 point in the motor coordinate system
+    x=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
+    y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
+    z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
     bidirectional        : boolean   # true = bidirectional scanning
     usecs_per_line=null  : float     # microseconds per scan line
@@ -179,9 +179,9 @@ class ScanInfo(dj.Imported):
         px_width          : smallint  # width in pixels
         um_height=null    : float     # height in microns
         um_width=null     : float     # width in microns
-        field_x           : float     # (um) center of field in the motor coordinate system
-        field_y           : float     # (um) center of field in the motor coordinate system
-        field_z           : float     # (um) relative depth of field
+        field_x=null      : float     # (um) center of field in the motor coordinate system
+        field_y=null      : float     # (um) center of field in the motor coordinate system
+        field_z=null      : float     # (um) relative depth of field
         delay_image=null  : longblob  # (ms) delay between the start of the scan and pixels in this field
         roi=null          : int       # the scanning roi (as recorded in the acquisition software) containing this field - only relevant to mesoscale scans
         """
@@ -193,7 +193,6 @@ class ScanInfo(dj.Imported):
         """
 
     def make(self, key):
-        """ Read and store some scan meta information."""
         acq_software = (Scan & key).fetch1('acq_software')
 
         if acq_software == 'ScanImage':
@@ -203,7 +202,13 @@ class ScanInfo(dj.Imported):
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero, y_zero, z_zero = scan.motor_position_at_zero  # motor x, y, z at ScanImage's 0
+            x_zero = scan.motor_position_at_zero[0] \
+                        if scan.motor_position_at_zero else None
+            y_zero = scan.motor_position_at_zero[1] \
+                        if scan.motor_position_at_zero else None
+            z_zero = scan.motor_position_at_zero[2] \
+                        if scan.motor_position_at_zero else None
+
             self.insert1(dict(key,
                               nfields=scan.num_fields,
                               nchannels=scan.num_channels,
@@ -227,9 +232,12 @@ class ScanInfo(dj.Imported):
                          px_width=scan.field_widths[field_id],
                          um_height=scan.field_heights_in_microns[field_id],
                          um_width=scan.field_widths_in_microns[field_id],
-                         field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x),
-                         field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y),
-                         field_z=z_zero + scan.fields[field_id].depth,
+                         field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x) \
+                                    if x_zero else None,
+                         field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y) \
+                                    if y_zero else None,
+                         field_z=z_zero + scan.fields[field_id].depth \
+                                    if z_zero else None,
                          delay_image=scan.field_offsets[field_id],
                          roi=scan.field_rois[field_id][0])
                     for field_id in range(scan.num_fields)])
@@ -241,9 +249,10 @@ class ScanInfo(dj.Imported):
                          px_width=scan.image_width,
                          um_height=getattr(scan, 'image_height_in_microns', None),
                          um_width=getattr(scan, 'image_width_in_microns', None),
-                         field_x=x_zero,
-                         field_y=y_zero,
-                         field_z=z_zero + scan.scanning_depths[plane_idx],
+                         field_x=x_zero if x_zero else None,
+                         field_y=y_zero if y_zero else None,
+                         field_z=z_zero + scan.scanning_depths[plane_idx] \
+                                    if z_zero else None,
                          delay_image=scan.field_offsets[plane_idx])
                     for plane_idx in range(scan.num_scanning_depths)])
         elif acq_software == 'Scanbox':
@@ -290,7 +299,8 @@ class ScanInfo(dj.Imported):
 
         else:
             raise NotImplementedError(
-                f'Loading routine not implemented for {acq_software} acquisition software')
+                f'Loading routine not implemented for {acq_software} '
+                'acquisition software')
 
         # Insert file(s)
         root_dir = find_root_directory(get_imaging_root_data_dir(), 
