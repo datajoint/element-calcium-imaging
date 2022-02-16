@@ -367,9 +367,9 @@ class ScanInfo(dj.Imported):
                               nchannels=nd2_file.attributes.channelCount,
                               nframes=nd2_file.metadata.contents.frameCount,
                               ndepths=nd2_file.sizes.get('Z', 1),
-                              x=0,
-                              y=0,
-                              z=0,
+                              x=None,
+                              y=None,
+                              z=None,
                               fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
                               bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
                               nrois=0))
@@ -384,9 +384,9 @@ class ScanInfo(dj.Imported):
                                         px_width=nd2_file.attributes.widthPx,
                                         um_height=nd2_file.attributes.heightPx * nd2_file.voxel_size().y,
                                         um_width=nd2_file.attributes.widthPx * nd2_file.voxel_size().x,
-                                        field_x=0,  # for now
-                                        field_y=0,  # for now
-                                        field_z=0)  # for now
+                                        field_x=None,
+                                        field_y=None,
+                                        field_z=None)
                                    for plane_idx in range(nd2_file.sizes.get('Z', 1))])
         else:
             raise NotImplementedError(
