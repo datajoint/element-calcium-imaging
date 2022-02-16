@@ -1,10 +1,8 @@
 import datajoint as dj
 import numpy as np
 import pathlib
-import uuid
 import os
 import inspect
-import hashlib
 import importlib
 from element_interface.utils import find_full_path, dict_to_uuid
 
