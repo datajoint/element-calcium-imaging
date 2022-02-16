@@ -34,6 +34,9 @@ def activate(scan_schema_name, *,
                     Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
                     :param scan_key: key of a Scan
                     :return: list of Scanbox files' full file-paths
+                + get_processed_root_data_dir() -> str:
+                    Retrieves the root directory for all processed data to be found from or written to
+                    :return: a string for full path to the root directory for processed data
     """
 
     if isinstance(linking_module, str):
@@ -66,7 +69,28 @@ def get_imaging_root_data_dir() -> str:
         :return: a string for full path to the imaging root data directory,
          or list of strings for possible root data directories
     """
-    return _linking_module.get_imaging_root_data_dir()
+
+    root_directories = _linking_module.get_imaging_root_data_dir()
+    if isinstance(root_directories, (str, pathlib.Path)):
+        root_directories = [root_directories]
+
+    if hasattr(_linking_module, 'get_processed_root_data_dir'):
+        root_directories.append(_linking_module.get_processed_root_data_dir())
+
+    return root_directories
+
+
+def get_processed_root_data_dir() -> str:
+    """
+    get_processed_root_data_dir() -> str:
+        Retrieves the root directory for all processed data to be found from or written to
+        :return: a string for full path to the root directory for processed data
+    """
+
+    if hasattr(_linking_module, 'get_processed_root_data_dir'):
+        return _linking_module.get_processed_root_data_dir()
+    else:
+        return get_imaging_root_data_dir()[0]
 
 
 def get_scan_image_files(scan_key: dict) -> list:
