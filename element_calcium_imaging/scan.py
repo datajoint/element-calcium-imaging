@@ -193,9 +193,9 @@ class ScanInfo(dj.Imported):
         """
 
     def make(self, key):
-        acquisition_software = (Scan & key).fetch1('acq_software')
+        acq_software = (Scan & key).fetch1('acq_software')
 
-        if acquisition_software == 'ScanImage':
+        if acq_software == 'ScanImage':
             import scanreader
             # Read the scan
             scan_filepaths = get_scan_image_files(key)
@@ -255,7 +255,7 @@ class ScanInfo(dj.Imported):
                                     if z_zero else None,
                          delay_image=scan.field_offsets[plane_idx])
                     for plane_idx in range(scan.num_scanning_depths)])
-        elif acquisition_software == 'Scanbox':
+        elif acq_software == 'Scanbox':
             import sbxreader
             # Read the scan
             scan_filepaths = get_scan_box_files(key)
@@ -299,7 +299,7 @@ class ScanInfo(dj.Imported):
 
         else:
             raise NotImplementedError(
-                f'Loading routine not implemented for {acquisition_software} '
+                f'Loading routine not implemented for {acq_software} '
                 'acquisition software')
 
         # Insert file(s)
