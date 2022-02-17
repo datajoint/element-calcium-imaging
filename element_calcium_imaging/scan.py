@@ -161,45 +161,6 @@ class Scan(dj.Manual):
     scan_notes='' : varchar(4095)         # free-notes
     """
 
-    @classmethod
-    def auto_generate_scan(cls, session_key):
-        """
-        Method to auto-generate Scan entries for a particular session.
-        Acquisition software (acq_software) is inferrerd from the scan file suffixes, if not provided as an argument.
-        An existing Equipment (scanner) has to be provided as an argument.
-        CAUTION: THIS METHOD MAY MISS SCANS IN A PARTICULAR SESSION IF ALL THE DATA IS NOT AVAILABLE.
-        """
-        # Find the session directory of a given session key
-        session_dir = find_full_path(get_imaging_root_data_dir(), get_session_directory(session_key))
-
-        softwares = {'*.nd2': 'NIS', '*.sbx': 'Scanbox', '*.tif': 'ScanImage'}
-        get_files_func = {'NIS': get_nd2_files, 'Scanbox': get_scan_box_files, 'ScanImage': get_scan_image_files}
-
-        # Determine the acquisition software assuming that all scan files in the session directory have the same suffix
-        for suffix in softwares:
-            image_filepaths = list(session_dir.rglob(suffix))
-            if image_filepaths:
-                acq_software = softwares[suffix]
-                break
-            else:
-                raise FileNotFoundError(
-                f'Calcium imaging data not found!'
-                f' No NIS, ScanImage, or ScanBox files found in: {session_dir}')
-        
-        # Insert in Scan
-        scan_list = []
-        for scan_id, scan_folder in enumerate(set([f.parent for f in image_filepaths])):
-            scan_key = {**session_key, 'scan_id': scan_id}
-            try:
-                get_files_func[acq_software](scan_key)
-            except:
-                continue
-            else:
-                scan_list.append({**scan_key, 'acq_software': acq_software})
-        
-        if scan_list:
-            cls.insert(scan_list)
-
 
 @schema
 class ScanLocation(dj.Manual):

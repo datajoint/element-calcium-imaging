@@ -4,7 +4,7 @@ import pathlib
 import os
 import inspect
 import importlib
-from element_interface.utils import find_full_path, dict_to_uuid
+from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
 
 from . import scan
 from .scan import get_imaging_root_data_dir, get_processed_root_data_dir, get_scan_image_files, get_scan_box_files, get_nd2_files
