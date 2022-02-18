@@ -332,7 +332,7 @@ class ScanInfo(dj.Imported):
                               y=None,
                               z=None,
                               fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
-                              bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection'] - 1),
+                              bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
                               nrois=0))
 
             # MultiROI to be implemented later
