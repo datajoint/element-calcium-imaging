@@ -9,7 +9,7 @@ schema = dj.schema()
 _linking_module = None
 
 
-def activate(scan_schema_name, *, 
+def activate(scan_schema_name, *,
              create_schema=True, create_tables=True, linking_module=None):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
@@ -111,15 +111,24 @@ def get_scan_box_files(scan_key: dict) -> list:
     return _linking_module.get_scan_box_files(scan_key)
 
 
+def get_nd2_files(scan_key: dict) -> list:
+    """
+    Retrieve the list of Nikon files (*.nd2) associated with a given Scan
+    :param scan_key: key of a Scan
+    :return: list of Nikon files' full file-paths
+    """
+    return _linking_module.get_nd2_files(scan_key)
+    
+
 # ----------------------------- Table declarations ----------------------
 
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox
+    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'Scanbox'])
+    contents = zip(['ScanImage', 'Scanbox', 'NIS'])
 
 
 @schema
@@ -136,7 +145,7 @@ class Scan(dj.Manual):
     -> Session
     scan_id: int        
     ---
-    -> Equipment  
+    -> [nullable] Equipment  
     -> AcquisitionSoftware  
     scan_notes='' : varchar(4095)         # free-notes
     """
@@ -222,7 +231,6 @@ class ScanInfo(dj.Imported):
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
                               nrois=scan.num_rois if scan.is_multiROI else 0))
-
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
@@ -296,7 +304,40 @@ class ScanInfo(dj.Imported):
                                         field_y=y_zero,
                                         field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
                                    for plane_idx in range(sbx_meta['num_planes'])])
+        elif acq_software == 'NIS':
+            import nd2
+            # Read the scan
+            scan_filepaths = get_nd2_files(key)
+            nd2_file = nd2.ND2File(scan_filepaths[0])
+            is_multiROI = False  # MultiROI to be implemented later
 
+            # Insert in ScanInfo
+            self.insert1(dict(key,
+                              nfields=nd2_file.sizes.get('P', 1),
+                              nchannels=nd2_file.attributes.channelCount,
+                              nframes=nd2_file.metadata.contents.frameCount,
+                              ndepths=nd2_file.sizes.get('Z', 1),
+                              x=None,
+                              y=None,
+                              z=None,
+                              fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
+                              bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
+                              nrois=0))
+
+            # MultiROI to be implemented later
+
+            # Insert in Field
+            if not is_multiROI:
+                self.Field.insert([dict(key,
+                                        field_idx=plane_idx,
+                                        px_height=nd2_file.attributes.heightPx,
+                                        px_width=nd2_file.attributes.widthPx,
+                                        um_height=nd2_file.attributes.heightPx * nd2_file.voxel_size().y,
+                                        um_width=nd2_file.attributes.widthPx * nd2_file.voxel_size().x,
+                                        field_x=None,
+                                        field_y=None,
+                                        field_z=None)
+                                   for plane_idx in range(nd2_file.sizes.get('Z', 1))])
         else:
             raise NotImplementedError(
                 f'Loading routine not implemented for {acq_software} '
