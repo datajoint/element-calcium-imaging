@@ -111,17 +111,6 @@ def get_scan_box_files(scan_key: dict) -> list:
     return _linking_module.get_scan_box_files(scan_key)
 
 
-def get_session_directory(session_key: dict) -> str:
-    """
-    get_session_directory(session_key: dict) -> str
-        Retrieve the session directory containing the
-        calcium imaging data for a given Session
-        :param session_key: a dictionary of one Session `key`
-        :return: a string for relative or full path to the session directory
-    """
-    return _linking_module.get_session_directory(session_key)
-
-
 def get_nd2_files(scan_key: dict) -> list:
     """
     Retrieve the list of Nikon files (*.nd2) associated with a given Scan
