@@ -186,6 +186,7 @@ class Processing(dj.Computed):
     def make(self, key):
         task_mode = (ProcessingTask & key).fetch1('task_mode')
 
+        output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
             # update processing_output_dir
@@ -221,7 +222,6 @@ class Processing(dj.Computed):
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params['input_format'] = input_format[1:]
-                print('input_format:', suite2p_params['input_format'])
                 
                 suite2p_paths = {
                     'data_path': [image_files[0].parent.as_posix()],
