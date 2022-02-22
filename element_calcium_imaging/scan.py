@@ -147,8 +147,6 @@ class Scan(dj.Manual):
     ---
     -> [nullable] Equipment  
     -> AcquisitionSoftware  
-    scan_datetime=null: datetime # datetime of the scan
-    scan_duration=null: float # (seconds) duration of the scan
     scan_notes='' : varchar(4095)         # free-notes
     """
 
@@ -179,6 +177,8 @@ class ScanInfo(dj.Imported):
     bidirectional        : boolean   # true = bidirectional scanning
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
+    scan_datetime=null   : datetime  # datetime of the scan
+    scan_duration=null   : float     # (seconds) duration of the scan
     """
 
     class Field(dj.Part):
