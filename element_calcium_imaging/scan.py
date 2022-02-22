@@ -147,6 +147,8 @@ class Scan(dj.Manual):
     ---
     -> [nullable] Equipment  
     -> AcquisitionSoftware  
+    scan_datetime=null: datetime # datetime of the scan
+    scan_duration=null: float # (seconds) duration of the scan
     scan_notes='' : varchar(4095)         # free-notes
     """
 
