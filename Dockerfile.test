@@ -13,7 +13,7 @@ WORKDIR /main/workflow-calcium-imaging
 # RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://github.com/datajoint/element-interface"
 
 # Option 2 - Install user's remote fork of element and workflow
-#            or and unreleased version of the element
+#            or an unreleased version of the element
 RUN pip install -b trigger_caiman git+https://github.com/datajoint/element-calcium-imaging.git
 RUN git clone https://github.com/datajoint/workflow-calcium-imaging.git /main/
 RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://github.com/datajoint/element-interface"
