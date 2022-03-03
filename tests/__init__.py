@@ -719,7 +719,7 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     scan = pipeline['scan']
 
     key = (scan.ScanInfo * imaging.ProcessingParamSet\
-        & "subject='subject1'").fetch("KEY")[0]
+        & "subject='subject1'").fetch1("KEY")
 
     newkey = key.copy()
     newkey['session_datetime'] = newkey["session_datetime"].strftime("%Y%m%dDT%H%M%S")
