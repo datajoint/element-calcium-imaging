@@ -726,7 +726,7 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     output_dir = '/main/test_data/demo/' + '_'.join(str(newkey[x]) for x in newkey)
     imaging.ProcessingTask.insert1({**key,
         'processing_output_dir': output_dir,
-        'task_mode': 'trigger'}, skip_duplicates=True)
+        'task_mode': 'trigger'})
     try:
         os.makedirs(output_dir)
     except OSError as error:
