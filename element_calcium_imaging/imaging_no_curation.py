@@ -61,7 +61,7 @@ class ProcessingParamSet(dj.Lookup):
     definition = """  #  Parameter set used for processing of calcium imaging data
     paramset_idx:  smallint
     ---
-    -> ProcessingMethod    
+    -> ProcessingMethod
     paramset_desc: varchar(128)
     param_set_hash: uuid
     unique index (param_set_hash)
@@ -115,8 +115,8 @@ class ProcessingTask(dj.Manual):
     -> scan.Scan
     -> ProcessingParamSet
     ---
-    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
-    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)            #  output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')      # 'load': load computed analysis results, 'trigger': trigger computation
     """
     
     @classmethod
@@ -187,6 +187,7 @@ class Processing(dj.Computed):
         task_mode = (ProcessingTask & key).fetch1('task_mode')
 
         output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
             # update processing_output_dir
@@ -208,9 +209,7 @@ class Processing(dj.Computed):
         elif task_mode == 'trigger':
             
             method = (ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key).fetch1('processing_method')
-            output_dir = (ProcessingTask & key).fetch1('processing_output_dir')
-            output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
-
+            
             if method == 'suite2p':
                 import suite2p
 
@@ -748,7 +747,7 @@ class Activity(dj.Computed):
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob  # 
+        activity_trace: longblob  #
         """
 
     @property
