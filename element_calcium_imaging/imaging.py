@@ -215,6 +215,7 @@ class Processing(dj.Computed):
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1('params')
                 suite2p_params['save_path0'] = output_dir
+                suite2p_params['fs'] = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1('fps')
 
                 image_files = (ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key).fetch('file_path')
                 image_files = [find_full_path(get_imaging_root_data_dir(), image_file) for image_file in image_files]
