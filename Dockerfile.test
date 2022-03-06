@@ -23,7 +23,7 @@ RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://git
 # COPY --chown=anaconda:anaconda ./element-calcium-imaging /main/element-calcium-imaging
 # RUN pip install /main/element-calcium-imaging
 # COPY --chown=anaconda:anaconda ./workflow-calcium-imaging /main/workflow-calcium-imaging
-# RUN pip install /main/element-interface
+# RUN pip install -e /main/element-interface
 # COPY --chown=anaconda:anaconda ./workflow-interface /main/workflow-interface
 # RUN rm -f /main/workflow-calcium-imaging/dj_local_conf.json
  
