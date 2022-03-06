@@ -29,7 +29,7 @@ RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://git
  
 
 # Install the workflow
-RUN pip install /main/workflow-calcium-imaging
+RUN pip install -e /main/workflow-calcium-imaging
 RUN pip install -r /main/workflow-calcium-imaging/requirements_test.txt
 
 # Install Caiman
