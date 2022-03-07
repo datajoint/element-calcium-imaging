@@ -220,8 +220,6 @@ class ScanInfo(dj.Imported):
             z_zero = scan.motor_position_at_zero[2] \
                         if scan.motor_position_at_zero else None
             
-
-
             self.insert1(dict(key,
                               nfields=scan.num_fields,
                               nchannels=scan.num_channels,
