@@ -777,6 +777,39 @@ class ActivityExtractionMethod(dj.Lookup):
 
 
 @schema
+class ActivityExtractionParamSet(dj.Lookup):
+    definition = """  #  Activity extraction parameter set used for the analysis/extraction of calcium events
+    activity_extraction_paramset_idx:  smallint
+    ---
+    -> ActivityExtractionMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(cls, extraction_method: str, activity_paramset_idx: int,
+                          paramset_desc: str, params: dict):
+        param_dict = {'processing_method': extraction_method,
+                      'paramset_idx': activity_paramset_idx,
+                      'paramset_desc': paramset_desc,
+                      'params': params,
+                      'param_set_hash': dict_to_uuid(params)}
+        q_param = cls & {'param_set_hash': param_dict['param_set_hash']}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1('activity_paramset_idx')
+            if pname == activity_paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    'The specified param-set already exists - name: {}'.format(pname))
+        else:
+            cls.insert1(param_dict)
+
+
+@schema
 class Activity(dj.Computed):
     definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
@@ -793,11 +826,11 @@ class Activity(dj.Computed):
 
     @property
     def key_source(self):
-        suite2p_key_source = (Fluorescence * ActivityExtractionMethod
+        suite2p_key_source = (Fluorescence * ActivityExtractionParamSet * ActivityExtractionMethod
                               * ProcessingParamSet.proj('processing_method')
                               & 'processing_method = "suite2p"'
                               & 'extraction_method LIKE "suite2p%"')
-        caiman_key_source = (Fluorescence * ActivityExtractionMethod
+        caiman_key_source = (Fluorescence * ActivityExtractionParamSet * ActivityExtractionMethod
                              * ProcessingParamSet.proj('processing_method')
                              & 'processing_method = "caiman"'
                              & 'extraction_method LIKE "caiman%"')
