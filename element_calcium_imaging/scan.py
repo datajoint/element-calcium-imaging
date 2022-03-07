@@ -235,7 +235,7 @@ class ScanInfo(dj.Imported):
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
                               nrois=scan.num_rois if scan.is_multiROI else 0,
-                              scan_duration=scan.num_frames / scan.fps))
+                              scan_duration=(scan.num_frames + 1) / scan.fps))
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
@@ -294,7 +294,7 @@ class ScanInfo(dj.Imported):
                               fps=sbx_meta['frame_rate'],
                               bidirectional=sbx_meta == 'bidirectional',
                               nrois=sbx_meta['num_rois'] if is_multiROI else 0),
-                              scan_duration=(sbx_meta['num_frames'] + 1)/sbx_meta['frame_rate'])
+                              scan_duration=(sbx_meta['num_frames'] + 1) / sbx_meta['frame_rate'])
             # Insert Field(s)
             if not is_multiROI:
                 px_width, px_height = sbx_meta['frame_size']
