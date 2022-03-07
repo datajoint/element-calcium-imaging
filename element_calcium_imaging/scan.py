@@ -219,6 +219,8 @@ class ScanInfo(dj.Imported):
                         if scan.motor_position_at_zero else None
             z_zero = scan.motor_position_at_zero[2] \
                         if scan.motor_position_at_zero else None
+            
+
 
             self.insert1(dict(key,
                               nfields=scan.num_fields,
@@ -232,7 +234,8 @@ class ScanInfo(dj.Imported):
                               bidirectional=scan.is_bidirectional,
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
-                              nrois=scan.num_rois if scan.is_multiROI else 0))
+                              nrois=scan.num_rois if scan.is_multiROI else 0,
+                              scan_duration=scan.num_frames / scan.fps))
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
@@ -290,7 +293,8 @@ class ScanInfo(dj.Imported):
                               z=z_zero,
                               fps=sbx_meta['frame_rate'],
                               bidirectional=sbx_meta == 'bidirectional',
-                              nrois=sbx_meta['num_rois'] if is_multiROI else 0))
+                              nrois=sbx_meta['num_rois'] if is_multiROI else 0),
+                              scan_duration=(sbx_meta['num_frames'] + 1)/sbx_meta['frame_rate'])
             # Insert Field(s)
             if not is_multiROI:
                 px_width, px_height = sbx_meta['frame_size']
@@ -313,6 +317,12 @@ class ScanInfo(dj.Imported):
             nd2_file = nd2.ND2File(scan_filepaths[0])
             is_multiROI = False  # MultiROI to be implemented later
 
+            # Calculate scan duration
+            tf = nd2_file.frame_metadata(nd2_file.shape[0]-1).channels[0].time.absoluteJulianDayNumber
+            ti = nd2_file.frame_metadata(0).channels[0].time.absoluteJulianDayNumber
+            c = nd2_file.experiment[0].parameters.periods[0].periodDiff.avg / 1000
+            scan_duration = (tf - ti) * 24 * 60 * 60 + c
+
             # Insert in ScanInfo
             self.insert1(dict(key,
                               nfields=nd2_file.sizes.get('P', 1),
@@ -324,7 +334,8 @@ class ScanInfo(dj.Imported):
                               z=None,
                               fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
                               bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
-                              nrois=0))
+                              nrois=0,
+                              scan_duration=scan_duration))
 
             # MultiROI to be implemented later
 
