@@ -2,6 +2,8 @@ import datajoint as dj
 import pathlib
 import importlib
 import inspect
+import scanreader
+import nd2
 from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
@@ -118,7 +120,7 @@ def get_nd2_files(scan_key: dict) -> list:
     :return: list of Nikon files' full file-paths
     """
     return _linking_module.get_nd2_files(scan_key)
-    
+
 
 # ----------------------------- Table declarations ----------------------
 
@@ -202,6 +204,14 @@ class ScanInfo(dj.Imported):
         -> master
         file_path: varchar(255)  # filepath relative to root data directory
         """
+
+    @staticmethod
+    def estimate_scan_duration(scan_obj):
+        ti = scan_obj.frame_metadata(0).channels[0].time.absoluteJulianDayNumber  # Initial frame's JD.
+        tf = scan_obj.frame_metadata(scan_obj.shape[0]-1).channels[0].time.absoluteJulianDayNumber  # Final frame's JD.
+        fps = 1000 / scan_obj.experiment[0].parameters.periods[0].periodDiff.avg  # Frame per second
+        return (tf - ti) * 86400 + 1 / fps
+
 
     def make(self, key):
         acq_software = (Scan & key).fetch1('acq_software')
@@ -315,12 +325,6 @@ class ScanInfo(dj.Imported):
             nd2_file = nd2.ND2File(scan_filepaths[0])
             is_multiROI = False  # MultiROI to be implemented later
 
-            # Calculate scan duration
-            tf = nd2_file.frame_metadata(nd2_file.shape[0]-1).channels[0].time.absoluteJulianDayNumber
-            ti = nd2_file.frame_metadata(0).channels[0].time.absoluteJulianDayNumber
-            c = nd2_file.experiment[0].parameters.periods[0].periodDiff.avg / 1000
-            scan_duration = (tf - ti) * 24 * 60 * 60 + c
-
             # Insert in ScanInfo
             self.insert1(dict(key,
                               nfields=nd2_file.sizes.get('P', 1),
@@ -333,7 +337,7 @@ class ScanInfo(dj.Imported):
                               fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
                               bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
                               nrois=0,
-                              scan_duration=scan_duration))
+                              scan_duration=self.estimate_scan_duration(nd2_file)))
 
             # MultiROI to be implemented later
 
