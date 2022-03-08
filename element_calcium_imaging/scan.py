@@ -2,8 +2,6 @@ import datajoint as dj
 import pathlib
 import importlib
 import inspect
-import scanreader
-import nd2
 from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
