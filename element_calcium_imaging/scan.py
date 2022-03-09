@@ -118,7 +118,7 @@ def get_nd2_files(scan_key: dict) -> list:
     :return: list of Nikon files' full file-paths
     """
     return _linking_module.get_nd2_files(scan_key)
-    
+
 
 # ----------------------------- Table declarations ----------------------
 
@@ -203,6 +203,15 @@ class ScanInfo(dj.Imported):
         file_path: varchar(255)  # filepath relative to root data directory
         """
 
+    @staticmethod
+    def estimate_scan_duration(scan_obj):
+        # Calculates scan duration for Nikon images
+        ti = scan_obj.frame_metadata(0).channels[0].time.absoluteJulianDayNumber  # Initial frame's JD.
+        tf = scan_obj.frame_metadata(scan_obj.shape[0]-1).channels[0].time.absoluteJulianDayNumber  # Final frame's JD.
+        fps = 1000 / scan_obj.experiment[0].parameters.periods[0].periodDiff.avg  # Frame per second
+        return (tf - ti) * 86400 + 1 / fps
+
+
     def make(self, key):
         acq_software = (Scan & key).fetch1('acq_software')
 
@@ -219,7 +228,7 @@ class ScanInfo(dj.Imported):
                         if scan.motor_position_at_zero else None
             z_zero = scan.motor_position_at_zero[2] \
                         if scan.motor_position_at_zero else None
-
+            
             self.insert1(dict(key,
                               nfields=scan.num_fields,
                               nchannels=scan.num_channels,
@@ -232,7 +241,8 @@ class ScanInfo(dj.Imported):
                               bidirectional=scan.is_bidirectional,
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
-                              nrois=scan.num_rois if scan.is_multiROI else 0))
+                              nrois=scan.num_rois if scan.is_multiROI else 0,
+                              scan_duration=scan.num_frames / scan.fps))
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
@@ -290,7 +300,8 @@ class ScanInfo(dj.Imported):
                               z=z_zero,
                               fps=sbx_meta['frame_rate'],
                               bidirectional=sbx_meta == 'bidirectional',
-                              nrois=sbx_meta['num_rois'] if is_multiROI else 0))
+                              nrois=sbx_meta['num_rois'] if is_multiROI else 0),
+                              scan_duration=sbx_meta['num_frames'] / sbx_meta['frame_rate'])
             # Insert Field(s)
             if not is_multiROI:
                 px_width, px_height = sbx_meta['frame_size']
@@ -324,7 +335,8 @@ class ScanInfo(dj.Imported):
                               z=None,
                               fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
                               bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
-                              nrois=0))
+                              nrois=0,
+                              scan_duration=self.estimate_scan_duration(nd2_file)))
 
             # MultiROI to be implemented later
 
