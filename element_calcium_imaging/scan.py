@@ -241,7 +241,7 @@ class ScanInfo(dj.Imported):
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
                               nrois=scan.num_rois if scan.is_multiROI else 0,
-                              scan_duration=(scan.num_frames + 1) / scan.fps))
+                              scan_duration=scan.num_frames / scan.fps))
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
