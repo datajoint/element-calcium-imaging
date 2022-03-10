@@ -733,7 +733,7 @@ class ActivityExtractionMethod(dj.Lookup):
     extraction_method: varchar(32)
     """
 
-    contents = zip(['suite2p_deconvolution', 'caiman_deconvolution', 'caiman_dff'])
+    contents = zip(['suite2p', 'caiman', 'FISSA'])
 
 
 @schema
@@ -773,15 +773,16 @@ class ActivityExtractionParamSet(dj.Lookup):
 class Activity(dj.Computed):
     definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
-    -> ActivityExtractionMethod
+    -> ActivityExtractionParamSet
     """
 
     class Trace(dj.Part):
         definition = """  #
         -> master
         -> Fluorescence.Trace
+        activity_type: varchar(16) #  e.g. dF/F, calcium-event
         ---
-        activity_trace: longblob  #
+        activity_trace: longblob  # 
         """
 
     @property
@@ -800,7 +801,7 @@ class Activity(dj.Computed):
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
-            if key['extraction_method'] == 'suite2p_deconvolution':
+            if key['extraction_method'] == 'suite2p':
                 suite2p_dataset = imaging_dataset
                 # ---- iterate through all s2p plane outputs ----
                 spikes = []
@@ -809,6 +810,7 @@ class Activity(dj.Computed):
                     for mask_idx, spks in enumerate(s2p.spks):
                         spikes.append({**key, 'mask': mask_idx + mask_count,
                                        'fluo_channel': 0,
+                                       'activity_type': 'spike',
                                        'activity_trace': spks})
 
                 self.insert1(key)
@@ -816,9 +818,7 @@ class Activity(dj.Computed):
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
-            if key['extraction_method'] in ('caiman_deconvolution', 'caiman_dff'):
-                attr_mapper = {'caiman_deconvolution': 'spikes', 'caiman_dff': 'dff'}
-
+            if key['extraction_method'] == 'caiman':
                 # infer "segmentation_channel" - from params if available, else from caiman loader
                 params = (ProcessingParamSet * ProcessingTask & key).fetch1('params')
                 segmentation_channel = params.get('segmentation_channel',
@@ -829,7 +829,13 @@ class Activity(dj.Computed):
                     activities.append({
                         **key, 'mask': mask['mask_id'],
                         'fluo_channel': segmentation_channel,
-                        'activity_trace': mask[attr_mapper[key['extraction_method']]]})
+                        'activity_type': 'dff',
+                        'activity_trace': mask['dff']})
+                    activities.append({
+                        **key, 'mask': mask['mask_id'],
+                        'fluo_channel': segmentation_channel,
+                        'activity_type': 'spike',
+                        'activity_trace': mask['spikes']})
                 self.insert1(key)
                 self.Trace.insert(activities)
         else:
