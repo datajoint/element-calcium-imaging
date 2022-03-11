@@ -27,7 +27,7 @@ workflow.
 ### element-lab
 
 ![element-lab](
-https://github.com/datajoint/element-lab/raw/main/images/element_lab_diagram.svg)
+https://github.com/datajoint/element-lab/raw/main/images/lab_diagram.svg)
 
 ### element-animal
 
