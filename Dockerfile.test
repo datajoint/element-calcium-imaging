@@ -21,7 +21,7 @@ RUN pip install "element-interface[scanreader,sbxreader,suite2p]@git+https://git
 # Option 3 - Install user's local fork of element and workflow
 # RUN mkdir /main/element-calcium-imaging
 # COPY --chown=anaconda:anaconda ./element-calcium-imaging /main/element-calcium-imaging
-# RUN pip install /main/element-calcium-imaging
+# RUN pip install -e /main/element-calcium-imaging
 # COPY --chown=anaconda:anaconda ./workflow-calcium-imaging /main/workflow-calcium-imaging
 # RUN pip install -e /main/element-interface
 # COPY --chown=anaconda:anaconda ./workflow-interface /main/workflow-interface
