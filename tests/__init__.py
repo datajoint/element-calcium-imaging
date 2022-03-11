@@ -719,14 +719,14 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     scan = pipeline['scan']
 
     key = (scan.ScanInfo * imaging.ProcessingParamSet\
-        & "subject='subject1'").fetch("KEY")[0]
+        & "subject='subject1'").fetch1("KEY")
 
     newkey = key.copy()
     newkey['session_datetime'] = newkey["session_datetime"].strftime("%Y%m%dDT%H%M%S")
     output_dir = '/main/test_data/demo/' + '_'.join(str(newkey[x]) for x in newkey)
     imaging.ProcessingTask.insert1({**key,
         'processing_output_dir': output_dir,
-        'task_mode': 'trigger'}, skip_duplicates=True)
+        'task_mode': 'trigger'})
     try:
         os.makedirs(output_dir)
     except OSError as error:
