@@ -723,8 +723,7 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
 
     newkey = key.copy()
     newkey['session_datetime'] = newkey["session_datetime"].strftime("%Y%m%dDT%H%M%S")
-    output_dir = get_imaging_root_data_dir()
-    output_dir = '/main/test_data/' + '_'.join(str(newkey[x]) for x in newkey)
+    output_dir = '_'.join(str(newkey[x]) for x in newkey)
     imaging.ProcessingTask.insert1({**key,
         'processing_output_dir': output_dir,
         'task_mode': 'trigger'})
