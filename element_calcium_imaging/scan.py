@@ -299,8 +299,8 @@ class ScanInfo(dj.Imported):
                               z=z_zero,
                               fps=sbx_meta['frame_rate'],
                               bidirectional=sbx_meta == 'bidirectional',
-                              nrois=sbx_meta['num_rois'] if is_multiROI else 0),
-                              scan_duration=(sbx_meta['num_frames'] + 1) / sbx_meta['frame_rate'])
+                              nrois=sbx_meta['num_rois'] if is_multiROI else 0,
+                              scan_duration=(sbx_meta['num_frames'] + 1) / sbx_meta['frame_rate']))
             # Insert Field(s)
             if not is_multiROI:
                 px_width, px_height = sbx_meta['frame_size']
