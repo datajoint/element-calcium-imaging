@@ -205,6 +205,7 @@ class ScanInfo(dj.Imported):
 
     @staticmethod
     def estimate_scan_duration(scan_obj):
+        # Calculates scan duration for Nikon images
         ti = scan_obj.frame_metadata(0).channels[0].time.absoluteJulianDayNumber  # Initial frame's JD.
         tf = scan_obj.frame_metadata(scan_obj.shape[0]-1).channels[0].time.absoluteJulianDayNumber  # Final frame's JD.
         fps = 1000 / scan_obj.experiment[0].parameters.periods[0].periodDiff.avg  # Frame per second
@@ -241,7 +242,7 @@ class ScanInfo(dj.Imported):
                               usecs_per_line=scan.seconds_per_line * 1e6,
                               fill_fraction=scan.temporal_fill_fraction,
                               nrois=scan.num_rois if scan.is_multiROI else 0,
-                              scan_duration=(scan.num_frames + 1) / scan.fps))
+                              scan_duration=scan.num_frames / scan.fps))
             # Insert Field(s)
             if scan.is_multiROI:
                 self.Field.insert([
