@@ -718,12 +718,12 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     imaging = pipeline['imaging']
     scan = pipeline['scan']
 
-    key = (scan.ScanInfo * imaging.ProcessingParamSet\
-        & "subject='subject1'").fetch1("KEY")
+    # This is to use 1 tif out of 2 - So do not change this to fetch1("KEY")!!!
+    key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch("KEY")[0]  
 
     newkey = key.copy()
     newkey['session_datetime'] = newkey["session_datetime"].strftime("%Y%m%dDT%H%M%S")
-    output_dir = '_'.join(str(newkey[x]) for x in newkey)
+    output_dir = 'demo/' + '_'.join(str(newkey[x]) for x in newkey)
     imaging.ProcessingTask.insert1({**key,
         'processing_output_dir': output_dir,
         'task_mode': 'trigger'})
