@@ -10,7 +10,7 @@ RUN git clone --branch master https://github.com/vathes/CaImAn
 WORKDIR /main/CaImAn
 RUN conda install -n base -c conda-forge -y mamba
 RUN /bin/bash -c 'mamba env update --n base --file environment.yml' 
-# Suite2p complains if np.__version__ != 1.21
+# Suite2p requires np.__version__ == 1.21
 RUN pip install numpy==1.21
 RUN pip install .
 
