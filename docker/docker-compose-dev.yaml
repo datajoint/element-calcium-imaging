@@ -1,17 +1,17 @@
-# docker-compose -f docker-compose-dev.yaml up --build -d
-# docker-compose -f docker-compose-dev.yaml down
+# docker-compose -f ./docker/docker-compose-dev.yaml up --build -d
+# docker-compose -f ./docker/docker-compose-dev.yaml down
 
 version: "2.4"
 x-net: &net
   networks:
       - main
 services:
-  db:
+  calcium-imaging-dev-db:
     <<: *net
     image: datajoint/mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=simple
-  workflow-calcium-imagin-dev:
+  calcium-imaging-dev-workflow:
     <<: *net
     build:
       context: ../../
@@ -29,7 +29,7 @@ services:
       - ../../element-calcium-imaging:/main/element-calcium-imaging
       - ..:/main/workflow-calcium-imaging
     depends_on:
-      db:
+      calcium-imaging-dev-db:
         condition: service_healthy
 networks:
   main:

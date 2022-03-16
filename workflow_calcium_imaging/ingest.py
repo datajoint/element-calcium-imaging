@@ -136,7 +136,7 @@ def ingest_events(recording_csv_path='./user_data/behavior_recordings.csv',
             block_csv_path, block_csv_path,
             trial_csv_path, trial_csv_path, trial_csv_path,
             trial_csv_path,
-            event_csv_path]
+            event_csv_path, event_csv_path]
     tables = [event.BehaviorRecording(), event.BehaviorRecording.File(),
               trial.Block(), trial.Block.Attribute(),
               trial.TrialType(), trial.Trial(), trial.Trial.Attribute(),
