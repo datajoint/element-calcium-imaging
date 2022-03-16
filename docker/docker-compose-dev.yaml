@@ -17,7 +17,7 @@ services:
       context: ../../
       dockerfile: ./workflow-calcium-imaging/docker/Dockerfile.dev
     env_file: .env
-    image: workflow_calcium_imaging:0.1.0a2
+    image: workflow_calcium_imaging_dev:0.1.0a2
     environment:
       - IMAGING_ROOT_DATA_DIR=/main/test_data/workflow_calcium_imaging/
     volumes:
