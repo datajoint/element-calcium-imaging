@@ -1,5 +1,5 @@
-# docker-compose -f docker-compose-dev.yaml up --build -d
-# docker-compose -f docker-compose-dev.yaml down
+# docker-compose -f ./docker/docker-compose-dev.yaml up --build -d
+# docker-compose -f ./docker/docker-compose-dev.yaml down
 
 version: "2.4"
 x-net: &net
