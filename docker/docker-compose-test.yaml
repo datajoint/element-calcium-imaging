@@ -16,7 +16,7 @@ services:
     build:
       context: ../../
       dockerfile: ./workflow-calcium-imaging/docker/Dockerfile.test
-    image: workflow_calcium_imaging:0.1.0a2
+    image: workflow_calcium_imaging_test:0.1.0a2
     environment:
       - DJ_HOST=db
       - DJ_USER=root
