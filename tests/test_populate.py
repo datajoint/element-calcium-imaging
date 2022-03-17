@@ -86,7 +86,7 @@ def test_processing_populate_trigger_suite2p_2D(trigger_processing_suite2p_2D, p
     # fetch('KEY')[0] is intentional to keep the test short. otherwise there are 2 keys.
     key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch("KEY")[0]
     output_dir = (imaging.ProcessingTask & key).fetch1('processing_output_dir')
-    output_dir = imaging.find_full_path(get_imaging_root_data_dir(key), output_dir).as_posix()
+    output_dir = imaging.find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
 
     Suite2p(output_dir)
 
