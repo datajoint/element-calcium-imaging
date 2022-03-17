@@ -29,7 +29,7 @@ services:
       - ../../element-calcium-imaging:/main/element-calcium-imaging
       - ..:/main/workflow-calcium-imaging
     depends_on:
-      db:
+      calcium-imaging-dev-db:
         condition: service_healthy
 networks:
   main:
