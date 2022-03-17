@@ -21,7 +21,7 @@ WORKDIR /main
 
 # Option 2 - Install user's remote fork of element and workflow
 #            or an unreleased version of the element
-# RUN pip install git+https://github.com/<user>element-lab.git
+# RUN pip install git+https://github.com/<user>/element-lab.git
 # RUN pip install git+https://github.com/<user>/element-animal.git
 # RUN pip install git+https://github.com/<user>/element-session.git
 # RUN pip install "element-interface[scanreader,sbxreader, suite2p]@git+https://github.com/<user>/element-interface"
