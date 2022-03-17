@@ -6,7 +6,7 @@ x-net: &net
   networks:
       - main
 services:
-  db:
+  calcium-imaging-dev-db:
     <<: *net
     image: datajoint/mysql:5.7
     environment:
