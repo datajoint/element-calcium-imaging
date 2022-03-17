@@ -27,7 +27,7 @@ workflow.
 ### element-lab
 
 ![element-lab](
-https://github.com/datajoint/element-lab/raw/main/images/element_lab_diagram.svg)
+https://github.com/datajoint/element-lab/raw/main/images/lab_diagram.svg)
 
 ### element-animal
 
@@ -42,7 +42,7 @@ https://github.com/datajoint/element-animal/blob/main/images/subject_diagram.svg
 
 + The installation instructions can be found at 
 [datajoint-elements/install.md](
-     https://github.com/datajoint/datajoint-elements/blob/main/install.md).
+     https://github.com/datajoint/datajoint-elements/blob/main/gh-pages/docs/usage/install.md).
 
 ## Interacting with the DataJoint workflow
 
