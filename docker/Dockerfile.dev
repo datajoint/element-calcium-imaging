@@ -17,10 +17,11 @@ RUN pip install .
 WORKDIR /main
 
 RUN mkdir /main/element-lab \
-          /main/element-animal \
-          /main/element-session \
+           /main/element-animal \
+           /main/element-session \
            /main/element-interface \
-          /main/workflow-calcium-imaging
+           /main/element-calcium-imaging \
+           /main/workflow-calcium-imaging
 
 # Copy user's local fork of elements and workflow
 COPY --chown=anaconda:anaconda ./element-lab /main/element-lab
