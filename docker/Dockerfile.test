@@ -24,7 +24,7 @@ WORKDIR /main
 # RUN pip install git+https://github.com/<user>/element-lab.git
 # RUN pip install git+https://github.com/<user>/element-animal.git
 # RUN pip install git+https://github.com/<user>/element-session.git
-# RUN pip install "element-interface[scanreader,sbxreader, suite2p]@git+https://github.com/<user>/element-interface"
+# RUN pip install "element-interface[scanreader,sbxreader,image_converter,suite2p]@git+https://github.com/<user>/element-interface"
 # RUN pip install git+https://github.com/<user>/element-calcium-imaging.git
 # RUN git clone https://github.com/<user>/workflow-calcium-imaging.git /main/workflow-calcium-imaging
 
