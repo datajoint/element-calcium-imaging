@@ -118,7 +118,6 @@ def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_pat
         'px_width', 'px_height')
     assert ave_img.shape == (img_height, img_width)
 
-@pytest.mark.skip()
 def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_paths):
     imaging = pipeline['imaging']
     scan = pipeline['scan']
