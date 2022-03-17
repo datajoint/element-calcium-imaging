@@ -20,7 +20,6 @@ RUN mkdir /main/element-lab \
           /main/element-animal \
           /main/element-session \
            /main/element-interface \
-          /main/element-array-ephys \
           /main/workflow-calcium-imaging
 
 # Copy user's local fork of elements and workflow
