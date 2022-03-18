@@ -1,15 +1,15 @@
 import datajoint as dj
 from element_animal import subject
 from element_lab import lab
-from element_session import session
+from element_session import session_with_datetime as session
 from element_calcium_imaging import scan, imaging
 
 from element_lab.lab import Source, Lab, Protocol, User, Location, Project
 from element_animal.subject import Subject
-from element_session.session import Session
+from element_session.session_with_datetime import Session
 
 from .paths import (get_imaging_root_data_dir,
-                    get_scan_image_files, get_scan_box_files)
+                    get_scan_image_files, get_scan_box_files, get_nd2_files)
 
 
 if 'custom' not in dj.config:
@@ -24,6 +24,7 @@ lab.activate(db_prefix + 'lab')
 
 subject.activate(db_prefix + 'subject', linking_module=__name__)
 
+Experimenter = lab.User
 session.activate(db_prefix + 'session', linking_module=__name__)
 
 # ------------- Declare table Equipment for use in element_calcium_imaging -------------
@@ -32,9 +33,9 @@ session.activate(db_prefix + 'session', linking_module=__name__)
 @lab.schema
 class Equipment(dj.Manual):
     definition = """
-    scanner: varchar(32) 
+    scanner: varchar(32)
     """
 
 
 # ------------- Activate "imaging" schema -------------
-imaging.activate(db_prefix + 'imaging',  db_prefix + 'scan',  linking_module=__name__)
+imaging.activate(db_prefix + 'imaging', db_prefix + 'scan', linking_module=__name__)
