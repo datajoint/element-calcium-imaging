@@ -1,11 +1,11 @@
-import numpy as np
-
+import pytest
+import shutil
 from . import (dj_config, pipeline, test_data,
                subjects_csv, ingest_subjects,
                sessions_csv, ingest_sessions,
                testdata_paths, suite2p_paramset,
                caiman2D_paramset, caiman3D_paramset,
-               scan_info,
+               scan_info, trigger_processing_suite2p_2D,
                processing_tasks,
                processing, curations)
 
@@ -71,7 +71,26 @@ def test_scan_info_populate_scanbox_3D(testdata_paths, pipeline, scan_info):
 
 def test_processing_populate(processing, pipeline):
     imaging = pipeline['imaging']
+
     assert len(imaging.Processing()) == 5
+
+
+def test_processing_populate_trigger_suite2p_2D(trigger_processing_suite2p_2D, pipeline):
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+    get_imaging_root_data_dir = pipeline['get_imaging_root_data_dir']
+    assert len(imaging.Processing()) == 1
+
+    from element_interface.suite2p_loader import Suite2p
+
+    # fetch('KEY')[0] is intentional to keep the test short. otherwise there are 2 keys.
+    key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch("KEY")[0]
+    output_dir = (imaging.ProcessingTask & key).fetch1('processing_output_dir')
+    output_dir = imaging.find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+
+    Suite2p(output_dir)
+
+    shutil.rmtree('/main/test_data/demo')
 
 
 def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_paths):
@@ -98,7 +117,6 @@ def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_pat
     img_width, img_height = (scan.ScanInfo.Field & curation_key).fetch1(
         'px_width', 'px_height')
     assert ave_img.shape == (img_height, img_width)
-
 
 def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_paths):
     imaging = pipeline['imaging']
