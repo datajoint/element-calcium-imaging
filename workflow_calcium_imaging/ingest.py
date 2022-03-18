@@ -112,8 +112,8 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv',
     Equipment.insert(scanner_list, skip_duplicates=True)
 
     print(f'\n---- Insert {len(session_list)} entry(s) into session.Session ----')
-    session.Session.insert(session_list, skip_duplicates=skip_duplicates)
-    session.SessionDirectory.insert(session_dir_list, skip_duplicates=skip_duplicates)
+    session.Session.insert(session_list)
+    session.SessionDirectory.insert(session_dir_list)
 
     print(f'\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----')
     scan.Scan.insert(scan_list, skip_duplicates=skip_duplicates)
