@@ -1,12 +1,11 @@
-# run tests: pytest -sv --cov-report term-missing --cov=workflow-calcium-imaging -p no:warnings
+# run tests: pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging -p no:warnings
 
 import os
 import pytest
-import pandas as pd
 import pathlib
-import datajoint as dj
 import numpy as np
-
+import pandas as pd
+import datajoint as dj
 from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 # ------------------- SOME CONSTANTS -------------------
@@ -714,6 +713,34 @@ def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_par
 
 
 @pytest.fixture
+def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
+    """ Triggers suite2p pipeline on subject1 data """
+    imaging = pipeline['imaging']
+    scan = pipeline['scan']
+
+    # This is to use 1 tif out of 2 - So do not change this to fetch1("KEY")!!!
+    key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch("KEY")[0]  
+
+    newkey = key.copy()
+    newkey['session_datetime'] = newkey["session_datetime"].strftime("%Y%m%dT%H%M%S")
+    output_dir = 'demo/' + '_'.join(str(newkey[x]) for x in newkey)
+    imaging.ProcessingTask.insert1({**key,
+        'processing_output_dir': output_dir,
+        'task_mode': 'trigger'})
+    try:
+        os.makedirs(get_imaging_root_data_dir() / output_dir)
+    except OSError as error:
+        print(error)
+
+    imaging.Processing.populate()
+
+    yield
+
+    imaging.ProcessingTask.delete()
+    imaging.Processing.delete()
+
+
+@pytest.fixture
 def processing(processing_tasks, pipeline):
     imaging = pipeline['imaging']
 
@@ -722,6 +749,7 @@ def processing(processing_tasks, pipeline):
     yield
 
     imaging.Processing.delete()
+
 
 
 @pytest.fixture
