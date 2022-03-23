@@ -1,7 +1,10 @@
 # DataJoint Workflow - Calcium Imaging
 
-Workflow for calcium imaging data acquired with `ScanImage` or `Scanbox` 
-software and processed with `Suite2p` or `CaImAn`.
+Workflow for calcium imaging data acquired with 
+[ScanImage](http://scanimage.vidriotechnologies.com),  
+[Scanbox](https://scanbox.org), or `Nikon NIS` software and processed with 
+[Suite2p](https://github.com/MouseLand/suite2p) or 
+[CaImAn](https://github.com/flatironinstitute/CaImAn).
 
 A complete calcium imaging workflow can be built using the DataJoint Elements.
 + [element-lab](https://github.com/datajoint/element-lab)
@@ -19,22 +22,12 @@ convention, and directory lookup methods (see
 
 ## Workflow architecture
 
-The calcium imaging workflow presented here uses components from 4 DataJoint 
-Elements (`element-lab`, `element-animal`, `element-session`, 
-`element-calcium-imaging`) assembled together to form a fully functional 
-workflow. 
-
-### element-lab
-
-![element-lab](
-https://github.com/datajoint/element-lab/raw/main/images/lab_diagram.svg)
-
-### element-animal
-
-![element-animal](
-https://github.com/datajoint/element-animal/blob/main/images/subject_diagram.svg)
-
-### assembled with element-calcium-imaging
+The calcium imaging workflow presented here uses components from four DataJoint 
+Elements ([element-lab](https://github.com/datajoint/element-lab), 
+[element-animal](https://github.com/datajoint/element-animal), 
+[element-session](https://github.com/datajoint/element-session), 
+[element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging)) 
+assembled together to form a fully functional workflow. 
 
 ![element_calcium_imaging](images/attached_calcium_imaging_element.svg)
 
