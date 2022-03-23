@@ -28,6 +28,7 @@ services:
       - ../../element-lab:/main/element-lab
       - ../../element-animal:/main/element-animal
       - ../../element-session:/main/element-session
+      - ../../element-interface:/main/element-interface
       - ../../element-calcium-imaging:/main/element-calcium-imaging
       - ..:/main/workflow-calcium-imaging
     depends_on:
