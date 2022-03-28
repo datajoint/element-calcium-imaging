@@ -4,8 +4,8 @@ from datetime import datetime
 from pathlib import Path
 
 from element_interface.utils import find_full_path
-from .pipeline import subject, scan, session, Equipment, trial, event
-from .paths import get_imaging_root_data_dir
+from workflow_calcium_imaging.pipeline import subject, scan, session, Equipment, trial, event
+from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_general(csvs, tables, skip_duplicates=True, verbose=True,
@@ -45,7 +45,7 @@ def ingest_subjects(subject_csv_path='./user_data/subjects.csv',
 
 
 def ingest_sessions(session_csv_path='./user_data/sessions.csv',
-                    skip_duplicates=False):
+                    skip_duplicates=True):
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------

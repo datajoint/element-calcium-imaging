@@ -30,7 +30,7 @@ class ActivityAlignment(dj.Computed):
     definition = """
     -> ActivityAlignmentCondition
     ---
-    aligned_timestamps = longblob
+    aligned_timestamps: longblob
     """
 
     class AlignedTrialSpikes(dj.Part):
@@ -63,7 +63,7 @@ class ActivityAlignment(dj.Computed):
 
         aligned_trial_activities = []
         for _, r in trialized_event_times.iterrows():
-            if np.isnan(r.event):
+            if r.event is None or np.isnan(r.event):
                 continue
             alignment_start_time = r.event - min_limit
             alignment_end_time = r.event + max_limit

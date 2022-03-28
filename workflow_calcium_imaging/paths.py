@@ -1,8 +1,10 @@
 import datajoint as dj
+import pathlib
 
 
 def get_imaging_root_data_dir():
-    return dj.config.get('custom', {}).get('imaging_root_data_dir', None)
+    data_dir = dj.config.get('custom', {}).get('imaging_root_data_dir', None)
+    return pathlib.Path(data_dir) if data_dir else None
 
 
 def get_scan_image_files(scan_key):
