@@ -106,8 +106,8 @@ ENV/
 .mypy_cache/
 
 # datajoint
-dj_local_conf.json
-dj_local_conf_old.json
+dj_local_conf*.json
+temp*
 
 # emacs
 **/*~
