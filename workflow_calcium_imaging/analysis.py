@@ -58,7 +58,7 @@ class ActivityAlignment(dj.Computed):
         max_limit = (trialized_event_times.end - trialized_event_times.event).max()
 
         # Spike raster
-        roi_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
+        trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
         activity_traces = np.hstack(activity_traces)
 
         aligned_trial_activities = []
@@ -70,8 +70,8 @@ class ActivityAlignment(dj.Computed):
             roi_aligned_activities = activity_traces[:, (alignment_start_time <= frame_timestamps)
                                                         & (frame_timestamps < alignment_end_time)]
 
-            aligned_trial_activities.extend([{**key, **r.trial_key, **roi, 'aligned_trace': roi_trace}
-                                             for roi, roi_trace in zip(roi_keys, roi_aligned_activities)])
+            aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key, 'aligned_trace': aligned_trace}
+                                             for trace_key, aligned_trace in zip(trace_keys, roi_aligned_activities)])
 
         self.insert1({**key, 'aligned_timestamps': np.linspace(
             -min_limit, max_limit, len(aligned_trial_activities[0]['aligned_trace']))})
