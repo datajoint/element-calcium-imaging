@@ -33,6 +33,9 @@ subject.activate(db_prefix + 'subject', linking_module=__name__)
 Experimenter = lab.User
 session.activate(db_prefix + 'session', linking_module=__name__)
 
+
+# Activate "event" and "trial" schema ---------------------------------
+
 trial.activate(db_prefix + 'trial', db_prefix + 'event', linking_module=__name__)
 
 
