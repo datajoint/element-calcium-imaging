@@ -59,7 +59,7 @@ class ActivityAlignment(dj.Computed):
 
         # Spike raster
         trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
-        activity_traces = np.hstack(activity_traces)
+        activity_traces = np.vstack(activity_traces)
 
         aligned_trial_activities = []
         for _, r in trialized_event_times.iterrows():
@@ -86,11 +86,12 @@ class ActivityAlignment(dj.Computed):
         else:
             ax0, ax1 = axs
 
-        aligned_timestamps = (self & key).fetch1('aligned_trace')
+        aligned_timestamps = (self & key).fetch1('aligned_timestamps')
         trial_ids, aligned_spikes = (self.AlignedTrialSpikes
-                                     & key & {'mask': roi}).fetch('trial_id', 'aligned_trace', order_by='trial_id')
+                                     & key & {'mask': roi}).fetch(
+            'trial_id', 'aligned_trace', order_by='trial_id')
 
-        aligned_spikes = np.hstack(aligned_spikes)
+        aligned_spikes = np.vstack(aligned_spikes)
 
         ax0.imshow(aligned_spikes, cmap='gray', interpolation='nearest')
         ax0.axvline(x=0, linestyle='--', color='white')
