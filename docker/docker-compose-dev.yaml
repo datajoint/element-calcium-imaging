@@ -6,18 +6,20 @@ x-net: &net
   networks:
       - main
 services:
-  calcium-imaging-dev-db:
+  db:
     <<: *net
     image: datajoint/mysql:5.7
+    container_name: workflow-calcium-imaging-dev-db
     environment:
       - MYSQL_ROOT_PASSWORD=simple
-  calcium-imaging-dev-workflow:
+  workflow:
     <<: *net
     build:
       context: ../../
       dockerfile: ./workflow-calcium-imaging/docker/Dockerfile.dev
     env_file: .env
-    image: workflow_calcium_imaging_dev:0.1.0a2
+    image: workflow-calcium-imaging-dev:0.1.0a2
+    container_name: workflow-calcium-imaging-dev
     environment:
       - IMAGING_ROOT_DATA_DIR=/main/test_data/workflow_calcium_imaging/
     volumes:
@@ -29,7 +31,7 @@ services:
       - ../../element-calcium-imaging:/main/element-calcium-imaging
       - ..:/main/workflow-calcium-imaging
     depends_on:
-      calcium-imaging-dev-db:
+      db:
         condition: service_healthy
 networks:
   main:

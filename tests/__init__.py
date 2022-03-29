@@ -10,6 +10,8 @@ from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 # ------------------- SOME CONSTANTS -------------------
 
+_tear_down = False
+
 test_user_data_dir = pathlib.Path('./tests/user_data')
 test_user_data_dir.mkdir(exist_ok=True)
 
@@ -86,7 +88,8 @@ def pipeline():
            'Equipment': pipeline.Equipment,
            'get_imaging_root_data_dir': pipeline.get_imaging_root_data_dir}
 
-    pipeline.subject.Subject.delete()
+    if _tear_down:
+        pipeline.subject.Subject.delete()
 
 
 @pytest.fixture
@@ -108,7 +111,8 @@ def subjects_csv():
 
     yield input_subjects, subjects_csv_path
 
-    subjects_csv_path.unlink()  # delete csv file after use
+    if _tear_down:
+        subjects_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
@@ -139,7 +143,8 @@ def sessions_csv(test_data):
 
     yield input_sessions, sessions_csv_path
 
-    sessions_csv_path.unlink()  # delete csv file after use
+    if _tear_down:
+        sessions_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
@@ -237,7 +242,8 @@ def suite2p_paramset(pipeline):
 
     yield params_suite2p
 
-    (imaging.ProcessingParamSet & 'paramset_idx = 0').delete()
+    if _tear_down:
+        (imaging.ProcessingParamSet & 'paramset_idx = 0').delete()
 
 
 @pytest.fixture
@@ -437,7 +443,8 @@ def caiman2D_paramset(pipeline):
 
     yield params_caiman_2d
 
-    (imaging.ProcessingParamSet & 'paramset_idx = 1').delete()
+    if _tear_down:
+        (imaging.ProcessingParamSet & 'paramset_idx = 1').delete()
 
 
 @pytest.fixture
@@ -637,7 +644,8 @@ def caiman3D_paramset(pipeline):
 
     yield params_caiman_3d
 
-    (imaging.ProcessingParamSet & 'paramset_idx = 2').delete()
+    if _tear_down:
+        (imaging.ProcessingParamSet & 'paramset_idx = 2').delete()
 
 
 @pytest.fixture
@@ -648,7 +656,8 @@ def scan_info(pipeline, ingest_sessions):
 
     yield
 
-    scan.ScanInfo.delete()
+    if _tear_down:
+        scan.ScanInfo.delete()
 
 
 @pytest.fixture
@@ -709,7 +718,8 @@ def processing_tasks(pipeline, suite2p_paramset, caiman2D_paramset, caiman3D_par
 
     yield
 
-    imaging.ProcessingTask.delete()
+    if _tear_down:
+        imaging.ProcessingTask.delete()
 
 
 @pytest.fixture
@@ -732,33 +742,38 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     except OSError as error:
         print(error)
 
-    imaging.Processing.populate()
+    imaging.Processing.populate(key)
 
     yield
 
-    imaging.ProcessingTask.delete()
-    imaging.Processing.delete()
+    if _tear_down:
+        (imaging.ProcessingTask & key).delete()
+        (imaging.Processing & key).delete()
 
 
 @pytest.fixture
 def processing(processing_tasks, pipeline):
     imaging = pipeline['imaging']
 
-    imaging.Processing.populate()
+    errors = imaging.Processing.populate(suppress_errors=True)
+
+    if errors:
+        print(f'Populate ERROR: {len(errors)} errors in "imaging.Processing.populate()" - {errors[0][-1]}')
 
     yield
 
-    imaging.Processing.delete()
-
+    if _tear_down:
+        imaging.Processing.delete()
 
 
 @pytest.fixture
 def curations(processing, pipeline):
     imaging = pipeline['imaging']
 
-    for key in (imaging.ProcessingTask - imaging.Curation).fetch('KEY'):
+    for key in (imaging.Processing - imaging.Curation).fetch('KEY'):
         imaging.Curation().create1_from_processing_task(key)
 
     yield
 
-    imaging.Curation.delete()
+    if _tear_down:
+        imaging.Curation.delete()
