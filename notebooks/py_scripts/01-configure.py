@@ -7,9 +7,8 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.13.7
 #   kernelspec:
-#     display_name: venv-nwb
-#     language: python
-#     name: venv-nwb
+#     display_name: 'Python 3.7.9 64-bit (''workflow-calcium-imaging'': conda)'
+#     name: python379jvsc74a57bd01a512f474e195e32ad84236879d3bb44800a92b431919ef0b10d543f5012a23c
 # ---
 
 # # Configure DataJoint connection to the database
@@ -52,7 +51,7 @@ dj.conn()
 #
 # + The prefix could be configurated as follows in `dj.config`:
 
-dj.config['custom'] = {'database.prefix': 'u24_'}
+dj.config['custom'] = {'database.prefix': 'neuro_'}
 
 # ### Root directories for raw calcium imaging data and processed results
 #

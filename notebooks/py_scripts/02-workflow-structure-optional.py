@@ -8,9 +8,8 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.13.7
 #   kernelspec:
-#     display_name: venv-nwb
-#     language: python
-#     name: venv-nwb
+#     display_name: 'Python 3.7.9 64-bit (''workflow-calcium-imaging'': conda)'
+#     name: python379jvsc74a57bd01a512f474e195e32ad84236879d3bb44800a92b431919ef0b10d543f5012a23c
 # ---
 
 # # Introduction to the workflow structure
