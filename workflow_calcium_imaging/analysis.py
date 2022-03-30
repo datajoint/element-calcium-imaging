@@ -1,7 +1,8 @@
 import datajoint as dj
 import numpy as np
 
-from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial, event
+from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial, \
+                                              event
 
 
 schema = dj.schema(db_prefix + 'analysis')
@@ -63,7 +64,8 @@ class ActivityAlignment(dj.Computed):
         aligned_timestamps = np.arange(-min_limit, max_limit, 1/frame_rate)
         nsamples = len(aligned_timestamps)
 
-        trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
+        trace_keys, activity_traces = (imaging.Activity.Trace & key
+                                       ).fetch('KEY', 'activity_trace', order_by='mask')
         activity_traces = np.vstack(activity_traces)
 
         aligned_trial_activities = []
@@ -71,10 +73,13 @@ class ActivityAlignment(dj.Computed):
             if r.event is None or np.isnan(r.event):
                 continue
             alignment_start_idx = int((r.event - min_limit) * frame_rate)
-            roi_aligned_activities = activity_traces[:, alignment_start_idx: (alignment_start_idx + nsamples)]
+            roi_aligned_activities = activity_traces[:,
+                                                     alignment_start_idx:
+                                                     (alignment_start_idx + nsamples)]
             if roi_aligned_activities.shape[-1] != nsamples:
+                shape_diff = nsamples - roi_aligned_activities.shape[-1]
                 roi_aligned_activities = np.pad(roi_aligned_activities,
-                                                ((0, 0), (0, nsamples - roi_aligned_activities.shape[-1])),
+                                                ((0, 0), (0, shape_diff)),
                                                 mode='constant', constant_values=np.nan)
 
             aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key,
@@ -86,13 +91,14 @@ class ActivityAlignment(dj.Computed):
         self.insert1({**key, 'aligned_timestamps': aligned_timestamps})
         self.AlignedTrialActivity.insert(aligned_trial_activities)
 
-    def plot_aligned_activities(self, key, roi, axs=None):
+    def plot_aligned_activities(self, key, roi, axs=None, title=None):
         """
         peri-stimulus time histogram (PSTH) for calcium imaging spikes
         :param key: key of ActivityAlignment master table
         :param roi: imaging segmentation mask
         :param axs: optional definition of axes for plot.
                     Default is plt.subplots(2, 1, figsize=(12, 8))
+        :param title: Optional title label
         """
         import matplotlib.pyplot as plt
 
@@ -122,5 +128,8 @@ class ActivityAlignment(dj.Computed):
         ax1.axvline(x=0, linestyle='--', color='black')
         ax1.set_xlabel('Time (s)')
         ax1.set_xlim(aligned_timestamps[0], aligned_timestamps[-1])
+
+        if title:
+            plt.suptitle(title)
 
         return fig
