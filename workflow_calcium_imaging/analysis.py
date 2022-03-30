@@ -1,7 +1,8 @@
 import datajoint as dj
 import numpy as np
 
-from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial, event
+from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial,\
+                                              event
 
 
 schema = dj.schema(db_prefix + 'analysis')
@@ -19,7 +20,7 @@ class ActivityAlignmentCondition(dj.Manual):
     """
 
     class Trial(dj.Part):
-        definition = """  # Trials (or subset of trials) to computed event-aligned activity
+        definition = """  # Trials (or subset) to compute event-aligned activity
         -> master
         -> trial.Trial
         """
@@ -43,8 +44,11 @@ class ActivityAlignment(dj.Computed):
         """
 
     def make(self, key):
-        sess_time, scan_time, nframes, frame_rate = (scan.ScanInfo * session.Session & key).fetch1(
-            'session_datetime', 'scan_datetime', 'nframes', 'fps')
+        sess_time, scan_time, nframes, frame_rate = (scan.ScanInfo * session.Session
+                                                     & key
+                                                     ).fetch1('session_datetime',
+                                                              'scan_datetime',
+                                                              'nframes', 'fps')
 
         # Estimation of frame timestamps with respect to the session-start
         # (to be replaced by timestamps retrieved from some synchronization routine)
@@ -58,8 +62,9 @@ class ActivityAlignment(dj.Computed):
         max_limit = (trialized_event_times.end - trialized_event_times.event).max()
 
         # Spike raster
-        trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
-        activity_traces = np.hstack(activity_traces)
+        trace_keys, activity_traces = (imaging.Activity.Trace & key
+                                       ).fetch('KEY', 'activity_trace', order_by='mask')
+        activity_traces = np.vstack(activity_traces)
 
         aligned_trial_activities = []
         for _, r in trialized_event_times.iterrows():
@@ -67,17 +72,28 @@ class ActivityAlignment(dj.Computed):
                 continue
             alignment_start_time = r.event - min_limit
             alignment_end_time = r.event + max_limit
-            roi_aligned_activities = activity_traces[:, (alignment_start_time <= frame_timestamps)
-                                                        & (frame_timestamps < alignment_end_time)]
+            roi_aligned_activities = activity_traces[:,
+                                                     (alignment_start_time <= frame_timestamps)
+                                                     & (frame_timestamps < alignment_end_time)]
 
-            aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key, 'aligned_trace': aligned_trace}
-                                             for trace_key, aligned_trace in zip(trace_keys, roi_aligned_activities)])
+            aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key,
+                                              'aligned_trace': aligned_trace}
+                                             for trace_key, aligned_trace
+                                             in zip(trace_keys,
+                                                    roi_aligned_activities)])
 
         self.insert1({**key, 'aligned_timestamps': np.linspace(
             -min_limit, max_limit, len(aligned_trial_activities[0]['aligned_trace']))})
         self.AlignedTrialSpikes.insert(aligned_trial_activities)
 
     def plot_aligned_activities(self, key, roi, axs=None):
+        """
+        peri-stimulus time histogram (PSTH) for calcium imaging spikes
+        :param key: key of ActivityAlignment master table
+        :param roi: imaging segmentation mask
+        :param axs: optional definition of axes for plot.
+                    Default is plt.subplots(2, 1, figsize=(12, 8))
+        """
         import matplotlib.pyplot as plt
 
         fig = None
@@ -86,13 +102,15 @@ class ActivityAlignment(dj.Computed):
         else:
             ax0, ax1 = axs
 
-        aligned_timestamps = (self & key).fetch1('aligned_trace')
+        aligned_timestamps = (self & key).fetch1('aligned_timestamps')
         trial_ids, aligned_spikes = (self.AlignedTrialSpikes
-                                     & key & {'mask': roi}).fetch('trial_id', 'aligned_trace', order_by='trial_id')
+                                     & key & {'mask': roi}).fetch('trial_id',
+                                                                  'aligned_trace',
+                                                                  order_by='trial_id')
 
-        aligned_spikes = np.hstack(aligned_spikes)
+        aligned_spikes = np.vstack(aligned_spikes)
 
-        ax0.imshow(aligned_spikes, cmap='gray', interpolation='nearest')
+        ax0.imgshow(aligned_spikes, cmap='gray', interpolation='nearest')
         ax0.axvline(x=0, linestyle='--', color='white')
         ax0.set_xticks([])
         ax0.set_yticks([])
