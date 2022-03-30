@@ -93,7 +93,8 @@ class ActivityAlignment(dj.Computed):
 
     def plot_aligned_activities(self, key, roi, axs=None, title=None):
         """
-        peri-stimulus time histogram (PSTH) for calcium imaging spikes
+        Plot event-aligned Calcium activities for all selected trials, and trial-averaged Calcium activity
+        e.g. dF/F, neuropil-corrected dF/F, Calcium events, etc.
         :param key: key of ActivityAlignment master table
         :param roi: imaging segmentation mask
         :param axs: optional definition of axes for plot.
