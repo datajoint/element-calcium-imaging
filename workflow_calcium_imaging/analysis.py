@@ -1,7 +1,8 @@
 import datajoint as dj
 import numpy as np
 
-from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial, event
+from workflow_calcium_imaging.pipeline import db_prefix, session, scan, imaging, trial, \
+                                              event
 
 
 schema = dj.schema(db_prefix + 'analysis')
@@ -19,7 +20,7 @@ class ActivityAlignmentCondition(dj.Manual):
     """
 
     class Trial(dj.Part):
-        definition = """  # Trials (or subset of trials) to computed event-aligned activity
+        definition = """  # Trials (or subset) to compute event-aligned activity
         -> master
         -> trial.Trial
         """
@@ -43,8 +44,11 @@ class ActivityAlignment(dj.Computed):
         """
 
     def make(self, key):
-        sess_time, scan_time, nframes, frame_rate = (scan.ScanInfo * session.Session & key).fetch1(
-            'session_datetime', 'scan_datetime', 'nframes', 'fps')
+        sess_time, scan_time, nframes, frame_rate = (scan.ScanInfo * session.Session
+                                                     & key
+                                                     ).fetch1('session_datetime',
+                                                              'scan_datetime',
+                                                              'nframes', 'fps')
 
         # Estimation of frame timestamps with respect to the session-start
         # (to be replaced by timestamps retrieved from some synchronization routine)
@@ -60,7 +64,8 @@ class ActivityAlignment(dj.Computed):
         aligned_timestamps = np.arange(-min_limit, max_limit, 1/frame_rate)
         nsamples = len(aligned_timestamps)
 
-        trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch('KEY', 'activity_trace', order_by='mask')
+        trace_keys, activity_traces = (imaging.Activity.Trace & key
+                                       ).fetch('KEY', 'activity_trace', order_by='mask')
         activity_traces = np.vstack(activity_traces)
 
         aligned_trial_activities = []
@@ -68,19 +73,34 @@ class ActivityAlignment(dj.Computed):
             if r.event is None or np.isnan(r.event):
                 continue
             alignment_start_idx = int((r.event - min_limit) * frame_rate)
-            roi_aligned_activities = activity_traces[:, alignment_start_idx: (alignment_start_idx + nsamples)]
+            roi_aligned_activities = activity_traces[:,
+                                                     alignment_start_idx:
+                                                     (alignment_start_idx + nsamples)]
             if roi_aligned_activities.shape[-1] != nsamples:
+                shape_diff = nsamples - roi_aligned_activities.shape[-1]
                 roi_aligned_activities = np.pad(roi_aligned_activities,
-                                                ((0, 0), (0, nsamples - roi_aligned_activities.shape[-1])),
+                                                ((0, 0), (0, shape_diff)),
                                                 mode='constant', constant_values=np.nan)
 
-            aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key, 'aligned_trace': aligned_trace}
-                                             for trace_key, aligned_trace in zip(trace_keys, roi_aligned_activities)])
+            aligned_trial_activities.extend([{**key, **r.trial_key, **trace_key,
+                                              'aligned_trace': aligned_trace}
+                                             for trace_key, aligned_trace
+                                             in zip(trace_keys,
+                                                    roi_aligned_activities)])
 
         self.insert1({**key, 'aligned_timestamps': aligned_timestamps})
         self.AlignedTrialActivity.insert(aligned_trial_activities)
 
-    def plot_aligned_activities(self, key, roi, axs=None):
+    def plot_aligned_activities(self, key, roi, axs=None, title=None):
+        """
+        Plot event-aligned Calcium activities for all selected trials, and trial-averaged Calcium activity
+        e.g. dF/F, neuropil-corrected dF/F, Calcium events, etc.
+        :param key: key of ActivityAlignment master table
+        :param roi: imaging segmentation mask
+        :param axs: optional definition of axes for plot.
+                    Default is plt.subplots(2, 1, figsize=(12, 8))
+        :param title: Optional title label
+        """
         import matplotlib.pyplot as plt
 
         fig = None
@@ -109,5 +129,8 @@ class ActivityAlignment(dj.Computed):
         ax1.axvline(x=0, linestyle='--', color='black')
         ax1.set_xlabel('Time (s)')
         ax1.set_xlim(aligned_timestamps[0], aligned_timestamps[-1])
+
+        if title:
+            plt.suptitle(title)
 
         return fig

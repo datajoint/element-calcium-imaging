@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: DataJoint Contribution Guideline
+    url: https://docs.datajoint.org/python/community/02-Contribute.html
+    about: Please make sure to review the DataJoint Contribution Guidelines

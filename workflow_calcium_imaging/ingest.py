@@ -45,7 +45,7 @@ def ingest_subjects(subject_csv_path='./user_data/subjects.csv',
 
 
 def ingest_sessions(session_csv_path='./user_data/sessions.csv',
-                    skip_duplicates=True):
+                    skip_duplicates=True, verbose=True):
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
@@ -108,17 +108,22 @@ def ingest_sessions(session_csv_path='./user_data/sessions.csv',
                                      'session_dir': sess_dir.relative_to(root_data_dir
                                                                          ).as_posix()})
     new_equipment = set(val for dic in scanner_list for val in dic.values())
-    print(f'\n---- Insert {len(new_equipment)} entry(s) into experiment.Equipment ----')
+    if verbose:
+        print(f'\n---- Insert {len(new_equipment)} entry(s) into '
+              + 'experiment.Equipment ----')
     Equipment.insert(scanner_list, skip_duplicates=True)
 
-    print(f'\n---- Insert {len(session_list)} entry(s) into session.Session ----')
-    session.Session.insert(session_list, skip_duplicates=skip_duplicates)
-    session.SessionDirectory.insert(session_dir_list, skip_duplicates=skip_duplicates)
+    if verbose:
+        print(f'\n---- Insert {len(session_list)} entry(s) into session.Session ----')
+    session.Session.insert(session_list)
+    session.SessionDirectory.insert(session_dir_list)
 
-    print(f'\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----')
+    if verbose:
+        print(f'\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----')
     scan.Scan.insert(scan_list, skip_duplicates=skip_duplicates)
 
-    print('\n---- Successfully completed ingest_sessions ----')
+    if verbose:
+        print('\n---- Successfully completed ingest_sessions ----')
 
 
 def ingest_events(recording_csv_path='./user_data/behavior_recordings.csv',
@@ -136,12 +141,12 @@ def ingest_events(recording_csv_path='./user_data/behavior_recordings.csv',
             block_csv_path, block_csv_path,
             trial_csv_path, trial_csv_path, trial_csv_path,
             trial_csv_path,
-            event_csv_path]
+            event_csv_path, event_csv_path, event_csv_path]
     tables = [event.BehaviorRecording(), event.BehaviorRecording.File(),
               trial.Block(), trial.Block.Attribute(),
               trial.TrialType(), trial.Trial(), trial.Trial.Attribute(),
               trial.BlockTrial(),
-              event.EventType(), event.Event()]
+              event.EventType(), event.Event(), trial.TrialEvent()]
 
     # Allow direct insert required bc element-trial has Imported that should be Manual
     ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose,
