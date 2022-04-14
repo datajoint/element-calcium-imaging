@@ -7,11 +7,13 @@ pkg_name = 'workflow_calcium_imaging'
 here = path.abspath(path.dirname(__file__))
 
 long_description = """"
-# Workflow for calcium imaging data acquired with ScanImage or Scanbox software and analyzed with Suite2p or CaImAn.
+# Workflow for calcium imaging data acquired with ScanImage, Scanbox, or Nikon NIS software and analyzed with Suite2p or CaImAn.
 
 Build a complete imaging workflow using the DataJoint elements
 + [element-lab](https://github.com/datajoint/element-lab)
 + [element-animal](https://github.com/datajoint/element-animal)
++ [element-session](https://github.com/datajoint/element-session)
++ [element-event](https://github.com/datajoint/element-event)
 + [element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging)
 """
 
