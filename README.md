@@ -68,6 +68,11 @@ See [Background](Background.md) for the background information and development t
 </details>
 
 ## Installation
+<details>
+<summary>Click to expand details</summary>
+
++ The installation instructions can be found at the
+[DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
 
 + Install `element-calcium-imaging`
      ```
@@ -115,6 +120,8 @@ See [Background](Background.md) for the background information and development t
           pip install "element-interface[caiman_requirements] @ git+https://github.com/datajoint/element-interface"
           pip install "element-interface[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-interface"
           ```
+
+</details>
 
 ## Element usage
 
