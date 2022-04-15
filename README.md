@@ -21,6 +21,10 @@ See [Background](Background.md) for the background information and development t
 
      + `Location` as a dependency for `ScanLocation`
 
+## Table definitions
+<details>
+<summary>Click to expand details</summary>
+
 ### Scan
 
 + A `Session` (more specifically an experimental session) may have multiple scans, where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
@@ -60,6 +64,8 @@ See [Background](Background.md) for the background information and development t
 + `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
+
+</details>
 
 ## Installation
 
