@@ -1,11 +1,11 @@
 # DataJoint Element - Functional Calcium Imaging
-This repository features DataJoint pipeline design for functional Calcium imaging 
++ This repository features DataJoint pipeline design for functional Calcium imaging 
 with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
 
-The element presented here is not a complete workflow by itself,
++ The element presented here is not a complete workflow by itself,
  but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
 
-This modular element can be flexibly attached downstream to 
++ This modular element can be flexibly attached downstream to 
 any particular design of experiment session, thus assembling 
 a fully functional calcium imaging workflow.
 
