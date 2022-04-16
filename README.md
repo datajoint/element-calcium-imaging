@@ -9,7 +9,9 @@ This modular element can be flexibly attached downstream to
 any particular design of experiment session, thus assembling 
 a fully functional calcium imaging workflow.
 
-See [Background](Background.md) for the background information and development timeline.
++ See the [Element Calcium Imaging documentation](https://elements.datajoint.org/description/calcium_imaging/) for the background information and development timeline.
+
++ For more information on the DataJoint Elements project, please visit https://elements.datajoint.org.  This work is supported by the National Institutes of Health.
 
 ## Element architecture
 
