@@ -20,7 +20,7 @@ convention, and directory lookup methods (see
 [workflow_calcium_imaging/paths.py](workflow_calcium_imaging/paths.py)).
 3. Ingestion of segmentation and deconvolution results.
 
-For more information on the DataJoint Elements project, please visit https://elements.datajoint.org.  This work is supported in part by the National Institutes of Health.
+For more information on the DataJoint Elements project, please visit https://elements.datajoint.org.  This work is supported by the National Institutes of Health.
 
 ## Workflow architecture
 
