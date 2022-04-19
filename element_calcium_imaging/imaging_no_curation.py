@@ -733,22 +733,56 @@ class ActivityExtractionMethod(dj.Lookup):
     extraction_method: varchar(32)
     """
 
-    contents = zip(['suite2p_deconvolution', 'caiman_deconvolution', 'caiman_dff'])
+    contents = zip(['suite2p', 'caiman', 'FISSA'])
+
+
+@schema
+class ActivityExtractionParamSet(dj.Lookup):
+    definition = """  #  Activity extraction parameter set used for the analysis/extraction of calcium events
+    activity_extraction_paramset_idx:  smallint
+    ---
+    -> ActivityExtractionMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(cls, extraction_method: str, activity_paramset_idx: int,
+                          paramset_desc: str, params: dict):
+        param_dict = {'processing_method': extraction_method,
+                      'paramset_idx': activity_paramset_idx,
+                      'paramset_desc': paramset_desc,
+                      'params': params,
+                      'param_set_hash': dict_to_uuid(params)}
+        q_param = cls & {'param_set_hash': param_dict['param_set_hash']}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1('activity_paramset_idx')
+            if pname == activity_paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    'The specified param-set already exists - name: {}'.format(pname))
+        else:
+            cls.insert1(param_dict)
 
 
 @schema
 class Activity(dj.Computed):
     definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
-    -> ActivityExtractionMethod
+    -> ActivityExtractionParamSet
     """
 
     class Trace(dj.Part):
         definition = """  #
         -> master
         -> Fluorescence.Trace
+        activity_type: varchar(16) #  e.g. dF/F, calcium-event
         ---
-        activity_trace: longblob  #
+        activity_trace: longblob  # 
         """
 
     @property
@@ -767,7 +801,7 @@ class Activity(dj.Computed):
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == 'suite2p':
-            if key['extraction_method'] == 'suite2p_deconvolution':
+            if key['extraction_method'] == 'suite2p':
                 suite2p_dataset = imaging_dataset
                 # ---- iterate through all s2p plane outputs ----
                 spikes = []
@@ -776,6 +810,7 @@ class Activity(dj.Computed):
                     for mask_idx, spks in enumerate(s2p.spks):
                         spikes.append({**key, 'mask': mask_idx + mask_count,
                                        'fluo_channel': 0,
+                                       'activity_type': 'spike',
                                        'activity_trace': spks})
 
                 self.insert1(key)
@@ -783,9 +818,7 @@ class Activity(dj.Computed):
         elif method == 'caiman':
             caiman_dataset = imaging_dataset
 
-            if key['extraction_method'] in ('caiman_deconvolution', 'caiman_dff'):
-                attr_mapper = {'caiman_deconvolution': 'spikes', 'caiman_dff': 'dff'}
-
+            if key['extraction_method'] == 'caiman':
                 # infer "segmentation_channel" - from params if available, else from caiman loader
                 params = (ProcessingParamSet * ProcessingTask & key).fetch1('params')
                 segmentation_channel = params.get('segmentation_channel',
@@ -796,7 +829,13 @@ class Activity(dj.Computed):
                     activities.append({
                         **key, 'mask': mask['mask_id'],
                         'fluo_channel': segmentation_channel,
-                        'activity_trace': mask[attr_mapper[key['extraction_method']]]})
+                        'activity_type': 'dff',
+                        'activity_trace': mask['dff']})
+                    activities.append({
+                        **key, 'mask': mask['mask_id'],
+                        'fluo_channel': segmentation_channel,
+                        'activity_type': 'spike',
+                        'activity_trace': mask['spikes']})
                 self.insert1(key)
                 self.Trace.insert(activities)
         else:
