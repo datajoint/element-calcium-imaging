@@ -73,10 +73,7 @@ class ProcessingMethod(dj.Lookup):
     processing_method_desc: varchar(1000)
     """
 
-    contents = [
-        ("suite2p", "suite2p analysis suite"),
-        ("caiman", "caiman analysis suite"),
-    ]
+    contents = [("suite2p", "suite2p analysis suite"), ("caiman", "caiman analysis suite")]
 
 
 @schema
@@ -143,8 +140,8 @@ class ProcessingTask(dj.Manual):
     -> scan.Scan
     -> ProcessingParamSet
     ---
-    processing_output_dir: varchar(255)            #  output directory of the processed scan relative to root data directory
-    task_mode='load': enum('load', 'trigger')      # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
     @classmethod
@@ -227,9 +224,10 @@ class Processing(dj.Computed):
         return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
-        task_mode = (ProcessingTask & key).fetch1("task_mode")
+        task_mode, output_dir = (ProcessingTask & key).fetch1(
+            "task_mode", "processing_output_dir"
+        )
 
-        output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
         output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
@@ -257,6 +255,14 @@ class Processing(dj.Computed):
                 ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
             ).fetch1("processing_method")
 
+            image_files = (
+                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key
+            ).fetch("file_path")
+            image_files = [
+                find_full_path(get_imaging_root_data_dir(), image_file)
+                for image_file in image_files
+            ]
+
             if method == "suite2p":
                 import suite2p
 
@@ -265,14 +271,6 @@ class Processing(dj.Computed):
                 suite2p_params["fs"] = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1(
                     "fps"
                 )
-
-                image_files = (
-                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key
-                ).fetch("file_path")
-                image_files = [
-                    find_full_path(get_imaging_root_data_dir(), image_file)
-                    for image_file in image_files
-                ]
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -291,14 +289,6 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                tiff_files = (
-                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key
-                ).fetch("file_path")
-                tiff_files = [
-                    find_full_path(get_imaging_root_data_dir(), tiff_file).as_posix()
-                    for tiff_file in tiff_files
-                ]
-
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
                 sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1("fps")
 
@@ -310,7 +300,7 @@ class Processing(dj.Computed):
                         "Caiman pipeline is not capable of analyzing 3D scans at the moment."
                     )
                 run_caiman(
-                    file_paths=tiff_files,
+                    file_paths=[f.as_posix() for f in image_files],
                     parameters=params,
                     sampling_rate=sampling_rate,
                     output_dir=output_dir,
