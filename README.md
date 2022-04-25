@@ -88,8 +88,6 @@ The `imaging` schema stores information regarding the calcium traces for each ma
 </details>
 
 ## Installation
-<details>
-<summary>Click to expand details</summary>
 
 + The installation instructions can be found at the
 [DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
@@ -114,6 +112,8 @@ The `imaging` schema stores information regarding the calcium traces for each ma
 
      + If your workflow uses these packages, you should install them when you install `element-interface`.
 
+     <details>
+     <summary>Click to expand details</summary>
      + Install `element-interface` with `scanreader`
           ```
           pip install "element-interface[scanreader] @ git+https://github.com/datajoint/element-interface"
@@ -141,7 +141,7 @@ The `imaging` schema stores information regarding the calcium traces for each ma
           pip install "element-interface[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-interface"
           ```
 
-</details>
+     </details>
 
 ## Element usage
 
