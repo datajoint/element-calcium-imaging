@@ -1,9 +1,10 @@
 # DataJoint Element - Functional Calcium Imaging
+
 + This repository features DataJoint pipeline design for functional Calcium imaging 
-with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
+with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis.
 
 + The element presented here is not a complete workflow by itself,
- but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
+ but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow.
 
 + This modular element can be flexibly attached downstream to 
 any particular design of experiment session, thus assembling 
@@ -24,10 +25,13 @@ a fully functional calcium imaging workflow.
      + `Location` as a dependency for `ScanLocation`
 
 ## Table definitions
-<details>
-<summary>Click to expand details</summary>
 
 ### Scan
+The `scan` schema contains information regarding the raw data acquired with ScanImage 
+or Scanbox.
+
+<details>
+<summary>Click to expand details</summary>
 
 + A `Session` (more specifically an experimental session) may have multiple scans, where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
 
@@ -41,8 +45,13 @@ a fully functional calcium imaging workflow.
 
      + For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
 
-### Preprocessing - Motion Correction
+</details>
 
+### Preprocessing - Motion Correction
+The `imaging` schema stores information regarding the motion corrected images.
+
+<details>
+<summary>Click to expand details</summary>
 + `MotionCorrection` - motion correction information performed on a scan
 
 + `MotionCorrection.RigidMotionCorrection` - details of the rigid motion correction (e.g. shifting in x, y) at a per `ScanInfo.Field` level
@@ -50,17 +59,26 @@ a fully functional calcium imaging workflow.
 + `MotionCorrection.NonRigidMotionCorrection` and `MotionCorrection.Block` tables are used to describe the non-rigid motion correction performed on each `ScanInfo.Field`
 
 + `MotionCorrection.Summary` - summary images for each `ScanInfo.Field` after motion correction (e.g. average image, correlation image)
-    
-### Preprocessing - Segmentation
 
+</details>
+
+### Preprocessing - Segmentation
+The `imaging` schema stores information regarding the segmented masks for each field.
+
+<details>
+<summary>Click to expand details</summary>
 + `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
  
 + `Segmentation.Mask` - image mask for the segmented region of interest from a particular `ScanInfo.Field`
 
 + `MaskClassification` - classification of `Segmentation.Mask` into different type (e.g. soma, axon, dendrite, artifact, etc.)
+</details>
 
 ### Neural activity extraction
+The `imaging` schema stores information regarding the calcium traces for each mask.
 
+<details>
+<summary>Click to expand details</summary>
 + `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
 
 + `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
