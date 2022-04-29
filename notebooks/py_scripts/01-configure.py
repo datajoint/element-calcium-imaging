@@ -22,7 +22,8 @@
 # + As a convention, we set the configuration up in the root directory of the `workflow-calcium-imaging` package and always start importing DataJoint and pipeline modules from there.
 
 import os
-os.chdir('..')
+if os.path.basename(os.getcwd()) == 'notebooks':
+    os.chdir('..')
 
 pwd
 
