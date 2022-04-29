@@ -52,6 +52,7 @@ The `imaging` schema stores information regarding the motion corrected images.
 
 <details>
 <summary>Click to expand details</summary>
+
 + `MotionCorrection` - motion correction information performed on a scan
 
 + `MotionCorrection.RigidMotionCorrection` - details of the rigid motion correction (e.g. shifting in x, y) at a per `ScanInfo.Field` level
@@ -67,6 +68,7 @@ The `imaging` schema stores information regarding the segmented masks for each f
 
 <details>
 <summary>Click to expand details</summary>
+
 + `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
  
 + `Segmentation.Mask` - image mask for the segmented region of interest from a particular `ScanInfo.Field`
@@ -79,6 +81,7 @@ The `imaging` schema stores information regarding the calcium traces for each ma
 
 <details>
 <summary>Click to expand details</summary>
+
 + `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
 
 + `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
