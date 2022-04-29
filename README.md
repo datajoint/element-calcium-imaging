@@ -114,6 +114,7 @@ The `imaging` schema stores information regarding the calcium traces for each ma
 
      <details>
      <summary>Click to expand details</summary>
+
      + Install `element-interface` with `scanreader`
           ```
           pip install "element-interface[scanreader] @ git+https://github.com/datajoint/element-interface"
