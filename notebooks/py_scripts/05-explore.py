@@ -57,7 +57,7 @@ session.Session()
 
 # + Fetch the primary key for the session of interest which will be used later on in this notebook.
 
-session_key = (session.Session & 'subject = "subject3"' & 'session_datetime = "2021-04-30 12:22:15.032"').fetch1('KEY')
+session_key = (session.Session & 'subject = "subject3"').fetch1('KEY')
 
 # ### `scan.Scan` and `scan.ScanInfo` tables
 #
