@@ -1,15 +1,18 @@
 # DataJoint Element - Functional Calcium Imaging
-This repository features DataJoint pipeline design for functional Calcium imaging 
-with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis. 
 
-The element presented here is not a complete workflow by itself,
- but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow. 
++ This repository features DataJoint pipeline design for functional Calcium imaging 
+with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis.
 
-This modular element can be flexibly attached downstream to 
++ The element presented here is not a complete workflow by itself,
+ but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow.
+
++ This modular element can be flexibly attached downstream to 
 any particular design of experiment session, thus assembling 
 a fully functional calcium imaging workflow.
 
-See [Background](Background.md) for the background information and development timeline.
++ See the [Element Calcium Imaging documentation](https://elements.datajoint.org/description/calcium_imaging/) for the background information and development timeline.
+
++ For more information on the DataJoint Elements project, please visit https://elements.datajoint.org.  This work is supported by the National Institutes of Health.
 
 ## Element architecture
 
@@ -21,7 +24,14 @@ See [Background](Background.md) for the background information and development t
 
      + `Location` as a dependency for `ScanLocation`
 
+## Table definitions
+
 ### Scan
+The `scan` schema contains information regarding the raw data acquired with ScanImage 
+or Scanbox.
+
+<details>
+<summary>Click to expand details</summary>
 
 + A `Session` (more specifically an experimental session) may have multiple scans, where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
 
@@ -35,7 +45,13 @@ See [Background](Background.md) for the background information and development t
 
      + For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
 
+</details>
+
 ### Preprocessing - Motion Correction
+The `imaging` schema stores information regarding the motion corrected images.
+
+<details>
+<summary>Click to expand details</summary>
 
 + `MotionCorrection` - motion correction information performed on a scan
 
@@ -44,16 +60,27 @@ See [Background](Background.md) for the background information and development t
 + `MotionCorrection.NonRigidMotionCorrection` and `MotionCorrection.Block` tables are used to describe the non-rigid motion correction performed on each `ScanInfo.Field`
 
 + `MotionCorrection.Summary` - summary images for each `ScanInfo.Field` after motion correction (e.g. average image, correlation image)
-    
+
+</details>
+
 ### Preprocessing - Segmentation
+The `imaging` schema stores information regarding the segmented masks for each field.
+
+<details>
+<summary>Click to expand details</summary>
 
 + `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
  
 + `Segmentation.Mask` - image mask for the segmented region of interest from a particular `ScanInfo.Field`
 
 + `MaskClassification` - classification of `Segmentation.Mask` into different type (e.g. soma, axon, dendrite, artifact, etc.)
+</details>
 
 ### Neural activity extraction
+The `imaging` schema stores information regarding the calcium traces for each mask.
+
+<details>
+<summary>Click to expand details</summary>
 
 + `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
 
@@ -61,7 +88,12 @@ See [Background](Background.md) for the background information and development t
 
 + `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
 
+</details>
+
 ## Installation
+
++ The installation instructions can be found at the
+[DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
 
 + Install `element-calcium-imaging`
      ```
@@ -82,6 +114,9 @@ See [Background](Background.md) for the background information and development t
      + `element-interface` can also be used to install packages used for reading acquired data (e.g. `scanreader`) and running analysis (e.g. `CaImAn`).
 
      + If your workflow uses these packages, you should install them when you install `element-interface`.
+
+     <details>
+     <summary>Click to expand details</summary>
 
      + Install `element-interface` with `scanreader`
           ```
@@ -110,10 +145,24 @@ See [Background](Background.md) for the background information and development t
           pip install "element-interface[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-interface"
           ```
 
+     </details>
+
 ## Element usage
 
 + See [workflow-calcium-imaging](https://github.com/datajoint/workflow-calcium-imaging) 
 repository for an example usage of `element-calcium-imaging`.
 
+## Citation
 
++ If your work uses DataJoint and DataJoint Elements, please cite the respective Research Resource Identifiers (RRIDs) and manuscripts.
+
++ DataJoint for Python or MATLAB
+    + Yatsenko D, Reimer J, Ecker AS, Walker EY, Sinz F, Berens P, Hoenselaar A, Cotton RJ, Siapas AS, Tolias AS. DataJoint: managing big scientific data using MATLAB or Python. bioRxiv. 2015 Jan 1:031658. doi: https://doi.org/10.1101/031658
+
+    + DataJoint ([RRID:SCR_014543](https://scicrunch.org/resolver/SCR_014543)) - DataJoint for `<Select Python or MATLAB>` (version `<Enter version number>`)
+
++ DataJoint Elements
+    + Yatsenko D, Nguyen T, Shen S, Gunalan K, Turner CA, Guzman R, Sasaki M, Sitonic D, Reimer J, Walker EY, Tolias AS. DataJoint Elements: Data Workflows for Neurophysiology. bioRxiv. 2021 Jan 1. doi: https://doi.org/10.1101/2021.03.30.437358
+
+    + DataJoint Elements ([RRID:SCR_021894](https://scicrunch.org/resolver/SCR_021894)) - Element Calcium Imaging (version `<Enter version number>`)
     
