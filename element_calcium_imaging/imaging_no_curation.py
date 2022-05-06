@@ -960,29 +960,39 @@ class Activity(dj.Computed):
 
     @property
     def key_source(self):
+        ks = Fluorescence * ActivityExtractionParamSet
         suite2p_key_source = (
-            Fluorescence
-            * ActivityExtractionMethod
-            * ActivityExtractionParamSet
-            * ProcessingParamSet.proj("processing_method")
-            & 'processing_method = "suite2p"'
-            & 'extraction_method = "suite2p"'
+            ks
+            & (
+                Fluorescence
+                * ActivityExtractionMethod
+                * ActivityExtractionParamSet
+                * ProcessingParamSet.proj("processing_method")
+                & 'processing_method = "suite2p"'
+                & 'extraction_method = "suite2p"'
+            ).proj()
         )
         caiman_key_source = (
-            Fluorescence
-            * ActivityExtractionMethod
-            * ActivityExtractionParamSet
-            * ProcessingParamSet.proj("processing_method")
-            & 'processing_method = "caiman"'
-            & 'extraction_method = "caiman"'
+            ks
+            & (
+                Fluorescence
+                * ActivityExtractionMethod
+                * ActivityExtractionParamSet
+                * ProcessingParamSet.proj("processing_method")
+                & 'processing_method = "caiman"'
+                & 'extraction_method = "caiman"'
+            ).proj()
         )
         fissa_key_source = (
-            Fluorescence
-            * ActivityExtractionMethod
-            * ActivityExtractionParamSet
-            * ProcessingParamSet.proj("processing_method")
-            & 'processing_method in ("suite2p")'
-            & 'extraction_method = "FISSA"'
+            ks
+            & (
+                Fluorescence
+                * ActivityExtractionMethod
+                * ActivityExtractionParamSet
+                * ProcessingParamSet.proj("processing_method")
+                & 'processing_method in ("suite2p")'
+                & 'extraction_method = "FISSA"'
+            ).proj()
         )
         return suite2p_key_source.proj() + caiman_key_source.proj() + fissa_key_source.proj()
 
