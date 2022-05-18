@@ -43,6 +43,110 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
 
 # -------------- Table declarations --------------
 
+@schema
+class PreProcessingMethod(dj.Lookup):
+    definition = """  #  Method, package, analysis suite used for pre-processing
+    preprocess_method: char(8)
+    ---
+    preprocess_method_desc: varchar(1000)
+    """
+
+
+@schema
+class PreProcessingParamSet(dj.Lookup):
+    definition = """  #  Parameter set used for pre-processing of calcium imaging data
+    paramset_idx:  smallint
+    ---
+    -> PreProcessingMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(cls, preprocess_method: str, paramset_idx: int,
+                          paramset_desc: str, params: dict):
+        param_dict = {'preprocess_method': preprocess_method,
+                      'paramset_idx': paramset_idx,
+                      'paramset_desc': paramset_desc,
+                      'params': params,
+                      'param_set_hash': dict_to_uuid(params)}
+        q_param = cls & {'param_set_hash': param_dict['param_set_hash']}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1('paramset_idx')
+            if pname == paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    'The specified param-set already exists - name: {}'.format(pname))
+        else:
+            cls.insert1(param_dict)
+
+@schema
+class PreProcessParamList(dj.Manual):
+    definition = """
+    # Ordered list of paramset_idx that are to be run
+    preprocess_param_list_id: smallint
+    """
+
+    class ParamOrder(dj.Part):
+        definition = """
+        -> master
+        order_id: smallint                  # Order of operations
+        ---
+        -> [nullable] PreProcessParamSet    # Nullable for when pre-processing is not performed.
+        """
+
+@schema
+class PreProcessTask(dj.Manual):
+    definition = """
+    # Manual table for defining a pre-processing task ready to be run
+    -> scan.Scan
+    -> PreProcessParamList
+    ---
+    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
+                                         # to the root data directory
+    task_mode='none': enum('none','load', 'trigger') # 'none': no pre-processing
+                                                     # 'load': load analysis results
+                                                     # 'trigger': trigger computation
+    """
+
+
+@schema
+class PreProcess(dj.Imported):
+    """
+    A processing table to handle each PreProcessTask:
+    + If `task_mode == "none"`: no pre-processing performed
+    + If `task_mode == "trigger"`: trigger pre-processing analysis according to 
+                                    the PreProcessParamSet
+    + If `task_mode == "load"`: verify output
+    """
+    definition = """
+    -> PreProcessTask
+    ---
+    preprocess_time=null: datetime  # time of generation of this set of pre-processing results 
+    package_version='': varchar(16)
+    """
+
+    def make(self, key):
+        task_mode, output_dir = (PreProcessTask & key).fetch1('task_mode', 
+                                                              'preprocess_output_dir')
+        preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+        if task_mode == 'none':
+            pass
+        elif task_mode in ['load', 'trigger']:
+            raise NotImplementedError('Pre-processing steps are not implemented.'
+                                      'Please overwrite this `make` function with'
+                                      'desired pre-processing steps.')
+        else:
+            raise ValueError(f'Unknown task mode: {task_mode}')
+
+        self.insert1({**key})
+
+
 
 @schema
 class ProcessingMethod(dj.Lookup):
@@ -112,7 +216,7 @@ class MaskType(dj.Lookup):
 @schema
 class ProcessingTask(dj.Manual):
     definition = """  # Manual table for defining a processing task ready to be run
-    -> scan.Scan
+    -> PreProcess
     -> ProcessingParamSet
     ---
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
