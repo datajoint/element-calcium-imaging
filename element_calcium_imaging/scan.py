@@ -9,8 +9,9 @@ schema = dj.schema()
 _linking_module = None
 
 
-def activate(scan_schema_name, *,
-             create_schema=True, create_tables=True, linking_module=None):
+def activate(
+    scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None
+):
     """
     activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
         :param scan_schema_name: schema name on the database server to activate the `scan` module
@@ -41,19 +42,23 @@ def activate(scan_schema_name, *,
 
     if isinstance(linking_module, str):
         linking_module = importlib.import_module(linking_module)
-    assert inspect.ismodule(linking_module),\
-        "The argument 'dependency' must be a module's name or a module"
+    assert inspect.ismodule(
+        linking_module
+    ), "The argument 'dependency' must be a module's name or a module"
 
     global _linking_module
     _linking_module = linking_module
 
-    schema.activate(scan_schema_name, 
-                    create_schema=create_schema,
-                    create_tables=create_tables, 
-                    add_objects=_linking_module.__dict__)
+    schema.activate(
+        scan_schema_name,
+        create_schema=create_schema,
+        create_tables=create_tables,
+        add_objects=_linking_module.__dict__,
+    )
 
 
 # Functions required by element-calcium-imaging  -------------------------------
+
 
 def get_imaging_root_data_dir() -> str:
     """
@@ -74,7 +79,7 @@ def get_imaging_root_data_dir() -> str:
     if isinstance(root_directories, (str, pathlib.Path)):
         root_directories = [root_directories]
 
-    if hasattr(_linking_module, 'get_processed_root_data_dir'):
+    if hasattr(_linking_module, "get_processed_root_data_dir"):
         root_directories.append(_linking_module.get_processed_root_data_dir())
 
     return root_directories
@@ -87,7 +92,7 @@ def get_processed_root_data_dir() -> str:
         :return: a string for full path to the root directory for processed data
     """
 
-    if hasattr(_linking_module, 'get_processed_root_data_dir'):
+    if hasattr(_linking_module, "get_processed_root_data_dir"):
         return _linking_module.get_processed_root_data_dir()
     else:
         return get_imaging_root_data_dir()[0]
@@ -128,7 +133,7 @@ class AcquisitionSoftware(dj.Lookup):
     definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS
     acq_software: varchar(24)    
     """
-    contents = zip(['ScanImage', 'Scanbox', 'NIS'])
+    contents = zip(["ScanImage", "Scanbox", "NIS"])
 
 
 @schema
@@ -206,161 +211,228 @@ class ScanInfo(dj.Imported):
     @staticmethod
     def estimate_scan_duration(scan_obj):
         # Calculates scan duration for Nikon images
-        ti = scan_obj.frame_metadata(0).channels[0].time.absoluteJulianDayNumber  # Initial frame's JD.
-        tf = scan_obj.frame_metadata(scan_obj.shape[0]-1).channels[0].time.absoluteJulianDayNumber  # Final frame's JD.
-        fps = 1000 / scan_obj.experiment[0].parameters.periods[0].periodDiff.avg  # Frame per second
+        ti = (
+            scan_obj.frame_metadata(0).channels[0].time.absoluteJulianDayNumber
+        )  # Initial frame's JD.
+        tf = (
+            scan_obj.frame_metadata(scan_obj.shape[0] - 1)
+            .channels[0]
+            .time.absoluteJulianDayNumber
+        )  # Final frame's JD.
+        fps = (
+            1000 / scan_obj.experiment[0].parameters.periods[0].periodDiff.avg
+        )  # Frame per second
         return (tf - ti) * 86400 + 1 / fps
 
-
     def make(self, key):
-        acq_software = (Scan & key).fetch1('acq_software')
+        acq_software = (Scan & key).fetch1("acq_software")
 
-        if acq_software == 'ScanImage':
+        if acq_software == "ScanImage":
             import scanreader
+
             # Read the scan
             scan_filepaths = get_scan_image_files(key)
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero = scan.motor_position_at_zero[0] \
-                        if scan.motor_position_at_zero else None
-            y_zero = scan.motor_position_at_zero[1] \
-                        if scan.motor_position_at_zero else None
-            z_zero = scan.motor_position_at_zero[2] \
-                        if scan.motor_position_at_zero else None
-            
-            self.insert1(dict(key,
-                              nfields=scan.num_fields,
-                              nchannels=scan.num_channels,
-                              nframes=scan.num_frames,
-                              ndepths=scan.num_scanning_depths,
-                              x=x_zero,
-                              y=y_zero,
-                              z=z_zero,
-                              fps=scan.fps,
-                              bidirectional=scan.is_bidirectional,
-                              usecs_per_line=scan.seconds_per_line * 1e6,
-                              fill_fraction=scan.temporal_fill_fraction,
-                              nrois=scan.num_rois if scan.is_multiROI else 0,
-                              scan_duration=scan.num_frames / scan.fps))
+            x_zero = (
+                scan.motor_position_at_zero[0] if scan.motor_position_at_zero else None
+            )
+            y_zero = (
+                scan.motor_position_at_zero[1] if scan.motor_position_at_zero else None
+            )
+            z_zero = (
+                scan.motor_position_at_zero[2] if scan.motor_position_at_zero else None
+            )
+
+            self.insert1(
+                dict(
+                    key,
+                    nfields=scan.num_fields,
+                    nchannels=scan.num_channels,
+                    nframes=scan.num_frames,
+                    ndepths=scan.num_scanning_depths,
+                    x=x_zero,
+                    y=y_zero,
+                    z=z_zero,
+                    fps=scan.fps,
+                    bidirectional=scan.is_bidirectional,
+                    usecs_per_line=scan.seconds_per_line * 1e6,
+                    fill_fraction=scan.temporal_fill_fraction,
+                    nrois=scan.num_rois if scan.is_multiROI else 0,
+                    scan_duration=scan.num_frames / scan.fps,
+                )
+            )
             # Insert Field(s)
             if scan.is_multiROI:
-                self.Field.insert([
-                    dict(key,
-                         field_idx=field_id,
-                         px_height=scan.field_heights[field_id],
-                         px_width=scan.field_widths[field_id],
-                         um_height=scan.field_heights_in_microns[field_id],
-                         um_width=scan.field_widths_in_microns[field_id],
-                         field_x=x_zero + scan._degrees_to_microns(scan.fields[field_id].x) \
-                                    if x_zero else None,
-                         field_y=y_zero + scan._degrees_to_microns(scan.fields[field_id].y) \
-                                    if y_zero else None,
-                         field_z=z_zero + scan.fields[field_id].depth \
-                                    if z_zero else None,
-                         delay_image=scan.field_offsets[field_id],
-                         roi=scan.field_rois[field_id][0])
-                    for field_id in range(scan.num_fields)])
+                self.Field.insert(
+                    [
+                        dict(
+                            key,
+                            field_idx=field_id,
+                            px_height=scan.field_heights[field_id],
+                            px_width=scan.field_widths[field_id],
+                            um_height=scan.field_heights_in_microns[field_id],
+                            um_width=scan.field_widths_in_microns[field_id],
+                            field_x=x_zero
+                            + scan._degrees_to_microns(scan.fields[field_id].x)
+                            if x_zero
+                            else None,
+                            field_y=y_zero
+                            + scan._degrees_to_microns(scan.fields[field_id].y)
+                            if y_zero
+                            else None,
+                            field_z=z_zero + scan.fields[field_id].depth
+                            if z_zero
+                            else None,
+                            delay_image=scan.field_offsets[field_id],
+                            roi=scan.field_rois[field_id][0],
+                        )
+                        for field_id in range(scan.num_fields)
+                    ]
+                )
             else:
-                self.Field.insert([
-                    dict(key,
-                         field_idx=plane_idx,
-                         px_height=scan.image_height,
-                         px_width=scan.image_width,
-                         um_height=getattr(scan, 'image_height_in_microns', None),
-                         um_width=getattr(scan, 'image_width_in_microns', None),
-                         field_x=x_zero if x_zero else None,
-                         field_y=y_zero if y_zero else None,
-                         field_z=z_zero + scan.scanning_depths[plane_idx] \
-                                    if z_zero else None,
-                         delay_image=scan.field_offsets[plane_idx])
-                    for plane_idx in range(scan.num_scanning_depths)])
-        elif acq_software == 'Scanbox':
+                self.Field.insert(
+                    [
+                        dict(
+                            key,
+                            field_idx=plane_idx,
+                            px_height=scan.image_height,
+                            px_width=scan.image_width,
+                            um_height=getattr(scan, "image_height_in_microns", None),
+                            um_width=getattr(scan, "image_width_in_microns", None),
+                            field_x=x_zero if x_zero else None,
+                            field_y=y_zero if y_zero else None,
+                            field_z=z_zero + scan.scanning_depths[plane_idx]
+                            if z_zero
+                            else None,
+                            delay_image=scan.field_offsets[plane_idx],
+                        )
+                        for plane_idx in range(scan.num_scanning_depths)
+                    ]
+                )
+        elif acq_software == "Scanbox":
             import sbxreader
+
             # Read the scan
             scan_filepaths = get_scan_box_files(key)
             sbx_meta = sbxreader.sbx_get_metadata(scan_filepaths[0])
             sbx_matinfo = sbxreader.sbx_get_info(scan_filepaths[0])
-            is_multiROI = bool(sbx_matinfo.mesoscope.enabled)  # currently not handling "multiROI" ingestion
+            is_multiROI = bool(
+                sbx_matinfo.mesoscope.enabled
+            )  # currently not handling "multiROI" ingestion
 
             if is_multiROI:
                 raise NotImplementedError(
-                    'Loading routine not implemented for Scanbox multiROI scan mode')
+                    "Loading routine not implemented for Scanbox multiROI scan mode"
+                )
 
             # Insert in ScanInfo
-            x_zero, y_zero, z_zero = sbx_meta['stage_pos'] 
-            self.insert1(dict(key,
-                              nfields=sbx_meta['num_fields']
-                              if is_multiROI else sbx_meta['num_planes'],
-                              nchannels=sbx_meta['num_channels'],
-                              nframes=sbx_meta['num_frames'],
-                              ndepths=sbx_meta['num_planes'],
-                              x=x_zero,
-                              y=y_zero,
-                              z=z_zero,
-                              fps=sbx_meta['frame_rate'],
-                              bidirectional=sbx_meta == 'bidirectional',
-                              nrois=sbx_meta['num_rois'] if is_multiROI else 0,
-                              scan_duration=(sbx_meta['num_frames'] / sbx_meta['frame_rate'])))
+            x_zero, y_zero, z_zero = sbx_meta["stage_pos"]
+            self.insert1(
+                dict(
+                    key,
+                    nfields=sbx_meta["num_fields"]
+                    if is_multiROI
+                    else sbx_meta["num_planes"],
+                    nchannels=sbx_meta["num_channels"],
+                    nframes=sbx_meta["num_frames"],
+                    ndepths=sbx_meta["num_planes"],
+                    x=x_zero,
+                    y=y_zero,
+                    z=z_zero,
+                    fps=sbx_meta["frame_rate"],
+                    bidirectional=sbx_meta == "bidirectional",
+                    nrois=sbx_meta["num_rois"] if is_multiROI else 0,
+                    scan_duration=(sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
+                )
+            )
             # Insert Field(s)
             if not is_multiROI:
-                px_width, px_height = sbx_meta['frame_size']
-                self.Field.insert([dict(key,
-                                        field_idx=plane_idx,
-                                        px_height=px_height,
-                                        px_width=px_width,
-                                        um_height=px_height * sbx_meta['um_per_pixel_y']
-                                        if sbx_meta['um_per_pixel_y'] else None,
-                                        um_width=px_width * sbx_meta['um_per_pixel_x']
-                                        if sbx_meta['um_per_pixel_x'] else None,
-                                        field_x=x_zero,
-                                        field_y=y_zero,
-                                        field_z=z_zero + sbx_meta['etl_pos'][plane_idx])
-                                   for plane_idx in range(sbx_meta['num_planes'])])
-        elif acq_software == 'NIS':
+                px_width, px_height = sbx_meta["frame_size"]
+                self.Field.insert(
+                    [
+                        dict(
+                            key,
+                            field_idx=plane_idx,
+                            px_height=px_height,
+                            px_width=px_width,
+                            um_height=px_height * sbx_meta["um_per_pixel_y"]
+                            if sbx_meta["um_per_pixel_y"]
+                            else None,
+                            um_width=px_width * sbx_meta["um_per_pixel_x"]
+                            if sbx_meta["um_per_pixel_x"]
+                            else None,
+                            field_x=x_zero,
+                            field_y=y_zero,
+                            field_z=z_zero + sbx_meta["etl_pos"][plane_idx],
+                        )
+                        for plane_idx in range(sbx_meta["num_planes"])
+                    ]
+                )
+        elif acq_software == "NIS":
             import nd2
+
             # Read the scan
             scan_filepaths = get_nd2_files(key)
             nd2_file = nd2.ND2File(scan_filepaths[0])
             is_multiROI = False  # MultiROI to be implemented later
 
             # Insert in ScanInfo
-            self.insert1(dict(key,
-                              nfields=nd2_file.sizes.get('P', 1),
-                              nchannels=nd2_file.attributes.channelCount,
-                              nframes=nd2_file.metadata.contents.frameCount,
-                              ndepths=nd2_file.sizes.get('Z', 1),
-                              x=None,
-                              y=None,
-                              z=None,
-                              fps=1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
-                              bidirectional=bool(nd2_file.custom_data['GrabberCameraSettingsV1_0']['GrabberCameraSettings']['PropertiesQuality']['ScanDirection']),
-                              nrois=0,
-                              scan_duration=self.estimate_scan_duration(nd2_file)))
+            self.insert1(
+                dict(
+                    key,
+                    nfields=nd2_file.sizes.get("P", 1),
+                    nchannels=nd2_file.attributes.channelCount,
+                    nframes=nd2_file.metadata.contents.frameCount,
+                    ndepths=nd2_file.sizes.get("Z", 1),
+                    x=None,
+                    y=None,
+                    z=None,
+                    fps=1000
+                    / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg,
+                    bidirectional=bool(
+                        nd2_file.custom_data["GrabberCameraSettingsV1_0"][
+                            "GrabberCameraSettings"
+                        ]["PropertiesQuality"]["ScanDirection"]
+                    ),
+                    nrois=0,
+                    scan_duration=self.estimate_scan_duration(nd2_file),
+                )
+            )
 
             # MultiROI to be implemented later
 
             # Insert in Field
             if not is_multiROI:
-                self.Field.insert([dict(key,
-                                        field_idx=plane_idx,
-                                        px_height=nd2_file.attributes.heightPx,
-                                        px_width=nd2_file.attributes.widthPx,
-                                        um_height=nd2_file.attributes.heightPx * nd2_file.voxel_size().y,
-                                        um_width=nd2_file.attributes.widthPx * nd2_file.voxel_size().x,
-                                        field_x=None,
-                                        field_y=None,
-                                        field_z=None)
-                                   for plane_idx in range(nd2_file.sizes.get('Z', 1))])
+                self.Field.insert(
+                    [
+                        dict(
+                            key,
+                            field_idx=plane_idx,
+                            px_height=nd2_file.attributes.heightPx,
+                            px_width=nd2_file.attributes.widthPx,
+                            um_height=nd2_file.attributes.heightPx
+                            * nd2_file.voxel_size().y,
+                            um_width=nd2_file.attributes.widthPx
+                            * nd2_file.voxel_size().x,
+                            field_x=None,
+                            field_y=None,
+                            field_z=None,
+                        )
+                        for plane_idx in range(nd2_file.sizes.get("Z", 1))
+                    ]
+                )
         else:
             raise NotImplementedError(
-                f'Loading routine not implemented for {acq_software} '
-                'acquisition software')
+                f"Loading routine not implemented for {acq_software} "
+                "acquisition software"
+            )
 
         # Insert file(s)
-        root_dir = find_root_directory(get_imaging_root_data_dir(), 
-                                       scan_filepaths[0])
+        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
 
-        scan_files = [pathlib.Path(f).relative_to(root_dir).as_posix() 
-                      for f in scan_filepaths]
-        self.ScanFile.insert([{**key, 'file_path': f} for f in scan_files])
+        scan_files = [
+            pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
+        ]
+        self.ScanFile.insert([{**key, "file_path": f} for f in scan_files])
