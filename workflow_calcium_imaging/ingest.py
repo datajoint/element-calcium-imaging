@@ -1,15 +1,22 @@
-import pathlib
 import csv
-from datetime import datetime
+import pathlib
 from pathlib import Path
-
+from datetime import datetime
 from element_interface.utils import find_full_path
-from workflow_calcium_imaging.pipeline import subject, scan, session, Equipment, trial, event
+from workflow_calcium_imaging.pipeline import (
+    subject,
+    scan,
+    session,
+    Equipment,
+    trial,
+    event,
+)
 from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
-def ingest_general(csvs, tables, skip_duplicates=True, verbose=True,
-                   allow_direct_insert=False):
+def ingest_general(
+    csvs, tables, skip_duplicates=True, verbose=True, allow_direct_insert=False
+):
     """
     Inserts data from a series of csvs into their corresponding table:
         e.g., ingest_general(['./lab_data.csv', './proj_data.csv'],
@@ -20,21 +27,28 @@ def ingest_general(csvs, tables, skip_duplicates=True, verbose=True,
         :param verbose: print number inserted (i.e., table length change)
     """
     for csv_filepath, table in zip(csvs, tables):
-        with open(csv_filepath, newline='') as f:
-            data = list(csv.DictReader(f, delimiter=','))
+        with open(csv_filepath, newline="") as f:
+            data = list(csv.DictReader(f, delimiter=","))
         if verbose:
             prev_len = len(table)
-        table.insert(data, skip_duplicates=skip_duplicates,
-                     # Ignore extra fields because some CSVs feed multiple tables
-                     ignore_extra_fields=True, allow_direct_insert=allow_direct_insert)
+        table.insert(
+            data,
+            skip_duplicates=skip_duplicates,
+            # Ignore extra fields because some CSVs feed multiple tables
+            ignore_extra_fields=True,
+            allow_direct_insert=allow_direct_insert,
+        )
         if verbose:
-            insert_len = len(table) - prev_len     # report length change
-            print(f'\n---- Inserting {insert_len} entry(s) '
-                  + f'into {table.table_name} ----')
+            insert_len = len(table) - prev_len  # report length change
+            print(
+                f"\n---- Inserting {insert_len} entry(s) "
+                + f"into {table.table_name} ----"
+            )
 
 
-def ingest_subjects(subject_csv_path='./user_data/subjects.csv',
-                    skip_duplicates=True, verbose=True):
+def ingest_subjects(
+    subject_csv_path="./user_data/subjects.csv", skip_duplicates=True, verbose=True
+):
     """
     Ingest subjects listed in the subject column of ./user_data/subjects.csv
     """
@@ -44,117 +58,162 @@ def ingest_subjects(subject_csv_path='./user_data/subjects.csv',
     ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
-def ingest_sessions(session_csv_path='./user_data/sessions.csv',
-                    skip_duplicates=True, verbose=True):
+def ingest_sessions(
+    session_csv_path="./user_data/sessions.csv", skip_duplicates=True, verbose=True
+):
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
-    with open(session_csv_path, newline='') as f:
-        input_sessions = list(csv.DictReader(f, delimiter=','))
+    with open(session_csv_path, newline="") as f:
+        input_sessions = list(csv.DictReader(f, delimiter=","))
 
     # Folder structure: root / subject / session / .tif (raw)
     session_list, session_dir_list, scan_list, scanner_list = [], [], [], []
 
     for sess in input_sessions:
-        sess_dir = find_full_path(root_data_dir, Path(sess['session_dir']))
+        sess_dir = find_full_path(root_data_dir, Path(sess["session_dir"]))
 
         # search for either ScanImage or Scanbox files (in that order)
-        for scan_pattern, scan_type, glob_func in zip(['*.tif', '*.sbx'],
-                                                      ['ScanImage', 'Scanbox'],
-                                                      [sess_dir.glob, sess_dir.rglob]):
+        for scan_pattern, scan_type, glob_func in zip(
+            ["*.tif", "*.sbx"],
+            ["ScanImage", "Scanbox"],
+            [sess_dir.glob, sess_dir.rglob],
+        ):
             scan_filepaths = [fp.as_posix() for fp in glob_func(scan_pattern)]
             if len(scan_filepaths):
                 acq_software = scan_type
                 break
         else:
-            raise FileNotFoundError('Unable to identify scan files from the supported '
-                                    + 'acquisition softwares (ScanImage, Scanbox) at: '
-                                    + f'{sess_dir}')
+            raise FileNotFoundError(
+                "Unable to identify scan files from the supported "
+                + "acquisition softwares (ScanImage, Scanbox) at: "
+                + f"{sess_dir}"
+            )
 
-        if acq_software == 'ScanImage':
+        if acq_software == "ScanImage":
             import scanreader
             from element_interface import scanimage_utils
+
             try:  # attempt to read .tif as a scanimage file
                 loaded_scan = scanreader.read_scan(scan_filepaths)
                 recording_time = scanimage_utils.get_scanimage_acq_time(loaded_scan)
                 header = scanimage_utils.parse_scanimage_header(loaded_scan)
-                scanner = header['SI_imagingSystem'].strip('\'')
+                scanner = header["SI_imagingSystem"].strip("'")
             except Exception as e:
-                print(f'ScanImage loading error: {scan_filepaths}\n{str(e)}')
+                print(f"ScanImage loading error: {scan_filepaths}\n{str(e)}")
                 continue
-        elif acq_software == 'Scanbox':
+        elif acq_software == "Scanbox":
             import sbxreader
+
             try:  # attempt to load Scanbox
                 sbx_fp = pathlib.Path(scan_filepaths[0])
                 sbx_meta = sbxreader.sbx_get_metadata(sbx_fp)
                 # read from file when Scanbox support this
                 recording_time = datetime.fromtimestamp(sbx_fp.stat().st_ctime)
-                scanner = sbx_meta.get('imaging_system', 'Scanbox')
+                scanner = sbx_meta.get("imaging_system", "Scanbox")
             except Exception as e:
-                print(f'Scanbox loading error: {scan_filepaths}\n{str(e)}')
+                print(f"Scanbox loading error: {scan_filepaths}\n{str(e)}")
                 continue
         else:
-            raise NotImplementedError('Processing scan from acquisition software of '
-                                      + f'type {acq_software} is not yet implemented')
+            raise NotImplementedError(
+                "Processing scan from acquisition software of "
+                + f"type {acq_software} is not yet implemented"
+            )
 
-        session_key = {'subject': sess['subject'], 'session_datetime': recording_time}
+        session_key = {"subject": sess["subject"], "session_datetime": recording_time}
         if session_key not in session.Session():
-            scanner_list.append({'scanner': scanner})
+            scanner_list.append({"scanner": scanner})
             session_list.append(session_key)
-            scan_list.append({**session_key, 'scan_id': 0, 'scanner': scanner,
-                              'acq_software': acq_software})
+            scan_list.append(
+                {
+                    **session_key,
+                    "scan_id": 0,
+                    "scanner": scanner,
+                    "acq_software": acq_software,
+                }
+            )
 
-            session_dir_list.append({**session_key,
-                                     'session_dir': sess_dir.relative_to(root_data_dir
-                                                                         ).as_posix()})
+            session_dir_list.append(
+                {
+                    **session_key,
+                    "session_dir": sess_dir.relative_to(root_data_dir).as_posix(),
+                }
+            )
     new_equipment = set(val for dic in scanner_list for val in dic.values())
     if verbose:
-        print(f'\n---- Insert {len(new_equipment)} entry(s) into '
-              + 'experiment.Equipment ----')
+        print(
+            f"\n---- Insert {len(new_equipment)} entry(s) into "
+            + "experiment.Equipment ----"
+        )
     Equipment.insert(scanner_list, skip_duplicates=True)
 
     if verbose:
-        print(f'\n---- Insert {len(session_list)} entry(s) into session.Session ----')
+        print(f"\n---- Insert {len(session_list)} entry(s) into session.Session ----")
     session.Session.insert(session_list)
     session.SessionDirectory.insert(session_dir_list)
 
     if verbose:
-        print(f'\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----')
+        print(f"\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----")
     scan.Scan.insert(scan_list, skip_duplicates=skip_duplicates)
 
     if verbose:
-        print('\n---- Successfully completed ingest_sessions ----')
+        print("\n---- Successfully completed ingest_sessions ----")
 
 
-def ingest_events(recording_csv_path='./user_data/behavior_recordings.csv',
-                  block_csv_path='./user_data/blocks.csv',
-                  trial_csv_path='./user_data/trials.csv',
-                  event_csv_path='./user_data/events.csv',
-                  skip_duplicates=True, verbose=True):
+def ingest_events(
+    recording_csv_path="./user_data/behavior_recordings.csv",
+    block_csv_path="./user_data/blocks.csv",
+    trial_csv_path="./user_data/trials.csv",
+    event_csv_path="./user_data/events.csv",
+    skip_duplicates=True,
+    verbose=True,
+):
     """
     Ingest each level of experiment heirarchy for element-trial:
         recording, block (i.e., phases of trials), trials (repeated units),
         events (optionally 0-duration occurances within trial).
     This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging
     """
-    csvs = [recording_csv_path, recording_csv_path,
-            block_csv_path, block_csv_path,
-            trial_csv_path, trial_csv_path, trial_csv_path,
-            trial_csv_path,
-            event_csv_path, event_csv_path, event_csv_path]
-    tables = [event.BehaviorRecording(), event.BehaviorRecording.File(),
-              trial.Block(), trial.Block.Attribute(),
-              trial.TrialType(), trial.Trial(), trial.Trial.Attribute(),
-              trial.BlockTrial(),
-              event.EventType(), event.Event(), trial.TrialEvent()]
+    csvs = [
+        recording_csv_path,
+        recording_csv_path,
+        block_csv_path,
+        block_csv_path,
+        trial_csv_path,
+        trial_csv_path,
+        trial_csv_path,
+        trial_csv_path,
+        event_csv_path,
+        event_csv_path,
+        event_csv_path,
+    ]
+    tables = [
+        event.BehaviorRecording(),
+        event.BehaviorRecording.File(),
+        trial.Block(),
+        trial.Block.Attribute(),
+        trial.TrialType(),
+        trial.Trial(),
+        trial.Trial.Attribute(),
+        trial.BlockTrial(),
+        event.EventType(),
+        event.Event(),
+        trial.TrialEvent(),
+    ]
 
     # Allow direct insert required bc element-trial has Imported that should be Manual
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose,
-                   allow_direct_insert=True)
+    ingest_general(
+        csvs,
+        tables,
+        skip_duplicates=skip_duplicates,
+        verbose=verbose,
+        allow_direct_insert=True,
+    )
 
 
-def ingest_alignment(alignment_csv_path='./user_data/alignments.csv',
-                     skip_duplicates=True, verbose=True):
+def ingest_alignment(
+    alignment_csv_path="./user_data/alignments.csv", skip_duplicates=True, verbose=True
+):
     """This is duplicated across wf-array-ephys and wf-calcium-imaging"""
 
     csvs = [alignment_csv_path]
@@ -163,7 +222,7 @@ def ingest_alignment(alignment_csv_path='./user_data/alignments.csv',
     ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ingest_subjects()
     ingest_sessions()
     ingest_events()
