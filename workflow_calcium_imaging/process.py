@@ -1,16 +1,18 @@
 from workflow_calcium_imaging.pipeline import imaging, scan
 import warnings
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 def run(display_progress=True):
 
-    populate_settings = {'display_progress': display_progress,
-                         'reserve_jobs': False,
-                         'suppress_errors': False}
+    populate_settings = {
+        "display_progress": display_progress,
+        "reserve_jobs": False,
+        "suppress_errors": False,
+    }
 
-    print('\n---- Populate imported and computed tables ----')
+    print("\n---- Populate imported and computed tables ----")
 
     scan.ScanInfo.populate(**populate_settings)
 
@@ -26,8 +28,8 @@ def run(display_progress=True):
 
     imaging.Activity.populate(**populate_settings)
 
-    print('\n---- Successfully completed workflow_calcium_imaging/process.py ----')
+    print("\n---- Successfully completed workflow_calcium_imaging/process.py ----")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
