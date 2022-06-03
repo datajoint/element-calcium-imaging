@@ -13,6 +13,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Citation section to README
 + Add - YouTube tutorial link to README
 + Update - Requirements
++ Add - Adopt black formatting into code base
 
 ## 0.1.0a2 - 2022-01-24
 
