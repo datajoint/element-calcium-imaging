@@ -44,20 +44,20 @@ def activate(imaging_schema_name, scan_schema_name=None, *,
 # -------------- Table declarations --------------
 
 @schema
-class PreProcessingMethod(dj.Lookup):
-    definition = """  #  Method, package, analysis suite used for pre-processing
-    preprocess_method: char(8)
+class PreProcessMethod(dj.Lookup):
+    definition = """  #  Method/package used for pre-processing
+    preprocess_method: varchar(16)
     ---
     preprocess_method_desc: varchar(1000)
     """
 
 
 @schema
-class PreProcessingParamSet(dj.Lookup):
+class PreProcessParamSet(dj.Lookup):
     definition = """  #  Parameter set used for pre-processing of calcium imaging data
     paramset_idx:  smallint
     ---
-    -> PreProcessingMethod
+    -> PreProcessMethod
     paramset_desc: varchar(128)
     param_set_hash: uuid
     unique index (param_set_hash)
@@ -85,18 +85,22 @@ class PreProcessingParamSet(dj.Lookup):
             cls.insert1(param_dict)
 
 @schema
-class PreProcessParamList(dj.Manual):
+class PreProcessParamSteps(dj.Manual):
     definition = """
     # Ordered list of paramset_idx that are to be run
+    # When pre-processing is not performed, do not create an entry in `Step` Part table
     preprocess_param_list_id: smallint
+    ---
+    precluster_param_steps_name: varchar(32)
+    precluster_param_steps_desc: varchar(128)
     """
 
-    class ParamOrder(dj.Part):
+    class Step(dj.Part):
         definition = """
         -> master
-        order_id: smallint                  # Order of operations
+        step_number: smallint                  # Order of operations
         ---
-        -> [nullable] PreProcessParamSet    # Nullable for when pre-processing is not performed.
+        -> PreProcessParamSet
         """
 
 @schema
@@ -104,7 +108,7 @@ class PreProcessTask(dj.Manual):
     definition = """
     # Manual table for defining a pre-processing task ready to be run
     -> scan.Scan
-    -> PreProcessParamList
+    -> PreProcessParamSteps
     ---
     preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
                                          # to the root data directory
@@ -126,7 +130,7 @@ class PreProcess(dj.Imported):
     definition = """
     -> PreProcessTask
     ---
-    preprocess_time=null: datetime  # time of generation of this set of pre-processing results 
+    preprocess_time=null: datetime  # time of generation of pre-processing results 
     package_version='': varchar(16)
     """
 
