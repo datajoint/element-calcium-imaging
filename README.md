@@ -16,31 +16,13 @@ a fully functional calcium imaging workflow.
 
 ## Element architecture
 
-`element-calcium-imaging` is comprised of two schemas, `scan` and `imaging`.  To handle
-several use cases of this pipeline, we have designed several `imaging` schemas,
-including `imaging`, `imaging_no_curation`, and `imaging_preprocess`.
-
-+ `imaging` - Multiple scans are acquired during each session and each scan is processed
-              independently.
-
-+ `imaging_preprocess` - Multiple scans are acquired during each session and each scan
-                         is processed independently.  And pre-processing steps can be
-                         performed on each scan prior to processing with Suite2p or
-                         CaImAn.
-
-### `imaging` module
-
-![imaging diagram](images/attached_calcium_imaging_element.svg)
-
-### `imaging_preprocess` module
-
-![imaging-preprocess diagram](images/attached_calcium_imaging_element_preprocess.svg)
+![element-calcium-imaging diagram](images/attached_calcium_imaging_element.svg)
 
 + As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
-    + `Scanner` for equipment/device
+     + `Scanner` for equipment/device
 
-    + `Location` as a dependency for `ScanLocation`
+     + `Location` as a dependency for `ScanLocation`
 
 ## Table definitions
 
