@@ -47,6 +47,10 @@ assembled together to form a fully functional workflow.
 workflow ([03-process.ipynb](notebooks/03-process.ipynb)) and explore the data 
 ([05-explore.ipynb](notebooks/05-explore.ipynb)).
 
++ See our YouTube tutorial for a walkthrough of the schemas and functions:
+
+    [![YouTube tutorial](https://img.youtube.com/vi/gFLn0GB1L30/0.jpg)](https://www.youtube.com/watch?v=gFLn0GB1L30)
+
 ## Citation
 
 + If your work uses DataJoint and DataJoint Elements, please cite the respective Research Resource Identifiers (RRIDs) and manuscripts.
