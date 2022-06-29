@@ -385,7 +385,7 @@ class ScanInfo(dj.Imported):
                 return (tf - ti) * 86400 + 1 / fps
 
             scan_duration = sum(
-                [estimate_nd2_scan_duration(nd2.ND2File(f)) for f in scan_filepaths]
+                estimate_nd2_scan_duration(nd2.ND2File(f)) for f in scan_filepaths
             )
 
             # Insert in ScanInfo

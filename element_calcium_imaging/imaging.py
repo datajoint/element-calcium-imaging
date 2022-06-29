@@ -265,10 +265,7 @@ class Processing(dj.Computed):
                 ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
             ).fetch1("processing_method")
 
-            image_files = (
-                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
-                & key
-            ).fetch("file_path")
+            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
                 find_full_path(get_imaging_root_data_dir(), image_file)
                 for image_file in image_files
