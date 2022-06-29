@@ -21,7 +21,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 + Update - Add workaround to handle DataJoint 0.13.* [issue #914](https://github.com/datajoint/datajoint-python/issues/914)
 
-## [0.1.0a3] - 2021-05-03
+## 0.1.0a3 - 2021-05-03
 
 + Add - GitHub Action release process
 + Add - `scan` and `imaging` elements
@@ -30,4 +30,3 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [0.1.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0
 [0.1.0b0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0b0
 [0.1.0a4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0a4
-[0.1.0a3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0a3
