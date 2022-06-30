@@ -261,9 +261,7 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (
-                ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
-            ).fetch1("processing_method")
+            method = (ProcessingMethod & key).fetch1("processing_method")
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -274,13 +272,9 @@ class Processing(dj.Computed):
             if method == "suite2p":
                 import suite2p
 
-                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
-                    "params"
-                )
+                suite2p_params = (ProcessingParamSet & key).fetch1("params")
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"] = (
-                    ProcessingTask * scan.Scan * scan.ScanInfo & key
-                ).fetch1("fps")
+                suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -299,14 +293,10 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
-                sampling_rate = (
-                    ProcessingTask * scan.Scan * scan.ScanInfo & key
-                ).fetch1("fps")
+                params = (ProcessingParamSet & key).fetch1("params")
+                sampling_rate = (scan.ScanInfo & key).fetch1("fps")
 
-                ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1(
-                    "ndepths"
-                )
+                ndepths = (scan.ScanInfo & key).fetch1("ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
@@ -551,7 +541,7 @@ class MotionCorrection(dj.Imported):
 
                 # -- summary images --
                 motion_correction_key = (
-                    scan.ScanInfo.Field * Curation & key & field_keys[plane]
+                    scan.ScanInfo.Field & key & field_keys[plane]
                 ).fetch1("KEY")
                 summary_images.append(
                     {
@@ -845,7 +835,7 @@ class Segmentation(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
+            params = (ProcessingParamSet & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -984,7 +974,7 @@ class Fluorescence(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
+            params = (ProcessingParamSet & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -1078,7 +1068,7 @@ class Activity(dj.Computed):
                 attr_mapper = {"caiman_deconvolution": "spikes", "caiman_dff": "dff"}
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
-                params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
+                params = (ProcessingParamSet & key).fetch1("params")
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
