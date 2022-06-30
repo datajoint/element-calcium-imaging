@@ -261,7 +261,7 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (ProcessingMethod & key).fetch1("processing_method")
+            method = (ProcessingParamSet & key).fetch1("processing_method")
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -491,7 +491,7 @@ class MotionCorrection(dj.Imported):
 
                 # -- summary images --
                 motion_correction_key = (
-                    scan.ScanInfo.Field & key & field_keys[plane]
+                    scan.ScanInfo.Field * Processing & key & field_keys[plane]
                 ).fetch1("KEY")
                 summary_images.append(
                     {
