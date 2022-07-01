@@ -1,0 +1,19 @@
+name: u24_element_build_release_call
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  call_u24_elements_build_release_alpine:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_element_build_release.yaml@main
+    with:
+      py_ver: 3.9
+      dist: alpine
+      image: djbase
+  call_u24_elements_build_release_debian:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_element_build_release.yaml@main
+    with:
+      py_ver: 3.9
+      dist: debian
+      image: djbase
