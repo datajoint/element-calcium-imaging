@@ -2,9 +2,6 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [Unreleased]
-+ Add - Calling reusable CICD 
-
 ## [0.1.0] - 2022-06-29
 
 + Add - Support for element-interface
@@ -16,6 +13,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Citation section to README
 + Update - Move background file to elements.datajoint.org
 + Add - Adopt black formatting into code base
++ Add - Calling reusable CICD 
 
 ## [0.1.0b0] - 2021-05-07
 
@@ -31,7 +29,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
-[Unreleased]: https://github.com/datajoint/element-calcium-imaging/compare/0.1.0...HEAD
-[0.1.0]: https://github.com/datajoint/element-calcium-imaging/compare/0.1.0...0.1.0b0
-[0.1.0b0]: https://github.com/datajoint/element-calcium-imaging/compare/0.1.0b0...0.1.0a4
+
+[0.1.0]: https://github.com/datajoint/element-calcium-imaging/compare/0.1.0b0...0.1.0
+[0.1.0b0]: https://github.com/datajoint/element-calcium-imaging/compare/0.1.0a4...0.1.0b0
 [0.1.0a4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0a4
