@@ -2,6 +2,10 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.2.0] - 2022-07-01
+
++ Add - Imaging module (imaging_preprocess.py) for pre-processing steps
+
 ## [0.1.0] - 2022-06-29
 
 + Add - Support for element-interface
@@ -28,6 +32,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.2.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.0
 [0.1.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0
 [0.1.0b0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0b0
 [0.1.0a4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0a4
