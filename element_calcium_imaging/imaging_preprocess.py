@@ -383,14 +383,38 @@ class Processing(dj.Computed):
                 ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
             ).fetch1("processing_method")
 
-            image_files = (
-                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
-                & key
-            ).fetch("file_path")
-            image_files = [
-                find_full_path(get_imaging_root_data_dir(), image_file)
-                for image_file in image_files
-            ]
+            preprocess_paramsets = (
+                PreProcessParamSteps.Step()
+                & dict(preprocess_param_steps_id=key["preprocess_param_steps_id"])
+            ).fetch("paramset_idx")
+
+            if len(preprocess_paramsets) == 0:
+                # No pre-processing steps were performed on the acquired dataset, so process the acquired files.
+                image_files = (
+                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
+                    & key
+                ).fetch("file_path")
+
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
+
+            else:
+                preprocess_output_dir = (PreProcessTask & key).fetch1(
+                    "preprocess_output_dir"
+                )
+
+                preprocess_output_dir = find_full_path(
+                    get_imaging_root_data_dir(), preprocess_output_dir
+                )
+
+                if not preprocess_output_dir.exists():
+                    raise FileNotFoundError(
+                        f"Pre-processed output directory not found ({preprocess_output_dir})"
+                    )
+
+                image_files = [fp for fp in preprocess_output_dir.glob("*.tif")]
 
             if method == "suite2p":
                 import suite2p
