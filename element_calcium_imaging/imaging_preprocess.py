@@ -117,7 +117,7 @@ class PreProcessParamSteps(dj.Manual):
     definition = """
     # Ordered list of paramset_idx that are to be run
     # When pre-processing is not performed, do not create an entry in `Step` Part table
-    preprocess_param_list_id: smallint
+    preprocess_param_steps_id: smallint
     ---
     precluster_param_steps_name: varchar(32)
     precluster_param_steps_desc: varchar(128)
