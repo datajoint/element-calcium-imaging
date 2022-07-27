@@ -119,8 +119,8 @@ class PreProcessParamSteps(dj.Manual):
     # When pre-processing is not performed, do not create an entry in `Step` Part table
     preprocess_param_steps_id: smallint
     ---
-    precluster_param_steps_name: varchar(32)
-    precluster_param_steps_desc: varchar(128)
+    preprocess_param_steps_name: varchar(32)
+    preprocess_param_steps_desc: varchar(128)
     """
 
     class Step(dj.Part):
