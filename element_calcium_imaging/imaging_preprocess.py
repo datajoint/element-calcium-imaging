@@ -67,7 +67,7 @@ def activate(
 
 
 @schema
-class PreProcessMethod(dj.Lookup):
+class PreprocessMethod(dj.Lookup):
     definition = """  #  Method/package used for pre-processing
     preprocess_method: varchar(16)
     ---
@@ -76,11 +76,11 @@ class PreProcessMethod(dj.Lookup):
 
 
 @schema
-class PreProcessParamSet(dj.Lookup):
+class PreprocessParamSet(dj.Lookup):
     definition = """  #  Parameter set used for pre-processing of calcium imaging data
     paramset_idx:  smallint
     ---
-    -> PreProcessMethod
+    -> PreprocessMethod
     paramset_desc: varchar(128)
     param_set_hash: uuid
     unique index (param_set_hash)
@@ -113,7 +113,7 @@ class PreProcessParamSet(dj.Lookup):
 
 
 @schema
-class PreProcessParamSteps(dj.Manual):
+class PreprocessParamSteps(dj.Manual):
     definition = """
     # Ordered list of paramset_idx that are to be run
     # When pre-processing is not performed, do not create an entry in `Step` Part table
@@ -128,16 +128,16 @@ class PreProcessParamSteps(dj.Manual):
         -> master
         step_number: smallint                  # Order of operations
         ---
-        -> PreProcessParamSet
+        -> PreprocessParamSet
         """
 
 
 @schema
-class PreProcessTask(dj.Manual):
+class PreprocessTask(dj.Manual):
     definition = """
     # Manual table for defining a pre-processing task ready to be run
     -> scan.Scan
-    -> PreProcessParamSteps
+    -> PreprocessParamSteps
     ---
     preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
                                          # to the root data directory
@@ -148,23 +148,23 @@ class PreProcessTask(dj.Manual):
 
 
 @schema
-class PreProcess(dj.Imported):
+class Preprocess(dj.Imported):
     """
-    A processing table to handle each PreProcessTask:
+    A processing table to handle each PreprocessTask:
     + If `task_mode == "none"`: no pre-processing performed
     + If `task_mode == "trigger"`: Not implemented
     + If `task_mode == "load"`: Not implemented
     """
 
     definition = """
-    -> PreProcessTask
+    -> PreprocessTask
     ---
     preprocess_time=null: datetime  # time of generation of pre-processing results 
     package_version='': varchar(16)
     """
 
     def make(self, key):
-        task_mode, output_dir = (PreProcessTask & key).fetch1(
+        task_mode, output_dir = (PreprocessTask & key).fetch1(
             "task_mode", "preprocess_output_dir"
         )
         preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
@@ -258,7 +258,7 @@ class MaskType(dj.Lookup):
 @schema
 class ProcessingTask(dj.Manual):
     definition = """  # Manual table for defining a processing task ready to be run
-    -> PreProcess
+    -> Preprocess
     -> ProcessingParamSet
     ---
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
@@ -383,7 +383,7 @@ class Processing(dj.Computed):
             ).fetch1("processing_method")
 
             preprocess_paramsets = (
-                PreProcessParamSteps.Step()
+                PreprocessParamSteps.Step()
                 & dict(preprocess_param_steps_id=key["preprocess_param_steps_id"])
             ).fetch("paramset_idx")
 
@@ -400,7 +400,7 @@ class Processing(dj.Computed):
                 ]
 
             else:
-                preprocess_output_dir = (PreProcessTask & key).fetch1(
+                preprocess_output_dir = (PreprocessTask & key).fetch1(
                     "preprocess_output_dir"
                 )
 
