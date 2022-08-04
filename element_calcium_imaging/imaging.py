@@ -15,7 +15,7 @@ from .scan import (
     get_nd2_files,
 )
 
-schema = dj.schema()
+schema = dj.Schema()
 
 _linking_module = None
 
