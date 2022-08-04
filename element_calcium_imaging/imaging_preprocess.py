@@ -152,9 +152,8 @@ class PreProcess(dj.Imported):
     """
     A processing table to handle each PreProcessTask:
     + If `task_mode == "none"`: no pre-processing performed
-    + If `task_mode == "trigger"`: trigger pre-processing analysis according to
-                                    the PreProcessParamSet
-    + If `task_mode == "load"`: verify output
+    + If `task_mode == "trigger"`: Not implemented
+    + If `task_mode == "load"`: Not implemented
     """
 
     definition = """
@@ -171,7 +170,7 @@ class PreProcess(dj.Imported):
         preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
 
         if task_mode == "none":
-            pass
+            print(f"No pre-processing run on entry: {key}")
         elif task_mode in ["load", "trigger"]:
             raise NotImplementedError(
                 "Pre-processing steps are not implemented."
@@ -181,7 +180,7 @@ class PreProcess(dj.Imported):
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
 
-        self.insert1({**key})
+        self.insert1(key)
 
 
 @schema
@@ -389,7 +388,7 @@ class Processing(dj.Computed):
             ).fetch("paramset_idx")
 
             if len(preprocess_paramsets) == 0:
-                # No pre-processing steps were performed on the acquired dataset, so process the acquired files.
+                # No pre-processing steps were performed on the acquired dataset, so process the raw/acquired files.
                 image_files = (
                     ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
                     & key
@@ -414,7 +413,7 @@ class Processing(dj.Computed):
                         f"Pre-processed output directory not found ({preprocess_output_dir})"
                     )
 
-                image_files = [fp for fp in preprocess_output_dir.glob("*.tif")]
+                image_files = list(preprocess_output_dir.glob("*.tif"))
 
             if method == "suite2p":
                 import suite2p
