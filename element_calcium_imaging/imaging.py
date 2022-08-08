@@ -181,7 +181,7 @@ class ProcessingTask(dj.Manual):
         Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
         """
 
-        default_paramset_idx = os.environ.get("DEFAULT_PARAMSET_IDX", 0)
+        default_paramset_idx = os.environ.get("CALCIUM_PARAMSET") or os.environ.get("DEFAULT_PARAMSET_IDX", 0)
 
         output_dir = cls.infer_output_dir(scan_key, relative=False, mkdir=True)
 
@@ -215,6 +215,8 @@ class ProcessingTask(dj.Manual):
                 "task_mode": task_mode,
             }
         )
+
+    generate = auto_generate_entries
 
 
 @schema
