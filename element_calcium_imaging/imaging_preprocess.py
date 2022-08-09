@@ -446,13 +446,9 @@ class Processing(dj.Computed):
                 from element_interface.run_caiman import run_caiman
 
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
-                sampling_rate = (
+                sampling_rate, ndepths = (
                     ProcessingTask * scan.ScanInfo & key
-                ).fetch1("fps")
-
-                ndepths = (ProcessingTask * scan.ScanInfo & key).fetch1(
-                    "ndepths"
-                )
+                ).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
