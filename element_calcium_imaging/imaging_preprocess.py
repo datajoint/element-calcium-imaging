@@ -293,7 +293,7 @@ class ProcessingTask(dj.Manual):
         return output_dir.relative_to(processed_dir) if relative else output_dir
 
     @classmethod
-    def auto_generate_entries(cls, scan_key, task_mode):
+    def generate(cls, scan_key, task_mode):
         """
         Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
         """
@@ -333,7 +333,7 @@ class ProcessingTask(dj.Manual):
             }
         )
 
-    generate = auto_generate_entries
+    auto_generate_entries = generate
 
 
 @schema
