@@ -425,7 +425,7 @@ class Processing(dj.Computed):
                 )
                 suite2p_params["save_path0"] = output_dir
                 suite2p_params["fs"] = (
-                    ProcessingTask * scan.ScanInfo & key
+                    scan.ScanInfo & key
                 ).fetch1("fps")
 
                 input_format = pathlib.Path(image_files[0]).suffix
@@ -447,7 +447,7 @@ class Processing(dj.Computed):
 
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
                 sampling_rate, ndepths = (
-                    ProcessingTask * scan.ScanInfo & key
+                    scan.ScanInfo & key
                 ).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
