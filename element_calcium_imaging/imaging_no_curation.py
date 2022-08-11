@@ -1007,18 +1007,16 @@ class Activity(dj.Computed):
             if key["extraction_method"] == "suite2p_deconvolution":
                 suite2p_dataset = imaging_dataset
                 # ---- iterate through all s2p plane outputs ----
-                spikes = []
-                for s2p in suite2p_dataset.planes.values():
-                    mask_count = len(spikes)  # increment mask id from all "plane"
-                    for mask_idx, spks in enumerate(s2p.spks):
-                        spikes.append(
-                            {
-                                **key,
-                                "mask": mask_idx + mask_count,
-                                "fluo_channel": 0,
-                                "activity_trace": spks,
-                            }
-                        )
+                spikes = [
+                    dict(key,
+                         mask=mask_idx,
+                         fluo_channel=0,
+                         activity_trace=spks,
+                      )
+                      for mask_idx, spks in enumerate( 
+                          s for plane in suite2p_dataset.planes.values()  
+                                for s in plane.spks)
+                ]
 
                 self.insert1(key)
                 self.Trace.insert(spikes)
