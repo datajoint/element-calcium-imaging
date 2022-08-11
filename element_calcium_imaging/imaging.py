@@ -1083,21 +1083,19 @@ class Activity(dj.Computed):
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
-
-                activities = []
-                for mask in caiman_dataset.masks:
-                    activities.append(
-                        {
-                            **key,
-                            "mask": mask["mask_id"],
-                            "fluo_channel": segmentation_channel,
-                            "activity_trace": mask[
+                
+                self.insert1(key)
+                self.Trace.insert(     
+                        dict(
+                            key,
+                            mask=mask["mask_id"],
+                            fluo_channel=segmentation_channel,
+                            activity_trace=mask[
                                 attr_mapper[key["extraction_method"]]
                             ],
-                        }
-                    )
-                self.insert1(key)
-                self.Trace.insert(activities)
+                        )
+                        for mask in caiman_dataset.masks
+                )
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
