@@ -67,6 +67,123 @@ def activate(
 
 
 @schema
+class PreprocessMethod(dj.Lookup):
+    definition = """  #  Method/package used for pre-processing
+    preprocess_method: varchar(16)
+    ---
+    preprocess_method_desc: varchar(1000)
+    """
+
+
+@schema
+class PreprocessParamSet(dj.Lookup):
+    definition = """  #  Parameter set used for pre-processing of calcium imaging data
+    paramset_idx:  smallint
+    ---
+    -> PreprocessMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(
+        cls, preprocess_method: str, paramset_idx: int, paramset_desc: str, params: dict
+    ):
+        param_dict = {
+            "preprocess_method": preprocess_method,
+            "paramset_idx": paramset_idx,
+            "paramset_desc": paramset_desc,
+            "params": params,
+            "param_set_hash": dict_to_uuid(params),
+        }
+        q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1("paramset_idx")
+            if pname == paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    "The specified param-set already exists - name: {}".format(pname)
+                )
+        else:
+            cls.insert1(param_dict)
+
+
+@schema
+class PreprocessParamSteps(dj.Manual):
+    definition = """
+    # Ordered list of paramset_idx that are to be run
+    # When pre-processing is not performed, do not create an entry in `Step` Part table
+    preprocess_param_steps_id: smallint
+    ---
+    preprocess_param_steps_name: varchar(32)
+    preprocess_param_steps_desc: varchar(128)
+    """
+
+    class Step(dj.Part):
+        definition = """
+        -> master
+        step_number: smallint                  # Order of operations
+        ---
+        -> PreprocessParamSet
+        """
+
+
+@schema
+class PreprocessTask(dj.Manual):
+    definition = """
+    # Manual table for defining a pre-processing task ready to be run
+    -> scan.Scan
+    -> PreprocessParamSteps
+    ---
+    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
+                                         # to the root data directory
+    task_mode='none': enum('none','load', 'trigger') # 'none': no pre-processing
+                                                     # 'load': load analysis results
+                                                     # 'trigger': trigger computation
+    """
+
+
+@schema
+class Preprocess(dj.Imported):
+    """
+    A processing table to handle each PreprocessTask:
+    + If `task_mode == "none"`: no pre-processing performed
+    + If `task_mode == "trigger"`: Not implemented
+    + If `task_mode == "load"`: Not implemented
+    """
+
+    definition = """
+    -> PreprocessTask
+    ---
+    preprocess_time=null: datetime  # time of generation of pre-processing results 
+    package_version='': varchar(16)
+    """
+
+    def make(self, key):
+        task_mode, output_dir = (PreprocessTask & key).fetch1(
+            "task_mode", "preprocess_output_dir"
+        )
+        preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+        if task_mode == "none":
+            print(f"No pre-processing run on entry: {key}")
+        elif task_mode in ["load", "trigger"]:
+            raise NotImplementedError(
+                "Pre-processing steps are not implemented."
+                "Please overwrite this `make` function with"
+                "desired pre-processing steps."
+            )
+        else:
+            raise ValueError(f"Unknown task mode: {task_mode}")
+
+        self.insert1(key)
+
+
+@schema
 class ProcessingMethod(dj.Lookup):
     definition = """  #  Method, package, analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
@@ -141,7 +258,7 @@ class MaskType(dj.Lookup):
 @schema
 class ProcessingTask(dj.Manual):
     definition = """  # Manual table for defining a processing task ready to be run
-    -> scan.Scan
+    -> Preprocess
     -> ProcessingParamSet
     ---
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
@@ -215,7 +332,7 @@ class ProcessingTask(dj.Manual):
                 "task_mode": task_mode,
             }
         )
-    
+
     auto_generate_entries = generate
 
 
@@ -267,14 +384,38 @@ class Processing(dj.Computed):
                 ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
             ).fetch1("processing_method")
 
-            image_files = (
-                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
-                & key
-            ).fetch("file_path")
-            image_files = [
-                find_full_path(get_imaging_root_data_dir(), image_file)
-                for image_file in image_files
-            ]
+            preprocess_paramsets = (
+                PreprocessParamSteps.Step()
+                & dict(preprocess_param_steps_id=key["preprocess_param_steps_id"])
+            ).fetch("paramset_idx")
+
+            if len(preprocess_paramsets) == 0:
+                # No pre-processing steps were performed on the acquired dataset, so process the raw/acquired files.
+                image_files = (
+                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
+                    & key
+                ).fetch("file_path")
+
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
+
+            else:
+                preprocess_output_dir = (PreprocessTask & key).fetch1(
+                    "preprocess_output_dir"
+                )
+
+                preprocess_output_dir = find_full_path(
+                    get_imaging_root_data_dir(), preprocess_output_dir
+                )
+
+                if not preprocess_output_dir.exists():
+                    raise FileNotFoundError(
+                        f"Pre-processed output directory not found ({preprocess_output_dir})"
+                    )
+
+                image_files = list(preprocess_output_dir.glob("*.tif"))
 
             if method == "suite2p":
                 import suite2p
@@ -332,13 +473,63 @@ class Processing(dj.Computed):
         self.insert1(key)
 
 
+@schema
+class Curation(dj.Manual):
+    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation can also be included here)
+    -> Processing
+    curation_id: int
+    ---
+    curation_time: datetime             # time of generation of this set of curated results 
+    curation_output_dir: varchar(255)   # output directory of the curated results, relative to root data directory
+    manual_curation: bool               # has manual curation been performed on this result?
+    curation_note='': varchar(2000)  
+    """
+
+    def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
+        """
+        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
+        """
+        if key not in Processing():
+            raise ValueError(
+                f"No corresponding entry in Processing available for: {key};"
+                f" do `Processing.populate(key)`"
+            )
+
+        output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+
+        if method == "suite2p":
+            suite2p_dataset = imaging_dataset
+            curation_time = suite2p_dataset.creation_time
+        elif method == "caiman":
+            caiman_dataset = imaging_dataset
+            curation_time = caiman_dataset.creation_time
+        else:
+            raise NotImplementedError("Unknown method: {}".format(method))
+
+        # Synthesize curation_id
+        curation_id = (
+            dj.U().aggr(self & key, n="ifnull(max(curation_id)+1,1)").fetch1("n")
+        )
+        self.insert1(
+            {
+                **key,
+                "curation_id": curation_id,
+                "curation_time": curation_time,
+                "curation_output_dir": output_dir,
+                "manual_curation": is_curated,
+                "curation_note": curation_note,
+            }
+        )
+
+
 # -------------- Motion Correction --------------
 
 
 @schema
 class MotionCorrection(dj.Imported):
     definition = """  #  Results of motion correction performed on the imaging data
-    -> Processing
+    -> Curation
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
@@ -402,7 +593,7 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        method, imaging_dataset = get_loader_result(key, Curation)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch(
             "KEY", "field_z", order_by="field_z"
@@ -502,7 +693,7 @@ class MotionCorrection(dj.Imported):
 
                 # -- summary images --
                 motion_correction_key = (
-                    scan.ScanInfo.Field * Processing & key & field_keys[plane]
+                    scan.ScanInfo.Field * Curation & key & field_keys[plane]
                 ).fetch1("KEY")
                 summary_images.append(
                     {
@@ -721,7 +912,7 @@ class MotionCorrection(dj.Imported):
 @schema
 class Segmentation(dj.Computed):
     definition = """ # Different mask segmentations.
-    -> Processing
+    -> Curation
     """
 
     class Mask(dj.Part):
@@ -741,7 +932,7 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
             suite2p_dataset = imaging_dataset
@@ -893,7 +1084,7 @@ class Fluorescence(dj.Computed):
         """
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
             suite2p_dataset = imaging_dataset
@@ -979,7 +1170,7 @@ class Activity(dj.Computed):
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob  #
+        activity_trace: longblob  # 
         """
 
     @property
@@ -1001,7 +1192,7 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
             if key["extraction_method"] == "suite2p_deconvolution":
