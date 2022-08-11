@@ -1234,7 +1234,7 @@ class Activity(dj.Computed):
                             activity_trace=mask[
                                 attr_mapper[key["extraction_method"]]
                             ],
-                        }
+                        )
                         for mask in caiman_dataset.masks
                 )
         else:
