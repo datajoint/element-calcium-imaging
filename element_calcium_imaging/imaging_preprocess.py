@@ -475,7 +475,7 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation can also be included here)
+    definition = """  #  Curation(s) performed on processing results (including none)
     -> Processing
     curation_id: int
     ---
