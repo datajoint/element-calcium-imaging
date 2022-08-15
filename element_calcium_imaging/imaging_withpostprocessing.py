@@ -342,7 +342,7 @@ class Curation(dj.Manual):
         if key not in Processing():
             raise ValueError(
                 f"No corresponding entry in Processing available for: {key};"
-                f" do `Processing.populate(key)`"
+                f"Please run `Processing.populate(key)`"
             )
 
         output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
