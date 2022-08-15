@@ -185,7 +185,9 @@ class Preprocess(dj.Imported):
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    definition = """  #  Method, package, analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
+    definition = """
+    # Method, package, analysis suite used for processing of calcium imaging
+    # data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
     ---
     processing_method_desc: varchar(1000)
@@ -382,9 +384,9 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (
-                ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
-            ).fetch1("processing_method")
+            method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+                "processing_method"
+            )
 
             preprocess_paramsets = (
                 PreprocessParamSteps.Step()
@@ -393,11 +395,7 @@ class Processing(dj.Computed):
 
             if len(preprocess_paramsets) == 0:
                 # No pre-processing steps were performed on the acquired dataset, so process the raw/acquired files.
-                image_files = (
-                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
-                    & key
-                ).fetch("file_path")
-
+                image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
                 image_files = [
                     find_full_path(get_imaging_root_data_dir(), image_file)
                     for image_file in image_files
@@ -453,7 +451,7 @@ class Processing(dj.Computed):
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not capable of analyzing 3D scans at the moment."
+                        "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
@@ -492,7 +490,7 @@ class Curation(dj.Manual):
         if key not in Processing():
             raise ValueError(
                 f"No corresponding entry in Processing available for: {key};"
-                f" do `Processing.populate(key)`"
+                f"Please run `Processing.populate(key)`"
             )
 
         output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
@@ -1160,17 +1158,18 @@ class ActivityExtractionMethod(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
+    definition = """
+    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
     -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
-        definition = """  #
+        definition = """
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob  # 
+        activity_trace: longblob
         """
 
     @property

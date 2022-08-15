@@ -15,7 +15,7 @@ from .scan import (
     get_nd2_files,
 )
 
-schema = dj.schema()
+schema = dj.Schema()
 
 _linking_module = None
 
@@ -178,12 +178,14 @@ class ProcessingTask(dj.Manual):
         return output_dir.relative_to(processed_dir) if relative else output_dir
 
     @classmethod
-    def auto_generate_entries(cls, scan_key, task_mode):
+    def generate(cls, scan_key, task_mode):
         """
         Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
         """
 
-        default_paramset_idx = os.environ.get("DEFAULT_PARAMSET_IDX", 0)
+        default_paramset_idx = os.environ.get("CALCIUM_PARAMSET") or os.environ.get(
+            "DEFAULT_PARAMSET_IDX", 0
+        )
 
         output_dir = cls.infer_output_dir(scan_key, relative=False, mkdir=True)
 
@@ -217,6 +219,8 @@ class ProcessingTask(dj.Manual):
                 "task_mode": task_mode,
             }
         )
+
+    auto_generate_entries = generate
 
 
 @schema
@@ -263,7 +267,9 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (ProcessingParamSet & key).fetch1("processing_method")
+            method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+                "processing_method"
+            )
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -274,7 +280,9 @@ class Processing(dj.Computed):
             if method == "suite2p":
                 import suite2p
 
-                suite2p_params = (ProcessingParamSet & key).fetch1("params")
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
                 suite2p_params["save_path0"] = output_dir
                 suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
 
@@ -295,10 +303,10 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                caiman_params = (ProcessingParamSet & key).fetch1("params")
-                sampling_rate = (scan.ScanInfo & key).fetch1("fps")
-
-                ndepths = (scan.ScanInfo & key).fetch1("ndepths")
+                caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
+                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
@@ -837,7 +845,7 @@ class Segmentation(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -976,7 +984,7 @@ class Fluorescence(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -1053,7 +1061,8 @@ class ActivityExtractionParamSet(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
+    definition = """
+    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
     -> ActivityExtractionParamSet
     """
@@ -1137,7 +1146,7 @@ class Activity(dj.Computed):
 
             if key["extraction_method"] == "caiman":
                 # infer "segmentation_channel" - from params if available, else from caiman loader
-                params = (ProcessingParamSet & key).fetch1("params")
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )

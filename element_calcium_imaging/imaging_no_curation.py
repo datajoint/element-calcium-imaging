@@ -267,7 +267,9 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (ProcessingParamSet & key).fetch1("processing_method")
+            method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+                "processing_method"
+            )
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -278,9 +280,10 @@ class Processing(dj.Computed):
             if method == "suite2p":
                 import suite2p
 
-                suite2p_params = (ProcessingParamSet & key).fetch1("params")
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
                 suite2p_params["save_path0"] = output_dir
-
                 suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
 
                 input_format = pathlib.Path(image_files[0]).suffix
@@ -308,7 +311,7 @@ class Processing(dj.Computed):
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not capable of analyzing 3D scans at the moment."
+                        "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
@@ -792,7 +795,7 @@ class Segmentation(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -931,7 +934,7 @@ class Fluorescence(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -965,17 +968,18 @@ class ActivityExtractionMethod(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
+    definition = """
+    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
     -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
-        definition = """  #
+        definition = """
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob  #
+        activity_trace: longblob
         """
 
     @property
@@ -1026,7 +1030,7 @@ class Activity(dj.Computed):
                 attr_mapper = {"caiman_deconvolution": "spikes", "caiman_dff": "dff"}
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
-                params = (ProcessingParamSet & key).fetch1("params")
+                params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
