@@ -295,7 +295,7 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                params = (ProcessingParamSet & key).fetch1("params")
+                caiman_params = (ProcessingParamSet & key).fetch1("params")
                 sampling_rate = (scan.ScanInfo & key).fetch1("fps")
 
                 ndepths = (scan.ScanInfo & key).fetch1("ndepths")
@@ -307,7 +307,7 @@ class Processing(dj.Computed):
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
-                    parameters=params,
+                    parameters=caiman_params,
                     sampling_rate=sampling_rate,
                     output_dir=output_dir,
                     is3D=is3D,
