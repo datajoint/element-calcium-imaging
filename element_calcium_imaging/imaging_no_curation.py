@@ -15,7 +15,7 @@ from .scan import (
     get_nd2_files,
 )
 
-schema = dj.schema()
+schema = dj.Schema()
 
 _linking_module = None
 
@@ -178,12 +178,12 @@ class ProcessingTask(dj.Manual):
         return output_dir.relative_to(processed_dir) if relative else output_dir
 
     @classmethod
-    def auto_generate_entries(cls, scan_key, task_mode):
+    def generate(cls, scan_key, task_mode):
         """
         Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
         """
 
-        default_paramset_idx = os.environ.get("DEFAULT_PARAMSET_IDX", 0)
+        default_paramset_idx = os.environ.get("CALCIUM_PARAMSET") or os.environ.get("DEFAULT_PARAMSET_IDX", 0)
 
         output_dir = cls.infer_output_dir(scan_key, relative=False, mkdir=True)
 
@@ -217,6 +217,8 @@ class ProcessingTask(dj.Manual):
                 "task_mode": task_mode,
             }
         )
+    
+    auto_generate_entries = generate
 
 
 @schema
@@ -276,6 +278,7 @@ class Processing(dj.Computed):
 
                 suite2p_params = (ProcessingParamSet & key).fetch1("params")
                 suite2p_params["save_path0"] = output_dir
+
                 suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
 
                 input_format = pathlib.Path(image_files[0]).suffix
@@ -295,10 +298,10 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                params = (ProcessingParamSet & key).fetch1("params")
-                sampling_rate = (scan.ScanInfo & key).fetch1("fps")
-
-                ndepths = (scan.ScanInfo & key).fetch1("ndepths")
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+                sampling_rate, ndepths = (
+                    scan.ScanInfo & key
+                ).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
@@ -998,18 +1001,16 @@ class Activity(dj.Computed):
             if key["extraction_method"] == "suite2p_deconvolution":
                 suite2p_dataset = imaging_dataset
                 # ---- iterate through all s2p plane outputs ----
-                spikes = []
-                for s2p in suite2p_dataset.planes.values():
-                    mask_count = len(spikes)  # increment mask id from all "plane"
-                    for mask_idx, spks in enumerate(s2p.spks):
-                        spikes.append(
-                            {
-                                **key,
-                                "mask": mask_idx + mask_count,
-                                "fluo_channel": 0,
-                                "activity_trace": spks,
-                            }
-                        )
+                spikes = [
+                    dict(key,
+                         mask=mask_idx,
+                         fluo_channel=0,
+                         activity_trace=spks,
+                      )
+                      for mask_idx, spks in enumerate( 
+                          s for plane in suite2p_dataset.planes.values()  
+                                for s in plane.spks)
+                ]
 
                 self.insert1(key)
                 self.Trace.insert(spikes)
@@ -1025,20 +1026,18 @@ class Activity(dj.Computed):
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
 
-                activities = []
-                for mask in caiman_dataset.masks:
-                    activities.append(
-                        {
-                            **key,
-                            "mask": mask["mask_id"],
-                            "fluo_channel": segmentation_channel,
-                            "activity_trace": mask[
+                self.insert1(key)
+                self.Trace.insert(     
+                        dict(
+                            key,
+                            mask=mask["mask_id"],
+                            fluo_channel=segmentation_channel,
+                            activity_trace=mask[
                                 attr_mapper[key["extraction_method"]]
                             ],
-                        }
-                    )
-                self.insert1(key)
-                self.Trace.insert(activities)
+                        )
+                        for mask in caiman_dataset.masks
+                )
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
