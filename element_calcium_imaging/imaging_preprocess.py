@@ -67,6 +67,123 @@ def activate(
 
 
 @schema
+class PreprocessMethod(dj.Lookup):
+    definition = """  #  Method/package used for pre-processing
+    preprocess_method: varchar(16)
+    ---
+    preprocess_method_desc: varchar(1000)
+    """
+
+
+@schema
+class PreprocessParamSet(dj.Lookup):
+    definition = """  #  Parameter set used for pre-processing of calcium imaging data
+    paramset_idx:  smallint
+    ---
+    -> PreprocessMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(
+        cls, preprocess_method: str, paramset_idx: int, paramset_desc: str, params: dict
+    ):
+        param_dict = {
+            "preprocess_method": preprocess_method,
+            "paramset_idx": paramset_idx,
+            "paramset_desc": paramset_desc,
+            "params": params,
+            "param_set_hash": dict_to_uuid(params),
+        }
+        q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1("paramset_idx")
+            if pname == paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    "The specified param-set already exists - name: {}".format(pname)
+                )
+        else:
+            cls.insert1(param_dict)
+
+
+@schema
+class PreprocessParamSteps(dj.Manual):
+    definition = """
+    # Ordered list of paramset_idx that are to be run
+    # When pre-processing is not performed, do not create an entry in `Step` Part table
+    preprocess_param_steps_id: smallint
+    ---
+    preprocess_param_steps_name: varchar(32)
+    preprocess_param_steps_desc: varchar(128)
+    """
+
+    class Step(dj.Part):
+        definition = """
+        -> master
+        step_number: smallint                  # Order of operations
+        ---
+        -> PreprocessParamSet
+        """
+
+
+@schema
+class PreprocessTask(dj.Manual):
+    definition = """
+    # Manual table for defining a pre-processing task ready to be run
+    -> scan.Scan
+    -> PreprocessParamSteps
+    ---
+    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
+                                         # to the root data directory
+    task_mode='none': enum('none','load', 'trigger') # 'none': no pre-processing
+                                                     # 'load': load analysis results
+                                                     # 'trigger': trigger computation
+    """
+
+
+@schema
+class Preprocess(dj.Imported):
+    """
+    A processing table to handle each PreprocessTask:
+    + If `task_mode == "none"`: no pre-processing performed
+    + If `task_mode == "trigger"`: Not implemented
+    + If `task_mode == "load"`: Not implemented
+    """
+
+    definition = """
+    -> PreprocessTask
+    ---
+    preprocess_time=null: datetime  # time of generation of pre-processing results 
+    package_version='': varchar(16)
+    """
+
+    def make(self, key):
+        task_mode, output_dir = (PreprocessTask & key).fetch1(
+            "task_mode", "preprocess_output_dir"
+        )
+        preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+        if task_mode == "none":
+            print(f"No pre-processing run on entry: {key}")
+        elif task_mode in ["load", "trigger"]:
+            raise NotImplementedError(
+                "Pre-processing steps are not implemented."
+                "Please overwrite this `make` function with"
+                "desired pre-processing steps."
+            )
+        else:
+            raise ValueError(f"Unknown task mode: {task_mode}")
+
+        self.insert1(key)
+
+
+@schema
 class ProcessingMethod(dj.Lookup):
     definition = """  #  Method, package, analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
@@ -141,7 +258,7 @@ class MaskType(dj.Lookup):
 @schema
 class ProcessingTask(dj.Manual):
     definition = """  # Manual table for defining a processing task ready to be run
-    -> scan.Scan
+    -> Preprocess
     -> ProcessingParamSet
     ---
     processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
@@ -263,22 +380,54 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (ProcessingParamSet & key).fetch1("processing_method")
+            method = (
+                ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
+            ).fetch1("processing_method")
 
-            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
-            image_files = [
-                find_full_path(get_imaging_root_data_dir(), image_file)
-                for image_file in image_files
-            ]
+            preprocess_paramsets = (
+                PreprocessParamSteps.Step()
+                & dict(preprocess_param_steps_id=key["preprocess_param_steps_id"])
+            ).fetch("paramset_idx")
+
+            if len(preprocess_paramsets) == 0:
+                # No pre-processing steps were performed on the acquired dataset, so process the raw/acquired files.
+                image_files = (
+                    ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
+                    & key
+                ).fetch("file_path")
+
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
+
+            else:
+                preprocess_output_dir = (PreprocessTask & key).fetch1(
+                    "preprocess_output_dir"
+                )
+
+                preprocess_output_dir = find_full_path(
+                    get_imaging_root_data_dir(), preprocess_output_dir
+                )
+
+                if not preprocess_output_dir.exists():
+                    raise FileNotFoundError(
+                        f"Pre-processed output directory not found ({preprocess_output_dir})"
+                    )
+
+                image_files = list(preprocess_output_dir.glob("*.tif"))
 
             if method == "suite2p":
                 import suite2p
 
-                suite2p_params = (ProcessingParamSet & key).fetch1("params")
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
                 suite2p_params["save_path0"] = output_dir
+                suite2p_params["fs"] = (
+                    scan.ScanInfo & key
+                ).fetch1("fps")
 
-                suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
-                
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
 
@@ -838,7 +987,7 @@ class Segmentation(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -977,7 +1126,7 @@ class Fluorescence(dj.Computed):
             caiman_dataset = imaging_dataset
 
             # infer "segmentation_channel" - from params if available, else from caiman loader
-            params = (ProcessingParamSet & key).fetch1("params")
+            params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
             segmentation_channel = params.get(
                 "segmentation_channel", caiman_dataset.segmentation_channel
             )
@@ -1069,11 +1218,11 @@ class Activity(dj.Computed):
                 attr_mapper = {"caiman_deconvolution": "spikes", "caiman_dff": "dff"}
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
-                params = (ProcessingParamSet & key).fetch1("params")
+                params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
-                
+
                 self.insert1(key)
                 self.Trace.insert(     
                         dict(
