@@ -301,7 +301,7 @@ class Processing(dj.Computed):
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not capable of analyzing 3D scans at the moment."
+                        "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
