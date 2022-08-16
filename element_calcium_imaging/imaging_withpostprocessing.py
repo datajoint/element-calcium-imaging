@@ -1063,6 +1063,7 @@ class ActivityExtractionParamSet(dj.Lookup):
 class Activity(dj.Computed):
     definition = """
     # Inferred neural activity from fluorescence trace - e.g. dff, spikes
+    # Calculates the Traces for all ActivityExtractionParamSet
     -> Fluorescence
     -> ActivityExtractionParamSet
     """
@@ -1075,48 +1076,6 @@ class Activity(dj.Computed):
         ---
         activity_trace: longblob
         """
-
-    @property
-    def key_source(self):
-        ks = Fluorescence * ActivityExtractionParamSet
-        suite2p_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionMethod
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method = "suite2p"'
-                & 'extraction_method = "suite2p"'
-            ).proj()
-        )
-        caiman_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionMethod
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method = "caiman"'
-                & 'extraction_method = "caiman"'
-            ).proj()
-        )
-        fissa_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionMethod
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method in ("suite2p")'
-                & 'extraction_method = "FISSA"'
-            ).proj()
-        )
-        return (
-            suite2p_key_source.proj()
-            + caiman_key_source.proj()
-            + fissa_key_source.proj()
-        )
 
     def make(self, key):
         processing_method, imaging_dataset = get_loader_result(key, ProcessingTask)
