@@ -23,6 +23,7 @@ __all__ = [
     "subject",
     "lab",
     "session",
+    "Equipment",
     "trial",
     "event",
     "scan",
