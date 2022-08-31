@@ -169,7 +169,7 @@ analysis.ActivityAlignment.populate(display_progress=True)
 
 analysis.ActivityAlignment()
 
-# The `AlignedTrialActivity` part table captures aligned traces fore each alignment and trial condition specified in the master table.
+# The `AlignedTrialActivity` part table captures aligned traces for each alignment and trial condition specified in the master table.
 
 analysis.ActivityAlignment.AlignedTrialActivity()
 

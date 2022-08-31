@@ -27,6 +27,8 @@ if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
 
 pwd
 
+import datajoint as dj
+
 # ## Configure database host address and credentials
 #
 # Now let's set up the host, user and password in the `dj.config` global variable
