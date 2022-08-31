@@ -5,10 +5,11 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.7
+#       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: 'Python 3.7.9 64-bit (''workflow-calcium-imaging'': conda)'
-#     name: python379jvsc74a57bd01a512f474e195e32ad84236879d3bb44800a92b431919ef0b10d543f5012a23c
+#     display_name: Python 3.9.12 ('elementsPractice')
+#     language: python
+#     name: python3
 # ---
 
 # # Configure DataJoint connection to the database
@@ -22,8 +23,7 @@
 # + As a convention, we set the configuration up in the root directory of the `workflow-calcium-imaging` package and always start importing DataJoint and pipeline modules from there.
 
 import os
-if os.path.basename(os.getcwd()) == 'notebooks':
-    os.chdir('..')
+if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
 
 pwd
 
@@ -50,9 +50,10 @@ dj.conn()
 #
 # + Giving a prefix to schema could help on the configuration of privilege settings. For example, if we set prefix `neuro_`, every schema created with the current workflow will start with `neuro_`, e.g. `neuro_lab`, `neuro_subject`, `neuro_imaging` etc.
 #
-# + The prefix could be configurated as follows in `dj.config`:
+# + The prefix could be configurated in `dj.config` as follows. CodeBook users should keep their username as the prefix for schema for declaration permissions.
 
-dj.config['custom'] = {'database.prefix': 'neuro_'}
+username_as_prefix = dj.config["database.user"] + "_"
+dj.config["custom"] = {"database.prefix": username_as_prefix}
 
 # ### Root directories for raw calcium imaging data and processed results
 #

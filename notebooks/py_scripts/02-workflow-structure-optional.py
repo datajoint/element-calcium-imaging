@@ -6,10 +6,11 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.7
+#       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: 'Python 3.7.9 64-bit (''workflow-calcium-imaging'': conda)'
-#     name: python379jvsc74a57bd01a512f474e195e32ad84236879d3bb44800a92b431919ef0b10d543f5012a23c
+#     display_name: Python 3.9.12 ('elementsPractice')
+#     language: python
+#     name: python3
 # ---
 
 # # Introduction to the workflow structure
@@ -25,7 +26,7 @@
 # To load the local configuration, we will change the directory to the package root.
 
 import os
-os.chdir('..')
+if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
 
 # ## Schemas and tables
 #
