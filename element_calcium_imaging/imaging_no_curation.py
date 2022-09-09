@@ -149,25 +149,33 @@ class ProcessingTask(dj.Manual):
     """
 
     @classmethod
-    def infer_output_dir(cls, scan_key, relative=False, mkdir=False):
+    def infer_output_dir(cls, key, relative=False, mkdir=False):
+        """
+        Given a 'key' to an entry in this table
+        Return the expected processing_output_dir based on the following convention:
+            processed_dir / scan_dir / {processing_method}_{paramset_idx}
+            e.g.: sub4/sess1/scan0/suite2p_0
+        """
         image_locators = {
             "NIS": get_nd2_files,
             "ScanImage": get_scan_image_files,
             "Scanbox": get_scan_box_files,
         }
-        image_locator = image_locators[(scan.Scan & scan_key).fetch1("acq_software")]
+        image_locator = image_locators[(scan.Scan & key).fetch1("acq_software")]
 
         scan_dir = find_full_path(
-            get_imaging_root_data_dir(), image_locator(scan_key)[0]
+            get_imaging_root_data_dir(), image_locator(key)[0]
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
-        paramset_key = ProcessingParamSet.fetch1()
+        method = (ProcessingParamSet * ProcessingMethod & key).fetch1(
+            'processing_method').replace(".", "-")
+
         processed_dir = pathlib.Path(get_processed_root_data_dir())
         output_dir = (
             processed_dir
             / scan_dir.relative_to(root_dir)
-            / f'{paramset_key["processing_method"]}_{paramset_key["paramset_idx"]}'
+            / f'{method}_{key["paramset_idx"]}'
         )
 
         if mkdir:
@@ -176,28 +184,25 @@ class ProcessingTask(dj.Manual):
         return output_dir.relative_to(processed_dir) if relative else output_dir
 
     @classmethod
-    def generate(cls, scan_key, task_mode):
+    def generate(cls, scan_key, paramset_idx=0):
         """
-        Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
+        Method to auto-generate ProcessingTask entries for a particular Scan using the specified parameter set.
         """
+        key = {**scan_key, 'paramset_idx': paramset_idx}
 
-        default_paramset_idx = os.environ.get("CALCIUM_PARAMSET") or os.environ.get("DEFAULT_PARAMSET_IDX", 0)
+        output_dir = cls.infer_output_dir(key, relative=False, mkdir=True)
 
-        output_dir = cls.infer_output_dir(scan_key, relative=False, mkdir=True)
-
-        method = (ProcessingParamSet & {"paramset_idx": default_paramset_idx}).fetch1(
+        method = (ProcessingParamSet & {"paramset_idx": paramset_idx}).fetch1(
             "processing_method"
         )
 
         try:
             if method == "suite2p":
                 from element_interface import suite2p_loader
-
-                loaded_dataset = suite2p_loader.Suite2p(output_dir)
+                suite2p_loader.Suite2p(output_dir)
             elif method == "caiman":
                 from element_interface import caiman_loader
-
-                loaded_dataset = caiman_loader.CaImAn(output_dir)
+                caiman_loader.CaImAn(output_dir)
             else:
                 raise NotImplementedError(
                     "Unknown/unimplemented method: {}".format(method)
@@ -209,13 +214,12 @@ class ProcessingTask(dj.Manual):
 
         cls.insert1(
             {
-                **scan_key,
-                "paramset_idx": default_paramset_idx,
+                **key,
                 "processing_output_dir": output_dir,
                 "task_mode": task_mode,
             }
         )
-    
+
     auto_generate_entries = generate
 
 
