@@ -975,14 +975,13 @@ class ActivityExtractionMethod(dj.Lookup):
 class Activity(dj.Computed):
     definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
-    -> ActivityExtractionParamSet
+    -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
         definition = """  #
         -> master
         -> Fluorescence.Trace
-        activity_type: varchar(16) #  e.g. dF/F, calcium-event
         ---
         activity_trace: longblob  # 
         """
