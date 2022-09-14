@@ -285,7 +285,7 @@ class ProcessingTask(dj.Manual):
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
-        method = (ProcessingParamSet * ProcessingMethod & key).fetch1(
+        method = (ProcessingParamSet & key).fetch1(
             'processing_method').replace(".", "-")
 
         processed_dir = pathlib.Path(get_processed_root_data_dir())
