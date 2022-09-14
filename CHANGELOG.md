@@ -2,6 +2,10 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.2.1] - 2022-09-12
+
++ Bugfix - fix errors in auto generating new ProcessingTask
+
 ## [0.2.0] - 2022-07-01
 
 + Add - Imaging module (imaging_preprocess.py) for pre-processing steps
