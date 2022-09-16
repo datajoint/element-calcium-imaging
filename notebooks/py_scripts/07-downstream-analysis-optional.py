@@ -76,9 +76,6 @@ event.AlignmentEvent()
 
 # + [markdown] tags=[]
 # # Event-aligned trialized calcium activity
-# -
-
-from workflow_calcium_imaging import analysis
 
 # + [markdown] jp-MarkdownHeadingCollapsed=true tags=[]
 # ### Analysis
