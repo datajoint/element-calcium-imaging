@@ -113,12 +113,12 @@ def ingest_sessions(
             f"\n---- Insert {len(new_equipment)} entry(s) into "
             + "experiment.Equipment ----"
         )
-    Equipment.insert(scanner_list, skip_duplicates=True)
+    Equipment.insert(scanner_list, skip_duplicates=skip_duplicates)
 
     if verbose:
         print(f"\n---- Insert {len(session_list)} entry(s) into session.Session ----")
-    session.Session.insert(session_list)
-    session.SessionDirectory.insert(session_dir_list)
+    session.Session.insert(session_list, skip_duplicates=skip_duplicates)
+    session.SessionDirectory.insert(session_dir_list, skip_duplicates=skip_duplicates)
 
     if verbose:
         print(f"\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----")
