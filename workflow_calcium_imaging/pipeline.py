@@ -12,7 +12,7 @@ from .paths import (
     get_scan_box_files,
     get_nd2_files,
 )
-
+from . import analysis
 
 if "custom" not in dj.config:
     dj.config["custom"] = {}
@@ -72,3 +72,7 @@ class Equipment(dj.Manual):
 # ------------- Activate "imaging" schema -------------
 
 imaging.activate(db_prefix + "imaging", db_prefix + "scan", linking_module=__name__)
+
+# ------------- Activate "analysis" schema ------------
+
+analysis.activate(db_prefix + "analysis", linking_module=__name__)

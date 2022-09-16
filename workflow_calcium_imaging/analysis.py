@@ -1,16 +1,52 @@
 import datajoint as dj
 import numpy as np
-from workflow_calcium_imaging.pipeline import (
-    db_prefix,
-    session,
-    scan,
-    imaging,
-    trial,
-    event,
-)
+import importlib
+import inspect
 
 
-schema = dj.schema(db_prefix + "analysis")
+schema = dj.schema()
+
+_linking_module = None
+
+
+def activate(
+    schema_name, *, create_schema=True, create_tables=True, linking_module=None
+):
+    """
+    activate(schema_name, *, create_schema=True, create_tables=True,
+             linking_module=None)
+        :param schema_name: schema name on the database server to activate the
+                            `subject` element
+        :param create_schema: when True (default), create schema in the
+                              database if it does not yet exist.
+        :param create_tables: when True (default), create tables in the
+                              database if they do not yet exist.
+        :param linking_module: a module name or a module containing the
+         required dependencies to activate the `subject` element:
+             Upstream tables:
+                + Source: the source of the material/resources
+                          (e.g. allele, animal) - typically refers to the
+                          vendor (e.g. Jackson Lab - JAX)
+                + Lab: the lab for which a particular animal belongs to
+                + Protocol: the protocol applicable to a particular animal
+                            (e.g. IACUC, IRB)
+                + User: the user associated with a particular animal
+    """
+    if isinstance(linking_module, str):
+        linking_module = importlib.import_module(linking_module)
+    assert inspect.ismodule(linking_module), (
+        "The argument 'dependency' must " + "be a module's name or a module"
+    )
+
+    global _linking_module
+    _linking_module = linking_module
+
+    schema.activate(
+        schema_name,
+        create_schema=create_schema,
+        create_tables=create_tables,
+        add_objects=linking_module.__dict__,
+    )
 
 
 @schema
@@ -50,16 +86,11 @@ class ActivityAlignment(dj.Computed):
 
     def make(self, key):
         sess_time, scan_time, nframes, frame_rate = (
-            scan.ScanInfo * session.Session & key
+            _linking_module.scan.ScanInfo * _linking_module.session.Session & key
         ).fetch1("session_datetime", "scan_datetime", "nframes", "fps")
 
-        # Estimation of frame timestamps with respect to the session-start
-        # (to be replaced by timestamps retrieved from some synchronization routine)
-        scan_start = (scan_time - sess_time).total_seconds() if scan_time else 0
-        frame_timestamps = np.arange(nframes) / frame_rate + scan_start
-
-        trialized_event_times = trial.get_trialized_alignment_event_times(
-            key, trial.Trial & (ActivityAlignmentCondition.Trial & key)
+        trialized_event_times = _linking_module.trial.get_trialized_alignment_event_times(
+            key, _linking_module.trial.Trial & (ActivityAlignmentCondition.Trial & key)
         )
 
         min_limit = (trialized_event_times.event - trialized_event_times.start).max()
@@ -68,7 +99,7 @@ class ActivityAlignment(dj.Computed):
         aligned_timestamps = np.arange(-min_limit, max_limit, 1 / frame_rate)
         nsamples = len(aligned_timestamps)
 
-        trace_keys, activity_traces = (imaging.Activity.Trace & key).fetch(
+        trace_keys, activity_traces = (_linking_module.imaging.Activity.Trace & key).fetch(
             "KEY", "activity_trace", order_by="mask"
         )
         activity_traces = np.vstack(activity_traces)
@@ -79,7 +110,7 @@ class ActivityAlignment(dj.Computed):
                 continue
             alignment_start_idx = int((r.event - min_limit) * frame_rate)
             roi_aligned_activities = activity_traces[
-                :, alignment_start_idx : (alignment_start_idx + nsamples)
+                :, alignment_start_idx: (alignment_start_idx + nsamples)
             ]
             if roi_aligned_activities.shape[-1] != nsamples:
                 shape_diff = nsamples - roi_aligned_activities.shape[-1]
@@ -104,7 +135,7 @@ class ActivityAlignment(dj.Computed):
 
     def plot_aligned_activities(self, key, roi, axs=None, title=None):
         """
-        Plot event-aligned Calcium activities for all selected trials, and trial-averaged Calcium activity
+        Plot event-aligned activities for selected trials, and trial-averaged activity
         e.g. dF/F, neuropil-corrected dF/F, Calcium events, etc.
         :param key: key of ActivityAlignment master table
         :param roi: imaging segmentation mask

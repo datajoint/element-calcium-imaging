@@ -7,7 +7,7 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: Python 3.9.12 ('elementsPractice')
+#     display_name: Python 3.9.13 ('ele')
 #     language: python
 #     name: python3
 # ---
@@ -58,7 +58,7 @@ session.Session()
 
 # + Fetch the primary key for the session of interest which will be used later on in this notebook.
 
-session_key = (session.Session & 'subject = "subject3"').fetch1('KEY')
+session_key = (session.Session & 'subject = "subject3"').fetch('KEY')[0]
 
 # ### `scan.Scan` and `scan.ScanInfo` tables
 #
