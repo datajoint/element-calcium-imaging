@@ -1,0 +1,15 @@
+name: u24_workflow_tag_to_release_0.0.1
+on:
+  push:
+    tags:
+      - '*.*.*'
+      - 'test*.*.*'
+jobs:
+  call_context_check:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/context_check.yaml@main
+  call_u24_workflow_build_debian:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_workflow_build.yaml@main
+    with:
+      jhub_ver: 1.4.2
+      py_ver: 3.9
+      dist: debian

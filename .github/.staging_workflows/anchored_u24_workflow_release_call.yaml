@@ -1,0 +1,46 @@
+name: u24_workflow_release_call_0.0.1
+
+on:
+  workflow_run:
+    workflows: ["u24_workflow_tag_to_release_0.0.1"]
+    types:
+      - completed
+
+anchor-dev-release-call: &dev-release-call
+  uses: yambottle/djsciops-cicd/.github/workflows/u24_workflow_release.yaml@main
+
+anchor-test-release-call: &test-release-call
+  uses: yambottle/djsciops-cicd/.github/workflows/u24_workflow_release.yaml@main
+
+anchor-prod-release-call: &prod-release-call
+  uses: dj-sciops/djsciops-cicd/.github/workflows/u24_workflow_release.yaml@main
+
+anchor-dev-release-if: &dev-release-if
+  if: >-
+    github.event.workflow_run.conclusion == 'success' &&
+    github.repository_owner == 'yambottle'
+
+anchor-test-release-if: &test-release-if
+  if: >-
+    github.event.workflow_run.conclusion == 'success' &&
+    github.repository_owner == 'yambottle'
+
+anchor-prod-release-if: &prod-release-if
+  if: >-
+    github.event.workflow_run.conclusion == 'success' &&
+    github.repository_owner == 'datajoint'
+
+jobs:
+  call_context_check:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/context_check.yaml@main
+  
+  call_u24_workflow_release_debian:
+    !!merge <<: *$STAGE-release-if
+    !!merge <<: *$STAGE-release-call
+    with:
+      jhub_ver: 1.4.2
+      py_ver: 3.9
+      dist: debian
+    secrets:
+      REGISTRY_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      REGISTRY_PASSWORD: ${{secrets.DOCKER_PASSWORD}}

@@ -1,0 +1,20 @@
+name: u24_workflow_release_call_0.0.1
+on:
+  workflow_run:
+    workflows: ["u24_workflow_tag_to_release_0.0.1"]
+    types:
+      - completed
+jobs:
+  call_context_check:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/context_check.yaml@main
+  call_u24_workflow_release_debian:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' && github.repository_owner == 'datajoint'
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_workflow_release.yaml@main
+    with:
+      jhub_ver: 1.4.2
+      py_ver: 3.9
+      dist: debian
+    secrets:
+      REGISTRY_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      REGISTRY_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
