@@ -7,9 +7,9 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: venv-nwb
+#     display_name: Python 3.9.13 ('ele')
 #     language: python
-#     name: venv-nwb
+#     name: python3
 # ---
 
 # + [markdown] tags=[]
@@ -24,8 +24,6 @@
 import os
 # change to the upper level folder to detect dj_local_conf.json
 if os.path.basename(os.getcwd())=='notebooks': os.chdir('..')
-assert os.path.basename(os.getcwd())=='workflow-calcium-imaging', (
-    "Please move to the workflow directory")
 # We'll be working with long tables, so we'll make visualization easier with a limit
 import datajoint as dj; dj.config['display.limit']=10
 
@@ -97,7 +95,7 @@ imaging.Activity()
 # We'll isolate the scan of interest with the following key:
 
 ca_activity_key = (imaging.Activity & {'subject': 'subject3', 'scan_id': 0}
-                  ).fetch1('KEY')
+                  ).fetch('KEY')[0]
 
 # Here, we can see all trials for this scan:
 

@@ -7,13 +7,16 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: 'Python 3.7.9 64-bit (''workflow-calcium-imaging'': conda)'
-#     name: python379jvsc74a57bd01a512f474e195e32ad84236879d3bb44800a92b431919ef0b10d543f5012a23c
+#     display_name: Python 3.9.13 ('ele')
+#     language: python
+#     name: python3
 # ---
 
 # # Download example dataset
 #
-# + This workflow will need two-photon calcium imaging data collected from either ScanImage or Scanbox and the processed with Suite2p or CaImAn.  We provide an example dataset to be downloaded to run through the workflow. This notebook walks you through the process to download the dataset.
+# This workflow will need two-photon calcium imaging data collected from either ScanImage or Scanbox and the processed with Suite2p or CaImAn.  We provide an example dataset to be downloaded to run through the workflow. This notebook walks you through the process to download the dataset.
+#
+# [CodeBook](codebook.datajoint.io) users can skip this step.
 #
 # ## Install `djarchive-client`
 #
@@ -21,10 +24,13 @@
 #
 # + We provide a client package, [djarchive-client](https://github.com/datajoint/djarchive-client), to download the data which can be installed with pip:
 
-pip install git+https://github.com/datajoint/djarchive-client.git
+# + language="bash"
+# pip install git+https://github.com/datajoint/djarchive-client.git
+# -
 
-# ## Download calcium imaging example datasets using `djarchive-client`
+# ## Download imaging datasets using `djarchive-client`
 
+import os
 import djarchive_client
 client = djarchive_client.client()
 
