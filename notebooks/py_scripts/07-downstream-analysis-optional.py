@@ -29,7 +29,7 @@ import datajoint as dj; dj.config['display.limit']=10
 
 # Next, we populate the python namespace with the required schemas
 
-from workflow_calcium_imaging.pipeline import session, imaging, trial, event
+from workflow_calcium_imaging.pipeline import session, imaging, trial, event, analysis
 
 # + [markdown] jp-MarkdownHeadingCollapsed=true tags=[]
 # ## Trial and Event schemas
@@ -186,7 +186,7 @@ imaging.Segmentation.Mask & 'mask<3'
 from workflow_calcium_imaging import analysis
 from workflow_calcium_imaging.pipeline import session, imaging, trial, event
 ca_activity_key = (imaging.Activity & {'subject': 'subject3', 'scan_id': 0}
-                  ).fetch1('KEY')
+                  ).fetch('KEY')[0]
 alignment_key = (event.AlignmentEvent & 'alignment_name = "center_button"'
                 ).fetch1('KEY')
 alignment_condition_ctrl = {**ca_activity_key, **alignment_key, 
