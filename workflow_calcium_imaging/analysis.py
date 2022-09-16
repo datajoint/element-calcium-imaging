@@ -23,14 +23,7 @@ def activate(
                               database if they do not yet exist.
         :param linking_module: a module name or a module containing the
          required dependencies to activate the `subject` element:
-             Upstream tables:
-                + Source: the source of the material/resources
-                          (e.g. allele, animal) - typically refers to the
-                          vendor (e.g. Jackson Lab - JAX)
-                + Lab: the lab for which a particular animal belongs to
-                + Protocol: the protocol applicable to a particular animal
-                            (e.g. IACUC, IRB)
-                + User: the user associated with a particular animal
+             Upstream schema: scan, session, trial
     """
     if isinstance(linking_module, str):
         linking_module = importlib.import_module(linking_module)
