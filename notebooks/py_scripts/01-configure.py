@@ -7,90 +7,95 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.14.1
 #   kernelspec:
-#     display_name: Python 3.9.12 ('elementsPractice')
+#     display_name: Python 3.9.13 ('ele')
 #     language: python
 #     name: python3
 # ---
 
-# # Configure DataJoint connection to the database
+# # DataJoint configuration
 #
-# + To run `workflow-calcium-imaging`, we need to properly set up the DataJoint configuration. The configuration will be saved in a file called `dj_local_conf.json` on each machine and this notebook walks you through the process.
+# ## Setup - Working Directory
 #
-# + The configuration only needs to be set up once.  If you have gone through the configuration before, directly go to [02-workflow-structure](02-workflow-structure-optional.ipynb).
+# To run the workflow, we need to properly set up the DataJoint configuration. The configuration can be saved in a local directory as `dj_local_conf.json` or at your root directory as a hidden file. This notebook walks you through the setup process.
 #
-# ## Set up configuration in root directory of this package
-#
-# + As a convention, we set the configuration up in the root directory of the `workflow-calcium-imaging` package and always start importing DataJoint and pipeline modules from there.
+# **The configuration only needs to be set up once**, if you have gone through the configuration before, directly go to [02-workflow-structure](02-workflow-structure-optional.ipynb).
 
 import os
 if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
-
-pwd
+import datajoint as dj
 
 import datajoint as dj
 
-# ## Configure database host address and credentials
+# ## Setup - Credentials
 #
 # Now let's set up the host, user and password in the `dj.config` global variable
 
 import getpass
-dj.config['database.host'] = '{YOUR_HOST}'
-dj.config['database.user'] = '{YOUR_USERNAME}'
-dj.config['database.password'] = getpass.getpass() # enter the password securily
+dj.config["database.host"] = "{YOUR_HOST}" # CodeBook users should omit this
+dj.config["database.user"] = "{YOUR_USERNAME}"
+dj.config["database.password"] = getpass.getpass()  # enter the password securily
 
 # You should be able to connect to the database at this stage.
 
 dj.conn()
 
-# ## Configure the `custom` field in `dj.config` for element-calcium-imaging
+# ## Setup - `dj.config['custom']`
 #
-# + The major component of the current workflow is the [DataJoint element-calcium-imaging](https://github.com/datajoint/element-calcium-imaging). `element-calcium-imaging` requires configurations in the field `custom` in `dj.config`:
+# The major component of the current workflow is the [DataJoint Calcium Imaging Element](https://github.com/datajoint/element-array-ephys). Calcium Imaging Element requires configurations in the field `custom` in `dj.config`:
 #
 # ### Database prefix
 #
-# + Giving a prefix to schema could help on the configuration of privilege settings. For example, if we set prefix `neuro_`, every schema created with the current workflow will start with `neuro_`, e.g. `neuro_lab`, `neuro_subject`, `neuro_imaging` etc.
+# Giving a prefix to schema could help on the configuration of privilege settings. For example, if we set prefix `neuro_`, every schema created with the current workflow will start with `neuro_`, e.g. `neuro_lab`, `neuro_subject`, `neuro_scan` etc.
 #
-# + The prefix could be configurated in `dj.config` as follows. CodeBook users should keep their username as the prefix for schema for declaration permissions.
+# The prefix could be configurated in `dj.config` as follows. CodeBook users should keep their username as the prefix for schema declaration permissions.
 
 username_as_prefix = dj.config["database.user"] + "_"
 dj.config["custom"] = {"database.prefix": username_as_prefix}
 
-# ### Root directories for raw calcium imaging data and processed results
+# ### Root directories for raw/processed data
 #
-# + `imaging_root_data_dir` field indicates the root directory for the calcium imaging raw data from ScanImage or Scanbox (e.g. `*.tif`) or the processed results from Suite2p or CaImAn (e.g. `F.npy`). The root path typically do not contain information of subjects or sessions, all data from subjects/sessions should be subdirectories in the root path.
+# `imaging_root_data_dir` field indicates the root directory for
+# + The **raw data** from ScanImage or Scanbox (e.g. `*.tif`)
+# + The processed results from Suite2p or CaImAn (e.g. `F.npy`). 
 #
-# + In the database, every path for the raw calcium imaging data is relative to this root path. The benefit is that the absolute path could be configured for each machine, and when data transfer happens, we just need to change the root directory in the config file.
+# This can be specific to each machine. The root path typically **does not** contain information of subjects or sessions, all data from subjects/sessions should be subdirectories in the root path.
 #
-# + The workflow supports multiple root directories. If there are multiple possible root directories, specify the `imaging_root_data_dir` as a list.
+# + In the example dataset downloaded with [these instructions](00-data-download-optional.ipynb), `/tmp/test_data` will be the root. 
+# + For CodeBook users, the root is `/home/inbox/0_1_0a2/`
 #
-# + The root path(s) are specific to each machine, as the name of drive mount could be different for different operating systems or machines.
+# ```
+# subject3
+# └── 210107_run00_orientation_8dir
+#     ├── run00_orientation_8dir_000_000.mat
+#     ├── run00_orientation_8dir_000_000.sbx
+#     └── suite2p
+#         ├── combined # same as plane0, plane1, plane2, and plane3
+#         │   ├── F.npy
+#         │   ├── Fneu.npy
+#         │   ├── iscell.npy
+#         │   ├── ops.npy
+#         │   ├── spks.npy
+#         │   └── stat.npy
+#         └── run.log
+# ```
+
 #
-# + In the context of the workflow, all the paths saved into the database or saved in the config file need to be in the POSIX standards (Unix/Linux), with `/`. The path conversion for machines of any operating system is taken care of inside the elements.
 
 # If using our example dataset, downloaded with this notebook [00-data-download](00-data-download-optional.ipynb), the root directory will be:
 
-# If there is only one root path:
-dj.config['custom']['imaging_root_data_dir'] = '/tmp/example_data'
-# If there are multiple possible root paths:
-dj.config['custom']['imaging_root_data_dir'] = ['/tmp/example_data']
+dj.config['custom']['imaging_root_data_dir'] = '/tmp/example_data' # local download
+dj.config['custom']['imaging_root_data_dir'] = '/home/inbox/0_1_0a2/' # on CodeBook
 
 dj.config
 
-# ## Save the configuration as a json file
+# ## Save configuration
 #
-# With the proper configurations, we could save this as a file, either as a local json file, or a global file.
-
-dj.config.save_local()
-
-# ls
-
-# Local configuration file is saved as `dj_local_conf.json` in the root directory of this package `workflow-calcium-imaging`. Next time if you change your directory to `workflow-calcium-imaging` before importing DataJoint and the pipeline packages, the configurations will get properly loaded.
+# We could save this as a file, either as a local json file, or a global file. Local configuration file is saved as `dj_local_conf.json` in current directory, which is great for project-specific settings.
 #
-# If saved globally, there will be a hidden configuration file saved in your root directory. The configuration will be loaded no matter where the directory is.
+# For first-time and CodeBook users, we recommend saving globally. This will create a hidden configuration file saved in your root directory, loaded whenever there is no local version to override it.
 
-# +
-# dj.config.save_global()
-# -
+# dj.config.save_local()
+dj.config.save_global()
 
 # ## Next Step
 #

@@ -2,7 +2,7 @@ import csv
 import pathlib
 from pathlib import Path
 from datetime import datetime
-from element_interface.utils import find_full_path
+from element_interface.utils import find_full_path, ingest_csv_to_table
 from workflow_calcium_imaging.pipeline import (
     subject,
     scan,
@@ -14,38 +14,6 @@ from workflow_calcium_imaging.pipeline import (
 from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
-def ingest_general(
-    csvs, tables, skip_duplicates=True, verbose=True, allow_direct_insert=False
-):
-    """
-    Inserts data from a series of csvs into their corresponding table:
-        e.g., ingest_general(['./lab_data.csv', './proj_data.csv'],
-                                 [lab.Lab(),lab.Project()]
-    ingest_general(csvs, tables, skip_duplicates=True)
-        :param csvs: list of relative paths to CSV files.  CSV are delimited by commas.
-        :param tables: list of datajoint tables with ()
-        :param verbose: print number inserted (i.e., table length change)
-    """
-    for csv_filepath, table in zip(csvs, tables):
-        with open(csv_filepath, newline="") as f:
-            data = list(csv.DictReader(f, delimiter=","))
-        if verbose:
-            prev_len = len(table)
-        table.insert(
-            data,
-            skip_duplicates=skip_duplicates,
-            # Ignore extra fields because some CSVs feed multiple tables
-            ignore_extra_fields=True,
-            allow_direct_insert=allow_direct_insert,
-        )
-        if verbose:
-            insert_len = len(table) - prev_len  # report length change
-            print(
-                f"\n---- Inserting {insert_len} entry(s) "
-                + f"into {table.table_name} ----"
-            )
-
-
 def ingest_subjects(
     subject_csv_path="./user_data/subjects.csv", skip_duplicates=True, verbose=True
 ):
@@ -55,7 +23,7 @@ def ingest_subjects(
     csvs = [subject_csv_path]
     tables = [subject.Subject()]
 
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
+    ingest_csv_to_table(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
 def ingest_sessions(
@@ -145,12 +113,12 @@ def ingest_sessions(
             f"\n---- Insert {len(new_equipment)} entry(s) into "
             + "experiment.Equipment ----"
         )
-    Equipment.insert(scanner_list, skip_duplicates=True)
+    Equipment.insert(scanner_list, skip_duplicates=skip_duplicates)
 
     if verbose:
         print(f"\n---- Insert {len(session_list)} entry(s) into session.Session ----")
-    session.Session.insert(session_list)
-    session.SessionDirectory.insert(session_dir_list)
+    session.Session.insert(session_list, skip_duplicates=skip_duplicates)
+    session.SessionDirectory.insert(session_dir_list, skip_duplicates=skip_duplicates)
 
     if verbose:
         print(f"\n---- Insert {len(scan_list)} entry(s) into scan.Scan ----")
@@ -202,7 +170,7 @@ def ingest_events(
     ]
 
     # Allow direct insert required bc element-trial has Imported that should be Manual
-    ingest_general(
+    ingest_csv_to_table(
         csvs,
         tables,
         skip_duplicates=skip_duplicates,
@@ -219,7 +187,7 @@ def ingest_alignment(
     csvs = [alignment_csv_path]
     tables = [event.AlignmentEvent()]
 
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
+    ingest_csv_to_table(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
 if __name__ == "__main__":
