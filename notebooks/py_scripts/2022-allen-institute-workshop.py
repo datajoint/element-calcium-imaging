@@ -169,7 +169,7 @@ imaging.ProcessingParamSet.insert_new_params(processing_method='suite2p',
 imaging.ProcessingParamSet()
 
 # +
-os.makedirs('subject3/210107_run00_orientation_8dir/suite2p_1', exist_ok=True)
+os.makedirs('/home/inbox/0_1_0a2/subject3/210107_run00_orientation_8dir/suite2p_1', exist_ok=True)
 
 imaging.ProcessingTask.insert1(dict(subject='subject3', 
                                     session_datetime='2022-09-01 19:16:44', 
