@@ -23,7 +23,7 @@
 #
 # First, some packages we'll use in this notebook...
 
-import datajoint as dj
+import datajoint as dj 
 import numpy as np
 from matplotlib import pyplot
 import os
@@ -59,8 +59,8 @@ dj.config.save_global()
 from workflow_calcium_imaging.pipeline import session, imaging # import schemas
 from workflow_calcium_imaging.ingest import ingest_subjects, ingest_sessions #csv loaders
 
-ingest_subjects()
-ingest_sessions()
+ingest_subjects(subject_csv_path="/home/user_data/subjects.csv")
+ingest_sessions(session_csv_path="/home/user_data/sessions.csv")
 
 params_suite2p = {'look_one_level_down': 0.0,
                   'fast_disk': [],
@@ -185,7 +185,7 @@ imaging.Fluorescence.Trace()
 
 query_trace = imaging.Fluorescence.Trace & 'subject="subject3"' \
                                     & 'session_datetime="2022-09-01 19:16:44"' \
-                                    & 'mask_id=120'
+                                    & 'mask=120'
 query_trace
 
 # Fetch a fluorescence trace from the database.
@@ -199,10 +199,10 @@ sampling_rate = (scan.ScanInfo & 'subject="subject3"' & 'session_datetime="2022-
 
 pyplot.plot(np.r_[:trace.size] * 1/sampling_rate, trace, 'k')
 
-pyplot.title('Fluorescence trace for mask 120',labelsize=14)
+pyplot.title('Fluorescence trace for mask 120', fontsize=14)
 pyplot.tick_params(labelsize=14)
-pyplot.set_xlabel('Time (s)')
-pyplot.set_ylabel('Activity (a.u.)')
+pyplot.xlabel('Time (s)')
+pyplot.ylabel('Activity (a.u.)')
 # -
 
 # ## Running an analysis
