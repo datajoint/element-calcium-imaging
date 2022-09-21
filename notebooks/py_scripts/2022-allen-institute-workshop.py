@@ -187,6 +187,10 @@ populate_settings = dict(display_progress=True)
 
 imaging.Processing.populate(**populate_settings)
 
+key = (imaging.ProcessingTask & 'subject="subject3"' & 'session_datetime="2022-09-01 19:16:44"').fetch1('KEY')
+
+imaging.Curation().create1_from_processing_task(key)
+
 imaging.MotionCorrection.populate(**populate_settings)
 
 imaging.Segmentation.populate(**populate_settings)
