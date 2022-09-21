@@ -317,7 +317,9 @@ imaging.ProcessingTask.insert1(
 
 imaging.ProcessingTask()
 
-# Run Suite2p for the new parameter set and save the results to the respective tables.
+# If you have write access to the data, you can then run Suite2p for the new parameter set and save the results to the respective tables.
+#
+# **Note:** CodeBook does not yet support write access for shared datasets. To see Suite2p triggering in action, contact Support@DataJoint.com to find out how to upload your own data.
 
 # +
 populate_settings = dict(display_progress=True)
