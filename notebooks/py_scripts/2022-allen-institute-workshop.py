@@ -66,15 +66,14 @@ imaging.Fluorescence.Trace()
 
 # Restrict the table with specific criteria.
 
-imaging.Fluorescence.Trace & 'subject="subject3"' \
-                           & 'session_datetime="2022-09-01 19:16:44"' \
-                           & 'mask_id=120'
+query_trace = imaging.Fluorescence.Trace & 'subject="subject3"' \
+                                    & 'session_datetime="2022-09-01 19:16:44"' \
+                                    & 'mask_id=120'
+query_trace
 
 # Fetch a fluorescence trace from the database.
 
-trace = (imaging.Fluorescence.Trace & 'subject="subject3"' \
-                                    & 'session_datetime="2022-09-01 19:16:44"' \
-                                    & 'mask_id=120').fetch('fluorescence')
+trace = (query_trace).fetch('fluorescence')
 
 # Plot the fluorescence trace.
 
