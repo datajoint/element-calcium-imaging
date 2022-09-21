@@ -8,3 +8,4 @@ element-interface @ git+https://github.com/datajoint/element-interface.git
 ipykernel>=6.0.1
 jupytext>=1.13.7
 sbxreader
+suite2p @ git+https://github.com/datajoint-company/suite2p.git

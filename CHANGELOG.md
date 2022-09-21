@@ -3,6 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and 
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.1.3] - 2022-09-20
+
++ Add - Notebook for Allen Institute workshop
+
 ## [0.1.2] - 2022-09-19
 
 + Update - Increment version to test CI/CD
@@ -39,6 +43,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Containerization for pytests
 + Comment - Phase previously designated 0.1.0 -> 0.0.0
 
+[0.1.3]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.3
 [0.1.2]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.2
 [0.1.1]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.1
 [0.1.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.0
