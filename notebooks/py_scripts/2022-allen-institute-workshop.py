@@ -30,6 +30,7 @@
 import datajoint as dj
 import numpy as np
 from matplotlib import pyplot
+import os
 
 # Enter database credentials.  A DataJoint workflow requires a connection to an existing relational database. The connection setup parameters are defined in the `dj.config` python dictionary.
 
@@ -65,20 +66,20 @@ imaging.Fluorescence.Trace()
 
 # Restrict the table with specific criteria.
 
-imaging.Fluorescence.Trace & 'subject=""' \
-                           & 'session_datetime="2020-08-08"' \
+imaging.Fluorescence.Trace & 'subject="subject3"' \
+                           & 'session_datetime="2022-09-01 19:16:44"' \
                            & 'mask_id=120'
 
 # Fetch a fluorescence trace from the database.
 
-trace = (imaging.Fluorescence.Trace & 'subject=""' \
-                                    & 'session_datetime="2020-08-08"' \
+trace = (imaging.Fluorescence.Trace & 'subject="subject3"' \
+                                    & 'session_datetime="2022-09-01 19:16:44"' \
                                     & 'mask_id=120').fetch('fluorescence')
 
 # Plot the fluorescence trace.
 
 # +
-sampling_rate = (scan.ScanInfo & 'subject=""' & 'session_datetime="2020-08-08"').fetch1('fps')
+sampling_rate = (scan.ScanInfo & 'subject="subject3"' & 'session_datetime="2022-09-01 19:16:44"').fetch1('fps')
 
 pyplot.plot(np.r_[:trace.size] * 1/sampling_rate, trace, 'k')
 
@@ -159,6 +160,23 @@ params_suite2p = {'look_one_level_down': 0.0,
                   'neucoeff': 0.7,
                   'xrange': np.array([0, 0]),
                   'yrange': np.array([0, 0])}
+
+imaging.ProcessingParamSet.insert_new_params(processing_method='suite2p', 
+                                             paramset_idx=1, 
+                                             params=params_suite2p,
+                                             paramset_desc='diameter=10')
+
+imaging.ProcessingParamSet()
+
+# +
+os.makedirs('subject3/210107_run00_orientation_8dir/suite2p_1', exist_ok=True)
+
+imaging.ProcessingTask.insert1(dict(subject='subject3', 
+                                    session_datetime='2022-09-01 19:16:44', 
+                                    scan_id=0,
+                                    paramset_idx=1,
+                                    processing_output_dir='subject3/210107_run00_orientation_8dir/suite2p_1'))
+# -
 
 imaging.ProcessingTask()
 
