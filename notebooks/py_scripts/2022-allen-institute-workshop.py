@@ -36,7 +36,7 @@ import getpass
 # Enter database credentials.  A DataJoint workflow requires a connection to an existing relational database. The connection setup parameters are defined in the `dj.config` python dictionary.
 
 # + tags=[]
-username_as_prefix = dj.config["database.user"] + "_"
+username_as_prefix = dj.config["database.user"] + "_img_"
 dj.config['custom'] = {
     'database.prefix': username_as_prefix,
     'imaging_root_data_dir': '/home/inbox/0_1_0a2/'
