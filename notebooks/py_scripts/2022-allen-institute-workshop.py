@@ -237,7 +237,7 @@ params_suite2p = {'look_one_level_down': 0.0,
                   'h5py_key': 'data',
                   'save_path0': [],
                   'subfolders': [],
-                  'nplanes': 1,
+                  'nplanes': 4,
                   'nchannels': 1,
                   'functional_chan': 1,
                   'tau': 1.0,
@@ -317,9 +317,7 @@ imaging.ProcessingTask.insert1(
 
 imaging.ProcessingTask()
 
-# If you have write access to the data, you can then run Suite2p for the new parameter set and save the results to the respective tables.
-#
-# **Note:** CodeBook does not yet support write access for shared datasets. To see Suite2p triggering in action, contact Support@DataJoint.com to find out how to upload your own data.
+# You can then run Suite2p for the new parameter set and save the results to the respective tables. For this dataset (4 channels, 4 depths, 7.5k frames), this may take several hours.
 
 # +
 populate_settings = dict(display_progress=True)
