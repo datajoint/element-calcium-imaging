@@ -39,7 +39,7 @@ import getpass
 username_as_prefix = dj.config["database.user"] + "_img_"
 dj.config['custom'] = {
     'database.prefix': username_as_prefix,
-    'imaging_root_data_dir': '/home/inbox/0_1_0a2/'
+    'imaging_root_data_dir': '/home/'
 }
 # -
 
@@ -53,14 +53,23 @@ dj.config.save_global()
 
 # ## Populating the database
 
-# Next, we'll populate these schema using steps from [04-automate](04-automate-optional.ipynb). If your schema are already populated, you can skip this step. For more details on each of these steps, please visit [that notebook](04-automate-optional.ipynb).
+# Next, we'll populate these schema using some steps from [04-automate](04-automate-optional.ipynb). If your schema are already populated, you can skip this step. For more details on each of these steps, please visit [that notebook](04-automate-optional.ipynb). Additional steps ensure write permissions on output directories.
 
 # +
+
 from workflow_calcium_imaging.pipeline import session, imaging # import schemas
 from workflow_calcium_imaging.ingest import ingest_subjects, ingest_sessions #csv loaders
 
+import csv
+
+sessions_csv_path = f"/home/{dj.config['database.user']}/sessions.csv"
+with open(sessions_csv_path, 'w', newline='') as f:
+    csv_writer = csv.writer(f)
+    csv_writer.writerow(["subject","session_dir"])
+    csv_writer.writerow(["subject3","inbox/0_1_0a2/subject3/210107_run00_orientation_8dir/"])
+
 ingest_subjects(subject_csv_path="/home/user_data/subjects.csv")
-ingest_sessions(session_csv_path="/home/user_data/sessions.csv")
+ingest_sessions(session_csv_path=sessions_csv_path)
 
 params_suite2p = {'look_one_level_down': 0.0,
                   'fast_disk': [],
@@ -138,10 +147,15 @@ from workflow_calcium_imaging import process
 
 process.run()
 session_key = (session.Session & 'subject="subject3"').fetch('KEY')[0]
-imaging.ProcessingTask.insert1(dict(session_key, 
-                                    scan_id=0,
-                                    paramset_idx=0,
-                                    processing_output_dir='subject3/210107_run00_orientation_8dir/suite2p'), skip_duplicates=True)
+imaging.ProcessingTask.insert1(
+    dict(
+        session_key, 
+        scan_id=0,
+        paramset_idx=0,
+        processing_output_dir='inbox/0_1_0a2/subject3/210107_run00_orientation_8dir/suite2p'
+    ),
+    skip_duplicates=True
+)
 process.run()
 # -
 
@@ -190,7 +204,7 @@ query_trace
 
 # Fetch a fluorescence trace from the database.
 
-trace = (query_trace).fetch('fluorescence')
+trace = (query_trace).fetch('fluorescence')[0]
 
 # Plot the fluorescence trace.
 
@@ -285,13 +299,20 @@ imaging.ProcessingParamSet.insert_new_params(processing_method='suite2p',
 imaging.ProcessingParamSet()
 
 # +
-os.makedirs('/home/inbox/0_1_0a2/subject3/210107_run00_orientation_8dir/suite2p_1', exist_ok=True)
+output_dir = f"{dj.config['database.user']}"
+print(output_dir)
+os.makedirs(output_dir, exist_ok=True)
 
-imaging.ProcessingTask.insert1(dict(subject='subject3', 
-                                    session_datetime='2022-09-01 19:16:44', 
-                                    scan_id=0,
-                                    paramset_idx=1,
-                                    processing_output_dir='subject3/210107_run00_orientation_8dir/suite2p_1'))
+imaging.ProcessingTask.insert1(
+    dict(
+        subject='subject3', 
+        session_datetime='2022-09-01 19:16:44', 
+        scan_id=0,
+        paramset_idx=1,
+        processing_output_dir=output_dir,
+        task_mode='trigger'
+    )
+)
 # -
 
 imaging.ProcessingTask()
