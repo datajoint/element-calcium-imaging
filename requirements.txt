@@ -7,5 +7,6 @@ element-event @ git+https://github.com/datajoint/element-event.git
 element-interface @ git+https://github.com/datajoint/element-interface.git
 ipykernel>=6.0.1
 jupytext>=1.13.7
-sbxreader
+sbxreader @ git+https://github.com/CBroz1/sbxreader
+nd2
 suite2p @ git+https://github.com/datajoint-company/suite2p.git
