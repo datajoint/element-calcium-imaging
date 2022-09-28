@@ -2,6 +2,13 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+
+## [0.2.2] - 2022-09-28
+
++ Update - Minor table explanation edits
++ Update - Query simplifications
++ Update - Minor code refactoring
+
 ## [0.2.1] - 2022-09-12
 
 + Bugfix - fix errors in auto generating new ProcessingTask
@@ -36,6 +43,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.2.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.2
+[0.2.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.1
 [0.2.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.0
 [0.1.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0
 [0.1.0b0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.1.0b0

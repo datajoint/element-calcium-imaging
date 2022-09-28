@@ -68,7 +68,9 @@ def activate(
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    definition = """  #  Method, package, analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
+    definition = """
+    # Method, package, analysis suite used for processing of calcium imaging 
+    # data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
     ---
     processing_method_desc: varchar(1000)
@@ -168,8 +170,9 @@ class ProcessingTask(dj.Manual):
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
-        method = (ProcessingParamSet & key).fetch1(
-            'processing_method').replace(".", "-")
+        method = (
+            (ProcessingParamSet & key).fetch1("processing_method").replace(".", "-")
+        )
 
         processed_dir = pathlib.Path(get_processed_root_data_dir())
         output_dir = (
@@ -188,7 +191,7 @@ class ProcessingTask(dj.Manual):
         """
         Method to auto-generate ProcessingTask entries for a particular Scan using the specified parameter set.
         """
-        key = {**scan_key, 'paramset_idx': paramset_idx}
+        key = {**scan_key, "paramset_idx": paramset_idx}
 
         output_dir = cls.infer_output_dir(key, relative=False, mkdir=True)
 
@@ -199,9 +202,11 @@ class ProcessingTask(dj.Manual):
         try:
             if method == "suite2p":
                 from element_interface import suite2p_loader
+
                 suite2p_loader.Suite2p(output_dir)
             elif method == "caiman":
                 from element_interface import caiman_loader
+
                 caiman_loader.CaImAn(output_dir)
             else:
                 raise NotImplementedError(
@@ -267,14 +272,11 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (
-                ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
-            ).fetch1("processing_method")
+            method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+                "processing_method"
+            )
 
-            image_files = (
-                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile
-                & key
-            ).fetch("file_path")
+            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
                 find_full_path(get_imaging_root_data_dir(), image_file)
                 for image_file in image_files
@@ -287,9 +289,7 @@ class Processing(dj.Computed):
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"] = (
-                    scan.ScanInfo & key
-                ).fetch1("fps")
+                suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -308,19 +308,19 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
-                sampling_rate, ndepths = (
-                    scan.ScanInfo & key
-                ).fetch1("fps", "ndepths")
+                caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
+                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not capable of analyzing 3D scans at the moment."
+                        "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
-                    parameters=params,
+                    parameters=caiman_params,
                     sampling_rate=sampling_rate,
                     output_dir=output_dir,
                     is3D=is3D,
@@ -338,7 +338,7 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    definition = """  #  Different rounds of curation performed on the processing results of the imaging data (no-curation can also be included here)
+    definition = """  #  Curation(s) performed on processing results (including none)
     -> Processing
     curation_id: int
     ---
@@ -355,7 +355,7 @@ class Curation(dj.Manual):
         if key not in Processing():
             raise ValueError(
                 f"No corresponding entry in Processing available for: {key};"
-                f" do `Processing.populate(key)`"
+                f"Please run `Processing.populate(key)`"
             )
 
         output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
@@ -1023,17 +1023,18 @@ class ActivityExtractionMethod(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
+    definition = """
+    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
     -> Fluorescence
     -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
-        definition = """  #
+        definition = """
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob  # 
+        activity_trace: longblob
         """
 
     @property
@@ -1062,14 +1063,17 @@ class Activity(dj.Computed):
                 suite2p_dataset = imaging_dataset
                 # ---- iterate through all s2p plane outputs ----
                 spikes = [
-                    dict(key,
-                         mask=mask_idx,
-                         fluo_channel=0,
-                         activity_trace=spks,
-                      )
-                      for mask_idx, spks in enumerate( 
-                          s for plane in suite2p_dataset.planes.values()  
-                                for s in plane.spks)
+                    dict(
+                        key,
+                        mask=mask_idx,
+                        fluo_channel=0,
+                        activity_trace=spks,
+                    )
+                    for mask_idx, spks in enumerate(
+                        s
+                        for plane in suite2p_dataset.planes.values()
+                        for s in plane.spks
+                    )
                 ]
 
                 self.insert1(key)
@@ -1085,18 +1089,16 @@ class Activity(dj.Computed):
                 segmentation_channel = params.get(
                     "segmentation_channel", caiman_dataset.segmentation_channel
                 )
-                
+
                 self.insert1(key)
-                self.Trace.insert(     
-                        dict(
-                            key,
-                            mask=mask["mask_id"],
-                            fluo_channel=segmentation_channel,
-                            activity_trace=mask[
-                                attr_mapper[key["extraction_method"]]
-                            ],
-                        )
-                        for mask in caiman_dataset.masks
+                self.Trace.insert(
+                    dict(
+                        key,
+                        mask=mask["mask_id"],
+                        fluo_channel=segmentation_channel,
+                        activity_trace=mask[attr_mapper[key["extraction_method"]]],
+                    )
+                    for mask in caiman_dataset.masks
                 )
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
