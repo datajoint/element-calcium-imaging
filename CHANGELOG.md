@@ -5,9 +5,9 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 ## [0.2.2] - 2022-09-28
 
-+ Minor table explanation edits
-+ Query simplifications
-+ Minor code refactoring
++ Update - Minor table explanation edits
++ Update - Query simplifications
++ Update - Minor code refactoring
 
 ## [0.2.1] - 2022-09-12
 
