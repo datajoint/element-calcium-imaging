@@ -125,15 +125,23 @@ def get_nd2_files(scan_key: dict) -> list:
     return _linking_module.get_nd2_files(scan_key)
 
 
+def get_prairieview_files(scan_key: dict) -> list:
+    """
+    Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan
+    :param scan_key: key of a Scan
+    :return: list of Bruker PrairieView files' full file-paths
+    """
+
+
 # ----------------------------- Table declarations ----------------------
 
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS
+    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS, PrairieView
     acq_software: varchar(24)    
     """
-    contents = zip(["ScanImage", "Scanbox", "NIS"])
+    contents = zip(["ScanImage", "Scanbox", "NIS", "PrairieView"])
 
 
 @schema
@@ -180,6 +188,7 @@ class ScanInfo(dj.Imported):
     z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
     bidirectional        : boolean   # true = bidirectional scanning
+    bidirectional_z=null : booleaen  # true = bidirectional z-stack for PrairieView
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
     scan_datetime=null   : datetime  # datetime of the scan
@@ -432,6 +441,47 @@ class ScanInfo(dj.Imported):
                         for plane_idx in range(nd2_file.sizes.get("Z", 1))
                     ]
                 )
+        elif acq_software == "PrairieView":
+            import prairieviewreader
+            
+            # Read the scan
+            scan_filepaths = get_prairieview_files(key)
+            scan = prairieview.get_pv_metadata(scan_filepaths)
+
+            # Insert in ScanInfo
+            self.insert1(
+                dict(
+                    key,
+                    nfields = scan["num_fields"],
+                    nchannels = scan["num_nchannels"],
+                    ndepths = scan["num_planes"],
+                    nframes = scan["num_frames"],
+                    rois = scan["num_rois"],
+                    x = scan["x_pos"],
+                    y = scan["y_pos"],
+                    z = scan["z_pos"],
+                    fps = scan["frame_rate"],
+                    usecs_per_line = scan["usecs_per_line"],
+                    scan_datetime = scan["scan_datetime"],
+                    scan_duration = scan["scan_duration"],
+                )
+            
+            )
+
+            # Insert in Field 
+            self.Field.insert(
+                [
+                    dict(
+                        key,
+                        field_idx = plane_idx,
+                        px_height = scan["height_in_pixels"],
+                        px_width = scan["width_in_pixels"],
+                        um_height = scan["height_in_um"],
+                        um_width = scan["width_in_um"],
+                    )
+                    for plane_idx in range(scan["num_planes"])
+                ]
+            )
         else:
             raise NotImplementedError(
                 f"Loading routine not implemented for {acq_software} "
