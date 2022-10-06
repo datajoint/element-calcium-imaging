@@ -82,8 +82,11 @@ class ActivityAlignment(dj.Computed):
             _linking_module.scan.ScanInfo * _linking_module.session.Session & key
         ).fetch1("session_datetime", "scan_datetime", "nframes", "fps")
 
-        trialized_event_times = _linking_module.trial.get_trialized_alignment_event_times(
-            key, _linking_module.trial.Trial & (ActivityAlignmentCondition.Trial & key)
+        trialized_event_times = (
+            _linking_module.trial.get_trialized_alignment_event_times(
+                key,
+                _linking_module.trial.Trial & (ActivityAlignmentCondition.Trial & key),
+            )
         )
 
         min_limit = (trialized_event_times.event - trialized_event_times.start).max()
@@ -92,9 +95,9 @@ class ActivityAlignment(dj.Computed):
         aligned_timestamps = np.arange(-min_limit, max_limit, 1 / frame_rate)
         nsamples = len(aligned_timestamps)
 
-        trace_keys, activity_traces = (_linking_module.imaging.Activity.Trace & key).fetch(
-            "KEY", "activity_trace", order_by="mask"
-        )
+        trace_keys, activity_traces = (
+            _linking_module.imaging.Activity.Trace & key
+        ).fetch("KEY", "activity_trace", order_by="mask")
         activity_traces = np.vstack(activity_traces)
 
         aligned_trial_activities = []
@@ -103,7 +106,7 @@ class ActivityAlignment(dj.Computed):
                 continue
             alignment_start_idx = int((r.event - min_limit) * frame_rate)
             roi_aligned_activities = activity_traces[
-                :, alignment_start_idx: (alignment_start_idx + nsamples)
+                :, alignment_start_idx : (alignment_start_idx + nsamples)
             ]
             if roi_aligned_activities.shape[-1] != nsamples:
                 shape_diff = nsamples - roi_aligned_activities.shape[-1]
