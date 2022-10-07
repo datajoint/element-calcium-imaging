@@ -188,7 +188,7 @@ class ScanInfo(dj.Imported):
     z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
     bidirectional        : boolean   # true = bidirectional scanning
-    bidirectional_z=null : boolean  # true = bidirectional z-stack for PrairieView
+    bidirectional_z=null : boolean   # true = bidirectional in z-direction
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
     scan_datetime=null   : datetime  # datetime of the scan
