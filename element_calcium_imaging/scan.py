@@ -131,7 +131,7 @@ def get_prairieview_files(scan_key: dict) -> list:
     :param scan_key: key of a Scan
     :return: list of Bruker PrairieView files' full file-paths
     """
-
+    return _linking_module.get_prairieview_files(scan_key)
 
 # ----------------------------- Table declarations ----------------------
 
@@ -442,11 +442,11 @@ class ScanInfo(dj.Imported):
                     ]
                 )
         elif acq_software == "PrairieView":
-            import prairieviewreader
+            from element_interface import prairieviewreader
             
             # Read the scan
             scan_filepaths = get_prairieview_files(key)
-            scan = prairieview.get_pv_metadata(scan_filepaths)
+            scan = prairieviewreader.get_pv_metadata(scan_filepaths[0])
 
             # Insert in ScanInfo
             self.insert1(
