@@ -17,6 +17,7 @@ from . import (
     processing_tasks,
     processing,
     curations,
+    verbose_context,
 )
 
 
@@ -126,7 +127,8 @@ def test_motion_correction_populate_suite2p_2D(curations, pipeline, testdata_pat
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
 
-    imaging.MotionCorrection.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"
@@ -154,7 +156,8 @@ def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_pat
     curation_key = (
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
-    imaging.MotionCorrection.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"
@@ -172,7 +175,8 @@ def test_motion_correction_populate_suite2p_3D(curations, pipeline, testdata_pat
     curation_key = (
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
-    imaging.MotionCorrection.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"
@@ -227,10 +231,11 @@ def test_segmentation_populate_suite2p_2D(curations, pipeline, testdata_paths):
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
 
-    imaging.MotionCorrection.populate(curation_key)
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
+        imaging.Segmentation.populate(curation_key)
+        imaging.Fluorescence.populate(curation_key)
+        imaging.Activity.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"
@@ -275,10 +280,11 @@ def test_segmentation_populate_suite2p_3D(curations, pipeline, testdata_paths):
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
 
-    imaging.MotionCorrection.populate(curation_key)
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
+        imaging.Segmentation.populate(curation_key)
+        imaging.Fluorescence.populate(curation_key)
+        imaging.Activity.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"
@@ -318,10 +324,11 @@ def test_segmentation_populate_suite2p_3D(curations, pipeline, testdata_paths):
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
 
-    imaging.MotionCorrection.populate(curation_key)
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
+        imaging.Segmentation.populate(curation_key)
+        imaging.Fluorescence.populate(curation_key)
+        imaging.Activity.populate(curation_key)
 
     assert len(imaging.Segmentation.Mask & curation_key) == 6636
 
@@ -362,10 +369,11 @@ def test_segmentation_populate_caiman_2D(curations, pipeline, testdata_paths):
         imaging.Curation & f'curation_output_dir LIKE "%{rel_path}"'
     ).fetch1("KEY")
 
-    imaging.MotionCorrection.populate(curation_key)
-    imaging.Segmentation.populate(curation_key)
-    imaging.Fluorescence.populate(curation_key)
-    imaging.Activity.populate(curation_key)
+    with verbose_context:
+        imaging.MotionCorrection.populate(curation_key)
+        imaging.Segmentation.populate(curation_key)
+        imaging.Fluorescence.populate(curation_key)
+        imaging.Activity.populate(curation_key)
 
     assert (imaging.Curation * imaging.ProcessingParamSet & curation_key).fetch1(
         "processing_method"

@@ -2,7 +2,11 @@ import csv
 import pathlib
 from pathlib import Path
 from datetime import datetime
-from element_interface.utils import find_full_path, ingest_csv_to_table
+from element_interface.utils import (
+    find_full_path,
+    find_root_directory,
+    ingest_csv_to_table,
+)
 from workflow_calcium_imaging.pipeline import (
     subject,
     scan,
@@ -29,7 +33,7 @@ def ingest_subjects(
 def ingest_sessions(
     session_csv_path="./user_data/sessions.csv", skip_duplicates=True, verbose=True
 ):
-    root_data_dir = get_imaging_root_data_dir()
+    root_data_dirs = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
     with open(session_csv_path, newline="") as f:
@@ -39,7 +43,8 @@ def ingest_sessions(
     session_list, session_dir_list, scan_list, scanner_list = [], [], [], []
 
     for sess in input_sessions:
-        sess_dir = find_full_path(root_data_dir, Path(sess["session_dir"]))
+        sess_dir = find_full_path(root_data_dirs, Path(sess["session_dir"]))
+        root_data_dir = find_root_directory(root_data_dirs, sess_dir)
 
         # search for either ScanImage or Scanbox files (in that order)
         for scan_pattern, scan_type, glob_func in zip(
