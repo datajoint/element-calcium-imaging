@@ -445,24 +445,24 @@ class ScanInfo(dj.Imported):
             from element_interface import prairieviewreader
             
 
-            scan_filepaths = get_prairieview_files(key)
-            scan = prairieviewreader.get_pv_metadata(scan_filepaths[0])
+            pvscan_filepaths = get_prairieview_files(key)
+            pvscan_info = prairieviewreader.get_pv_metadata(pvscan_filepaths[0])
 
             self.insert1(
                 dict(
                     key,
-                    nfields = scan["num_fields"],
-                    nchannels = scan["num_nchannels"],
-                    ndepths = scan["num_planes"],
-                    nframes = scan["num_frames"],
-                    rois = scan["num_rois"],
-                    x = scan["x_pos"],
-                    y = scan["y_pos"],
-                    z = scan["z_pos"],
-                    fps = scan["frame_rate"],
-                    usecs_per_line = scan["usecs_per_line"],
-                    scan_datetime = scan["scan_datetime"],
-                    scan_duration = scan["scan_duration"],
+                    nfields = pvscan_info["num_fields"],
+                    nchannels = pvscan_info["num_nchannels"],
+                    ndepths = pvscan_info["num_planes"],
+                    nframes = pvscan_info["num_frames"],
+                    rois = pvscan_info["num_rois"],
+                    x = pvscan_info["x_pos"],
+                    y = pvscan_info["y_pos"],
+                    z = pvscan_info["z_pos"],
+                    fps = pvscan_info["frame_rate"],
+                    usecs_per_line = pvscan_info["usecs_per_line"],
+                    scan_datetime = pvscan_info["scan_datetime"],
+                    scan_duration = pvscan_info["scan_duration"],
                 )
             
             )
@@ -472,12 +472,12 @@ class ScanInfo(dj.Imported):
                 dict(
                     key,
                     field_idx = plane_idx,
-                    px_height = scan["height_in_pixels"],
-                    px_width = scan["width_in_pixels"],
-                    um_height = scan["height_in_um"],
-                    um_width = scan["width_in_um"],
+                    px_height = pvscan_info["height_in_pixels"],
+                    px_width = pvscan_info["width_in_pixels"],
+                    um_height = pvscan_info["height_in_um"],
+                    um_width = pvscan_info["width_in_um"],
                     )
-                    for plane_idx in range(scan["num_planes"])
+                    for plane_idx in range(pvscan_info["num_planes"])
             )
         else:
             raise NotImplementedError(
