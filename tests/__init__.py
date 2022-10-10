@@ -27,7 +27,7 @@ sessions_dirs = [
 
 is_multi_scan_processing = False
 
-verbose = True
+verbose = False
 
 logger = dj.logger
 
@@ -99,10 +99,8 @@ def pipeline():
 @pytest.fixture(autouse=True)
 def test_data(dj_config, pipeline):
     root_dirs = pipeline["get_imaging_root_data_dir"]
-    # try:
-    _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
     try:
-        pass
+        _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
     except FileNotFoundError:
         test_data_dir = "/main/test_data/"
         try:
@@ -843,7 +841,8 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch(
         "KEY"
     )[0]
-    root_subj1 = find_root_directory(get_imaging_root_data_dir(), sessions_dirs[1])
+    subj1_fullpath = find_full_path(get_imaging_root_data_dir(), sessions_dirs[1])
+    subj1_root = find_root_directory(get_imaging_root_data_dir(), subj1_fullpath)
 
     newkey = key.copy()
     newkey["session_datetime"] = newkey["session_datetime"].strftime("%Y%m%dT%H%M%S")
@@ -852,7 +851,7 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
         {**key, "processing_output_dir": output_dir, "task_mode": "trigger"}
     )
     try:
-        os.makedirs(root_subj1 / output_dir)
+        os.makedirs(subj1_root / output_dir)
     except OSError as error:
         print(error)
 
