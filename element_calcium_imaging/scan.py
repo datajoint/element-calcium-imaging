@@ -133,6 +133,7 @@ def get_prairieview_files(scan_key: dict) -> list:
     """
     return _linking_module.get_prairieview_files(scan_key)
 
+
 # ----------------------------- Table declarations ----------------------
 
 
@@ -443,41 +444,40 @@ class ScanInfo(dj.Imported):
                 )
         elif acq_software == "PrairieView":
             from element_interface import prairieviewreader
-            
 
             pvscan_filepaths = get_prairieview_files(key)
             pvscan_info = prairieviewreader.get_pv_metadata(pvscan_filepaths[0])
-
             self.insert1(
                 dict(
                     key,
-                    nfields = pvscan_info["num_fields"],
-                    nchannels = pvscan_info["num_nchannels"],
-                    ndepths = pvscan_info["num_planes"],
-                    nframes = pvscan_info["num_frames"],
-                    rois = pvscan_info["num_rois"],
-                    x = pvscan_info["x_pos"],
-                    y = pvscan_info["y_pos"],
-                    z = pvscan_info["z_pos"],
-                    fps = pvscan_info["frame_rate"],
-                    usecs_per_line = pvscan_info["usecs_per_line"],
-                    scan_datetime = pvscan_info["scan_datetime"],
-                    scan_duration = pvscan_info["scan_duration"],
+                    nfields=pvscan_info["num_fields"],
+                    nchannels=pvscan_info["num_nchannels"],
+                    ndepths=pvscan_info["num_planes"],
+                    nframes=pvscan_info["num_frames"],
+                    rois=pvscan_info["num_rois"],
+                    x=pvscan_info["x_pos"],
+                    y=pvscan_info["y_pos"],
+                    z=pvscan_info["z_pos"],
+                    fps=pvscan_info["frame_rate"],
+                    usecs_per_line=pvscan_info["usecs_per_line"],
+                    scan_datetime=pvscan_info["scan_datetime"],
+                    scan_duration=pvscan_info["scan_duration"],
                 )
-            
             )
 
-            
             self.Field.insert(
                 dict(
                     key,
-                    field_idx = plane_idx,
-                    px_height = pvscan_info["height_in_pixels"],
-                    px_width = pvscan_info["width_in_pixels"],
-                    um_height = pvscan_info["height_in_um"],
-                    um_width = pvscan_info["width_in_um"],
-                    )
-                    for plane_idx in range(pvscan_info["num_planes"])
+                    field_idx=plane_idx,
+                    px_height=pvscan_info["height_in_pixels"],
+                    px_width=pvscan_info["width_in_pixels"],
+                    um_height=pvscan_info["height_in_um"],
+                    um_width=pvscan_info["width_in_um"],
+                    field_x=pvscan_info["fieldX"],
+                    field_y=pvscan_info["fieldY"],
+                    field_z=pvscan_info["fieldZ"][plane_idx],
+                )
+                for plane_idx in range(pvscan_info["num_planes"])
             )
         else:
             raise NotImplementedError(
