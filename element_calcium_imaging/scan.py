@@ -444,7 +444,7 @@ class ScanInfo(dj.Imported):
         elif acq_software == "PrairieView":
             from element_interface import prairieviewreader
             
-            # Read the scan
+
             scan_filepaths = get_prairieview_files(key)
             scan = prairieviewreader.get_pv_metadata(scan_filepaths[0])
 
@@ -467,7 +467,7 @@ class ScanInfo(dj.Imported):
             
             )
 
-            # Insert in Field 
+            
             self.Field.insert(
                 dict(
                     key,
