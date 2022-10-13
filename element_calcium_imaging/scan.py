@@ -189,11 +189,11 @@ class ScanInfo(dj.Imported):
     z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
     bidirectional        : boolean   # true = bidirectional scanning
-    bidirectional_z=null : boolean   # true = bidirectional in z-direction
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
     scan_datetime=null   : datetime  # datetime of the scan
     scan_duration=null   : float     # (seconds) duration of the scan
+    bidirectional_z=null : boolean   # true = bidirectional z-scan
     """
 
     class Field(dj.Part):
@@ -293,8 +293,10 @@ class ScanInfo(dj.Imported):
                             field_idx=plane_idx,
                             px_height=scan.image_height,
                             px_width=scan.image_width,
-                            um_height=getattr(scan, "image_height_in_microns", None),
-                            um_width=getattr(scan, "image_width_in_microns", None),
+                            um_height=getattr(
+                                scan, "image_height_in_microns", None),
+                            um_width=getattr(
+                                scan, "image_width_in_microns", None),
                             field_x=x_zero if x_zero else None,
                             field_y=y_zero if y_zero else None,
                             field_z=z_zero + scan.scanning_depths[plane_idx]
@@ -338,7 +340,8 @@ class ScanInfo(dj.Imported):
                     fps=sbx_meta["frame_rate"],
                     bidirectional=sbx_meta == "bidirectional",
                     nrois=sbx_meta["num_rois"] if is_multiROI else 0,
-                    scan_duration=(sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
+                    scan_duration=(
+                        sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
                 )
             )
             # Insert Field(s)
@@ -374,7 +377,8 @@ class ScanInfo(dj.Imported):
 
             # Frame per second
             try:
-                fps = 1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
+                fps = 1000 / \
+                    nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
             except:
                 fps = 1000 / nd2_file.experiment[0].parameters.periodDiff.avg
 
@@ -445,20 +449,23 @@ class ScanInfo(dj.Imported):
         elif acq_software == "PrairieView":
             from element_interface import prairieviewreader
 
-            pvscan_filepaths = get_prairieview_files(key)
-            pvscan_info = prairieviewreader.get_pv_metadata(pvscan_filepaths[0])
+            scan_filepaths = get_prairieview_files(key)
+            pvscan_info = prairieviewreader.get_pv_metadata(
+                scan_filepaths[0])
             self.insert1(
                 dict(
                     key,
                     nfields=pvscan_info["num_fields"],
-                    nchannels=pvscan_info["num_nchannels"],
+                    nchannels=pvscan_info["num_channels"],
                     ndepths=pvscan_info["num_planes"],
                     nframes=pvscan_info["num_frames"],
-                    rois=pvscan_info["num_rois"],
+                    nrois=pvscan_info["num_rois"],
                     x=pvscan_info["x_pos"],
                     y=pvscan_info["y_pos"],
                     z=pvscan_info["z_pos"],
                     fps=pvscan_info["frame_rate"],
+                    bidirectional=pvscan_info["bidirectional"],
+                    bidirectional_z=pvscan_info["bidirectional_z"],
                     usecs_per_line=pvscan_info["usecs_per_line"],
                     scan_datetime=pvscan_info["scan_datetime"],
                     scan_duration=pvscan_info["scan_duration"],
@@ -486,7 +493,8 @@ class ScanInfo(dj.Imported):
             )
 
         # Insert file(s)
-        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
+        root_dir = find_root_directory(
+            get_imaging_root_data_dir(), scan_filepaths[0])
 
         scan_files = [
             pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
