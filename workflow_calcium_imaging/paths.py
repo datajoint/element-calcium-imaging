@@ -74,7 +74,7 @@ def get_prairieview_files(scan_key):
                            scan_key).fetch1("session_dir")
 
     if not sess_dir.exists():
-        raise FileNotFoundError(f"Session direction not found ({sess_dir})")
+        raise FileNotFoundError(f"Session directory not found ({sess_dir})")
 
     pv_filepaths = [fp.as_posix() for fp in sess_dir.glob("*.tif")]
     if pv_filepaths:
