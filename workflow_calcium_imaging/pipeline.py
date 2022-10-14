@@ -11,6 +11,7 @@ from .paths import (
     get_scan_image_files,
     get_scan_box_files,
     get_nd2_files,
+    get_prairieview_files,
 )
 from . import analysis
 
@@ -40,6 +41,7 @@ __all__ = [
     "get_scan_image_files",
     "get_scan_box_files",
     "get_nd2_files",
+    "get_prairieview_files",
 ]
 
 
@@ -56,7 +58,8 @@ session.activate(db_prefix + "session", linking_module=__name__)
 
 # Activate "event" and "trial" schema ---------------------------------
 
-trial.activate(db_prefix + "trial", db_prefix + "event", linking_module=__name__)
+trial.activate(db_prefix + "trial", db_prefix +
+               "event", linking_module=__name__)
 
 
 # ------------- Declare table Equipment for use in element_calcium_imaging -------------
@@ -71,7 +74,8 @@ class Equipment(dj.Manual):
 
 # ------------- Activate "imaging" schema -------------
 
-imaging.activate(db_prefix + "imaging", db_prefix + "scan", linking_module=__name__)
+imaging.activate(db_prefix + "imaging", db_prefix +
+                 "scan", linking_module=__name__)
 
 # ------------- Activate "analysis" schema ------------
 
