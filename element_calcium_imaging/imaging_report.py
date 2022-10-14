@@ -52,6 +52,81 @@ def make_maskid_image(img, roi_ids, mask_xpix, mask_ypix):
     return maskid_image
 
 
+def get_tracelayout(key, width=600, height=600):
+    text = f"Trace for Cell {key['mask']}" if isinstance(key, dict) else "Trace"
+
+    return dict(
+        margin=dict(l=0, r=0, b=0, t=65, pad=0),
+        width=width,
+        height=height,  # 700,
+        transition={"duration": 0},
+        title={
+            "text": text,
+            "xanchor": "center",
+            "yanchor": "top",
+            "y": 0.97,
+            "x": 0.5,
+        },
+        xaxis={
+            "title": "Time (sec)",
+            "visible": True,
+            "showticklabels": True,
+            "showgrid": True,
+        },
+        yaxis={
+            "title": "Fluorescence (a.u.)",
+            "visible": True,
+            "showticklabels": True,
+            "showgrid": True,
+            "anchor": "free",
+            "overlaying": "y",
+            "side": "left",
+            "position": 0,
+        },
+        yaxis2={
+            "title": "Calcium Event (a.u.)",
+            "visible": True,
+            "showticklabels": True,
+            "showgrid": True,
+            "anchor": "free",
+            "overlaying": "y",
+            "side": "right",
+            "position": 1,
+            "titlefont": dict(color="#d62728"),
+            "tickfont": dict(color="#d62728"),
+        },
+        shapes=[
+            go.layout.Shape(
+                type="rect",
+                xref="paper",
+                yref="paper",
+                x0=0,
+                y0=0,
+                x1=1.0,
+                y1=1.0,
+                line={"width": 1, "color": "black"},
+            )
+        ],
+        legend={
+            "traceorder": "normal",
+            "yanchor": "top",
+            "y": 0.99,
+            "xanchor": "right",
+            "x": 0.99,
+        },
+        plot_bgcolor="rgba(0,0,0,0.05)",
+        modebar_remove=[
+            "zoom",
+            "resetScale",
+            "pan",
+            "select",
+            "zoomIn",
+            "zoomOut",
+            "autoScale2d",
+        ],
+    )
+
+
 @schema
 class ScanLevelReport(dj.Computed):
     definition = """
@@ -111,54 +186,37 @@ class ScanLevelReport(dj.Computed):
 @schema
 class ActivityReport(dj.Computed):
     definition = """
-    -> imaging.Activity.Trace
+    -> imaging.Segmentation.Mask
     ---
     activity_trace: longblob
     """
 
     def make(self, key):
-        activity_trace = (imaging.Activity.Trace & key).fetch1("activity_trace")
-
-        fps = (scan.ScanInfo & key).fetch1("fps")
+        activity_trace = (
+            imaging.Activity.Trace & "extraction_method LIKE '%deconvolution'" & key
+        ).fetch1("activity_trace")
+        fluorescence, fps = (scan.ScanInfo * imaging.Fluorescence.Trace & key).fetch1(
+            "fluorescence", "fps"
+        )
 
         trace_fig = go.Figure(
-            go.Scatter(x=np.arange(len(activity_trace)) / fps, y=activity_trace)
+            [
+                go.Scatter(
+                    x=np.arange(len(fluorescence)) / fps,
+                    y=fluorescence,
+                    name="Fluorescence",
+                    yaxis="y1",
+                ),
+                go.Scatter(
+                    x=np.arange(len(activity_trace)) / fps,
+                    y=activity_trace,
+                    name="Calcium Event",
+                    yaxis="y2",
+                ),
+            ]
         )
 
-        trace_fig.update_layout(
-            title={
-                "text": f"Trace for Cell {key['mask']}",
-                "xanchor": "center",
-                "yanchor": "top",
-                "y": 0.97,
-                "x": 0.5,
-            },
-            xaxis={
-                "title": "Time (sec)",
-                "visible": True,
-                "showticklabels": True,
-                "showgrid": True,
-            },
-            yaxis={
-                "title": "Z-Score",
-                "visible": True,
-                "showticklabels": True,
-                "showgrid": True,
-            },
-            shapes=[
-                go.layout.Shape(
-                    type="rect",
-                    xref="paper",
-                    yref="paper",
-                    x0=0,
-                    y0=0,
-                    x1=1.0,
-                    y1=1.0,
-                    line={"width": 1, "color": "black"},
-                )
-            ],
-            plot_bgcolor="rgba(0,0,0,0.05)",
-        )
+        trace_fig.update_layout(get_tracelayout(key))
 
         self.insert1({**key, "activity_trace": trace_fig.to_json()})
 
@@ -185,11 +243,11 @@ def main(usedb=False):
         layout=wg.Layout(width="120px", grid_area="load_button"),
     )
 
-    FIG1_WIDTH = 700
+    FIG1_WIDTH = 600
     FIG1_LAYOUT = go.Layout(
         margin=dict(l=0, r=40, b=0, t=65, pad=0),
         width=FIG1_WIDTH,
-        height=700,
+        height=600,  # 700,
         transition={"duration": 0},
         title={
             "text": "Average Image with Cells",
@@ -221,6 +279,18 @@ def main(usedb=False):
             "zoomOut",
             "autoScale2d",
         ],
+        shapes=[
+            go.layout.Shape(
+                type="rect",
+                xref="paper",
+                yref="paper",
+                x0=0.035,
+                y0=0,
+                x1=0.965,
+                y1=1.0,
+                line={"width": 1, "color": "black"},
+            )
+        ],
     )
     fig1 = go.Figure(
         go.Image(
@@ -231,55 +301,22 @@ def main(usedb=False):
         layout=FIG1_LAYOUT,
     )
 
-    FIG2_WIDTH = 800
-    FIG2_LAYOUT = go.Layout(
-        margin=dict(l=0, r=0, b=0, t=65, pad=0),
-        width=FIG2_WIDTH,
-        height=700,
-        transition={"duration": 0},
-        title={
-            "text": "Trace",
-            "xanchor": "center",
-            "yanchor": "top",
-            "y": 0.97,
-            "x": 0.5,
-        },
-        xaxis={
-            "title": "Time (sec)",
-            "visible": True,
-            "showticklabels": True,
-            "showgrid": True,
-        },
-        yaxis={
-            "title": "Z-Score",
-            "visible": True,
-            "showticklabels": True,
-            "showgrid": True,
-        },
-        shapes=[
-            go.layout.Shape(
-                type="rect",
-                xref="paper",
-                yref="paper",
-                x0=0,
-                y0=0,
-                x1=1.0,
-                y1=1.0,
-                line={"width": 1, "color": "black"},
-            )
+    FIG2_WIDTH = 600
+    FIG2_HEIGHT = 600
+    fig2_layout = get_tracelayout(None, width=FIG2_WIDTH, height=FIG2_HEIGHT)
+
+    fig2 = go.Figure(
+        [
+            go.Scatter(
+                x=None,
+                y=None,
+                name="Fluorescence",
+                yaxis="y1",
+            ),
+            go.Scatter(x=None, y=None, name="Calcium Event", yaxis="y2"),
         ],
-        plot_bgcolor="rgba(0,0,0,0.05)",
-        modebar_remove=[
-            "zoom",
-            "resetScale",
-            "pan",
-            "select",
-            "zoomIn",
-            "zoomOut",
-            "autoScale2d",
-        ],
+        layout=fig2_layout,
     )
-    fig2 = go.Figure(go.Scatter(x=None, y=None), layout=FIG2_LAYOUT)
 
     fig1_widget = go.FigureWidget(fig1)
     fig2_widget = go.FigureWidget(fig2)
@@ -293,13 +330,17 @@ def main(usedb=False):
                     ActivityReport
                     & motioncorrection_dropdown.value
                     & f"mask='{mask_id}'"
-                    & f"activity_type='z_score'"
+                    # & f"activity_type='z_score'"
                 ).fetch1("activity_trace")
             )
 
             with fig2_widget.batch_update():
                 fig2_widget.data[0].x = activity_trace_figobj.data[0].x
                 fig2_widget.data[0].y = activity_trace_figobj.data[0].y
+                fig2_widget.data[0].name = activity_trace_figobj.data[0].name
+                fig2_widget.data[1].x = activity_trace_figobj.data[1].x
+                fig2_widget.data[1].y = activity_trace_figobj.data[1].y
+                fig2_widget.data[1].name = activity_trace_figobj.data[1].name
                 fig2_widget.layout["title"] = {
                     "text": f"Trace for Cell {mask_id}",
                     "xanchor": "center",
@@ -324,6 +365,8 @@ def main(usedb=False):
 
                 fig2_widget.data[0].x = None
                 fig2_widget.data[0].y = None
+                fig2_widget.data[1].x = None
+                fig2_widget.data[1].y = None
         else:
             image = (
                 imaging.MotionCorrection.Summary & motioncorrection_dropdown.value
@@ -358,6 +401,8 @@ def main(usedb=False):
                 }
                 fig2_widget.data[0].x = None
                 fig2_widget.data[0].y = None
+                fig2_widget.data[1].x = None
+                fig2_widget.data[1].y = None
 
     fig1_widget.data[0].on_click(tooltip_click)
     load_button.on_click(partial(response, usedb=usedb))
