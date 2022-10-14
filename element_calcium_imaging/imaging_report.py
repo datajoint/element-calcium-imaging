@@ -13,12 +13,8 @@ schema = imaging.schema
 def single_to_3channel_image(image, low_q, high_q):
     low_p, high_p = np.percentile(image, [low_q, high_q])
     image = np.clip(image, low_p, high_p)
-
-    image -= image.min()
-    image *= 255 / image.max()
-    image = np.uint8(image)
-    image = np.dstack([image] * 3)
-    return image
+    image = np.uint8(255 * (image - low_p) / (high_p - low_p))
+    return np.dstack([image] * 3)
 
 
 def paint_rois(image, mask_xpix, mask_ypix):
