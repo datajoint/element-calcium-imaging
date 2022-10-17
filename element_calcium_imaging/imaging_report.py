@@ -10,9 +10,9 @@ from . import imaging, scan
 schema = imaging.schema
 
 
-def single_to_3channel_image(image, low_q, high_q):
+def single_to_3channel_image(image, low_q=0, high_q=99.9):
+    image = (image - image.min()) ** 0.5
     low_p, high_p = np.percentile(image, [low_q, high_q])
-    image = np.clip(image, low_p, high_p)
     image = np.uint8(255 * (image - low_p) / (high_p - low_p))
     return np.dstack([image] * 3)
 
@@ -138,7 +138,7 @@ class ScanLevelReport(dj.Computed):
             imaging.Segmentation.Mask * imaging.MaskClassification.MaskType & key
         ).fetch("mask", "mask_xpix", "mask_ypix")
 
-        background_image = single_to_3channel_image(image, 1, 99)
+        background_image = single_to_3channel_image(image, low_q=0, high_q=99.9)
 
         background_image_with_cells_painted = paint_rois(
             background_image, mask_xpix, mask_ypix
@@ -373,7 +373,7 @@ def main(usedb=False):
                 & motioncorrection_dropdown.value
             ).fetch("mask", "mask_xpix", "mask_ypix")
 
-            background_image = single_to_3channel_image(image, 1, 99)
+            background_image = single_to_3channel_image(image, low_q=0, high_q=99.9)
 
             background_image_with_cells_painted = paint_rois(
                 background_image, mask_xpix, mask_ypix
