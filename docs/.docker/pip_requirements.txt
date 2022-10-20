@@ -1,4 +1,3 @@
-docs/.docker/pip_requirements.txt
 mkdocs-material
 mkdocs-redirects
 mkdocstrings
