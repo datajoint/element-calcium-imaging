@@ -1,5 +1,4 @@
 """Generate the api pages and navigation.
-
 NOTE: Works best when following the Google style guide
 https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
@@ -16,13 +15,11 @@ element = package.split("_", 1)[1]
 if not Path(f"workflow_{element}").is_dir():
     try:
         subprocess.run(
-            f"git clone -b documentation https://github.com/tdincer/workflow-{element.replace('_','-')}.git /main/delete".split(
+            f"git clone https://github.com/tdincer/workflow-{element.replace('_','-')}.git /main/delete".split(
                 " "
             ),
-            # f"git clone https://github.com/datajoint/workflow-{element.replace('_','-')}.git /main/delete".split(
-            #     " "
-            # ),
             check=True,
+            timeout=5,
         )
         os.system(f"mv /main/delete/workflow_{element} /main/")
         os.system("rm -fR /main/delete")
