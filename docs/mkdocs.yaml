@@ -1,0 +1,125 @@
+# ---------------------- PROJECT SPECIFIC ---------------------------
+
+site_name: Element Calcium Imaging
+repo_url: https://github.com/datajoint/element-calcium-imaging
+repo_name: datajoint/element-calcium-imaging
+nav:
+  - Element Calcium Imaging: index.md
+  - Concepts: concepts.md
+  - Tutorials: tutorials.md
+  - About:
+    - Changelog: about/changelog.md
+  - API: api/ # defer to gen-files + literate-nav
+
+# --------------------- NOTES TO CONTRIBUTORS -----------------------
+# 1. The above `nav` establishes the site structure. This should be
+#    more-or-less the same across Elements.
+# 2. Follow the google styleguide for best results with docstrings
+#    https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+# 3. To render the site for dev, use the following shell command
+#    ```console 
+#    MODE="LIVE" PACKAGE=element_{ELEMENT} \
+#    UPSTREAM_REPO=https://github.com/datajoint/element-{ELEMENT}.git \
+#    HOST_UID=$(id -u) docker compose -f docs/docker-compose.yaml up --build
+#    ```
+#    The Errors and Warnings mkdocs provides during the build are helpful
+#    for seeing where you may have broken links or docstring issues.
+# 4. To render your fork of the workflow repo prior to PRs, change the
+#    URL in ./docs/src/api/make_pages.py#L19
+# 5. Instead of using bash/shell comment blocks, use `console`
+# 6. Linking to headings requires [link](./relative-doc#sub-heading) format
+#    with (a) hypens instead of spaces, (b) all lowercase
+# 7. For redirect options, see 'redirects' below.
+# 8. Hard wrapping makes it easier to see changes in GitHub reviews. To
+#    get a keyboard shortcut for hard wrapping, see VSCode Rewrap extension.
+
+# ---------------------------- STANDARD -----------------------------
+
+edit_uri: ./edit/main/docs/src
+docs_dir: ./src
+theme:
+  font:
+    text: Roboto Slab
+    code: Source Code Pro
+  name: material
+  custom_dir: src/.overrides
+  icon:
+    logo: main/project-logo-black
+  favicon: assets/images/project-logo-color.png
+  features:
+    - toc.integrate
+    - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: datajoint
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+plugins:
+  - search
+#  - redirects:
+#      redirect_maps:
+#        "index.md": "getting_started.md"
+  - mkdocstrings:
+      default_handler: python
+  - gen-files:
+      scripts:
+      - ./src/api/make_pages.py
+  - literate-nav:
+      nav_file: navigation.md
+  - exclude-search:
+      exclude:
+        - "*/navigation.md"
+markdown_extensions:
+  - attr_list
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      options:
+        custom_icons:
+          - .overrides/.icons
+  - mdx_truly_sane_lists
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  
+extra:
+  generator: false # Disable watermark
+  version:
+    provider: mike
+  social:
+    - icon: main/company-logo
+      link: https://www.datajoint.com/
+    - icon: fontawesome/solid/ticket
+      link: https://support.djneuro.io/portal/en/home
+    - icon: fontawesome/brands/slack
+      link: https://datajoint.slack.com
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/datajoint
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/DataJointIO
+    - icon: fontawesome/brands/github
+      link: https://github.com/datajoint
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/datajoint
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/user/datajointbot
+    - icon: fontawesome/brands/stack-overflow
+      link: https://stackoverflow.com/questions/tagged/datajoint
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/channel/UCdeCuFOTCXlVMRzh6Wk-lGg
+extra_css:
+  - assets/stylesheets/extra.css
