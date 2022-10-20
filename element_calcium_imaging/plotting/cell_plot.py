@@ -11,21 +11,15 @@ def single_to_3channel_image(image, low_q=0, high_q=99.9):
 
 
 def paint_rois(image, mask_xpix, mask_ypix):
-    # Generate random hsv colors
     SATURATION = 40
     VALUE = 255
-    hues = np.random.sample(size=len(mask_xpix)) * 10000
-    hsv_colors = np.stack(
-        [hues, np.full(len(mask_xpix), SATURATION), np.full(len(mask_xpix), VALUE)]
-    ).T
 
     # Assign colors to each region
     masks = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    for xpix, ypix, hsv_color in zip(mask_xpix, mask_ypix, hsv_colors):
-        masks[ypix, xpix] = hsv_color
+    for xpix, ypix in zip(mask_xpix, mask_ypix):
+        masks[ypix, xpix] = [np.random.random()*255, SATURATION, VALUE]
+    return np.uint8(cv2.cvtColor(masks.astype(np.float32), cv2.COLOR_HSV2RGB))
 
-    masks = np.uint8(cv2.cvtColor(masks.astype(np.float32), cv2.COLOR_HSV2RGB))
-    return masks
 
 
 def alpha_combine_2images(image, masks):

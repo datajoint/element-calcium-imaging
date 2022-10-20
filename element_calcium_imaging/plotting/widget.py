@@ -86,7 +86,8 @@ def main(imaging, usedb=False):
 
     FIG2_WIDTH = 600
     FIG2_HEIGHT = 600
-    fig2_layout = get_tracelayout(None, width=FIG2_WIDTH, height=FIG2_HEIGHT)
+    fig2_layout = cell_plot.get_tracelayout(None, width=FIG2_WIDTH, height=FIG2_HEIGHT)
+
 
     fig2 = go.Figure(
         [
@@ -113,7 +114,6 @@ def main(imaging, usedb=False):
                     ActivityReport
                     & motioncorrection_dropdown.value
                     & f"mask='{mask_id}'"
-                    # & f"activity_type='z_score'"
                 ).fetch1("activity_trace")
             )
 
@@ -160,9 +160,11 @@ def main(imaging, usedb=False):
                 & motioncorrection_dropdown.value
             ).fetch("mask", "mask_xpix", "mask_ypix")
 
-            background_image = single_to_3channel_image(image, low_q=0, high_q=99.9)
+            background_image = cell_plot.single_to_3channel_image(image, low_q=0, high_q=99.9)
 
-            background_image_with_cells_painted = paint_rois(
+
+            background_image_with_cells_painted = cell_plot.paint_rois(
+
                 background_image, mask_xpix, mask_ypix
             )
             cells_maskid_image = make_maskid_image(
