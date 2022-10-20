@@ -1,4 +1,4 @@
-import datajoint as dj
+import inspect
 import pathlib
 import importlib
 import inspect
@@ -14,32 +14,36 @@ _linking_module = None
 def activate(
     scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None
 ):
-    """
-    activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
-        :param scan_schema_name: schema name on the database server to activate the `scan` module
-        :param create_schema: when True (default), create schema in the database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `scan` module:
-            Upstream tables:
-                + Session: parent table to Scan, typically identifying a recording session
-                + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
-                + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
-            Functions:
-                + get_imaging_root_data_dir() -> list
-                    Retrieve the full path for the root data directory - e.g. containing the imaging recording files or analysis results for all subject/sessions.
-                    :return: a string (or list of string) for full path to the root data directory
-                + get_scan_image_files(scan_key: dict) -> list
-                    Retrieve the list of ScanImage files associated with a given Scan
-                    :param scan_key: key of a Scan
-                    :return: list of ScanImage files' full file-paths
-                + get_scan_box_files(scan_key: dict) -> list
-                    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
-                    :param scan_key: key of a Scan
-                    :return: list of Scanbox files' full file-paths
-                + get_processed_root_data_dir() -> str:
-                    Retrieves the root directory for all processed data to be found from or written to
-                    :return: a string for full path to the root directory for processed data
+    """Activate this schema.
+
+    Args:
+        scan_schema_name (str): schema name on the database server to activate the `scan` module
+        create_schema (bool): when True (default), create schema in the database if it does not yet exist.
+        create_tables (bool): when True (default), create tables in the database if they do not yet exist.
+        linking_module (str): a module name or a module containing the required dependencies to activate
+            the `scan` module.
+
+    Dependencies:
+    Upstream tables:
+        + Session: parent table to Scan, typically identifying a recording session
+        + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
+        + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
+
+    Functions:
+        + get_imaging_root_data_dir() -> list
+            Retrieve the full path for the root data directory - e.g. containing the imaging recording files or analysis results for all subject/sessions.
+            :return: a string (or list of string) for full path to the root data directory
+        + get_scan_image_files(scan_key: dict) -> list
+            Retrieve the list of ScanImage files associated with a given Scan
+            :param scan_key: key of a Scan
+            :return: list of ScanImage files' full file-paths
+        + get_scan_box_files(scan_key: dict) -> list
+            Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
+            :param scan_key: key of a Scan
+            :return: list of Scanbox files' full file-paths
+        + get_processed_root_data_dir() -> str:
+            Retrieves the root directory for all processed data to be found from or written to
+            :return: a string for full path to the root directory for processed data
     """
 
     if isinstance(linking_module, str):
@@ -63,18 +67,16 @@ def activate(
 
 
 def get_imaging_root_data_dir() -> str:
-    """
-    All data paths, directories in DataJoint Elements are recommended to be stored as
-    relative paths (posix format), with respect to some user-configured "root" directory,
-     which varies from machine to machine (e.g. different mounted drive locations)
+    """Retrieve the root data directories containing the imaging data
+    for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
+    processing routines, etc.). All data paths, directories in DataJoint Elements are
+    recommended to be stored as relative paths (posix format), with respect to some
+    user-configured "root" directory, which varies from machine to machine
+    (e.g. different mounted drive locations).
 
-    get_imaging_root_data_dir() -> list
-        This user-provided function retrieves the possible root data directories
-         containing the imaging data for all subjects/sessions
-         (e.g. acquired ScanImage raw files,
-         output files from processing routines, etc.)
-        :return: a string for full path to the imaging root data directory,
-         or list of strings for possible root data directories
+    Returns:
+        A string for full path to the imaging root data directory, or list of strings for
+        possible root data directories.
     """
 
     root_directories = _linking_module.get_imaging_root_data_dir()
@@ -88,10 +90,14 @@ def get_imaging_root_data_dir() -> str:
 
 
 def get_processed_root_data_dir() -> str:
-    """
-    get_processed_root_data_dir() -> str:
-        Retrieves the root directory for all processed data to be found from or written to
-        :return: a string for full path to the root directory for processed data
+    """Retrieve the root directory for all processed data. All data paths, directories
+    in DataJoint Elements are recommended to be stored as relative paths (posix format),
+    with respect to some user-configured "root" directory, which varies from machine to
+    machine (e.g. different mounted drive locations).
+
+
+    Returns:
+        A string for full path to the root directory for processed data.
     """
 
     if hasattr(_linking_module, "get_processed_root_data_dir"):
@@ -101,37 +107,49 @@ def get_processed_root_data_dir() -> str:
 
 
 def get_scan_image_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of ScanImage files associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of ScanImage files' full file-paths
+    """Retrieve the list of ScanImage files associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of ScanImage files' full file-paths.
     """
     return _linking_module.get_scan_image_files(scan_key)
 
 
 def get_scan_box_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Scanbox files' full file-paths
+    """Retrieve the list of Scanbox files (*.sbx) associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Scanbox files' full file-paths.
     """
     return _linking_module.get_scan_box_files(scan_key)
 
 
 def get_nd2_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Nikon files (*.nd2) associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Nikon files' full file-paths
+    """Retrieve the list of Nikon files (*.nd2) associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Nikon files' full file-paths.
     """
     return _linking_module.get_nd2_files(scan_key)
 
 
 def get_prairieview_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Bruker PrairieView files' full file-paths
+    """Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Bruker PrairieView files' full file-paths.
     """
     return _linking_module.get_prairieview_files(scan_key)
 

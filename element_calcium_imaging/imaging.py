@@ -1,9 +1,9 @@
-import datajoint as dj
-import numpy as np
 import pathlib
-import os
 import inspect
 import importlib
+import numpy as np
+
+import datajoint as dj
 from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
 
 from . import scan, imaging_report
@@ -28,16 +28,21 @@ def activate(
     create_tables=True,
     linking_module=None,
 ):
-    """
-    activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
-        :param imaging_schema_name: schema name on the database server to activate the `imaging` module
-        :param scan_schema_name: schema name on the database server to activate the `scan` module
-         - may be omitted if the `scan` module is already activated
-        :param create_schema: when True (default), create schema in the database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `imaging` module:
-         + all that are required by the `scan` module
+    """Activate this schema.
+
+    Args:
+        imaging_schema_name (str): Schema name on the database server to activate the `imaging` module
+        scan_schema_name (str): Schema name on the database server to activate the `scan` module.
+            Omitted, if the `scan` module is already activated.
+        create_schema (bool): When True (default), create schema in the database if it does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they do not yet exist.
+        linking_module (str): A module name or a module containing the required dependencies to activate
+            the `imaging` module: + all that are required by the `scan` module.
+
+    Dependencies:
+    Upstream tables:
+        + Session: A parent table to Scan, identifying a scanning session.
+        + Equipment: A parent table to Scan, identifying a scanning device.
     """
 
     if isinstance(linking_module, str):
@@ -69,12 +74,12 @@ def activate(
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    definition = """
-    # Method, package, analysis suite used for processing of calcium imaging 
-    # data (e.g. Suite2p, CaImAn, etc.)
+    """Method, package, or analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)"""
+
+    definition = """# Method for calcium imaging processing
     processing_method: char(8)
     ---
-    processing_method_desc: varchar(1000)
+    processing_method_desc: varchar(1000)  # Processing method description
     """
 
     contents = [
@@ -85,20 +90,33 @@ class ProcessingMethod(dj.Lookup):
 
 @schema
 class ProcessingParamSet(dj.Lookup):
-    definition = """  #  Parameter set used for processing of calcium imaging data
-    paramset_idx:  smallint
+    """Parameter set used for the processing of the calcium imaging data,
+    including both the analysis suite and its respective input parameters.
+    A hash of the parameters of the analysis suite is also stored in order
+    to avoid duplicated entries."""
+
+    definition = """# Processing Parameter Set
+    paramset_idx: smallint  # A unique index to identify a parameter set.
     ---
     -> ProcessingMethod
-    paramset_desc: varchar(128)
-    param_set_hash: uuid
-    unique index (param_set_hash)
-    params: longblob  # dictionary of all applicable parameters
+    paramset_desc: varchar(1280)  # Parameter-set description
+    param_set_hash: uuid  # A universally unique identifier for the parameter set
+    params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
     @classmethod
     def insert_new_params(
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
+        """Insert a parameter set into ProcessingParamSet table.
+        This function automizes the parameter set hashing and avoids insertion of an existing parameter set.
+
+        Args:
+            processing_method (str): Processing method/package used for processing of calcium imaging.
+            paramset_idx (int): A unique index to identify a parameter set.
+            paramset_desc (str): Description of the parameter set.
+            params (dict): Parameter Set, a dictionary of all applicable parameters to the analysis suite.
+        """
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
@@ -122,8 +140,10 @@ class ProcessingParamSet(dj.Lookup):
 
 @schema
 class CellCompartment(dj.Lookup):
-    definition = """  # Cell compartments that can be imaged
-    cell_compartment         : char(16)
+    """Cell compartments that can be imaged (e.g. 'axon', 'soma', etc.)"""
+
+    definition = """# Cell compartments
+    cell_compartment: char(16)
     """
 
     contents = zip(["axon", "soma", "bouton"])
@@ -131,8 +151,10 @@ class CellCompartment(dj.Lookup):
 
 @schema
 class MaskType(dj.Lookup):
-    definition = """ # Possible classifications for a segmented mask
-    mask_type        : varchar(16)
+    """Possible types of a segmented mask (e.g. 'soma', 'axon', 'dendrite', 'neuropil')"""
+
+    definition = """# Possible types of a segmented mask
+    mask_type: varchar(16)
     """
 
     contents = zip(["soma", "axon", "dendrite", "neuropil", "artefact", "unknown"])
@@ -143,21 +165,32 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    definition = """  # Manual table for defining a processing task ready to be run
+    """This table defines a calcium imaging processing task for a combination of a `Scan` and a `ProcessingParamSet`
+    entries, including all the inputs (scan, method, method's parameters). The task defined here is then run in the
+    downstream table Processing. This table supports definitions of both loading of pre-generated results and the
+    triggering of new analysis for all supported analysis methods"""
+
+    definition = """# Manual table for defining a processing task ready to be run
     -> scan.Scan
     -> ProcessingParamSet
     ---
-    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
-    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')  # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
     @classmethod
     def infer_output_dir(cls, key, relative=False, mkdir=False):
-        """
-        Given a 'key' to an entry in this table
-        Return the expected processing_output_dir based on the following convention:
-            processed_dir / scan_dir / {processing_method}_{paramset_idx}
-            e.g.: sub4/sess1/scan0/suite2p_0
+        """Infer an output directory for an entry in ProcessingTask table.
+
+        Args:
+            key (dict): Primary key set of an entry in the ProcessingTask table.
+            relative (bool): If True, processing_output_dir is returned relative to imaging_root_dir.
+            mkdir (bool): If True, create the processing_output_dir directory.
+
+        Returns:
+            A default output directory for the processed results (processed_output_dir in ProcessingTask) based on the following convention:
+                processed_dir / scan_dir / {processing_method}_{paramset_idx}
+                e.g.: sub4/sess1/scan0/suite2p_0
         """
         image_locators = {
             "NIS": get_nd2_files,
@@ -189,8 +222,12 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """
-        Method to auto-generate ProcessingTask entries for a particular Scan using the specified parameter set.
+        """Generate a default ProcessingTask entry for a particular Scan using an existing
+        parameter set in the ProcessingParamSet table.
+
+        Args:
+            scan_key (dict): A primary key set of an entry in the Scan table.
+            paramset_idx (int): The primary key of the parameter set to be used.
         """
         key = {**scan_key, "paramset_idx": paramset_idx}
 
@@ -231,10 +268,13 @@ class ProcessingTask(dj.Manual):
 
 @schema
 class Processing(dj.Computed):
-    definition = """  # Processing Procedure
+    """Perform the computation of an entry (task) defined in the ProcessingTask table.
+    The computation is performed only on the scans with ScanInfo inserted."""
+
+    definition = """
     -> ProcessingTask
     ---
-    processing_time     : datetime  # time of generation of this set of processed, segmented results
+    processing_time     : datetime  # Time of generation of this set of processed, segmented results
     package_version=''  : varchar(16)
     """
 
@@ -339,19 +379,27 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    definition = """  #  Curation(s) performed on processing results (including none)
+    """Identifies the Curated results in a directory other than the processing_output_dir defined
+    in the ProcessingTask. If no curation is applied, the curation_output_dir can be set to the value
+    of processing_output_dir."""
+
+    definition = """# Curation(s) results
     -> Processing
     curation_id: int
     ---
-    curation_time: datetime             # time of generation of this set of curated results 
-    curation_output_dir: varchar(255)   # output directory of the curated results, relative to root data directory
-    manual_curation: bool               # has manual curation been performed on this result?
-    curation_note='': varchar(2000)  
+    curation_time: datetime  # Time of generation of this set of curated results 
+    curation_output_dir: varchar(255)  # Output directory of the curated results, relative to root data directory
+    manual_curation: bool  # Has manual curation been performed on this result?
+    curation_note='': varchar(2000)
     """
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
-        """
-        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
+        """Create a Curation entry for a given ProcessingTask key.
+
+        Args:
+            key (dict): Primary key set of an entry in the ProcessingTask table.
+            is_curated (bool): When True, indicates a manual curation.
+            curation_note (str): User's note on the specifics of the curation.
         """
         if key not in Processing():
             raise ValueError(
@@ -392,14 +440,16 @@ class Curation(dj.Manual):
 
 @schema
 class MotionCorrection(dj.Imported):
-    definition = """  #  Results of motion correction performed on the imaging data
+    """Results of motion correction shifts performed on the imaging data"""
+
+    definition = """# Results of motion correction
     -> Curation
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
 
     class RigidMotionCorrection(dj.Part):
-        definition = """  # Details of rigid motion correction performed on the imaging data
+        definition = """# Details of rigid motion correction performed on the imaging data
         -> master
         ---
         outlier_frames=null : longblob  # mask with true for frames with outlier shifts (already corrected)
@@ -412,12 +462,9 @@ class MotionCorrection(dj.Imported):
         """
 
     class NonRigidMotionCorrection(dj.Part):
-        """
-        Piece-wise rigid motion correction
-        - tile the FOV into multiple 3D blocks/patches
-        """
+        """Piece-wise rigid motion correction - tile the FOV into multiple 3D blocks/patches"""
 
-        definition = """  # Details of non-rigid motion correction performed on the imaging data
+        definition = """# Details of non-rigid motion correction performed on the imaging data
         -> master
         ---
         outlier_frames=null             : longblob      # mask with true for frames with outlier shifts (already corrected)
@@ -430,7 +477,7 @@ class MotionCorrection(dj.Imported):
         """
 
     class Block(dj.Part):
-        definition = """  # FOV-tiled blocks used for non-rigid motion correction
+        definition = """# FOV-tiled blocks used for non-rigid motion correction
         -> master.NonRigidMotionCorrection
         block_id        : int
         ---
@@ -446,7 +493,7 @@ class MotionCorrection(dj.Imported):
         """
 
     class Summary(dj.Part):
-        definition = """ # Summary images for each field and channel after corrections
+        definition = """# Summary images for each field and channel after corrections
         -> master
         -> scan.ScanInfo.Field
         ---
@@ -775,7 +822,9 @@ class MotionCorrection(dj.Imported):
 
 @schema
 class Segmentation(dj.Computed):
-    definition = """ # Different mask segmentations.
+    """Result of the Segmentation"""
+
+    definition = """# Different mask segmentations.
     -> Curation
     """
 
@@ -933,7 +982,9 @@ class MaskClassification(dj.Computed):
 
 @schema
 class Fluorescence(dj.Computed):
-    definition = """  # fluorescence traces before spike extraction or filtering
+    """Fluorescence traces obtained from segmented region of interests"""
+
+    definition = """# Fluorescence traces before spike extraction or filtering
     -> Segmentation
     """
 
@@ -941,9 +992,9 @@ class Fluorescence(dj.Computed):
         definition = """
         -> master
         -> Segmentation.Mask
-        -> scan.Channel.proj(fluo_channel='channel')  # the channel that this trace comes from         
+        -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from         
         ---
-        fluorescence                : longblob  # fluorescence trace associated with this mask
+        fluorescence                : longblob  # Fluorescence trace associated with this mask
         neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace
         """
 
@@ -1015,7 +1066,9 @@ class Fluorescence(dj.Computed):
 
 @schema
 class ActivityExtractionMethod(dj.Lookup):
-    definition = """
+    """Activity extraction method."""
+
+    definition = """# Activity extraction method 
     extraction_method: varchar(32)
     """
 
@@ -1024,8 +1077,9 @@ class ActivityExtractionMethod(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """
-    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
+    """Inferred neural activity from fluorescence trace (e.g. dff, spikes, etc.)."""
+
+    definition = """# Neural Activity
     -> Fluorescence
     -> ActivityExtractionMethod
     """
@@ -1114,14 +1168,19 @@ _table_attribute_mapper = {
 }
 
 
-def get_loader_result(key, table):
-    """
-    Retrieve the loaded processed imaging results from the loader (e.g. suite2p, caiman, etc.)
-        :param key: the `key` to one entry of ProcessingTask or Curation
-        :param table: the class defining the table to retrieve
-         the loaded results from (e.g. ProcessingTask, Curation)
-        :return: a loader object of the loaded results
-         (e.g. suite2p.Suite2p, caiman.CaImAn, etc.)
+def get_loader_result(key: dict, table: dj.Table):
+    """Retrieve the processed imaging results from a suite2p or caiman loader.
+
+    Args:
+        key (dict): The `key` to one entry of ProcessingTask or Curation
+        table (dj.Table): A datajoint table to retrieve the loaded results from (e.g. ProcessingTask, Curation)
+
+    Raises:
+        NotImplementedError: If the processing_method is different than 'suite2p' or 'caiman'.
+
+    Returns:
+        A loader object of the loaded results (e.g. suite2p.Suite2p or caiman.CaImAn,
+        see element-interface for more information on the loaders.)
     """
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         "processing_method", _table_attribute_mapper[table.__name__]
