@@ -167,10 +167,12 @@ def main(imaging, usedb=False):
 
                 background_image, mask_xpix, mask_ypix
             )
-            cells_maskid_image = make_maskid_image(
+            cells_maskid_image = cell_plot.make_maskid_image(
+
                 background_image[:, :, 0], cell_mask_ids, mask_xpix, mask_ypix
             )
-            background_with_cells = alpha_combine_2images(
+            background_with_cells = cell_plot.alpha_combine_2images(
+
                 background_image, background_image_with_cells_painted
             )
             with fig1_widget.batch_update():
