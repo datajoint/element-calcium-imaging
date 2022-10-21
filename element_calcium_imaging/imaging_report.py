@@ -1,6 +1,4 @@
 import datajoint as dj
-from plotly.io import from_json
-import plotly.graph_objects as go
 
 from . import scan
 from .plotting import cell_plot
