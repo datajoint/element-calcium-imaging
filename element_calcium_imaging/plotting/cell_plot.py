@@ -41,7 +41,8 @@ def get_tracelayout(key, width=600, height=600):
     return dict(
         margin=dict(l=0, r=0, b=0, t=65, pad=0),
         width=width,
-        height=height,  # 700,
+        height=height,
+
         transition={"duration": 0},
         title={
             "text": text,
