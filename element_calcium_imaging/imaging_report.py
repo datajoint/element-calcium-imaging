@@ -49,7 +49,7 @@ class ActivityReport(dj.Computed):
     definition = """
     -> imaging.Segmentation.Mask
     ---
-    activity_trace: longblob
+    cell_traces: longblob
     """
 
     def make(self, key):
