@@ -141,10 +141,9 @@ def main(imaging, usedb=False):
             )
 
             with fig1_widget.batch_update():
-                fig1_widget.data[0].z = composite_average_image.data[0].z
-                fig1_widget.data[0].customdata = composite_average_image.data[
-                    0
-                ].customdata
+                fig1_widget.data[0].z = cell_overlayed_image.data[0].z
+                fig1_widget.data[0].customdata = cell_overlayed_image.data[0].customdata
+
 
                 fig2_widget.data[0].x = None
                 fig2_widget.data[0].y = None
