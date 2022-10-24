@@ -54,4 +54,4 @@ class TraceReport(dj.Computed):
 
     def make(self, key):
         trace_fig = cell_plot.plot_cell_traces(imaging, key)
-        self.insert1({**key, "activity_trace": trace_fig.to_json()})
+        self.insert1({**key, "cell_traces": trace_fig.to_json()})
