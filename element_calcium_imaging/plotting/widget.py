@@ -114,7 +114,7 @@ def main(imaging, usedb=False):
                     TraceReport
                     & motioncorrection_dropdown.value
                     & f"mask='{mask_id}'"
-                ).fetch1("activity_trace")
+                ).fetch1("cell_traces")
             )
 
             with fig2_widget.batch_update():
