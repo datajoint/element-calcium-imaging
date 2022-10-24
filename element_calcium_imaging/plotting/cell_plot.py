@@ -119,7 +119,8 @@ def plot_cell_overlayed_image(imaging, segmentation_key):
         imaging.Segmentation.Mask * imaging.MaskClassification.MaskType & segmentation_key
     ).fetch("mask", "mask_xpix", "mask_ypix")
 
-    background_image = single_to_3channel_image(image, low_q=0, high_q=99.9)
+    background_image = single_to_3channel_image(average_image, low_q=0, high_q=99.9)
+
     background_image_with_cells_painted = paint_rois(
         background_image, mask_xpix, mask_ypix
     )
