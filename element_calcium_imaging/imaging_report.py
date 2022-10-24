@@ -45,7 +45,7 @@ class ScanLevelReport(dj.Computed):
 
 
 @schema
-class ActivityReport(dj.Computed):
+class TraceReport(dj.Computed):
     definition = """
     -> imaging.Segmentation.Mask
     ---
