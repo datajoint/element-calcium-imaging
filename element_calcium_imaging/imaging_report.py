@@ -36,7 +36,7 @@ class ScanLevelReport(dj.Computed):
     definition = """
     -> imaging.Segmentation
     ---
-    average_image: longblob
+    cell_overlayed_image: longblob
     """
 
     def make(self, key):
