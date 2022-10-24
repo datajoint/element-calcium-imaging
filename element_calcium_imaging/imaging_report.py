@@ -41,7 +41,7 @@ class ScanLevelReport(dj.Computed):
 
     def make(self, key):
         image_fig = cell_plot.plot_cell_overlayed_image(imaging, key)
-        self.insert1({**key, "average_image": image_fig.to_json()})
+        self.insert1({**key, "cell_overlayed_image": image_fig.to_json()})
 
 
 @schema
