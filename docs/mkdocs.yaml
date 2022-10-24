@@ -9,7 +9,7 @@ nav:
   - Tutorials: tutorials.md
   - Citation: citation.md
   - API: api/ # defer to gen-files + literate-nav
-  - Changelog: about/changelog.md
+  - Changelog: changelog.md
 
 # --------------------- NOTES TO CONTRIBUTORS -----------------------
 # 1. The above `nav` establishes the site structure. This should be

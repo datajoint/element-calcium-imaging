@@ -3,6 +3,54 @@
 ## Description of modality, user population
 Over the past two decades, in vivo two-photon laser-scanning imaging of calcium signals has evolved into a mainstream modality for neurophysiology experiments to record population activity in intact neural circuits. The tools for signal acquisition and analysis continue to evolve but common patterns and elements of standardization have emerged.
 
+## Preprocessing toolchain: development teams
+The preprocessing workflow for two-photon laser-scanning microscopy includes motion correction (rigid or non-rigid), cell segmentation, and calcium event extraction (sometimes described as "deconvolution" or "spike inference"). Some include raster artifact correction, cropping and stitching operations.
+
+Until recently, most labs have developed custom processing pipelines, sharing them with others as academic open-source projects. Recently, a few leaders have emerged as standardization candidates for the initial preprocessing.
+
+- [CaImAn](https://github.com/flatironinstitute/CaImAn) (Originally developed by Andrea Giovannucci, current support by FlatIron Institute: Eftychios A. Pnevmatikakis, Johannes Friedrich)
+- [Suite2p](https://github.com/MouseLand/suite2p) (Carsen Stringer and Marius Pachitariu at Janelia), 200+ users, active support
+
+Element Calcium Imaging encapsulates these packages to ease the management of data and its analysis.
+
+## Element Architecture
+Each node in the following diagram represents the analysis code in the workflow for Element Calcium Imaging and corresponding table in the database.  Within the workflow, Element Calcium Imaging connects to upstream Elements including Lab, Animal, and Session.
+
+![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
+
+### `lab` schema
+
+| Table | Description |
+| --- | --- |
+| Equipment | Scanner metadata |
+
+### `subject` schema
+- Although not required, most choose to connect the `Session` table to a `Subject` table.
+
+| Table | Description |
+| --- | --- |
+| Subject | Basic information of the research subject |
+
+### `session` schema
+
+| Table | Description |
+| --- | --- |
+| Session | Unique experimental session identifier |
+
+
+### `scan` schema
+
+| Table | Description |
+| --- | --- |
+| AcquisitionSoftware | Software used to acquire the imaging scans |
+| Channel | Recording Channel |
+| Scan |  |
+| ScanLocation | Anatomical location of the region scanned |
+| ScanInfo | Basic information of the imaging data |
+| ScanInfo.Field | |
+| ScanInfo.ScanFile | Path of the scan file |
+
+
 ## Acquisition tools
 
 ### Hardware
@@ -18,13 +66,6 @@ We do not include Miniscopes in these estimates. In all there are perhaps on the
 
 Vidrio’s [ScanImage](https://docs.scanimage.org/) is the data acquisition software for two types of home-built scanning two-photon systems, either based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version. Thorlabs also provides their own acquisition software - ThorImageLS (probably half of the systems).
 
-## Preprocessing toolchain: development teams
-The preprocessing workflow for two-photon laser-scanning microscopy includes motion correction (rigid or non-rigid), cell segmentation, and calcium event extraction (sometimes described as "deconvolution" or "spike inference"). Some include raster artifact correction, cropping and stitching operations.
-
-Until recently, most labs have developed custom processing pipelines, sharing them with others as academic open-source projects. Recently, a few leaders have emerged as standardization candidates for the initial preprocessing.
-
-- [CaImAn](https://github.com/flatironinstitute/CaImAn) (Originally developed by Andrea Giovannucci, current support by FlatIron Institute: Eftychios A. Pnevmatikakis, Johannes Friedrich)
-- [Suite2p](https://github.com/MouseLand/suite2p) (Carsen Stringer and Marius Pachitariu at Janelia), 200+ users, active support
 
 ## Key projects
 Over the past few years, several labs have developed DataJoint-based data management and processing pipelines for two-photon Calcium imaging. Our team collaborated with several of them during their projects. Additionally, we interviewed these teams to understand their experiment workflow, pipeline design, associated tools, and interfaces.

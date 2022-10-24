@@ -159,7 +159,9 @@ def get_prairieview_files(scan_key: dict) -> list:
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS, PrairieView
+    """A list of acquisition softwares supported by the workflow. Required to define a scan."""
+
+    definition = """  # Acquisition softwares
     acq_software: varchar(24)    
     """
     contents = zip(["ScanImage", "Scanbox", "NIS", "PrairieView"])
@@ -175,6 +177,10 @@ class Channel(dj.Lookup):
 
 @schema
 class Scan(dj.Manual):
+    """A scan entry in this table is defined by a measurement done using a scanner (Equipment)
+    and an acquisition software. The details of the scanning data is placed in other tables,
+    including, ScanLocation, ScanInfo, and ScanInfo's part tables."""
+
     definition = """    
     -> Session
     scan_id: int        
@@ -187,16 +193,24 @@ class Scan(dj.Manual):
 
 @schema
 class ScanLocation(dj.Manual):
-    definition = """
+    """Anatomical location of the scanned region in the brain
+
+    Refer to the `definition` attribute for the table design."""
+
+    definition = """Anatomical location
     -> Scan   
-    ---    
+    ---
     -> Location      
     """
 
 
 @schema
 class ScanInfo(dj.Imported):
-    definition = """ # general data about the reso/meso scans from header
+    """Metadata of the scan file
+
+    Refer to the `definition` attribute for the table design."""
+
+    definition = """ # General data about the reso/meso scans from header
     -> Scan
     ---
     nfields              : tinyint   # number of fields
@@ -217,6 +231,8 @@ class ScanInfo(dj.Imported):
     """
 
     class Field(dj.Part):
+        """Stores field information of scan, including its coordinates, size, pixel pitch, etc."""
+
         definition = """ # field-specific scan information
         -> master
         field_idx         : int
@@ -233,9 +249,11 @@ class ScanInfo(dj.Imported):
         """
 
     class ScanFile(dj.Part):
+        """Filepath of the scan relative to root data directory"""
+
         definition = """
         -> master
-        file_path: varchar(255)  # filepath relative to root data directory
+        file_path: varchar(255)  # Filepath relative to root data directory
         """
 
     def make(self, key):
