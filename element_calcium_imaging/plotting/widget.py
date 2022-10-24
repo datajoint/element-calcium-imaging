@@ -30,7 +30,8 @@ def main(imaging, usedb=False):
     FIG1_LAYOUT = go.Layout(
         margin=dict(l=0, r=40, b=0, t=65, pad=0),
         width=FIG1_WIDTH,
-        height=600,  # 700,
+        height=600,
+
         transition={"duration": 0},
         title={
             "text": "Average Image with Cells",
