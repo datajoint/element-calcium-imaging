@@ -112,7 +112,8 @@ def get_tracelayout(key, width=600, height=600):
 
 def plot_cell_overlayed_image(imaging, segmentation_key):
 
-    image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1("average_image")
+    average_image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1("average_image")
+
 
     cell_mask_ids, mask_xpix, mask_ypix = (
         imaging.Segmentation.Mask * imaging.MaskClassification.MaskType & segmentation_key
