@@ -75,8 +75,6 @@ def get_tracelayout(key, width=600, height=600):
             "overlaying": "y",
             "side": "right",
             "position": 1,
-            "titlefont": dict(color="#d62728"),
-            "tickfont": dict(color="#d62728"),
         },
         shapes=[
             go.layout.Shape(
