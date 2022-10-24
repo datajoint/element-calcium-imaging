@@ -2,6 +2,8 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.3.0] - 2022-10-07
++ Add - Reader for `Bruker PrairieView` acquisition system
 
 ## [0.2.2] - 2022-09-28
 
@@ -43,6 +45,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.3.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.3.0
 [0.2.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.2
 [0.2.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.1
 [0.2.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.0
