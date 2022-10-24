@@ -136,7 +136,7 @@ def main(imaging, usedb=False):
         if usedb:
             composite_average_image = from_json(
                 (ScanLevelReport & motioncorrection_dropdown.value).fetch1(
-                    "average_image"
+                    "cell_overlayed_image"
                 )
             )
 
