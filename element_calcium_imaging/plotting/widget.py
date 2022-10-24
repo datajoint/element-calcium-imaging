@@ -111,7 +111,7 @@ def main(imaging, usedb=False):
         if mask_id > -1:
             activity_trace_figobj = from_json(
                 (
-                    ActivityReport
+                    TraceReport
                     & motioncorrection_dropdown.value
                     & f"mask='{mask_id}'"
                 ).fetch1("activity_trace")
