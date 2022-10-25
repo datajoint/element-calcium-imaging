@@ -20,31 +20,31 @@ For a long time, most labs developed custom processing pipelines, sharing them w
 Element Calcium Imaging encapsulates these packages to ease the management of data and its analysis.
 
 ## Element Architecture
-Each node in the following diagram represents the analysis code in the workflow for Element Calcium Imaging and corresponding table in the database.  Within the workflow, Element Calcium Imaging connects to upstream Elements including Lab, Animal, and Session.
+Each node in the following diagram represents the analysis code in the workflow and the corresponding table in the database.  Within the workflow, Element Calcium Imaging connects to upstream Elements including Lab, Animal, and Session. For more detailed documentation on each table, see the API docs for the respective schemas.
 
 ![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
 
-### `lab` schema
+### `lab` schema ([API docs](../api/workflow_calcium_imaging/pipeline/#workflow_calcium_imaging.pipeline.Equipment))
 
 | Table | Description |
 | --- | --- |
 | Equipment | Scanner metadata |
 
-### `subject` schema
+### `subject` schema ([API docs](https://datajoint.com/docs/elements/element-animal/api/element_animal/subject))
 - Although not required, most choose to connect the `Session` table to a `Subject` table.
 
 | Table | Description |
 | --- | --- |
 | Subject | Basic information of the research subject |
 
-### `session` schema
+### `session` schema ([API docs](https://datajoint.com/docs/elements/element-session/api/element_session/session_with_datetime))
 
 | Table | Description |
 | --- | --- |
 | Session | Unique experimental session identifier |
 
 
-### `scan` schema
+### `scan` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/api/element_calcium_imaging/scan))
 
 | Table | Description |
 | --- | --- |
@@ -55,6 +55,33 @@ Each node in the following diagram represents the analysis code in the workflow 
 | ScanInfo | Basic information of the imaging data |
 | ScanInfo.Field | |
 | ScanInfo.ScanFile | Path of the scan file |
+
+### `imaging` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/api/element_calcium_imaging/imaging))
+
+| Table | Description |
+| --- | --- |
+| ProcessingMethod | |
+| ProcessingParamSet ||
+| CellCompartment ||
+| MaskType ||
+| ProcessingTask ||
+| Processing ||
+| Curation | |
+| MotionCorrection | |
+| MotionCorrection.RigidMotionCorrection | |
+| MotionCorrection.NonRigidMotionCorrection | |
+| MotionCorrection.NonRigidMotionCorrection.Block | |
+| MotionCorrection.Summary ||
+| Segmentation | |
+| Segmentation.Mask | |
+| MaskClassificationMethod | |
+| MaskClassification | |
+| MaskClassification.MaskType | |
+| Fluorescence | |
+| Fluorescence.Trace | |
+| ActivityExtractionMethod | |
+| Activity | |
+| Activity.Trace | |
 
 
 ## Acquisition tools
