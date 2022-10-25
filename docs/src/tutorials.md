@@ -1,15 +1,24 @@
 # Tutorials
 
-## Install Instructions
+## Installation
 
-The best tutorial of Element Calcium Imaging is the corresponding workflow. Follow our
-[user instructions](datajoint.com/docs/elements/user-instructions) for help 
-downloading and installing this workflow.
+Installation of the Element requires an integrated development environment and database.
+Instructions to setup each of the components can be found on the 
+[User Instructions](datajoint.com/docs/elements/user-instructions) page. These 
+instructions use the example 
+[workflow for Element Calcium Imaging](https://github.com/datajoint/workflow-calcium-imaging), 
+which can be modified for a user's specific experimental requirements. This example
+workflow uses four Elements (Lab, Animal, Session, and Calcium Imaging) to construct a
+complete pipeline, and is able to ingest experimental metadata and process calcium imaging
+scans.
 
-## YouTube
+## Videos
 
 Our [YouTube tutorial](https://www.youtube.com/watch?v=gFLn0GB1L30) gives an overview 
-of the element calcium imaging.
+of the workflow files, notebooks, as well as core concepts related to calcium imaging analysis.
+To try out Elements notebooks in an online Jupyter environment with access to example data, visit 
+[CodeBook](https://codebook.datajoint.io/). (Calcium Imaging notebooks coming soon!)
+
 
 ## Notebooks
 
