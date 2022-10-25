@@ -30,6 +30,8 @@ nav = mkdocs_gen_files.Nav()
 for path in sorted(Path(package).glob("**/*.py")) + sorted(
     Path(f"workflow_{element}").glob("**/*.py")
 ):
+    if path.stem == "__init__":
+        continue
     with mkdocs_gen_files.open(f"api/{path.with_suffix('')}.md", "w") as f:
         module_path = ".".join(
             [p for p in path.with_suffix("").parts if p != "__init__"]
