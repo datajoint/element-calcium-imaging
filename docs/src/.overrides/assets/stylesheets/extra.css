@@ -57,3 +57,7 @@
     /* previous/next text */
     --md-footer-fg-color: var(--dj-white);
 }
+
+.md-typeset figure img {
+    display: inline;
+}
