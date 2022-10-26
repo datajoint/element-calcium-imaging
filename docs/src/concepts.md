@@ -6,10 +6,13 @@ Over the past two decades, in vivo two-photon laser-scanning imaging of calcium 
 ## Preprocessing toolchain: development teams
 The preprocessing workflow for two-photon laser-scanning microscopy includes motion correction (rigid or non-rigid), cell segmentation, and calcium event extraction (sometimes described as "deconvolution" or "spike inference"). Some include raster artifact correction, cropping and stitching operations.
 
-![Raw Scans](./images/rawscans.gif){: style="height:250px"}
-![Motion Corrected Scans](./images/motioncorrectedscans.gif){: style="height:250px"}
-![Cell Segmentation](./images/cellsegmentation.png){: style="height:250px"}
-![Calcium Events](./images/calciumtraces.png){: style="height:250px"}
+<figure markdown>
+  ![Raw Scans](./images/rawscans.gif){: style="height:250px"}
+  ![Motion Corrected Scans](./images/motioncorrectedscans.gif){: style="height:250px"}
+  ![Cell Segmentation](./images/cellsegmentation.png){: style="height:250px"}
+  ![Calcium Events](./images/calciumtraces.png){: style="height:250px"}
+  <figcaption>Left to right: Raw scans, Motion corrected scans, Cell segmentation, Calcium events</figcaption>
+</figure>
 
 For a long time, most labs developed custom processing pipelines, sharing them with others as academic open-source projects. This has changed recently with the emerging of a few leaders as the standardization candidates for the initial preprocessing.
 
