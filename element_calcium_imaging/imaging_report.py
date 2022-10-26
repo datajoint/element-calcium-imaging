@@ -1,18 +1,12 @@
 import datajoint as dj
-
-from . import scan
 from .plotting import cell_plot
 
-
 schema = imaging.schema
-
 
 imaging = None
 
 
-def _activate(
-    schema_name, *, create_schema=True, create_tables=True
-):
+def _activate(schema_name, *, create_schema=True, create_tables=True):
     """
     activate(schema_name, *, create_schema=True, create_tables=True)
         :param schema_name: schema name on the database server to activate the `probe` element
