@@ -119,7 +119,7 @@ markdown_extensions:
       linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  --pymdownx.arithmatex:
+  - pymdownx.arithmatex:
       generic: true
 
   
