@@ -48,40 +48,40 @@ Each node in the following diagram represents the analysis code in the workflow 
 
 | Table | Description |
 | --- | --- |
-| AcquisitionSoftware | Software used to acquire the imaging scans |
+| AcquisitionSoftware | Software used in the acquisiton of the imaging scans |
 | Channel | Recording Channel |
-| Scan |  |
+| Scan | A set of imaging scans perfomed in a single session |
 | ScanLocation | Anatomical location of the region scanned |
-| ScanInfo | Basic information of the imaging data |
-| ScanInfo.Field | |
+| ScanInfo | Metadata of the imaging scan |
+| ScanInfo.Field | Metadata of the fields imaged |
 | ScanInfo.ScanFile | Path of the scan file |
 
 ### `imaging` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/api/element_calcium_imaging/imaging))
 
 | Table | Description |
 | --- | --- |
-| ProcessingMethod | |
-| ProcessingParamSet ||
-| CellCompartment ||
+| ProcessingMethod | Available analysis suites that can be used in processing of the imaging scans |
+| ProcessingParamSet | All parameters required to process a calcium imaging scan |
+| CellCompartment | ?? |
 | MaskType ||
-| ProcessingTask ||
-| Processing ||
-| Curation | |
-| MotionCorrection | |
-| MotionCorrection.RigidMotionCorrection | |
-| MotionCorrection.NonRigidMotionCorrection | |
-| MotionCorrection.NonRigidMotionCorrection.Block | |
-| MotionCorrection.Summary ||
-| Segmentation | |
-| Segmentation.Mask | |
-| MaskClassificationMethod | |
-| MaskClassification | |
-| MaskClassification.MaskType | |
-| Fluorescence | |
-| Fluorescence.Trace | |
-| ActivityExtractionMethod | |
-| Activity | |
-| Activity.Trace | |
+| ProcessingTask | Task defined by a combination of Scan and ProcessingParamSet |
+| Processing | The core table that executes a ProcessingTask |
+| Curation | Curated results |
+| MotionCorrection | Results of the motion correction procedure |
+| MotionCorrection.RigidMotionCorrection | Results of the rigid motion correction procedure |
+| MotionCorrection.NonRigidMotionCorrection | ??? |
+| MotionCorrection.NonRigidMotionCorrection.Block | Results of non-rigid motion correction for each block |
+| MotionCorrection.Summary | ??? |
+| Segmentation | Results of the segmentation |
+| Segmentation.Mask | Masks identified in the segmentation procedure |
+| MaskClassificationMethod | Method used in the mask classification procedure |
+| MaskClassification | Result of the mask classification procedure |
+| MaskClassification.MaskType |  |
+| Fluorescence | Fluorescence measurements |
+| Fluorescence.Trace | Fluorescence traces for each region of interest |
+| ActivityExtractionMethod | Method used in activity extraction |
+| Activity | Inferred neural activity |
+| Activity.Trace | Inferred neural activity from fluorescence traces |
 
 
 ## Acquisition tools
