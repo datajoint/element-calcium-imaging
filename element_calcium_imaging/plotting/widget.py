@@ -1,5 +1,8 @@
 from functools import partial
+from plotly.io import from_json
+from plotly.graph_objects import go
 from ipywidgets import widgets as wg
+from imaging_report import TraceReport, ScanLevelReport
 
 from . import cell_plot
 
@@ -88,7 +91,6 @@ def main(imaging, usedb=False):
     FIG2_HEIGHT = 600
     fig2_layout = cell_plot.get_tracelayout(None, width=FIG2_WIDTH, height=FIG2_HEIGHT)
 
-
     fig2 = go.Figure(
         [
             go.Scatter(
@@ -111,9 +113,7 @@ def main(imaging, usedb=False):
         if mask_id > -1:
             activity_trace_figobj = from_json(
                 (
-                    TraceReport
-                    & motioncorrection_dropdown.value
-                    & f"mask='{mask_id}'"
+                    TraceReport & motioncorrection_dropdown.value & f"mask='{mask_id}'"
                 ).fetch1("activity_trace")
             )
 
@@ -144,7 +144,6 @@ def main(imaging, usedb=False):
                 fig1_widget.data[0].z = cell_overlayed_image.data[0].z
                 fig1_widget.data[0].customdata = cell_overlayed_image.data[0].customdata
 
-
                 fig2_widget.data[0].x = None
                 fig2_widget.data[0].y = None
                 fig2_widget.data[1].x = None
@@ -159,19 +158,17 @@ def main(imaging, usedb=False):
                 & motioncorrection_dropdown.value
             ).fetch("mask", "mask_xpix", "mask_ypix")
 
-            background_image = cell_plot.single_to_3channel_image(image, low_q=0, high_q=99.9)
-
+            background_image = cell_plot.single_to_3channel_image(
+                image, low_q=0, high_q=99.9
+            )
 
             background_image_with_cells_painted = cell_plot.paint_rois(
-
                 background_image, mask_xpix, mask_ypix
             )
             cells_maskid_image = cell_plot.make_maskid_image(
-
                 background_image[:, :, 0], cell_mask_ids, mask_xpix, mask_ypix
             )
             background_with_cells = cell_plot.alpha_combine_2images(
-
                 background_image, background_image_with_cells_painted
             )
             with fig1_widget.batch_update():
