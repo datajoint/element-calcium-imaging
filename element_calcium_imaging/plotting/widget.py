@@ -111,19 +111,19 @@ def main(imaging, usedb=False):
         mask_id = trace.customdata[points.ys[0]][points.xs[0]]
 
         if mask_id > -1:
-            activity_trace_figobj = from_json(
+            cell_traces_figobj = from_json(
                 (
                     TraceReport & motioncorrection_dropdown.value & f"mask='{mask_id}'"
-                ).fetch1("activity_trace")
+                ).fetch1("cell_traces")
             )
 
             with fig2_widget.batch_update():
-                fig2_widget.data[0].x = activity_trace_figobj.data[0].x
-                fig2_widget.data[0].y = activity_trace_figobj.data[0].y
-                fig2_widget.data[0].name = activity_trace_figobj.data[0].name
-                fig2_widget.data[1].x = activity_trace_figobj.data[1].x
-                fig2_widget.data[1].y = activity_trace_figobj.data[1].y
-                fig2_widget.data[1].name = activity_trace_figobj.data[1].name
+                fig2_widget.data[0].x = cell_traces_figobj.data[0].x
+                fig2_widget.data[0].y = cell_traces_figobj.data[0].y
+                fig2_widget.data[0].name = cell_traces_figobj.data[0].name
+                fig2_widget.data[1].x = cell_traces_figobj.data[1].x
+                fig2_widget.data[1].y = cell_traces_figobj.data[1].y
+                fig2_widget.data[1].name = cell_traces_figobj.data[1].name
                 fig2_widget.layout["title"] = {
                     "text": f"Trace for Cell {mask_id}",
                     "xanchor": "center",
