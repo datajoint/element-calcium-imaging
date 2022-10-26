@@ -1,7 +1,7 @@
 import datajoint as dj
 from .plotting import cell_plot
 
-schema = imaging.Schema()
+schema = dj.Schema()
 
 imaging = None
 
