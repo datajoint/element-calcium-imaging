@@ -48,3 +48,4 @@ demonstrates the steps to fetch the results stored in the tables and plot them.
 provides the steps for dropping all the tables to start fresh.
 
 - [07-DownStreamAnalysis](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/07-downstream-analysis-optional.ipynb)
+demonstrates event- and trial-based analysis.
