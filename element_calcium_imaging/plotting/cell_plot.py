@@ -1,6 +1,7 @@
-import plotly.graph_objects as go
 import cv2
 import numpy as np
+import plotly.graph_objects as go
+from .. import scan
 
 
 def single_to_3channel_image(image, low_q=0, high_q=99.9):
@@ -17,9 +18,8 @@ def paint_rois(image, mask_xpix, mask_ypix):
     # Assign colors to each region
     masks = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     for xpix, ypix in zip(mask_xpix, mask_ypix):
-        masks[ypix, xpix] = [np.random.random()*255, SATURATION, VALUE]
+        masks[ypix, xpix] = [np.random.random() * 255, SATURATION, VALUE]
     return np.uint8(cv2.cvtColor(masks.astype(np.float32), cv2.COLOR_HSV2RGB))
-
 
 
 def alpha_combine_2images(image, masks):
@@ -112,10 +112,13 @@ def get_tracelayout(key, width=600, height=600):
 
 def plot_cell_overlayed_image(imaging, segmentation_key):
 
-    image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1("average_image")
+    image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1(
+        "average_image"
+    )
 
     cell_mask_ids, mask_xpix, mask_ypix = (
-        imaging.Segmentation.Mask * imaging.MaskClassification.MaskType & segmentation_key
+        imaging.Segmentation.Mask * imaging.MaskClassification.MaskType
+        & segmentation_key
     ).fetch("mask", "mask_xpix", "mask_ypix")
 
     background_image = single_to_3channel_image(image, low_q=0, high_q=99.9)
@@ -184,4 +187,3 @@ def plot_cell_traces(imaging, cell_key):
     trace_fig.update_layout(get_tracelayout(cell_key))
 
     return trace_fig
-    
