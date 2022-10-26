@@ -206,9 +206,10 @@ class ScanLocation(dj.Manual):
 
 @schema
 class ScanInfo(dj.Imported):
-    """Metadata of scans
-
-    Refer to the `definition` attribute for the table design."""
+    """
+    Information about the scan extracted from the recorded files.
+    Refer to the `definition` property to see the table design.
+    """
 
     definition = """ # General data about the reso/meso scans from header
     -> Scan
