@@ -2,7 +2,7 @@ from functools import partial
 from plotly.io import from_json
 from plotly import graph_objects as go
 from ipywidgets import widgets as wg
-from imaging_report import TraceReport, ScanLevelReport
+from ..imaging_report import TraceReport, ScanLevelReport
 
 from . import cell_plot
 
