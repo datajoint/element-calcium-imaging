@@ -206,7 +206,7 @@ class ScanLocation(dj.Manual):
 
 @schema
 class ScanInfo(dj.Imported):
-    """Metadata of the scan file
+    """Metadata of scans
 
     Refer to the `definition` attribute for the table design."""
 
