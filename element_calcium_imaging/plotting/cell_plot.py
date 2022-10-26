@@ -110,8 +110,7 @@ def get_tracelayout(key, width=600, height=600):
     )
 
 
-def plot_cell_overlayed_image(imaging, segmentation_key):
-
+def image_components(imaging, segmentation_key):
     image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1(
         "average_image"
     )
@@ -131,6 +130,15 @@ def plot_cell_overlayed_image(imaging, segmentation_key):
     background_with_cells = alpha_combine_2images(
         background_image, background_image_with_cells_painted
     )
+    return background_with_cells, cells_maskid_image
+
+
+def plot_cell_overlayed_image(imaging, segmentation_key):
+
+    background_with_cells, cells_maskid_image = image_components(
+        imaging, segmentation_key
+    )
+
     image_fig = go.Figure(
         go.Image(
             z=background_with_cells,

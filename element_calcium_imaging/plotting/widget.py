@@ -149,28 +149,11 @@ def main(imaging, usedb=False):
                 fig2_widget.data[1].x = None
                 fig2_widget.data[1].y = None
         else:
-            image = (
-                imaging.MotionCorrection.Summary & motioncorrection_dropdown.value
-            ).fetch1("average_image")
 
-            cell_mask_ids, mask_xpix, mask_ypix = (
-                imaging.Segmentation.Mask * imaging.MaskClassification.MaskType
-                & motioncorrection_dropdown.value
-            ).fetch("mask", "mask_xpix", "mask_ypix")
-
-            background_image = cell_plot.single_to_3channel_image(
-                image, low_q=0, high_q=99.9
+            background_with_cells, cells_maskid_image = cell_plot.image_components(
+                imaging, motioncorrection_dropdown.value
             )
 
-            background_image_with_cells_painted = cell_plot.paint_rois(
-                background_image, mask_xpix, mask_ypix
-            )
-            cells_maskid_image = cell_plot.make_maskid_image(
-                background_image[:, :, 0], cell_mask_ids, mask_xpix, mask_ypix
-            )
-            background_with_cells = cell_plot.alpha_combine_2images(
-                background_image, background_image_with_cells_painted
-            )
             with fig1_widget.batch_update():
                 fig1_widget.data[0].z = background_with_cells
                 fig1_widget.data[0].customdata = cells_maskid_image
