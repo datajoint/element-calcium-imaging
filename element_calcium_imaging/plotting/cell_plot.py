@@ -1,38 +1,24 @@
-import plotly.graph_objects as go
 import cv2
 import numpy as np
+from matplotlib import colors
+import plotly.graph_objects as go
+from .. import scan
 
 
-def single_to_3channel_image(image, low_q=0, high_q=99.9):
-    image = (image - image.min()) ** 0.5
-    low_p, high_p = np.percentile(image, [low_q, high_q])
-    image = np.uint8(255 * (image - low_p) / (high_p - low_p))
-    return np.dstack([image] * 3)
+def mask_overlayed_image(
+    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+):
+    q_min, q_max = np.quantile(image, [low_q, high_q])
+    image = np.clip(image, q_min, q_max)
+    image = (image - q_min) / (q_max - q_min)
 
-
-def paint_rois(image, mask_xpix, mask_ypix):
-    SATURATION = 40
-    VALUE = 255
-
-    # Assign colors to each region
-    masks = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    for xpix, ypix in zip(mask_xpix, mask_ypix):
-        masks[ypix, xpix] = [np.random.random()*255, SATURATION, VALUE]
-    return np.uint8(cv2.cvtColor(masks.astype(np.float32), cv2.COLOR_HSV2RGB))
-
-
-
-def alpha_combine_2images(image, masks):
-    alpha = 0.5
-    return np.uint8(image * alpha + masks * (1 - alpha))
-
-
-def make_maskid_image(img, roi_ids, mask_xpix, mask_ypix):
-    shape = img.shape[:2]
-    maskid_image = np.full(shape, -1)
-    for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, roi_ids):
+    SATURATION = 0.7
+    image = image[:, :, None] * np.array([0, 0, 1])
+    maskid_image = np.full(image.shape[:2], -1)
+    for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, cell_mask_ids):
+        image[ypix, xpix, :2] = [np.random.rand(), SATURATION]
         maskid_image[ypix, xpix] = roi_id
-    return maskid_image
+    return colors.hsv_to_rgb(image), maskid_image
 
 
 def get_tracelayout(key, width=600, height=600):
@@ -42,7 +28,6 @@ def get_tracelayout(key, width=600, height=600):
         margin=dict(l=0, r=0, b=0, t=65, pad=0),
         width=width,
         height=height,
-
         transition={"duration": 0},
         title={
             "text": text,
@@ -109,26 +94,26 @@ def get_tracelayout(key, width=600, height=600):
     )
 
 
-def plot_cell_overlayed_image(imaging, segmentation_key):
-
-    average_image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1("average_image")
-
+def figure_data(imaging, segmentation_key):
+    image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1(
+        "average_image"
+    )
 
     cell_mask_ids, mask_xpix, mask_ypix = (
-        imaging.Segmentation.Mask * imaging.MaskClassification.MaskType & segmentation_key
+        imaging.Segmentation.Mask * imaging.MaskClassification.MaskType
+        & segmentation_key
     ).fetch("mask", "mask_xpix", "mask_ypix")
 
-    background_image = single_to_3channel_image(average_image, low_q=0, high_q=99.9)
+    background_with_cells, cells_maskid_image = mask_overlayed_image(
+        image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+    )
 
-    background_image_with_cells_painted = paint_rois(
-        background_image, mask_xpix, mask_ypix
-    )
-    cells_maskid_image = make_maskid_image(
-        background_image[:, :, 0], cell_mask_ids, mask_xpix, mask_ypix
-    )
-    background_with_cells = alpha_combine_2images(
-        background_image, background_image_with_cells_painted
-    )
+    return background_with_cells, cells_maskid_image
+
+
+def plot_cell_overlayed_image(imaging, segmentation_key):
+    background_with_cells, cells_maskid_image = figure_data(imaging, segmentation_key)
+
     image_fig = go.Figure(
         go.Image(
             z=background_with_cells,
@@ -185,4 +170,3 @@ def plot_cell_traces(imaging, cell_key):
     trace_fig.update_layout(get_tracelayout(cell_key))
 
     return trace_fig
-    
