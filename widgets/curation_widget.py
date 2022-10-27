@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import datajoint as dj
+from matplotlib import colors
 import plotly.graph_objects as go
 from ipywidgets import widgets as wg
 from plotly.subplots import make_subplots
@@ -9,46 +10,20 @@ from plotly.subplots import make_subplots
 check_list, trace_list = [], []
 
 
-def single_to_3channel_image(image, low_q, high_q):
-    low_p, high_p = np.percentile(image, [low_q, high_q])
-    image = np.clip(image, low_p, high_p)
+def mask_overlayed_image(
+    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+):
+    q_min, q_max = np.quantile(image, [low_q, high_q])
+    image = np.clip(image, q_min, q_max)
+    image = (image - q_min) / (q_max - q_min)
 
-    image -= image.min()
-    image *= 255 / image.max()
-    image = np.uint8(image)
-    image = np.dstack([image] * 3)
-    return image
-
-
-def paint_rois(image, mask_xpix, mask_ypix):
-    # Generate random hsv colors
-    SATURATION = 40
-    VALUE = 255
-    hues = np.random.sample(size=len(mask_xpix)) * 10000
-    hsv_colors = np.stack(
-        [hues, np.full(len(mask_xpix), SATURATION), np.full(len(mask_xpix), VALUE)]
-    ).T
-
-    # Assign colors to each region
-    masks = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    for xpix, ypix, hsv_color in zip(mask_xpix, mask_ypix, hsv_colors):
-        masks[ypix, xpix] = hsv_color
-
-    masks = np.uint8(cv2.cvtColor(masks.astype(np.float32), cv2.COLOR_HSV2RGB))
-    return masks
-
-
-def alpha_combine_2images(image, masks):
-    alpha = 0.5
-    return np.uint8(image * alpha + masks * (1 - alpha))
-
-
-def make_maskid_image(img, roi_ids, mask_xpix, mask_ypix):
-    shape = img.shape[:2]
-    maskid_image = np.full(shape, -1)
-    for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, roi_ids):
+    SATURATION = 0.7
+    image = image[:, :, None] * np.array([0, 0, 1])
+    maskid_image = np.full(image.shape[:2], -1)
+    for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, cell_mask_ids):
+        image[ypix, xpix, :2] = [np.random.rand(), SATURATION]
         maskid_image[ypix, xpix] = roi_id
-    return maskid_image
+    return colors.hsv_to_rgb(image), maskid_image
 
 
 def main(db_prefix):
@@ -163,45 +138,35 @@ def main(db_prefix):
         global check_list, trace_list
         check_list, trace_list = [], []
 
-        average_image = (MotionCorrection.Summary & processed_dropdown.value).fetch1(
+        image = (MotionCorrection.Summary & processed_dropdown.value).fetch1(
             "average_image"
         )
-
-        background_image = single_to_3channel_image(average_image, 1, 99)
 
         # Cells
         cell_mask_ids, mask_xpix, mask_ypix = (
             Segmentation.Mask * MaskClassification.MaskType & processed_dropdown.value
         ).fetch("mask", "mask_xpix", "mask_ypix")
-        background_image_with_cells_painted = paint_rois(
-            background_image, mask_xpix, mask_ypix
-        )
-        cells_maskid_image = make_maskid_image(
-            background_image[:, :, 0], cell_mask_ids, mask_xpix, mask_ypix
+
+        background_image_with_cells_painted, cells_maskid_image = mask_overlayed_image(
+            image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
         )
 
         # NonCells
         noncell_mask_ids, mask_xpix, mask_ypix = (
             (Segmentation.Mask - MaskClassification.MaskType) & processed_dropdown.value
         ).fetch("mask", "mask_xpix", "mask_ypix")
-        background_image_with_noncells_paints = paint_rois(
-            background_image, mask_xpix, mask_ypix
-        )
-        noncells_maskid_image = make_maskid_image(
-            background_image[:, :, 0], noncell_mask_ids, mask_xpix, mask_ypix
+
+        (
+            background_image_with_noncells_paints,
+            noncells_maskid_image,
+        ) = mask_overlayed_image(
+            image, mask_xpix, mask_ypix, noncell_mask_ids, low_q=0, high_q=99.9
         )
 
         # Update plotly figure
         with fwg.batch_update():
-            background_with_cells = alpha_combine_2images(
-                background_image, background_image_with_cells_painted
-            )
-            background_with_noncells = alpha_combine_2images(
-                background_image, background_image_with_noncells_paints
-            )
-
-            fwg.data[0].z = background_with_cells
-            fwg.data[1].z = background_with_noncells
+            fwg.data[0].z = background_image_with_cells_painted
+            fwg.data[1].z = background_image_with_noncells_paints
 
             fwg.data[0].customdata = cells_maskid_image
             fwg.data[1].customdata = noncells_maskid_image
