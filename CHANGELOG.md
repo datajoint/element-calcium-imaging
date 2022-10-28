@@ -52,6 +52,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.4.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.4.1
 [0.4.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.4.0
 [0.3.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.3.0
 [0.2.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.2.2
