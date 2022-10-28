@@ -6,7 +6,9 @@ schema = dj.Schema()
 imaging = None
 
 
-def activate(schema_name, imaging_schema_name, *, create_schema=True, create_tables=True):
+def activate(
+    schema_name, imaging_schema_name, *, create_schema=True, create_tables=True
+):
     """
     activate(schema_name, *, create_schema=True, create_tables=True)
         :param schema_name: schema name on the database server to activate the `imaging_report` schema
