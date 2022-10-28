@@ -6,16 +6,17 @@ schema = dj.Schema()
 imaging = None
 
 
-def _activate(schema_name, *, create_schema=True, create_tables=True):
+def activate(schema_name, imaging_schema_name, *, create_schema=True, create_tables=True):
     """
     activate(schema_name, *, create_schema=True, create_tables=True)
-        :param schema_name: schema name on the database server to activate the `probe` element
+        :param schema_name: schema name on the database server to activate the `imaging_report` schema
+        :param imaging_schema_name: schema name of the activated imaging element for which this imaging_report schema will be downstream from
         :param create_schema: when True (default), create schema in the database if it does not yet exist.
         :param create_tables: when True (default), create tables in the database if they do not yet exist.
     (The "activation" of this imaging_report module should be evoked by one of the imaging modules only)
     """
     global imaging
-    imaging = dj.create_virtual_module("vm", schema_name)
+    imaging = dj.create_virtual_module("imaging", imaging_schema_name)
 
     schema.activate(
         schema_name,
