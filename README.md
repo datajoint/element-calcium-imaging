@@ -10,4 +10,4 @@ other Elements to assemble a fully functional pipeline.
 Installation and usage instructions can be found at the
 [Element documentation](https://datajoint.com/docs/elements/element-calcium-imaging).
 
-![element-deeplabcut diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
+![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
