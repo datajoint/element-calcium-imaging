@@ -1,7 +1,7 @@
 # ---------------------- PROJECT SPECIFIC ---------------------------
 
 site_name: DataJoint Documentation
-site_url: http://localhost/docs/element/element-calcium-imaging
+site_url: http://localhost/docs/elements/element-calcium-imaging
 repo_url: https://github.com/datajoint/element-calcium-imaging
 repo_name: datajoint/element-calcium-imaging
 nav:
