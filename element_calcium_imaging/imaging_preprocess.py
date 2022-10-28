@@ -6,7 +6,7 @@ import inspect
 import importlib
 from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
 
-from . import scan
+from . import scan, imaging_report
 from .scan import (
     get_imaging_root_data_dir,
     get_processed_root_data_dir,
@@ -61,6 +61,7 @@ def activate(
         create_tables=create_tables,
         add_objects=_linking_module.__dict__,
     )
+    imaging_report.activate(f"{imaging_schema_name}_report", imaging_schema_name)
 
 
 # -------------- Table declarations --------------
