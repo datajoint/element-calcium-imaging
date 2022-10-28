@@ -3,13 +3,16 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
 ## [0.4.1] - 2022-10-28
+
 + Update - Bump version to trigger PyPI release to revert updates from incorrect tag
 
 ## [0.4.0] - 2022-10-28
+
 + Add - New schema `imaging_report` to compute and store figures from results
 + Add - Widget to display figures
 
 ## [0.3.0] - 2022-10-07
+
 + Add - Reader for `Bruker PrairieView` acquisition system
 
 ## [0.2.2] - 2022-09-28
