@@ -61,7 +61,7 @@ def activate(
         create_tables=create_tables,
         add_objects=_linking_module.__dict__,
     )
-    imaging_report._activate(imaging_schema_name)
+    imaging_report.activate(f"{imaging_schema_name}_report", imaging_schema_name)
 
 
 # -------------- Table declarations --------------
