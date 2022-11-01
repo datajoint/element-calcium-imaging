@@ -63,7 +63,7 @@ def dj_config():
             os.environ.get("DATABASE_PREFIX") or dj.config["custom"]["database.prefix"]
         ),
         "imaging_root_data_dir": (
-            os.environ.get("IMAGING_ROOT_DATA_DIR")
+            list(os.environ.get("IMAGING_ROOT_DATA_DIR"))
             or dj.config["custom"]["imaging_root_data_dir"]
         ),
     }
