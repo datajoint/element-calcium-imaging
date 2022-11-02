@@ -2,8 +2,9 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [0.4.2] - 2022-11-01
+## [0.4.2] - 2022-11-02
 + Bugfix - Add plotting package to the requirements to generate the figures
++ Add - Scan date parser from nd2 files
 
 ## [0.4.1] - 2022-10-28
 + Update - Bump version to trigger PyPI release to revert updates from incorrect tag

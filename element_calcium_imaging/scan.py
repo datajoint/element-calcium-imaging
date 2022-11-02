@@ -2,6 +2,8 @@ import datajoint as dj
 import pathlib
 import importlib
 import inspect
+import re
+from datetime import datetime
 from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
@@ -293,10 +295,8 @@ class ScanInfo(dj.Imported):
                             field_idx=plane_idx,
                             px_height=scan.image_height,
                             px_width=scan.image_width,
-                            um_height=getattr(
-                                scan, "image_height_in_microns", None),
-                            um_width=getattr(
-                                scan, "image_width_in_microns", None),
+                            um_height=getattr(scan, "image_height_in_microns", None),
+                            um_width=getattr(scan, "image_width_in_microns", None),
                             field_x=x_zero if x_zero else None,
                             field_y=y_zero if y_zero else None,
                             field_z=z_zero + scan.scanning_depths[plane_idx]
@@ -340,8 +340,7 @@ class ScanInfo(dj.Imported):
                     fps=sbx_meta["frame_rate"],
                     bidirectional=sbx_meta == "bidirectional",
                     nrois=sbx_meta["num_rois"] if is_multiROI else 0,
-                    scan_duration=(
-                        sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
+                    scan_duration=(sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
                 )
             )
             # Insert Field(s)
@@ -377,8 +376,7 @@ class ScanInfo(dj.Imported):
 
             # Frame per second
             try:
-                fps = 1000 / \
-                    nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
+                fps = 1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
             except:
                 fps = 1000 / nd2_file.experiment[0].parameters.periodDiff.avg
 
@@ -402,6 +400,18 @@ class ScanInfo(dj.Imported):
                 estimate_nd2_scan_duration(nd2.ND2File(f)) for f in scan_filepaths
             )
 
+            try:
+                scan_datetime = nd2_file.text_info["date"]
+                scan_datetime = datetime.strptime(
+                    scan_datetime,
+                    "%m/%d/%Y %H:%M:%S %p"
+                    if re.search(("AM|PM"), scan_datetime)
+                    else "%m/%d/%Y %H:%M:%S",
+                )
+                scan_datetime = datetime.strftime(scan_datetime, "%Y-%m-%d %H:%M:%S")
+            except:
+                scan_datetime = None
+
             # Insert in ScanInfo
             self.insert1(
                 dict(
@@ -420,6 +430,7 @@ class ScanInfo(dj.Imported):
                         ]["PropertiesQuality"]["ScanDirection"]
                     ),
                     nrois=0,
+                    scan_datetime=scan_datetime,
                     scan_duration=scan_duration,
                 )
             )
@@ -450,8 +461,7 @@ class ScanInfo(dj.Imported):
             from element_interface import prairieviewreader
 
             scan_filepaths = get_prairieview_files(key)
-            pvscan_info = prairieviewreader.get_pv_metadata(
-                scan_filepaths[0])
+            pvscan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
             self.insert1(
                 dict(
                     key,
@@ -493,8 +503,7 @@ class ScanInfo(dj.Imported):
             )
 
         # Insert file(s)
-        root_dir = find_root_directory(
-            get_imaging_root_data_dir(), scan_filepaths[0])
+        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
 
         scan_files = [
             pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
