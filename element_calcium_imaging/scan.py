@@ -17,33 +17,22 @@ def activate(
     """Activate this schema.
 
     Args:
-        scan_schema_name (str): schema name on the database server to activate the `scan` module
-        create_schema (bool): when True (default), create schema in the database if it does not yet exist.
-        create_tables (bool): when True (default), create tables in the database if they do not yet exist.
-        linking_module (str): a module name or a module containing the required dependencies to activate
-            the `scan` module.
+        scan_schema_name (str): Schema name on the database server to activate the
+            `scan` module
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `scan` module.
 
     Dependencies:
     Upstream tables:
-        + Session: parent table to Scan, typically identifying a recording session
-        + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
-        + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
-
-    Functions:
-        + get_imaging_root_data_dir() -> list
-            Retrieve the full path for the root data directory - e.g. containing the imaging recording files or analysis results for all subject/sessions.
-            :return: a string (or list of string) for full path to the root data directory
-        + get_scan_image_files(scan_key: dict) -> list
-            Retrieve the list of ScanImage files associated with a given Scan
-            :param scan_key: key of a Scan
-            :return: list of ScanImage files' full file-paths
-        + get_scan_box_files(scan_key: dict) -> list
-            Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
-            :param scan_key: key of a Scan
-            :return: list of Scanbox files' full file-paths
-        + get_processed_root_data_dir() -> str:
-            Retrieves the root directory for all processed data to be found from or written to
-            :return: a string for full path to the root directory for processed data
+        + Session: Parent table to Scan, typically identifying a recording session
+        + Equipment: Reference table for Scan, specifying the equipment used for the
+            acquisition of this scan.
+        + Location: Reference table for ScanLocation, specifying the scanned regions's
+            anatomical location in the brain.
     """
 
     if isinstance(linking_module, str):
@@ -64,19 +53,17 @@ def activate(
 
 
 # Functions required by element-calcium-imaging  -------------------------------
-
-
-def get_imaging_root_data_dir() -> str:
-    """Retrieve the root data directories containing the imaging data
+def get_imaging_root_data_dir() -> list:
+    """Retrieve the root data director(y/ies) containing the imaging data
     for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
-    processing routines, etc.). All data paths, directories in DataJoint Elements are
+    processing routines, etc.). All data paths and directories in DataJoint Elements are
     recommended to be stored as relative paths (posix format), with respect to some
     user-configured "root" directory, which varies from machine to machine
     (e.g. different mounted drive locations).
 
     Returns:
-        A string for full path to the imaging root data directory, or list of strings for
-        possible root data directories.
+        A list of string(s) or Path(s) for the absolute paths of the imaging root data
+            director(y/ies).
     """
 
     root_directories = _linking_module.get_imaging_root_data_dir()
@@ -89,15 +76,14 @@ def get_imaging_root_data_dir() -> str:
     return root_directories
 
 
-def get_processed_root_data_dir() -> str:
-    """Retrieve the root directory for all processed data. All data paths, directories
-    in DataJoint Elements are recommended to be stored as relative paths (posix format),
-    with respect to some user-configured "root" directory, which varies from machine to
-    machine (e.g. different mounted drive locations).
-
+def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
+    """Retrieve the root directory for all processed data. All data paths and
+    directories in DataJoint Elements are recommended to be stored as relative paths
+    (posix format), with respect to some user-configured "root" directory, which varies
+    from machine to machine (e.g. different mounted drive locations).
 
     Returns:
-        A string for full path to the root directory for processed data.
+        Absolute path of the pocessed imaging root data directory.
     """
 
     if hasattr(_linking_module, "get_processed_root_data_dir"):
@@ -143,7 +129,7 @@ def get_nd2_files(scan_key: dict) -> list:
 
 
 def get_prairieview_files(scan_key: dict) -> list:
-    """Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan
+    """Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan.
 
     Args:
         scan_key: Primary key of a Scan entry.
@@ -159,7 +145,12 @@ def get_prairieview_files(scan_key: dict) -> list:
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    """A list of acquisition softwares supported by the workflow. Required to define a scan."""
+    """A list of acquisition softwares supported by the Element.
+    Required to define a scan.
+
+    Attributes:
+        acq_software (str): Acquistion software
+    """
 
     definition = """  # Acquisition softwares
     acq_software: varchar(24)    
@@ -169,6 +160,12 @@ class AcquisitionSoftware(dj.Lookup):
 
 @schema
 class Channel(dj.Lookup):
+    """Recording channels for the imaging wavelengths
+
+    Attributes:
+        channel (int): Channel index
+    """
+
     definition = """  # A recording channel
     channel     : tinyint  # 0-based indexing
     """
@@ -177,17 +174,25 @@ class Channel(dj.Lookup):
 
 @schema
 class Scan(dj.Manual):
-    """A scan entry in this table is defined by a measurement done using a scanner (Equipment)
-    and an acquisition software. The details of the scanning data is placed in other tables,
-    including, ScanLocation, ScanInfo, and ScanInfo's part tables."""
+    """Scan defined by a measurement done using a scanner (Equipment) and an acquisition
+    software. The details of the scanning data is placed in other tables, including,
+    ScanLocation, ScanInfo, and ScanInfo's part tables.
 
-    definition = """    
+    Attributes:
+        Session (foreign key): A primary key from Session.
+        scan_id (int): Unique Scan ID.
+        Equipment (foreign key): A primary key from Equipment, if any.
+        AcquisitionSoftware (foreign key): A primary key from AcquisitonSoftware.
+        scan_notes (str): Notes of the experimenter regarding the scan, if any.
+    """
+
+    definition = """
     -> Session
-    scan_id: int        
+    scan_id: int
     ---
-    -> [nullable] Equipment  
-    -> AcquisitionSoftware  
-    scan_notes='' : varchar(4095)         # free-notes
+    -> [nullable] Equipment
+    -> AcquisitionSoftware
+    scan_notes='' : varchar(4095)
     """
 
 
@@ -195,7 +200,10 @@ class Scan(dj.Manual):
 class ScanLocation(dj.Manual):
     """Anatomical location of the scanned region in the brain
 
-    Refer to the `definition` attribute for the table design."""
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        Locaton (foreign key): A primary key from Location.
+    """
 
     definition = """Anatomical location
     -> Scan   
@@ -232,7 +240,8 @@ class ScanInfo(dj.Imported):
     """
 
     class Field(dj.Part):
-        """Stores field information of scan, including its coordinates, size, pixel pitch, etc."""
+        """Stores field information of scan, including its coordinates, size, pixel pitch, etc.
+        Refer to the `definition` property to see the table design."""
 
         definition = """ # field-specific scan information
         -> master
@@ -250,7 +259,8 @@ class ScanInfo(dj.Imported):
         """
 
     class ScanFile(dj.Part):
-        """Filepath of the scan relative to root data directory"""
+        """Filepath of the scan relative to root data directory
+        Refer to the `definition` property to see the table design."""
 
         definition = """
         -> master
