@@ -31,18 +31,24 @@ def activate(
     """Activate this schema.
 
     Args:
-        imaging_schema_name (str): Schema name on the database server to activate the `imaging` module
-        scan_schema_name (str): Schema name on the database server to activate the `scan` module.
-            Omitted, if the `scan` module is already activated.
-        create_schema (bool): When True (default), create schema in the database if it does not yet exist.
-        create_tables (bool): When True (default), create tables in the database if they do not yet exist.
-        linking_module (str): A module name or a module containing the required dependencies to activate
-            the `imaging` module: + all that are required by the `scan` module.
+        imaging_schema_name (str): Schema name on the database server to activate the
+            `imaging` module.
+        scan_schema_name (str): Schema name on the database server to activate the
+            `scan` module. Omitted, if the `scan` module is already activated.
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `imaging` module: + all that are required by
+            the `scan` module.
 
     Dependencies:
     Upstream tables:
         + Session: A parent table to Scan, identifying a scanning session.
         + Equipment: A parent table to Scan, identifying a scanning device.
+    Functions:
+        +
     """
 
     if isinstance(linking_module, str):
@@ -74,7 +80,12 @@ def activate(
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    """Method, package, or analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)"""
+    """Method, package, or analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
+
+    Attributes:
+        processing_method (str): Processing method
+        processing_method_desc (str): Processing method description
+    """
 
     definition = """# Method for calcium imaging processing
     processing_method: char(8)
