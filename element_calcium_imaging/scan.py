@@ -1,9 +1,10 @@
+import re
 import inspect
 import pathlib
 import importlib
-import inspect
-import re
 from datetime import datetime
+
+import datajoint as dj
 from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
