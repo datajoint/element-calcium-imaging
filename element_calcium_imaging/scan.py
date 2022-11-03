@@ -81,7 +81,9 @@ def get_imaging_root_data_dir() -> list:
 
 
 def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
-    """Retrieve the root directory for all processed data. All data paths and
+    """Retrieve the root directory for all processed data. 
+    
+    All data paths and
     directories in DataJoint Elements are recommended to be stored as relative paths
     (posix format), with respect to some user-configured "root" directory, which varies
     from machine to machine (e.g. different mounted drive locations).
