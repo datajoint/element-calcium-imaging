@@ -58,8 +58,7 @@ session.activate(db_prefix + "session", linking_module=__name__)
 
 # Activate "event" and "trial" schema ---------------------------------
 
-trial.activate(db_prefix + "trial", db_prefix +
-               "event", linking_module=__name__)
+trial.activate(db_prefix + "trial", db_prefix + "event", linking_module=__name__)
 
 
 # ------------- Declare table Equipment for use in element_calcium_imaging -------------
@@ -67,6 +66,12 @@ trial.activate(db_prefix + "trial", db_prefix +
 
 @lab.schema
 class Equipment(dj.Manual):
+    """Equipment
+
+    Attributes:
+        scanner (str): Scanner used in imaging.
+    """
+
     definition = """
     scanner: varchar(32)
     """
@@ -74,8 +79,7 @@ class Equipment(dj.Manual):
 
 # ------------- Activate "imaging" schema -------------
 
-imaging.activate(db_prefix + "imaging", db_prefix +
-                 "scan", linking_module=__name__)
+imaging.activate(db_prefix + "imaging", db_prefix + "scan", linking_module=__name__)
 
 # ------------- Activate "analysis" schema ------------
 
