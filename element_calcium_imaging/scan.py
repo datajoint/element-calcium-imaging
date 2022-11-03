@@ -2,6 +2,7 @@ import re
 import inspect
 import pathlib
 import importlib
+from typing import Union
 from datetime import datetime
 
 import datajoint as dj
