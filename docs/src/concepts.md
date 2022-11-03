@@ -128,21 +128,21 @@ steps can be performed on each scan prior to processing with Suite2p or CaImAn.
 | --- | --- |
 | ProcessingMethod | Available analysis suites that can be used in processing of the imaging scans |
 | ProcessingParamSet | All parameters required to process a calcium imaging scan |
-| CellCompartment | ?? |
-| MaskType ||
+| CellCompartment | Cell compartments that can be imaged |
+| MaskType | Available labels for segmented masks |
 | ProcessingTask | Task defined by a combination of Scan and ProcessingParamSet |
 | Processing | The core table that executes a ProcessingTask |
 | Curation | Curated results |
 | MotionCorrection | Results of the motion correction procedure |
-| MotionCorrection.RigidMotionCorrection | Results of the rigid motion correction procedure |
-| MotionCorrection.NonRigidMotionCorrection | ??? |
+| MotionCorrection.RigidMotionCorrection | Details of the rigid motion correction performed on the imaging data |
+| MotionCorrection.NonRigidMotionCorrection | Details of nonrigid motion correction performed on the imaging data |
 | MotionCorrection.NonRigidMotionCorrection.Block | Results of non-rigid motion correction for each block |
-| MotionCorrection.Summary | ??? |
+| MotionCorrection.Summary | Summary images for each field and channel after motion corrections |
 | Segmentation | Results of the segmentation |
 | Segmentation.Mask | Masks identified in the segmentation procedure |
 | MaskClassificationMethod | Method used in the mask classification procedure |
 | MaskClassification | Result of the mask classification procedure |
-| MaskClassification.MaskType |  |
+| MaskClassification.MaskType | Type assigned to each mask |
 | Fluorescence | Fluorescence measurements |
 | Fluorescence.Trace | Fluorescence traces for each region of interest |
 | ActivityExtractionMethod | Method used in activity extraction |
