@@ -57,7 +57,7 @@ def activate(
 # Functions required by element-calcium-imaging  -------------------------------
 def get_imaging_root_data_dir() -> list:
     """Return imaging root data director(y/ies)
-    
+
     Retrieve the root data director(y/ies) containing the imaging data
     for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
     processing routines, etc.). All data paths and directories in DataJoint Elements are
@@ -81,15 +81,16 @@ def get_imaging_root_data_dir() -> list:
 
 
 def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
-    """Retrieve the root directory for all processed data. 
-    
-    All data paths and
-    directories in DataJoint Elements are recommended to be stored as relative paths
-    (posix format), with respect to some user-configured "root" directory, which varies
-    from machine to machine (e.g. different mounted drive locations).
+    """Retrieve the root directory for all processed data.
+
+    All data paths and directories in DataJoint Elements are recommended to be stored as
+    relative paths (posix format), with respect to some user-configured "root"
+    directory, which varies from machine to machine (e.g. different mounted drive
+    locations).
 
     Returns:
-        Absolute path of the pocessed imaging root data directory.
+        dir (str| pathlib.Path): Absolute path of the pocessed imaging root data
+            directory.
     """
 
     if hasattr(_linking_module, "get_processed_root_data_dir"):
