@@ -56,7 +56,9 @@ def activate(
 
 # Functions required by element-calcium-imaging  -------------------------------
 def get_imaging_root_data_dir() -> list:
-    """Retrieve the root data director(y/ies) containing the imaging data
+    """Return imaging root data director(y/ies)
+    
+    Retrieve the root data director(y/ies) containing the imaging data
     for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
     processing routines, etc.). All data paths and directories in DataJoint Elements are
     recommended to be stored as relative paths (posix format), with respect to some
