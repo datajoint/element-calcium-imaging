@@ -41,7 +41,7 @@ The primary acquisition systems are:
 + Bruker (we estimate 400 rigs in active use - TBC)
 + Neurolabware (we estimate 400 rigs in active use - TBC)
 
-We do not include Miniscopes in these estimates. In all there are perhaps on the order of 3000 two-photon setups globally but their processing needs may need to be further segmented.
+We do not include Miniscopes in these estimates. In, all there are perhaps on the order of 3000 two-photon setups globally but their processing needs may need to be further segmented.
 
 ### Software
 - ScanImage
