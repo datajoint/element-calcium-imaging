@@ -64,7 +64,7 @@ def get_imaging_root_data_dir() -> list:
     (e.g. different mounted drive locations).
 
     Returns:
-        A list of string(s) or Path(s) for the absolute paths of the imaging root data
+        dirs (list): A list of string(s) or Path(s) for the absolute paths of the imaging root data
             director(y/ies).
     """
 
