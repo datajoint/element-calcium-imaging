@@ -312,6 +312,8 @@ class ScanInfo(dj.Imported):
         """
 
     def make(self, key):
+        """Populate the ScanInfo with the information parsed from image files."""
+
         acq_software = (Scan & key).fetch1("acq_software")
 
         if acq_software == "ScanImage":
