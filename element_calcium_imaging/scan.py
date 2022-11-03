@@ -146,6 +146,7 @@ def get_prairieview_files(scan_key: dict) -> list:
 @schema
 class AcquisitionSoftware(dj.Lookup):
     """A list of acquisition softwares supported by the Element.
+
     Required to define a scan.
 
     Attributes:
@@ -160,7 +161,7 @@ class AcquisitionSoftware(dj.Lookup):
 
 @schema
 class Channel(dj.Lookup):
-    """Recording channels for the imaging wavelengths
+    """Recording channels for the imaging wavelengths.
 
     Attributes:
         channel (int): Channel index
@@ -174,16 +175,17 @@ class Channel(dj.Lookup):
 
 @schema
 class Scan(dj.Manual):
-    """Scan defined by a measurement done using a scanner (Equipment) and an acquisition
-    software. The details of the scanning data is placed in other tables, including,
+    """Scan defined by a measurement done using a scanner and an acquisition software.
+
+    The details of the scanning data is placed in other tables, including,
     ScanLocation, ScanInfo, and ScanInfo's part tables.
 
     Attributes:
         Session (foreign key): A primary key from Session.
         scan_id (int): Unique Scan ID.
-        Equipment (foreign key): A primary key from Equipment, if any.
+        Equipment (foreign key, optional): A primary key from Equipment.
         AcquisitionSoftware (foreign key): A primary key from AcquisitonSoftware.
-        scan_notes (str): Notes of the experimenter regarding the scan, if any.
+        scan_notes (str, optional): Notes of the experimenter regarding the scan.
     """
 
     definition = """
@@ -216,7 +218,25 @@ class ScanLocation(dj.Manual):
 class ScanInfo(dj.Imported):
     """
     Information about the scan extracted from the recorded files.
-    Refer to the `definition` property to see the table design.
+
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        nfields (int): Number of fields.
+        nchannels (int): Number of channels.
+        ndepths (int): Number of scanning depths (planes).
+        nframes (int): Number of recorded frames.
+        nrois (int): Number of ROIs (see scanimage's multi ROI imaging).
+        x (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        y (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        z (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        fps (float) : Frames per second (Hz) - Volumetric Scan Rate.
+        bidirectional (bool): True = bidirectional scanning.
+        usecs_per_line (float, optional): Microseconds per scan line.
+        fill_fraction (float, optional): Raster scan temporal fill fraction (see
+            scanimage)
+        scan_datetime (datetime, optional): Datetime of the scan.
+        scan_duration (float, optional): Duration of the scan (s).
+        bidirectional_z (bool, optional): True = bidirectional z-scan.
     """
 
     definition = """ # General data about the reso/meso scans from header
@@ -240,8 +260,26 @@ class ScanInfo(dj.Imported):
     """
 
     class Field(dj.Part):
-        """Stores field information of scan, including its coordinates, size, pixel pitch, etc.
-        Refer to the `definition` property to see the table design."""
+        """Stores field information of scan, including its coordinates, size, pixel
+        pitch, etc.
+
+        Attributes:
+            ScanInfo (foreign key): A primary key from ScanInfo.
+            field_idx (int): Unique field index.
+            px_height (int): Image height in pixels.
+            px_width (int): Image width in pixels.
+            um_height (float, optional): Image height in microns.
+            um_width (float, optional): Image width in microns.
+            field_x (float, optional): X coordinate of the center of field in the motor
+                coordinate system (um).
+            field_y (float, optional): Y coordinate of the center of field in the motor
+                coordinate system (um).
+            field_z (float, optional): Relative depth of field (um).
+            delay_image (longblob, optional): Delay between the start of the scan and
+                pixels in this field (ms).
+            roi (int, optional): The scanning roi (as recorded in the acquisition
+                software) containing this field - only relevant to mesoscale scans.
+        """
 
         definition = """ # field-specific scan information
         -> master
@@ -259,8 +297,12 @@ class ScanInfo(dj.Imported):
         """
 
     class ScanFile(dj.Part):
-        """Filepath of the scan relative to root data directory
-        Refer to the `definition` property to see the table design."""
+        """Filepath of the scan relative to root data directory.
+
+        Attributes:
+            ScanInfo (foreign key): A primary key from ScanInfo.
+            file_path (str): Path of the scan file relative to the root data directory.
+        """
 
         definition = """
         -> master
