@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from matplotlib import colors
 import plotly.graph_objects as go
