@@ -5,7 +5,7 @@ from .. import scan
 
 
 def mask_overlayed_image(
-    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=0.99
 ):
     q_min, q_max = np.quantile(image, [low_q, high_q])
     image = np.clip(image, q_min, q_max)
@@ -104,7 +104,7 @@ def figure_data(imaging, segmentation_key):
     ).fetch("mask", "mask_xpix", "mask_ypix")
 
     background_with_cells, cells_maskid_image = mask_overlayed_image(
-        image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+        image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=0.99
     )
 
     return background_with_cells, cells_maskid_image
