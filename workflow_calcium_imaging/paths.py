@@ -2,7 +2,7 @@ import datajoint as dj
 import pathlib
 
 
-def get_imaging_root_data_dir():
+def get_imaging_root_data_dir() -> pathlib.Path:
     """Retrieve imaging root data directory."""
 
     data_dir = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
