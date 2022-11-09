@@ -207,7 +207,9 @@ def ingest_events(
 def ingest_alignment(
     alignment_csv_path="./user_data/alignments.csv", skip_duplicates=True, verbose=True
 ):
-    """This is duplicated across wf-array-ephys and wf-calcium-imaging.
+    """Ingest event alignment information
+    
+    This is duplicated across wf-array-ephys and wf-calcium-imaging.
 
     Args:
         alignment_csv_path (str): relative path of alignments.csv
