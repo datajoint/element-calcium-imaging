@@ -98,7 +98,7 @@ def get_nd2_files(scan_key):
 
 
 def get_prairieview_files(scan_key):
-    """Retrieve the list of Prairieview files associated with a given Scan.
+    """Retrieve the list of PrairieView files associated with a given Scan.
 
     Args:
         scan_key (dict): Primary key from Scan.
