@@ -15,7 +15,7 @@ from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects(
-    subject_csv_path="./user_data/subjects.csv", skip_duplicates=True, verbose=True
+    subject_csv_path:str="./user_data/subjects.csv", skip_duplicates:bool=True, verbose:bool=True
 ):
     """Inserts ./user_data/subject.csv data into corresponding subject schema tables.
 
