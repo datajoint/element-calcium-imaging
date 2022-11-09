@@ -631,8 +631,7 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
-        """Populate MotionCorrection with results parsed from analysis outputs
-        """
+        """Populate MotionCorrection with results parsed from analysis outputs"""
 
         method, imaging_dataset = get_loader_result(key, Curation)
 
