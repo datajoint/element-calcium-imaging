@@ -1254,8 +1254,9 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        """Populate the Activity with the results parsed from analysis
-        outputs."""
+        """
+        Populate the Activity with the results parsed from analysis outputs.
+        """
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
