@@ -150,7 +150,9 @@ def ingest_events(
     verbose=True,
 ):
     """
-    Ingest each level of experiment heirarchy for element-trial: recording, block (i.e.,
+    Ingest session, block, trial, and event data.
+
+    Ingest each level of experiment hierarchy for element-trial: recording, block (i.e.,
     phases of trials), trials (repeated units), events (optionally 0-duration occurances
     within trial).
 
