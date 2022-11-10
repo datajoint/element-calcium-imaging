@@ -8,6 +8,17 @@ from . import cell_plot
 
 
 def main(imaging, usedb=False):
+    """Display the widget.
+
+    Args:
+        imaging (dj.Table): imaging table in the database.
+        usedb (bool, optional): Whether to use the figures in the database or compute
+            the figures on the fly.
+
+    Returns:
+        widget: Widget to display the figures.
+    """
+
     motioncorrection_dropdown = wg.Dropdown(
         options=imaging.Segmentation.fetch("KEY"),
         description="Result:",

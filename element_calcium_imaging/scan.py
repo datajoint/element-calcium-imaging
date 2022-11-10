@@ -1,9 +1,11 @@
-import datajoint as dj
+import re
+import inspect
 import pathlib
 import importlib
-import inspect
-import re
+from typing import Union
 from datetime import datetime
+
+import datajoint as dj
 from element_interface.utils import find_root_directory, find_full_path
 
 schema = dj.schema()
@@ -14,32 +16,25 @@ _linking_module = None
 def activate(
     scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None
 ):
-    """
-    activate(scan_schema_name, *, create_schema=True, create_tables=True, linking_module=None)
-        :param scan_schema_name: schema name on the database server to activate the `scan` module
-        :param create_schema: when True (default), create schema in the database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `scan` module:
-            Upstream tables:
-                + Session: parent table to Scan, typically identifying a recording session
-                + Equipment: Reference table for Scan, specifying the equipment used for the acquisition of this scan
-                + Location: Reference table for ScanLocation, specifying the brain location where this scan is acquired
-            Functions:
-                + get_imaging_root_data_dir() -> list
-                    Retrieve the full path for the root data directory - e.g. containing the imaging recording files or analysis results for all subject/sessions.
-                    :return: a string (or list of string) for full path to the root data directory
-                + get_scan_image_files(scan_key: dict) -> list
-                    Retrieve the list of ScanImage files associated with a given Scan
-                    :param scan_key: key of a Scan
-                    :return: list of ScanImage files' full file-paths
-                + get_scan_box_files(scan_key: dict) -> list
-                    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
-                    :param scan_key: key of a Scan
-                    :return: list of Scanbox files' full file-paths
-                + get_processed_root_data_dir() -> str:
-                    Retrieves the root directory for all processed data to be found from or written to
-                    :return: a string for full path to the root directory for processed data
+    """Activate this schema.
+
+    Args:
+        scan_schema_name (str): Schema name on the database server to activate the
+            `scan` module
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `scan` module.
+
+    Dependencies:
+    Upstream tables:
+        + Session: Parent table to Scan, typically identifying a recording session
+        + Equipment: Reference table for Scan, specifying the equipment used for the
+            acquisition of this scan.
+        + Location: Reference table for ScanLocation, specifying the scanned regions's
+            anatomical location in the brain.
     """
 
     if isinstance(linking_module, str):
@@ -60,21 +55,19 @@ def activate(
 
 
 # Functions required by element-calcium-imaging  -------------------------------
+def get_imaging_root_data_dir() -> list:
+    """Return imaging root data director(y/ies)
 
+    Retrieve the root data director(y/ies) containing the imaging data
+    for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
+    processing routines, etc.). All data paths and directories in DataJoint Elements are
+    recommended to be stored as relative paths (posix format), with respect to some
+    user-configured "root" directory, which varies from machine to machine
+    (e.g. different mounted drive locations).
 
-def get_imaging_root_data_dir() -> str:
-    """
-    All data paths, directories in DataJoint Elements are recommended to be stored as
-    relative paths (posix format), with respect to some user-configured "root" directory,
-     which varies from machine to machine (e.g. different mounted drive locations)
-
-    get_imaging_root_data_dir() -> list
-        This user-provided function retrieves the possible root data directories
-         containing the imaging data for all subjects/sessions
-         (e.g. acquired ScanImage raw files,
-         output files from processing routines, etc.)
-        :return: a string for full path to the imaging root data directory,
-         or list of strings for possible root data directories
+    Returns:
+        dirs (list): A list of string(s) or Path(s) for the absolute paths of the imaging root data
+            director(y/ies).
     """
 
     root_directories = _linking_module.get_imaging_root_data_dir()
@@ -87,11 +80,17 @@ def get_imaging_root_data_dir() -> str:
     return root_directories
 
 
-def get_processed_root_data_dir() -> str:
-    """
-    get_processed_root_data_dir() -> str:
-        Retrieves the root directory for all processed data to be found from or written to
-        :return: a string for full path to the root directory for processed data
+def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
+    """Retrieve the root directory for all processed data.
+
+    All data paths and directories in DataJoint Elements are recommended to be stored as
+    relative paths (posix format), with respect to some user-configured "root"
+    directory, which varies from machine to machine (e.g. different mounted drive
+    locations).
+
+    Returns:
+        dir (str| pathlib.Path): Absolute path of the pocessed imaging root data
+            directory.
     """
 
     if hasattr(_linking_module, "get_processed_root_data_dir"):
@@ -101,37 +100,49 @@ def get_processed_root_data_dir() -> str:
 
 
 def get_scan_image_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of ScanImage files associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of ScanImage files' full file-paths
+    """Retrieve the list of ScanImage files associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of ScanImage files' full file-paths.
     """
     return _linking_module.get_scan_image_files(scan_key)
 
 
 def get_scan_box_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Scanbox files (*.sbx) associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Scanbox files' full file-paths
+    """Retrieve the list of Scanbox files (*.sbx) associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Scanbox files' full file-paths.
     """
     return _linking_module.get_scan_box_files(scan_key)
 
 
 def get_nd2_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Nikon files (*.nd2) associated with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Nikon files' full file-paths
+    """Retrieve the list of Nikon files (*.nd2) associated with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Nikon files' full file-paths.
     """
     return _linking_module.get_nd2_files(scan_key)
 
 
 def get_prairieview_files(scan_key: dict) -> list:
-    """
-    Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan
-    :param scan_key: key of a Scan
-    :return: list of Bruker PrairieView files' full file-paths
+    """Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan.
+
+    Args:
+        scan_key: Primary key of a Scan entry.
+
+    Returns:
+        A list of Bruker PrairieView files' full file-paths.
     """
     return _linking_module.get_prairieview_files(scan_key)
 
@@ -141,7 +152,15 @@ def get_prairieview_files(scan_key: dict) -> list:
 
 @schema
 class AcquisitionSoftware(dj.Lookup):
-    definition = """  # Name of acquisition software - e.g. ScanImage, Scanbox, NIS, PrairieView
+    """A list of acquisition softwares supported by the Element.
+
+    Required to define a scan.
+
+    Attributes:
+        acq_software (str): Acquistion software
+    """
+
+    definition = """  # Acquisition softwares
     acq_software: varchar(24)    
     """
     contents = zip(["ScanImage", "Scanbox", "NIS", "PrairieView"])
@@ -149,6 +168,12 @@ class AcquisitionSoftware(dj.Lookup):
 
 @schema
 class Channel(dj.Lookup):
+    """Recording channels for the imaging wavelengths.
+
+    Attributes:
+        channel (int): Channel index
+    """
+
     definition = """  # A recording channel
     channel     : tinyint  # 0-based indexing
     """
@@ -157,28 +182,71 @@ class Channel(dj.Lookup):
 
 @schema
 class Scan(dj.Manual):
-    definition = """    
+    """Scan defined by a measurement done using a scanner and an acquisition software.
+
+    The details of the scanning data is placed in other tables, including,
+    ScanLocation, ScanInfo, and ScanInfo's part tables.
+
+    Attributes:
+        Session (foreign key): A primary key from Session.
+        scan_id (int): Unique Scan ID.
+        Equipment (foreign key, optional): A primary key from Equipment.
+        AcquisitionSoftware (foreign key): A primary key from AcquisitonSoftware.
+        scan_notes (str, optional): Notes of the experimenter regarding the scan.
+    """
+
+    definition = """
     -> Session
-    scan_id: int        
+    scan_id: int
     ---
-    -> [nullable] Equipment  
-    -> AcquisitionSoftware  
-    scan_notes='' : varchar(4095)         # free-notes
+    -> [nullable] Equipment
+    -> AcquisitionSoftware
+    scan_notes='' : varchar(4095)
     """
 
 
 @schema
 class ScanLocation(dj.Manual):
-    definition = """
+    """Anatomical location of the scanned region in the brain
+
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        Locaton (foreign key): A primary key from Location.
+    """
+
+    definition = """Anatomical location
     -> Scan   
-    ---    
+    ---
     -> Location      
     """
 
 
 @schema
 class ScanInfo(dj.Imported):
-    definition = """ # general data about the reso/meso scans from header
+    """
+    Information about the scan extracted from the recorded files.
+
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        nfields (int): Number of fields.
+        nchannels (int): Number of channels.
+        ndepths (int): Number of scanning depths (planes).
+        nframes (int): Number of recorded frames.
+        nrois (int): Number of ROIs (see scanimage's multi ROI imaging).
+        x (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        y (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        z (float, optional): ScanImage's 0 point in the motor coordinate system (um).
+        fps (float) : Frames per second (Hz) - Volumetric Scan Rate.
+        bidirectional (bool): True = bidirectional scanning.
+        usecs_per_line (float, optional): Microseconds per scan line.
+        fill_fraction (float, optional): Raster scan temporal fill fraction (see
+            scanimage)
+        scan_datetime (datetime, optional): Datetime of the scan.
+        scan_duration (float, optional): Duration of the scan (s).
+        bidirectional_z (bool, optional): True = bidirectional z-scan.
+    """
+
+    definition = """ # General data about the reso/meso scans from header
     -> Scan
     ---
     nfields              : tinyint   # number of fields
@@ -199,6 +267,27 @@ class ScanInfo(dj.Imported):
     """
 
     class Field(dj.Part):
+        """Stores field information of scan, including its coordinates, size, pixel
+        pitch, etc.
+
+        Attributes:
+            ScanInfo (foreign key): A primary key from ScanInfo.
+            field_idx (int): Unique field index.
+            px_height (int): Image height in pixels.
+            px_width (int): Image width in pixels.
+            um_height (float, optional): Image height in microns.
+            um_width (float, optional): Image width in microns.
+            field_x (float, optional): X coordinate of the center of field in the motor
+                coordinate system (um).
+            field_y (float, optional): Y coordinate of the center of field in the motor
+                coordinate system (um).
+            field_z (float, optional): Relative depth of field (um).
+            delay_image (longblob, optional): Delay between the start of the scan and
+                pixels in this field (ms).
+            roi (int, optional): The scanning roi (as recorded in the acquisition
+                software) containing this field - only relevant to mesoscale scans.
+        """
+
         definition = """ # field-specific scan information
         -> master
         field_idx         : int
@@ -215,12 +304,21 @@ class ScanInfo(dj.Imported):
         """
 
     class ScanFile(dj.Part):
+        """Filepath of the scan relative to root data directory.
+
+        Attributes:
+            ScanInfo (foreign key): A primary key from ScanInfo.
+            file_path (str): Path of the scan file relative to the root data directory.
+        """
+
         definition = """
         -> master
-        file_path: varchar(255)  # filepath relative to root data directory
+        file_path: varchar(255)  # Filepath relative to root data directory
         """
 
     def make(self, key):
+        """Populate the ScanInfo with the information parsed from image files."""
+
         acq_software = (Scan & key).fetch1("acq_software")
 
         if acq_software == "ScanImage":
