@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from matplotlib import colors
 import plotly.graph_objects as go
@@ -6,8 +5,10 @@ from .. import scan
 
 
 def mask_overlayed_image(
-    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+    image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=0.99
 ):
+    """Overlay transparent cell masks on average image."""
+
     q_min, q_max = np.quantile(image, [low_q, high_q])
     image = np.clip(image, q_min, q_max)
     image = (image - q_min) / (q_max - q_min)
@@ -18,10 +19,12 @@ def mask_overlayed_image(
     for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, cell_mask_ids):
         image[ypix, xpix, :2] = [np.random.rand(), SATURATION]
         maskid_image[ypix, xpix] = roi_id
-    return colors.hsv_to_rgb(image), maskid_image
+    image = (colors.hsv_to_rgb(image) * 255).astype(int)
+    return image, maskid_image
 
 
 def get_tracelayout(key, width=600, height=600):
+    """Returns a dictionary of layout settings for the trace figures."""
     text = f"Trace for Cell {key['mask']}" if isinstance(key, dict) else "Trace"
 
     return dict(
@@ -95,6 +98,18 @@ def get_tracelayout(key, width=600, height=600):
 
 
 def figure_data(imaging, segmentation_key):
+    """Prepare the images for a given segmentation_key.
+
+    Args:
+        imaging (dj.Table): imaging table.
+        segmentation_key (dict): A primary key from Segmentation table.
+
+    Returns:
+        background_with_cells (np.array): Average image with transparently overlayed
+            cells.
+        cells_maskid_image (np.array): Mask ID image.
+    """
+
     image = (imaging.MotionCorrection.Summary & segmentation_key).fetch1(
         "average_image"
     )
@@ -105,13 +120,24 @@ def figure_data(imaging, segmentation_key):
     ).fetch("mask", "mask_xpix", "mask_ypix")
 
     background_with_cells, cells_maskid_image = mask_overlayed_image(
-        image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=99.9
+        image, mask_xpix, mask_ypix, cell_mask_ids, low_q=0, high_q=0.99
     )
 
     return background_with_cells, cells_maskid_image
 
 
 def plot_cell_overlayed_image(imaging, segmentation_key):
+    """_summary_
+
+    Args:
+        imaging (dj.Table): imaging table.
+        segmentation_key (dict): A primary key from Segmentation table.
+
+    Returns:
+        image_fig (plotly.Fig): Plotly figure object of the average image with
+            transparently overlayed cells.
+    """
+
     background_with_cells, cells_maskid_image = figure_data(imaging, segmentation_key)
 
     image_fig = go.Figure(
@@ -143,6 +169,15 @@ def plot_cell_overlayed_image(imaging, segmentation_key):
 
 
 def plot_cell_traces(imaging, cell_key):
+    """Prepare plotly trace figure.
+
+    Args:
+        imaging (dj.Table): imaging table.
+        cell_key (dict): A primary key from imaging.Activity.Trace table.
+
+    Returns:
+        trace_fig: Plotly figure object of the traces.
+    """
     activity_trace = (
         imaging.Activity.Trace & "extraction_method LIKE '%deconvolution'" & cell_key
     ).fetch1("activity_trace")

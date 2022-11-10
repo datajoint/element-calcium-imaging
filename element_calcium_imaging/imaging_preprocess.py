@@ -1,9 +1,9 @@
-import datajoint as dj
-import numpy as np
-import pathlib
-import os
 import inspect
+import pathlib
 import importlib
+import numpy as np
+
+import datajoint as dj
 from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
 
 from . import scan, imaging_report
@@ -28,16 +28,25 @@ def activate(
     create_tables=True,
     linking_module=None,
 ):
-    """
-    activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
-        :param imaging_schema_name: schema name on the database server to activate the `imaging` module
-        :param scan_schema_name: schema name on the database server to activate the `scan` module
-         - may be omitted if the `scan` module is already activated
-        :param create_schema: when True (default), create schema in the database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `imaging` module:
-         + all that are required by the `scan` module
+    """Activate this schema.
+
+    Args:
+        imaging_schema_name (str): Schema name on the database server to activate the
+            `imaging` module.
+        scan_schema_name (str): Schema name on the database server to activate the
+            `scan` module. Omitted, if the `scan` module is already activated.
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `imaging` module: + all that are required by
+            the `scan` module.
+
+    Dependencies:
+    Upstream tables:
+        + Session: A parent table to Scan, identifying a scanning session.
+        + Equipment: A parent table to Scan, identifying a scanning device.
     """
 
     if isinstance(linking_module, str):
@@ -69,6 +78,13 @@ def activate(
 
 @schema
 class PreprocessMethod(dj.Lookup):
+    """Method(s) used for preprocessing of calcium imaging data.
+
+    Attributes:
+        preprocess_method (str): Preprocessing method.
+        preprocess_method_desc (str): Processing method description.
+    """
+
     definition = """  #  Method/package used for pre-processing
     preprocess_method: varchar(16)
     ---
@@ -78,6 +94,20 @@ class PreprocessMethod(dj.Lookup):
 
 @schema
 class PreprocessParamSet(dj.Lookup):
+    """Parameter set used for the preprocessing of the calcium imaging scans.
+
+    A hash of the parameters of the analysis suite is also stored in order
+    to avoid duplicated entries.
+
+    Attributes:
+        paramset_idx (int): Uniqiue parameter set ID.
+        PreprocessMethod (foreign key): A primary key from PreprocessMethod.
+        paramset_desc (str): Parameter set description.
+        param_set_hash (uuid): A universally unique identifier for the parameter set.
+        params (longblob): Parameter Set, a dictionary of all applicable parameters to
+            the analysis suite.
+    """
+
     definition = """  #  Parameter set used for pre-processing of calcium imaging data
     paramset_idx:  smallint
     ---
@@ -92,6 +122,16 @@ class PreprocessParamSet(dj.Lookup):
     def insert_new_params(
         cls, preprocess_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
+        """Insert a parameter set into PreprocessParamSet table.
+        This function automizes the parameter set hashing and avoids insertion of an
+            existing parameter set.
+
+        Attributes:
+            preprocess_method (str): Method used for processing of calcium imaging scans.
+            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_desc (str): Parameter set description.
+            params (dict): Parameter Set, all applicable parameters.
+        """
         param_dict = {
             "preprocess_method": preprocess_method,
             "paramset_idx": paramset_idx,
@@ -115,9 +155,17 @@ class PreprocessParamSet(dj.Lookup):
 
 @schema
 class PreprocessParamSteps(dj.Manual):
+    """Ordered list of paramset_idx that will be run.
+
+    When pre-processing is not performed, do not create an entry in `Step` Part table
+
+    Attributes:
+        preprocess_param_steps_id (int):
+        preprocess_param_steps_name (str):
+        preprocess_param_steps_desc (str):
+    """
+
     definition = """
-    # Ordered list of paramset_idx that are to be run
-    # When pre-processing is not performed, do not create an entry in `Step` Part table
     preprocess_param_steps_id: smallint
     ---
     preprocess_param_steps_name: varchar(32)
@@ -125,6 +173,14 @@ class PreprocessParamSteps(dj.Manual):
     """
 
     class Step(dj.Part):
+        """ADD DEFINITION
+
+        Attributes:
+            PreprocessParamSteps (foreign key): A primary key from PreprocessParamSteps.
+            step_number (int):
+            PreprocessParamSet (foreign key): A primary key from PreprocessParamSet.
+        """
+
         definition = """
         -> master
         step_number: smallint                  # Order of operations
@@ -135,6 +191,20 @@ class PreprocessParamSteps(dj.Manual):
 
 @schema
 class PreprocessTask(dj.Manual):
+    """This table defines a calcium imaging preprocessing task for a combination of a
+    `Scan` and a `PreprocessParamSteps` entries, including all the inputs (scan, method,
+    steps). The task defined here is then run in the downstream table
+    Preprocess. This table supports definitions of both loading of pre-generated,
+    results, triggering of new analysis, or skipping of preprocessing step.
+
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        PreprocessParamSteps (foreign key): A primary key from PreprocessParamSteps.
+        preprocess_output_dir (str): Output directory for the results of preprocessing.
+        task_mode (str, optional): One of 'load' (load computed analysis results), 'trigger'
+            (trigger computation), 'none' (no pre-processing). Default none.
+    """
+
     definition = """
     # Manual table for defining a pre-processing task ready to be run
     -> scan.Scan
@@ -150,21 +220,29 @@ class PreprocessTask(dj.Manual):
 
 @schema
 class Preprocess(dj.Imported):
-    """
-    A processing table to handle each PreprocessTask:
+    """Perform the computation of an entry (task) defined in the PreprocessTask table.
+
     + If `task_mode == "none"`: no pre-processing performed
     + If `task_mode == "trigger"`: Not implemented
     + If `task_mode == "load"`: Not implemented
+
+    Attributes:
+        PreprocessTask (foreign key):
+        preprocess_time (datetime, optional):
+        package_version (str, optional): Version of the analysis package used in
+            processing the data.
     """
 
     definition = """
     -> PreprocessTask
     ---
-    preprocess_time=null: datetime  # time of generation of pre-processing results 
+    preprocess_time=null: datetime  # Time of generation of pre-processing results 
     package_version='': varchar(16)
     """
 
     def make(self, key):
+        """Execute the preprocessing analysis steps defined in PreprocessTask."""
+
         task_mode, output_dir = (PreprocessTask & key).fetch1(
             "task_mode", "preprocess_output_dir"
         )
@@ -191,7 +269,7 @@ class ProcessingMethod(dj.Lookup):
     # data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
     ---
-    processing_method_desc: varchar(1000)
+    processing_method_desc: varchar(1000)  # Processing method description
     """
 
     contents = [
@@ -202,20 +280,46 @@ class ProcessingMethod(dj.Lookup):
 
 @schema
 class ProcessingParamSet(dj.Lookup):
-    definition = """  #  Parameter set used for processing of calcium imaging data
-    paramset_idx:  smallint
+    """Parameter set used for the processing of the calcium imaging scans,
+    including both the analysis suite and its respective input parameters.
+
+    A hash of the parameters of the analysis suite is also stored in order
+    to avoid duplicated entries.
+
+    Attributes:
+        paramset_idx (int): Uniqiue parameter set ID.
+        ProcessingMethod (foreign key): A primary key from ProcessingMethod.
+        paramset_desc (str): Parameter set description.
+        param_set_hash (uuid): A universally unique identifier for the parameter set.
+        params (longblob): Parameter Set, a dictionary of all applicable parameters to
+            the analysis suite.
+    """
+
+    definition = """# Processing Parameter Set
+    paramset_idx: smallint  # Uniqiue parameter set ID.
     ---
     -> ProcessingMethod
-    paramset_desc: varchar(128)
-    param_set_hash: uuid
-    unique index (param_set_hash)
-    params: longblob  # dictionary of all applicable parameters
+    paramset_desc: varchar(1280)  # Parameter-set description
+    param_set_hash: uuid  # A universally unique identifier for the parameter set
+    params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
     @classmethod
     def insert_new_params(
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
+        """Insert a parameter set into ProcessingParamSet table.
+        This function automizes the parameter set hashing and avoids insertion of an
+            existing parameter set.
+
+        Attributes:
+            processing_method (str): Processing method/package used for processing of
+                calcium imaging.
+            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_desc (str): Parameter set description.
+            params (dict): Parameter Set, all applicable parameters to the analysis
+                suite.
+        """
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
@@ -239,8 +343,14 @@ class ProcessingParamSet(dj.Lookup):
 
 @schema
 class CellCompartment(dj.Lookup):
-    definition = """  # Cell compartments that can be imaged
-    cell_compartment         : char(16)
+    """Cell compartments that can be imaged (e.g. 'axon', 'soma', etc.)
+
+    Attributes:
+        cell_compartment (str): Cell compartment.
+    """
+
+    definition = """# Cell compartments
+    cell_compartment: char(16)
     """
 
     contents = zip(["axon", "soma", "bouton"])
@@ -248,8 +358,14 @@ class CellCompartment(dj.Lookup):
 
 @schema
 class MaskType(dj.Lookup):
-    definition = """ # Possible classifications for a segmented mask
-    mask_type        : varchar(16)
+    """Available labels for segmented masks (e.g. 'soma', 'axon', 'dendrite', 'neuropil').
+
+    Attributes:
+        masky_type (str): Mask type.
+    """
+
+    definition = """# Possible types of a segmented mask
+    mask_type: varchar(16)
     """
 
     contents = zip(["soma", "axon", "dendrite", "neuropil", "artefact", "unknown"])
@@ -260,21 +376,43 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    definition = """  # Manual table for defining a processing task ready to be run
+    """This table defines a calcium imaging processing task for a combination of a
+    `Preprocess` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
+    method's parameters). The task defined here is then run in the downstream table
+    Processing. This table supports definitions of both loading of pre-generated results
+    and the triggering of new analysis for all supported analysis methods
+
+    Attributes:
+        Preprocess (foreign key):
+        ProcessingParamSet (foreign key):
+        processing_output_dir (str):
+        task_mode (str): One of 'load' (load computed analysis results) or 'trigger'
+            (trigger computation).
+    """
+
+    definition = """# Manual table for defining a processing task ready to be run
     -> Preprocess
     -> ProcessingParamSet
     ---
-    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
-    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')  # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
     @classmethod
     def infer_output_dir(cls, key, relative=False, mkdir=False):
-        """
-        Given a 'key' to an entry in this table
-        Return the expected processing_output_dir based on the following convention:
-            processed_dir / scan_dir / {processing_method}_{paramset_idx}
-            e.g.: sub4/sess1/scan0/suite2p_0
+        """Infer an output directory for an entry in ProcessingTask table.
+
+        Args:
+            key (dict): Primary key from the ProcessingTask table.
+            relative (bool): If True, processing_output_dir is returned relative to
+                imaging_root_dir.
+            mkdir (bool): If True, create the processing_output_dir directory.
+
+        Returns:
+            A default output directory for the processed results (processed_output_dir
+                in ProcessingTask) based on the following convention:
+                processed_dir / scan_dir / {processing_method}_{paramset_idx}
+                e.g.: sub4/sess1/scan0/suite2p_0
         """
         image_locators = {
             "NIS": get_nd2_files,
@@ -306,8 +444,12 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """
-        Method to auto-generate ProcessingTask entries for a particular Scan using the specified parameter set.
+        """Generate a default ProcessingTask entry for a particular Scan using an
+        existing parameter set in the ProcessingParamSet table.
+
+        Args:
+            scan_key (dict): Primary key from Scan table.
+            paramset_idx (int): Unique parameter set ID.
         """
         key = {**scan_key, "paramset_idx": paramset_idx}
 
@@ -348,19 +490,34 @@ class ProcessingTask(dj.Manual):
 
 @schema
 class Processing(dj.Computed):
-    definition = """  # Processing Procedure
+    """Perform the computation of an entry (task) defined in the ProcessingTask table.
+    The computation is performed only on the scans with ScanInfo inserted.
+
+    Attributes:
+        ProcessingTask (foreign key): Primary key from ProcessingTask.
+        processing_time (datetime): Process completion datetime.
+        package_version (str, optional): Version of the analysis package used in
+            processing the data.
+    """
+
+    definition = """
     -> ProcessingTask
     ---
-    processing_time     : datetime  # time of generation of this set of processed, segmented results
+    processing_time     : datetime  # Time of generation of this set of processed, segmented results
     package_version=''  : varchar(16)
     """
 
     # Run processing only on Scan with ScanInfo inserted
     @property
     def key_source(self):
+        """Limit the Processing to Scans that have their metadata ingested to the
+        database."""
+
         return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
+        """Execute the calcium imaging analysis defined by the ProcessingTask."""
+
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
@@ -430,7 +587,7 @@ class Processing(dj.Computed):
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
+                suite2p_params["fs"], suite2p_params["nplanes"], suite2p_params["nchannels"] = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -479,19 +636,37 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    definition = """  #  Curation(s) performed on processing results (including none)
+    """Curated results. If no curation is applied, the curation_output_dir can be set to
+    the value of processing_output_dir.
+
+    Attributes:
+        Processing (foreign key): Primary key from Processing.
+        curation_id (int): Unique curation ID.
+        curation_time (datetime): Time of generation of this set of curated results.
+        curation_output_dir (str): Output directory of the curated results, relative to
+            root data directory.
+        manual_curation (bool): If True, manual curation has been performed on this
+            result.
+        curation_note (str, optional): Notes about the curation task.
+    """
+
+    definition = """# Curation(s) results
     -> Processing
     curation_id: int
     ---
-    curation_time: datetime             # time of generation of this set of curated results 
-    curation_output_dir: varchar(255)   # output directory of the curated results, relative to root data directory
-    manual_curation: bool               # has manual curation been performed on this result?
+    curation_time: datetime  # Time of generation of this set of curated results 
+    curation_output_dir: varchar(255)  # Output directory of the curated results, relative to root data directory
+    manual_curation: bool  # Has manual curation been performed on this result?
     curation_note='': varchar(2000)  
     """
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
-        """
-        A convenient function to create a new corresponding "Curation" for a particular "ProcessingTask"
+        """Create a Curation entry for a given ProcessingTask key.
+
+        Args:
+            key (dict): Primary key set of an entry in the ProcessingTask table.
+            is_curated (bool): When True, indicates a manual curation.
+            curation_note (str): User's note on the specifics of the curation.
         """
         if key not in Processing():
             raise ValueError(
@@ -532,14 +707,37 @@ class Curation(dj.Manual):
 
 @schema
 class MotionCorrection(dj.Imported):
-    definition = """  #  Results of motion correction performed on the imaging data
+    """Results of motion correction shifts performed on the imaging data.
+
+    Attributes:
+        Curation (foreign key): Primary key from Curation.
+        scan.Channel.proj(motion_correct_channel='channel') (int): Channel used for
+            motion correction in this processing task.
+    """
+
+    definition = """# Results of motion correction
     -> Curation
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
 
     class RigidMotionCorrection(dj.Part):
-        definition = """  # Details of rigid motion correction performed on the imaging data
+        """Details of rigid motion correction performed on the imaging data.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            outlier_frames (longblob): Mask with true for frames with outlier shifts
+                (already corrected).
+            y_shifts (longblob): y motion correction shifts (pixels).
+            x_shifts (longblob): x motion correction shifts (pixels).
+            z_shifts (longblob, optional): z motion correction shifts (z-drift, pixels).
+            y_std (float): standard deviation of y shifts across all frames (pixels).
+            x_std (float): standard deviation of x shifts across all frames (pixels).
+            z_std (float, optional): standard deviation of z shifts across all frames
+                (pixels).
+        """
+
+        definition = """# Details of rigid motion correction performed on the imaging data
         -> master
         ---
         outlier_frames=null : longblob  # mask with true for frames with outlier shifts (already corrected)
@@ -552,25 +750,52 @@ class MotionCorrection(dj.Imported):
         """
 
     class NonRigidMotionCorrection(dj.Part):
-        """
-        Piece-wise rigid motion correction
-        - tile the FOV into multiple 3D blocks/patches
+        """Piece-wise rigid motion correction - tile the FOV into multiple 3D
+        blocks/patches.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            outlier_frames (longblob, null): Mask with true for frames with outlier
+                shifts (already corrected).
+            block_height (int): Block height in pixels.
+            block_width (int): Block width in pixels.
+            block_depth (int): Block depth in pixels.
+            block_count_y (int): Number of blocks tiled in the y direction.
+            block_count_x (int): Number of blocks tiled in the x direction.
+            block_count_z (int): Number of blocks tiled in the z direction.
         """
 
-        definition = """  # Details of non-rigid motion correction performed on the imaging data
+        definition = """# Details of non-rigid motion correction performed on the imaging data
         -> master
         ---
-        outlier_frames=null             : longblob      # mask with true for frames with outlier shifts (already corrected)
-        block_height                    : int           # (pixels)
-        block_width                     : int           # (pixels)
-        block_depth                     : int           # (pixels)
-        block_count_y                   : int           # number of blocks tiled in the y direction
-        block_count_x                   : int           # number of blocks tiled in the x direction
-        block_count_z                   : int           # number of blocks tiled in the z direction
+        outlier_frames=null : longblob # mask with true for frames with outlier shifts (already corrected)
+        block_height        : int      # (pixels)
+        block_width         : int      # (pixels)
+        block_depth         : int      # (pixels)
+        block_count_y       : int      # number of blocks tiled in the y direction
+        block_count_x       : int      # number of blocks tiled in the x direction
+        block_count_z       : int      # number of blocks tiled in the z direction
         """
 
     class Block(dj.Part):
-        definition = """  # FOV-tiled blocks used for non-rigid motion correction
+        """FOV-tiled blocks used for non-rigid motion correction.
+
+        Attributes:
+            NonRigidMotionCorrection (foreign key): Primary key from
+                NonRigidMotionCorrection.
+            block_id (int): Unique block ID.
+            block_y         : longblob  # (y_start, y_end) in pixel of this block
+            block_x         : longblob  # (x_start, x_end) in pixel of this block
+            block_z         : longblob  # (z_start, z_end) in pixel of this block
+            y_shifts        : longblob  # (pixels) y motion correction shifts for every frame
+            x_shifts        : longblob  # (pixels) x motion correction shifts for every frame
+            z_shifts=null   : longblob  # (pixels) x motion correction shifts for every frame
+            y_std           : float     # (pixels) standard deviation of y shifts across all frames
+            x_std           : float     # (pixels) standard deviation of x shifts across all frames
+            z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
+        """
+
+        definition = """# FOV-tiled blocks used for non-rigid motion correction
         -> master.NonRigidMotionCorrection
         block_id        : int
         ---
@@ -586,7 +811,19 @@ class MotionCorrection(dj.Imported):
         """
 
     class Summary(dj.Part):
-        definition = """ # Summary images for each field and channel after corrections
+        """Summary images for each field and channel after corrections.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            scan.ScanInfo.Field (foreign key): Primary key from scan.ScanInfo.Field.
+            ref_image (longblob): Image used as alignment template.
+            average_image (longblob): Mean of registered frames.
+            correlation_image (longblob, optional): Correlation map (computed during
+                cell detection).
+            max_proj_image (longblob, optional): Max of registered frames.
+        """
+
+        definition = """# Summary images for each field and channel after corrections
         -> master
         -> scan.ScanInfo.Field
         ---
@@ -597,6 +834,8 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
+        """Populate MotionCorrection with results parsed from analysis outputs"""
+
         method, imaging_dataset = get_loader_result(key, Curation)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch(
@@ -915,11 +1154,34 @@ class MotionCorrection(dj.Imported):
 
 @schema
 class Segmentation(dj.Computed):
-    definition = """ # Different mask segmentations.
+    """Result of the Segmentation process.
+
+    Attributes:
+        Curation (foreign key): Primary key from Curation.
+    """
+
+    definition = """# Different mask segmentations.
     -> Curation
     """
 
     class Mask(dj.Part):
+        """Details of the masks identified from the Segmentation procedure.
+
+        Attributes:
+            Segmentation (foreign key): Primary key from Segmentation.
+            mask (int): Unique mask ID.
+            scan.Channel.proj(segmentation_channel='channel') (foreign key): Channel
+                used for segmentation.
+            mask_npix (int): Number of pixels in ROIs.
+            mask_center_x (int): Center x coordinate in pixel.
+            mask_center_y (int): Center y coordinate in pixel.
+            mask_center_z (int): Center z coordinate in pixel.
+            mask_xpix (longblob): X coordinates in pixels.
+            mask_ypix (longblob): Y coordinates in pixels.
+            mask_zpix (longblob): Z coordinates in pixels.
+            mask_weights (longblob): Weights of the mask at the indices above.
+        """
+
         definition = """ # A mask produced by segmentation.
         -> master
         mask            : smallint
@@ -936,6 +1198,8 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
+        """Populate the Segmentation with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
@@ -1041,6 +1305,12 @@ class Segmentation(dj.Computed):
 
 @schema
 class MaskClassificationMethod(dj.Lookup):
+    """Available mask classification methods.
+
+    Attributes:
+        mask_classification_method (str): Mask classification method.
+    """
+
     definition = """
     mask_classification_method: varchar(48)
     """
@@ -1050,12 +1320,29 @@ class MaskClassificationMethod(dj.Lookup):
 
 @schema
 class MaskClassification(dj.Computed):
+    """Classes assigned to each mask.
+
+    Attributes:
+        Segmentation (foreign key): Primary key from Segmentation.
+        MaskClassificationMethod (foreign key): Primary key from
+            MaskClassificationMethod.
+    """
+
     definition = """
     -> Segmentation
     -> MaskClassificationMethod
     """
 
     class MaskType(dj.Part):
+        """Type assigned to each mask.
+
+        Attributes:
+            MaskClassification (foreign key): Primary key from MaskClassification.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            MaskType: Primary key from MaskType.
+            confidence (float, optional): Confidence level of the mask classification.
+        """
+
         definition = """
         -> master
         -> Segmentation.Mask
@@ -1073,21 +1360,40 @@ class MaskClassification(dj.Computed):
 
 @schema
 class Fluorescence(dj.Computed):
-    definition = """  # fluorescence traces before spike extraction or filtering
+    """Fluorescence traces.
+
+    Attributes:
+        Segmentation (foreign key): Primary key from Segmentation.
+    """
+
+    definition = """# Fluorescence traces before spike extraction or filtering
     -> Segmentation
     """
 
     class Trace(dj.Part):
+        """Traces obtained from segmented region of interests.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            scan.Channel.proj(fluo_channel='channel') (int): The channel that this trace
+                comes from.
+            fluorescence (longblob): Fluorescence trace associated with this mask.
+            neuropil_fluorescence (longblob, optional): Neuropil fluorescence trace.
+        """
+
         definition = """
         -> master
         -> Segmentation.Mask
-        -> scan.Channel.proj(fluo_channel='channel')  # the channel that this trace comes from         
+        -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from         
         ---
-        fluorescence                : longblob  # fluorescence trace associated with this mask
+        fluorescence                : longblob  # Fluorescence trace associated with this mask
         neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace
         """
 
     def make(self, key):
+        """Populate the Fluorescence with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
@@ -1155,7 +1461,13 @@ class Fluorescence(dj.Computed):
 
 @schema
 class ActivityExtractionMethod(dj.Lookup):
-    definition = """
+    """Available activity extraction methods.
+
+    Attributes:
+        extraction_method (str): Extraction method.
+    """
+
+    definition = """# Activity extraction method 
     extraction_method: varchar(32)
     """
 
@@ -1164,13 +1476,28 @@ class ActivityExtractionMethod(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """
-    # Inferred neural activity from fluorescence trace - e.g. dff, spikes
+    """Inferred neural activity from fluorescence trace (e.g. dff, spikes, etc.).
+
+    Attributes:
+        Fluorescence (foreign key): Primary key from Fluorescence.
+        ActivityExtractionMethod (foreign key): Primary key from
+            ActivityExtractionMethod.
+    """
+
+    definition = """# Neural Activity
     -> Fluorescence
     -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
+        """Trace(s) for each mask.
+
+        Attributes:
+            Activity (foreign key): Primary key from Activity.
+            Fluorescence.Trace (foreign key): Fluorescence.Trace.
+            activity_trace (longblob): Neural activity from fluoresence trace.
+        """
+
         definition = """
         -> master
         -> Fluorescence.Trace
@@ -1197,6 +1524,9 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
+        """Populate the Activity with the results parsed from analysis
+        outputs."""
+
         method, imaging_dataset = get_loader_result(key, Curation)
 
         if method == "suite2p":
@@ -1254,14 +1584,21 @@ _table_attribute_mapper = {
 }
 
 
-def get_loader_result(key, table):
-    """
-    Retrieve the loaded processed imaging results from the loader (e.g. suite2p, caiman, etc.)
-        :param key: the `key` to one entry of ProcessingTask or Curation
-        :param table: the class defining the table to retrieve
-         the loaded results from (e.g. ProcessingTask, Curation)
-        :return: a loader object of the loaded results
-         (e.g. suite2p.Suite2p, caiman.CaImAn, etc.)
+def get_loader_result(key: dict, table: dj.Table):
+    """Retrieve the processed imaging results from a suite2p or caiman loader.
+
+    Args:
+        key (dict): The `key` to one entry of ProcessingTask or Curation
+        table (dj.Table): A datajoint table to retrieve the loaded results from (e.g.
+            ProcessingTask, Curation)
+
+    Raises:
+        NotImplementedError: If the processing_method is different than 'suite2p' or
+            'caiman'.
+
+    Returns:
+        A loader object of the loaded results (e.g. suite2p.Suite2p or caiman.CaImAn,
+        see element-interface for more information on the loaders.)
     """
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         "processing_method", _table_attribute_mapper[table.__name__]
