@@ -230,6 +230,7 @@ class ProcessingTask(dj.Manual):
             relative (bool): If True, processing_output_dir is returned relative to
                 imaging_root_dir. Default False.
             mkdir (bool): If True, create the processing_output_dir directory.
+                Default True.
 
         Returns:
             A default output directory for the processed results (processed_output_dir
