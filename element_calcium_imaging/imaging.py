@@ -268,8 +268,10 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """Generate a default ProcessingTask entry for a particular Scan using an
-        existing parameter set in the ProcessingParamSet table.
+        """Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet
+        
+        Generate an entry in the ProcessingTask table for a particular scan using an 
+        existing parameter set from the ProcessingParamSet table.
 
         Args:
             scan_key (dict): Primary key from Scan table.
