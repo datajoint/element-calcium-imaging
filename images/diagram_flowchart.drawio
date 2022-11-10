@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="4ApZs3ESX_rJ877tGElo" name="docs">
-        <mxGraphModel dx="1746" dy="1771" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1240" math="0" shadow="0">
+        <mxGraphModel dx="1703" dy="1160" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1240" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -15,8 +15,11 @@
                 <mxCell id="wCUkDDBLQIwaV8VIMWGC-16" value="Generate quality&lt;br style=&quot;font-size: 28px&quot;&gt;control metrics" style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;fontFamily=Roboto Slab;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRoboto%2BSlab;container=1;labelBackgroundColor=none;fillColor=#808285;fontColor=#FFFFFF;strokeColor=none;" parent="1" vertex="1">
                     <mxGeometry x="10" y="910" width="323" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="0lQ9qycPSiAqUX2RLHM0-39" value="Synchronize data modalities&lt;br&gt;&amp;amp; exploratory&lt;br&gt;analysis" style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;fontFamily=Roboto Slab;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRoboto%2BSlab;container=1;labelBackgroundColor=none;fillColor=#808285;fontColor=#FFFFFF;strokeColor=none;" parent="1" vertex="1">
+                <mxCell id="0lQ9qycPSiAqUX2RLHM0-39" value="" style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;fontFamily=Roboto Slab;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRoboto%2BSlab;container=1;labelBackgroundColor=none;fillColor=#808285;fontColor=#FFFFFF;strokeColor=none;" parent="1" vertex="1">
                     <mxGeometry x="348" y="910" width="323" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Synchronize data modalities&lt;br&gt;&amp;amp; exploratory&lt;br&gt;analysis" style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;fontFamily=Roboto Slab;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRoboto%2BSlab;container=1;labelBackgroundColor=none;fillColor=#808285;fontColor=#FFFFFF;strokeColor=none;" vertex="1" parent="0lQ9qycPSiAqUX2RLHM0-39">
+                    <mxGeometry x="30" width="273" height="200" as="geometry"/>
                 </mxCell>
                 <mxCell id="mf8eVajY8xKNiSPVBCqu-2" value="Acquire calcium imaging data&lt;br style=&quot;font-size: 28px;&quot;&gt;&lt;br style=&quot;font-size: 28px;&quot;&gt;&lt;br style=&quot;font-size: 28px;&quot;&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;fontFamily=Roboto Slab;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRoboto%2BSlab;container=1;labelBackgroundColor=none;fillColor=#808285;fontColor=#FFFFFF;strokeColor=none;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="10" y="610" width="323" height="200" as="geometry"/>
