@@ -233,7 +233,7 @@ class ProcessingTask(dj.Manual):
                 Default True.
 
         Returns:
-            A default output directory for the processed results (processed_output_dir
+            dir (str): A default output directory for the processed results (processed_output_dir
                 in ProcessingTask) based on the following convention:
                 processed_dir / scan_dir / {processing_method}_{paramset_idx}
                 e.g.: sub4/sess1/scan0/suite2p_0
