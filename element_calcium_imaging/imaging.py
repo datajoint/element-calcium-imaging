@@ -439,7 +439,9 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    """Curated results. If no curation is applied, the curation_output_dir can be set to
+    """Curated results
+    
+    If no curation is applied, the curation_output_dir can be set to
     the value of processing_output_dir.
 
     Attributes:
