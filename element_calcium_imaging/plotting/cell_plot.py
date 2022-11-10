@@ -19,7 +19,8 @@ def mask_overlayed_image(
     for xpix, ypix, roi_id in zip(mask_xpix, mask_ypix, cell_mask_ids):
         image[ypix, xpix, :2] = [np.random.rand(), SATURATION]
         maskid_image[ypix, xpix] = roi_id
-    return colors.hsv_to_rgb(image), maskid_image
+    image = (colors.hsv_to_rgb(image) * 255).astype(int)
+    return image, maskid_image
 
 
 def get_tracelayout(key, width=600, height=600):
