@@ -129,6 +129,7 @@ class ProcessingParamSet(dj.Lookup):
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
         """Insert a parameter set into ProcessingParamSet table.
+        
         This function automizes the parameter set hashing and avoids insertion of an
             existing parameter set.
 
