@@ -197,7 +197,9 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    """This table defines a calcium imaging processing task for a combination of a
+    """A pairing of processing params and scans to be loaded or triggered 
+    
+    This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
     Processing. This table supports definitions of both loading of pre-generated results
