@@ -122,7 +122,7 @@ steps can be performed on each scan prior to processing with Suite2p or CaImAn.
 | ScanInfo.Field | Metadata of the fields imaged |
 | ScanInfo.ScanFile | Path of the scan file |
 
-### `imaging` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/api/element_calcium_imaging/imaging))
+### `imaging` schema ([API docs](../api/element_calcium_imaging/imaging))
 
 | Table | Description |
 | --- | --- |

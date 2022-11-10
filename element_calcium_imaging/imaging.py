@@ -129,6 +129,7 @@ class ProcessingParamSet(dj.Lookup):
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
         """Insert a parameter set into ProcessingParamSet table.
+        
         This function automizes the parameter set hashing and avoids insertion of an
             existing parameter set.
 
@@ -196,7 +197,9 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    """This table defines a calcium imaging processing task for a combination of a
+    """A pairing of processing params and scans to be loaded or triggered 
+    
+    This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
     Processing. This table supports definitions of both loading of pre-generated results
@@ -225,11 +228,12 @@ class ProcessingTask(dj.Manual):
         Args:
             key (dict): Primary key from the ProcessingTask table.
             relative (bool): If True, processing_output_dir is returned relative to
-                imaging_root_dir.
+                imaging_root_dir. Default False.
             mkdir (bool): If True, create the processing_output_dir directory.
+                Default True.
 
         Returns:
-            A default output directory for the processed results (processed_output_dir
+            dir (str): A default output directory for the processed results (processed_output_dir
                 in ProcessingTask) based on the following convention:
                 processed_dir / scan_dir / {processing_method}_{paramset_idx}
                 e.g.: sub4/sess1/scan0/suite2p_0
@@ -264,8 +268,10 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """Generate a default ProcessingTask entry for a particular Scan using an
-        existing parameter set in the ProcessingParamSet table.
+        """Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet
+        
+        Generate an entry in the ProcessingTask table for a particular scan using an 
+        existing parameter set from the ProcessingParamSet table.
 
         Args:
             scan_key (dict): Primary key from Scan table.
@@ -433,7 +439,9 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    """Curated results. If no curation is applied, the curation_output_dir can be set to
+    """Curated results
+    
+    If no curation is applied, the curation_output_dir can be set to
     the value of processing_output_dir.
 
     Attributes:
