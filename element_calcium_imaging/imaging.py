@@ -228,7 +228,7 @@ class ProcessingTask(dj.Manual):
         Args:
             key (dict): Primary key from the ProcessingTask table.
             relative (bool): If True, processing_output_dir is returned relative to
-                imaging_root_dir.
+                imaging_root_dir. Default False.
             mkdir (bool): If True, create the processing_output_dir directory.
 
         Returns:
