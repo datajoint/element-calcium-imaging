@@ -214,7 +214,7 @@ class ScanLocation(dj.Manual):
         Locaton (foreign key): A primary key from Location.
     """
 
-    definition = """Anatomical location
+    definition = """ # Anatomical location
     -> Scan   
     ---
     -> Location      
