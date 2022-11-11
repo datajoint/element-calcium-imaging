@@ -71,6 +71,13 @@ class TraceReport(dj.Computed):
     cell_traces: longblob
     """
 
+    @property
+    def key_source(self):
+        """Limit the TraceReport to Masks that have Activity table populated.
+        database."""
+
+        return imaging.Segmentation.Mask & imaging.Activity
+
     def make(self, key):
         """Compute and ingest the plotly figure objects."""
 
