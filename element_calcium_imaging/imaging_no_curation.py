@@ -384,7 +384,7 @@ class Processing(dj.Computed):
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"] = (scan.ScanInfo & key).fetch1("fps")
+                suite2p_params["fs"], suite2p_params["nplanes"], suite2p_params["nchannels"] = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
