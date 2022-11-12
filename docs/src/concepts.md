@@ -36,10 +36,10 @@ These teams include:
 ### Hardware
 The primary acquisition systems are:
 
-+ Sutter (we estimate 400 rigs in active use - TBC)
-+ Thorlabs (we estimate 400 rigs in active use - TBC)
-+ Bruker (we estimate 400 rigs in active use - TBC)
-+ Neurolabware (we estimate 400 rigs in active use - TBC)
++ Sutter
++ Thorlabs
++ Bruker
++ Neurolabware
 
 We do not include Miniscopes in these estimates. In, all there are perhaps on the order of 3000 two-photon setups globally but their processing needs may need to be further segmented.
 
