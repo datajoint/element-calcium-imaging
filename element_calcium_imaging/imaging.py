@@ -121,6 +121,7 @@ class ProcessingParamSet(dj.Lookup):
     -> ProcessingMethod
     paramset_desc: varchar(1280)  # Parameter-set description
     param_set_hash: uuid  # A universally unique identifier for the parameter set
+    unique index (param_set_hash)
     params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
@@ -129,7 +130,7 @@ class ProcessingParamSet(dj.Lookup):
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
         """Insert a parameter set into ProcessingParamSet table.
-        
+
         This function automizes the parameter set hashing and avoids insertion of an
             existing parameter set.
 
@@ -197,8 +198,8 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    """A pairing of processing params and scans to be loaded or triggered 
-    
+    """A pairing of processing params and scans to be loaded or triggered
+
     This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
@@ -269,8 +270,8 @@ class ProcessingTask(dj.Manual):
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
         """Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet
-        
-        Generate an entry in the ProcessingTask table for a particular scan using an 
+
+        Generate an entry in the ProcessingTask table for a particular scan using an
         existing parameter set from the ProcessingParamSet table.
 
         Args:
@@ -390,8 +391,12 @@ class Processing(dj.Computed):
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"], suite2p_params["nplanes"], suite2p_params["nchannels"] = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
-                
+                (
+                    suite2p_params["fs"],
+                    suite2p_params["nplanes"],
+                    suite2p_params["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
 
@@ -440,7 +445,7 @@ class Processing(dj.Computed):
 @schema
 class Curation(dj.Manual):
     """Curated results
-    
+
     If no curation is applied, the curation_output_dir can be set to
     the value of processing_output_dir.
 
