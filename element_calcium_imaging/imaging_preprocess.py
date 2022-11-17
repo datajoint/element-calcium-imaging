@@ -301,6 +301,7 @@ class ProcessingParamSet(dj.Lookup):
     -> ProcessingMethod
     paramset_desc: varchar(1280)  # Parameter-set description
     param_set_hash: uuid  # A universally unique identifier for the parameter set
+    unique index (param_set_hash)
     params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
@@ -587,7 +588,11 @@ class Processing(dj.Computed):
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"], suite2p_params["nplanes"], suite2p_params["nchannels"] = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+                (
+                    suite2p_params["fs"],
+                    suite2p_params["nplanes"],
+                    suite2p_params["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
