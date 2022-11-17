@@ -607,3 +607,75 @@ class ScanInfo(dj.Imported):
             pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
         ]
         self.ScanFile.insert([{**key, "file_path": f} for f in scan_files])
+
+
+@schema
+class ScanQualityMetrics(dj.Computed):
+    """
+    Metrics to assess quality of Scan.
+    """
+
+    definition = """
+    -> ScanInfo.Field
+    """
+
+    class MeanIntensity(dj.Part):
+        """
+        Mean intensity values across time
+        """
+
+        definition = """ 
+        -> master
+        channel: int
+        ---
+        intensities                 : longblob
+        """
+
+    class Contrast(dj.Part):
+        """
+        Difference between 99 and 1 percentile across time
+        """
+
+        definition = """ 
+        -> master
+        channel: int
+        ---
+        contrasts: longblob
+        """
+
+    class QuantalSize(dj.Part):
+        """
+        Quantal size in images
+        """
+
+        definition = """ 
+        -> master
+        channel: int
+        ---
+        min_intensity   : int      # min value in movie
+        max_intensity   : int      # max value in movie
+        quantal_size    : float    # variance slope, corresponds to quantal size
+        zero_level      : int      # level corresponding to zero (computed from variance dependence)
+        quantal_frame   : longblob # average frame expressed in quanta
+        """
+
+    def make(self, key):
+        acq_software = (Scan & key).fetch1("acq_software")
+
+        if acq_software == "ScanImage":
+            import scanreader
+
+            # Read the scan
+            scan_filepaths = get_scan_image_files(key)
+            scan = scanreader.read_scan(scan_filepaths)
+        elif acq_software == "Scanbox":
+            import sbxreader
+
+            # Read the scan
+            scan_filepaths = get_scan_box_files(key)
+        elif acq_software == "NIS":
+            import nd2
+
+            # Read the scan
+            scan_filepaths = get_nd2_files(key)
+            nd2_file = nd2.ND2File(scan_filepaths[0])
