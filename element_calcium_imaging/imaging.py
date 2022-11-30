@@ -95,6 +95,7 @@ class ProcessingMethod(dj.Lookup):
     contents = [
         ("suite2p", "suite2p analysis suite"),
         ("caiman", "caiman analysis suite"),
+        ("extract", "extract analysis suite"),
     ]
 
 
@@ -142,6 +143,18 @@ class ProcessingParamSet(dj.Lookup):
             params (dict): Parameter Set, all applicable parameters to the analysis
                 suite.
         """
+        if processing_method == "extract":
+            assert (
+                params.get("extract") != None and params.get("suite2p") != None
+            ), ValueError(
+                "Please provide the processing paramaters in the {'suite2p':{...}, 'extract': {...}} dictionary format."
+            )
+
+            assert params["suite2p"]["do_registration"] == True
+            if params["suite2p"]["roidetect"]:
+                "Suite2p's ROI detection step cannot be run. Instead, EXTRACT will be used."
+                params["roidetect"] = False
+
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
