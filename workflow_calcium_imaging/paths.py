@@ -48,3 +48,12 @@ def get_nd2_files(scan_key):
         return nd2_filepaths
     else:
         raise FileNotFoundError(f"No .nd2 file found in {sess_dir}")
+
+
+def get_prairieview_files(scan_key):
+    # Folder structure: root / subject / session / .tif
+    sess_dir, pv_filepaths = _find_files_by_type(scan_key, "*.tif")
+    if pv_filepaths:
+        return pv_filepaths
+    else:
+        raise FileNotFoundError(f"No .tif file found in {sess_dir}")
