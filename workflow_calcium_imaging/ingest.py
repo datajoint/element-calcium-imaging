@@ -15,10 +15,14 @@ from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects(
-    subject_csv_path="./user_data/subjects.csv", skip_duplicates=True, verbose=True
+    subject_csv_path:str="./user_data/subjects.csv", skip_duplicates:bool=True, verbose:bool=True
 ):
-    """
-    Ingest subjects listed in the subject column of ./user_data/subjects.csv
+    """Inserts ./user_data/subject.csv data into corresponding subject schema tables.
+
+    Args:
+        subject_csv_path (str): relative path of subject csv.
+        skip_duplicates (bool): Default True. Passed to DataJoint insert.
+        verbose (bool): Display number of entries inserted when ingesting.
     """
     csvs = [subject_csv_path]
     tables = [subject.Subject()]
@@ -29,6 +33,15 @@ def ingest_subjects(
 def ingest_sessions(
     session_csv_path="./user_data/sessions.csv", skip_duplicates=True, verbose=True
 ):
+    """Ingests all the manual table starting from session schema from
+    ./user_data/sessions.csv.
+
+    Args:
+        session_csv_path (str): relative path of session csv.
+        skip_duplicates (bool): Default True. Passed to DataJoint insert.
+        verbose (bool): Default True. Display number of entries inserted when ingesting.
+    """
+
     root_data_dir = get_imaging_root_data_dir()
 
     # ---------- Insert new "Session" and "Scan" ---------
@@ -137,10 +150,22 @@ def ingest_events(
     verbose=True,
 ):
     """
-    Ingest each level of experiment heirarchy for element-trial:
-        recording, block (i.e., phases of trials), trials (repeated units),
-        events (optionally 0-duration occurances within trial).
-    This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging
+    Ingest session, block, trial, and event data.
+
+    Ingest each level of experiment hierarchy for element-trial: recording, block (i.e.,
+    phases of trials), trials (repeated units), events (optionally 0-duration occurances
+    within trial).
+
+    This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging.
+
+    Args:
+        recording_csv_path (str, optional): relative path of behavior_recordings.csv.
+        block_csv_path (str, optional): relative path of blocks.csv.
+        trial_csv_path (str, optional): relative path of trials.csv.
+        event_csv_path (str, optional): relative path of events.csv.
+        skip_duplicates (bool, optional): Default True. Passed to DataJoint insert.
+        verbose (bool, optional): Display number of entries inserted when ingesting.
+            Default True.
     """
     csvs = [
         recording_csv_path,
@@ -182,7 +207,16 @@ def ingest_events(
 def ingest_alignment(
     alignment_csv_path="./user_data/alignments.csv", skip_duplicates=True, verbose=True
 ):
-    """This is duplicated across wf-array-ephys and wf-calcium-imaging"""
+    """Ingest event alignment information
+    
+    This is duplicated across wf-array-ephys and wf-calcium-imaging.
+
+    Args:
+        alignment_csv_path (str): relative path of alignments.csv
+        skip_duplicates (bool, optional): Default True. Passed to DataJoint insert.
+        verbose (bool, optional): Display number of entries inserted when ingesting.
+            Default True.
+    """
 
     csvs = [alignment_csv_path]
     tables = [event.AlignmentEvent()]
