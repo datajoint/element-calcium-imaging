@@ -1,11 +1,12 @@
-import datajoint as dj
-import numpy as np
-import pathlib
-import os
 import inspect
+import pathlib
 import importlib
+import numpy as np
+
+import datajoint as dj
 from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
-from . import scan
+
+from . import scan, imaging_report
 from .scan import (
     get_imaging_root_data_dir,
     get_processed_root_data_dir,
@@ -14,7 +15,7 @@ from .scan import (
     get_nd2_files,
 )
 
-schema = dj.schema()
+schema = dj.Schema()
 
 _linking_module = None
 
@@ -27,16 +28,25 @@ def activate(
     create_tables=True,
     linking_module=None,
 ):
-    """
-    activate(imaging_schema_name, *, scan_schema_name=None, create_schema=True, create_tables=True, linking_module=None)
-        :param imaging_schema_name: schema name on the database server to activate the `imaging` module
-        :param scan_schema_name: schema name on the database server to activate the `scan` module
-         - may be omitted if the `scan` module is already activated
-        :param create_schema: when True (default), create schema in the database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `imaging` module:
-         + all that are required by the `scan` module
+    """Activate this schema.
+
+    Args:
+        imaging_schema_name (str): Schema name on the database server to activate the
+            `imaging` module.
+        scan_schema_name (str): Schema name on the database server to activate the
+            `scan` module. Omitted, if the `scan` module is already activated.
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `imaging` module: + all that are required by
+            the `scan` module.
+
+    Dependencies:
+    Upstream tables:
+        + Session: A parent table to Scan, identifying a scanning session.
+        + Equipment: A parent table to Scan, identifying a scanning device.
     """
 
     if isinstance(linking_module, str):
@@ -60,6 +70,7 @@ def activate(
         create_tables=create_tables,
         add_objects=_linking_module.__dict__,
     )
+    imaging_report.activate(f"{imaging_schema_name}_report", imaging_schema_name)
 
 
 # -------------- Table declarations --------------
@@ -67,31 +78,69 @@ def activate(
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    definition = """  #  Method, package, analysis suite used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.)
-    processing_method: char(8)
-    ---
-    processing_method_desc: varchar(1000)
+    """Method, package, or analysis suite used for processing of calcium imaging data
+        (e.g. Suite2p, CaImAn, etc.).
+
+    Attributes:
+        processing_method (str): Processing method.
+        processing_method_desc (str): Processing method description.
     """
 
-    contents = [("suite2p", "suite2p analysis suite"), ("caiman", "caiman analysis suite")]
+    definition = """# Method for calcium imaging processing
+    processing_method: char(8)
+    ---
+    processing_method_desc: varchar(1000)  # Processing method description
+    """
+
+    contents = [
+        ("suite2p", "suite2p analysis suite"),
+        ("caiman", "caiman analysis suite"),
+    ]
 
 
 @schema
 class ProcessingParamSet(dj.Lookup):
-    definition = """  #  Parameter set used for processing of calcium imaging data
-    paramset_idx:  smallint
+    """Parameter set used for the processing of the calcium imaging scans,
+    including both the analysis suite and its respective input parameters.
+
+    A hash of the parameters of the analysis suite is also stored in order
+    to avoid duplicated entries.
+
+    Attributes:
+        paramset_idx (int): Uniqiue parameter set ID.
+        ProcessingMethod (foreign key): A primary key from ProcessingMethod.
+        paramset_desc (str): Parameter set description.
+        param_set_hash (uuid): A universally unique identifier for the parameter set.
+        params (longblob): Parameter Set, a dictionary of all applicable parameters to
+            the analysis suite.
+    """
+
+    definition = """# Processing Parameter Set
+    paramset_idx: smallint  # Uniqiue parameter set ID.
     ---
     -> ProcessingMethod
-    paramset_desc: varchar(128)
-    param_set_hash: uuid
+    paramset_desc: varchar(1280)  # Parameter-set description
+    param_set_hash: uuid  # A universally unique identifier for the parameter set
     unique index (param_set_hash)
-    params: longblob  # dictionary of all applicable parameters
+    params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
     @classmethod
     def insert_new_params(
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
+        """Insert a parameter set into ProcessingParamSet table.
+        This function automizes the parameter set hashing and avoids insertion of an
+            existing parameter set.
+
+        Attributes:
+            processing_method (str): Processing method/package used for processing of
+                calcium imaging.
+            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_desc (str): Parameter set description.
+            params (dict): Parameter Set, all applicable parameters to the analysis
+                suite.
+        """
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
@@ -115,8 +164,14 @@ class ProcessingParamSet(dj.Lookup):
 
 @schema
 class CellCompartment(dj.Lookup):
-    definition = """  # Cell compartments that can be imaged
-    cell_compartment         : char(16)
+    """Cell compartments that can be imaged (e.g. 'axon', 'soma', etc.)
+
+    Attributes:
+        cell_compartment (str): Cell compartment.
+    """
+
+    definition = """# Cell compartments
+    cell_compartment: char(16)
     """
 
     contents = zip(["axon", "soma", "bouton"])
@@ -124,8 +179,14 @@ class CellCompartment(dj.Lookup):
 
 @schema
 class MaskType(dj.Lookup):
-    definition = """ # Possible classifications for a segmented mask
-    mask_type        : varchar(16)
+    """Available labels for segmented masks (e.g. 'soma', 'axon', 'dendrite', 'neuropil').
+
+    Attributes:
+        masky_type (str): Mask type.
+    """
+
+    definition = """# Possible types of a segmented mask
+    mask_type: varchar(16)
     """
 
     contents = zip(["soma", "axon", "dendrite", "neuropil", "artefact", "unknown"])
@@ -136,32 +197,65 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    definition = """  # Manual table for defining a processing task ready to be run
+    """This table defines a calcium imaging processing task for a combination of a
+    `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
+    method's parameters). The task defined here is then run in the downstream table
+    Processing. This table supports definitions of both loading of pre-generated results
+    and the triggering of new analysis for all supported analysis methods
+
+    Attributes:
+        scan.Scan (foreign key):
+        ProcessingParamSet (foreign key):
+        processing_output_dir (str):
+        task_mode (str): One of 'load' (load computed analysis results) or 'trigger'
+            (trigger computation).
+    """
+
+    definition = """# Manual table for defining a processing task ready to be run
     -> scan.Scan
     -> ProcessingParamSet
     ---
-    processing_output_dir: varchar(255)         #  output directory of the processed scan relative to root data directory
-    task_mode='load': enum('load', 'trigger')   # 'load': load computed analysis results, 'trigger': trigger computation
+    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
+    task_mode='load': enum('load', 'trigger')  # 'load': load computed analysis results, 'trigger': trigger computation
     """
 
     @classmethod
-    def infer_output_dir(cls, scan_key, relative=False, mkdir=False):
+    def infer_output_dir(cls, key, relative=False, mkdir=False):
+        """Infer an output directory for an entry in ProcessingTask table.
+
+        Args:
+            key (dict): Primary key from the ProcessingTask table.
+            relative (bool): If True, processing_output_dir is returned relative to
+                imaging_root_dir.
+            mkdir (bool): If True, create the processing_output_dir directory.
+
+        Returns:
+            A default output directory for the processed results (processed_output_dir
+                in ProcessingTask) based on the following convention:
+                processed_dir / scan_dir / {processing_method}_{paramset_idx}
+                e.g.: sub4/sess1/scan0/suite2p_0
+        """
         image_locators = {
             "NIS": get_nd2_files,
             "ScanImage": get_scan_image_files,
             "Scanbox": get_scan_box_files,
         }
-        image_locator = image_locators[(scan.Scan & scan_key).fetch1("acq_software")]
+        image_locator = image_locators[(scan.Scan & key).fetch1("acq_software")]
 
-        scan_dir = find_full_path(get_imaging_root_data_dir(), image_locator(scan_key)[0]).parent
+        scan_dir = find_full_path(
+            get_imaging_root_data_dir(), image_locator(key)[0]
+        ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
-        paramset_key = ProcessingParamSet.fetch1()
+        method = (
+            (ProcessingParamSet & key).fetch1("processing_method").replace(".", "-")
+        )
+
         processed_dir = pathlib.Path(get_processed_root_data_dir())
         output_dir = (
             processed_dir
             / scan_dir.relative_to(root_dir)
-            / f'{paramset_key["processing_method"]}_{paramset_key["paramset_idx"]}'
+            / f'{method}_{key["paramset_idx"]}'
         )
 
         if mkdir:
@@ -170,16 +264,19 @@ class ProcessingTask(dj.Manual):
         return output_dir.relative_to(processed_dir) if relative else output_dir
 
     @classmethod
-    def auto_generate_entries(cls, scan_key, task_mode):
+    def generate(cls, scan_key, paramset_idx=0):
+        """Generate a default ProcessingTask entry for a particular Scan using an
+        existing parameter set in the ProcessingParamSet table.
+
+        Args:
+            scan_key (dict): Primary key from Scan table.
+            paramset_idx (int): Unique parameter set ID.
         """
-        Method to auto-generate ProcessingTask entries for a particular Scan using a default paramater set.
-        """
+        key = {**scan_key, "paramset_idx": paramset_idx}
 
-        default_paramset_idx = os.environ.get("DEFAULT_PARAMSET_IDX", 0)
+        output_dir = cls.infer_output_dir(key, relative=False, mkdir=True)
 
-        output_dir = cls.infer_output_dir(scan_key, relative=False, mkdir=True)
-
-        method = (ProcessingParamSet & {"paramset_idx": default_paramset_idx}).fetch1(
+        method = (ProcessingParamSet & {"paramset_idx": paramset_idx}).fetch1(
             "processing_method"
         )
 
@@ -187,13 +284,15 @@ class ProcessingTask(dj.Manual):
             if method == "suite2p":
                 from element_interface import suite2p_loader
 
-                loaded_dataset = suite2p_loader.Suite2p(output_dir)
+                suite2p_loader.Suite2p(output_dir)
             elif method == "caiman":
                 from element_interface import caiman_loader
 
-                loaded_dataset = caiman_loader.CaImAn(output_dir)
+                caiman_loader.CaImAn(output_dir)
             else:
-                raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
+                raise NotImplementedError(
+                    "Unknown/unimplemented method: {}".format(method)
+                )
         except FileNotFoundError:
             task_mode = "trigger"
         else:
@@ -201,29 +300,45 @@ class ProcessingTask(dj.Manual):
 
         cls.insert1(
             {
-                **scan_key,
-                "paramset_idx": default_paramset_idx,
+                **key,
                 "processing_output_dir": output_dir,
                 "task_mode": task_mode,
             }
         )
 
+    auto_generate_entries = generate
+
 
 @schema
 class Processing(dj.Computed):
-    definition = """  # Processing Procedure
+    """Perform the computation of an entry (task) defined in the ProcessingTask table.
+    The computation is performed only on the scans with ScanInfo inserted.
+
+    Attributes:
+        ProcessingTask (foreign key): Primary key from ProcessingTask.
+        processing_time (datetime): Process completion datetime.
+        package_version (str, optional): Version of the analysis package used in
+            processing the data.
+    """
+
+    definition = """
     -> ProcessingTask
     ---
-    processing_time     : datetime  # time of generation of this set of processed, segmented results
+    processing_time     : datetime  # Time of generation of this set of processed, segmented results
     package_version=''  : varchar(16)
     """
 
     # Run processing only on Scan with ScanInfo inserted
     @property
     def key_source(self):
+        """Limit the Processing to Scans that have their metadata ingested to the
+        database."""
+
         return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
+        """Execute the calcium imaging analysis defined by the ProcessingTask."""
+
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
@@ -232,7 +347,9 @@ class Processing(dj.Computed):
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
             # update processing_output_dir
-            ProcessingTask.update1({**key, "processing_output_dir": output_dir.as_posix()})
+            ProcessingTask.update1(
+                {**key, "processing_output_dir": output_dir.as_posix()}
+            )
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
@@ -251,13 +368,11 @@ class Processing(dj.Computed):
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
 
-            method = (
-                ProcessingTask * ProcessingParamSet * ProcessingMethod * scan.Scan & key
-            ).fetch1("processing_method")
+            method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+                "processing_method"
+            )
 
-            image_files = (
-                ProcessingTask * scan.Scan * scan.ScanInfo * scan.ScanInfo.ScanFile & key
-            ).fetch("file_path")
+            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
                 find_full_path(get_imaging_root_data_dir(), image_file)
                 for image_file in image_files
@@ -266,11 +381,15 @@ class Processing(dj.Computed):
             if method == "suite2p":
                 import suite2p
 
-                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
-                suite2p_params["save_path0"] = output_dir
-                suite2p_params["fs"] = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1(
-                    "fps"
+                suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
                 )
+                suite2p_params["save_path0"] = output_dir
+                (
+                    suite2p_params["fs"],
+                    suite2p_params["nplanes"],
+                    suite2p_params["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -289,19 +408,19 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
 
-                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
-                sampling_rate = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1("fps")
-
-                ndepths = (ProcessingTask * scan.Scan * scan.ScanInfo & key).fetch1("ndepths")
+                caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
+                    "params"
+                )
+                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not capable of analyzing 3D scans at the moment."
+                        "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
-                    parameters=params,
+                    parameters=caiman_params,
                     sampling_rate=sampling_rate,
                     output_dir=output_dir,
                     is3D=is3D,
@@ -322,14 +441,37 @@ class Processing(dj.Computed):
 
 @schema
 class MotionCorrection(dj.Imported):
-    definition = """  #  Results of motion correction performed on the imaging data
+    """Results of motion correction shifts performed on the imaging data.
+
+    Attributes:
+        Processing (foreign key): Primary key from Processing.
+        scan.Channel.proj(motion_correct_channel='channel') (int): Channel used for
+            motion correction in this processing task.
+    """
+
+    definition = """# Results of motion correction
     -> Processing
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
 
     class RigidMotionCorrection(dj.Part):
-        definition = """  # Details of rigid motion correction performed on the imaging data
+        """Details of rigid motion correction performed on the imaging data.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            outlier_frames (longblob): Mask with true for frames with outlier shifts
+                (already corrected).
+            y_shifts (longblob): y motion correction shifts (pixels).
+            x_shifts (longblob): x motion correction shifts (pixels).
+            z_shifts (longblob, optional): z motion correction shifts (z-drift, pixels).
+            y_std (float): standard deviation of y shifts across all frames (pixels).
+            x_std (float): standard deviation of x shifts across all frames (pixels).
+            z_std (float, optional): standard deviation of z shifts across all frames
+                (pixels).
+        """
+
+        definition = """# Details of rigid motion correction performed on the imaging data
         -> master
         ---
         outlier_frames=null : longblob  # mask with true for frames with outlier shifts (already corrected)
@@ -342,25 +484,54 @@ class MotionCorrection(dj.Imported):
         """
 
     class NonRigidMotionCorrection(dj.Part):
-        """
-        Piece-wise rigid motion correction
-        - tile the FOV into multiple 3D blocks/patches
+        """Piece-wise rigid motion correction - tile the FOV into multiple 3D
+        blocks/patches.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            outlier_frames (longblob, null): Mask with true for frames with outlier
+                shifts (already corrected).
+            block_height (int): Block height in pixels.
+            block_width (int): Block width in pixels.
+            block_depth (int): Block depth in pixels.
+            block_count_y (int): Number of blocks tiled in the y direction.
+            block_count_x (int): Number of blocks tiled in the x direction.
+            block_count_z (int): Number of blocks tiled in the z direction.
         """
 
-        definition = """  # Details of non-rigid motion correction performed on the imaging data
+        definition = """# Details of non-rigid motion correction performed on the imaging data
         -> master
         ---
-        outlier_frames=null             : longblob      # mask with true for frames with outlier shifts (already corrected)
-        block_height                    : int           # (pixels)
-        block_width                     : int           # (pixels)
-        block_depth                     : int           # (pixels)
-        block_count_y                   : int           # number of blocks tiled in the y direction
-        block_count_x                   : int           # number of blocks tiled in the x direction
-        block_count_z                   : int           # number of blocks tiled in the z direction
+        outlier_frames=null : longblob # mask with true for frames with outlier shifts (already corrected)
+        block_height        : int      # (pixels)
+        block_width         : int      # (pixels)
+        block_depth         : int      # (pixels)
+        block_count_y       : int      # number of blocks tiled in the y direction
+        block_count_x       : int      # number of blocks tiled in the x direction
+        block_count_z       : int      # number of blocks tiled in the z direction
         """
 
     class Block(dj.Part):
-        definition = """  # FOV-tiled blocks used for non-rigid motion correction
+        """FOV-tiled blocks used for non-rigid motion correction.
+
+        Attributes:
+            NonRigidMotionCorrection (foreign key): Primary key from
+                NonRigidMotionCorrection.
+            block_id (int): Unique block ID.
+            block_y (longblob): y_start and y_end in pixels for this block
+            block_x (longblob): x_start and x_end in pixels for this block
+            block_z (longblob): z_start and z_end in pixels for this block
+            y_shifts (longblob): y motion correction shifts for every frame in pixels
+            x_shifts (longblob): x motion correction shifts for every frame in pixels
+            z_shifts (longblob, optional): x motion correction shifts for every frame
+                in pixels
+            y_std (float): standard deviation of y shifts across all frames in pixels
+            x_std (float): standard deviation of x shifts across all frames in pixels
+            z_std (float, optional): standard deviation of z shifts across all frames
+                in pixels
+        """
+
+        definition = """# FOV-tiled blocks used for non-rigid motion correction
         -> master.NonRigidMotionCorrection
         block_id        : int
         ---
@@ -376,7 +547,19 @@ class MotionCorrection(dj.Imported):
         """
 
     class Summary(dj.Part):
-        definition = """ # Summary images for each field and channel after corrections
+        """Summary images for each field and channel after corrections.
+
+        Attributes:
+            MotionCorrection (foreign key): Primary key from MotionCorrection.
+            scan.ScanInfo.Field (foreign key): Primary key from scan.ScanInfo.Field.
+            ref_image (longblob): Image used as alignment template.
+            average_image (longblob): Mean of registered frames.
+            correlation_image (longblob, optional): Correlation map (computed during
+                cell detection).
+            max_proj_image (longblob, optional): Max of registered frames.
+        """
+
+        definition = """# Summary images for each field and channel after corrections
         -> master
         -> scan.ScanInfo.Field
         ---
@@ -387,9 +570,12 @@ class MotionCorrection(dj.Imported):
         """
 
     def make(self, key):
+        """Populate MotionCorrection with results parsed from analysis outputs"""
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
-        field_keys, _ = (scan.ScanInfo.Field & key).fetch("KEY", "field_z", order_by="field_z")
+        field_keys, _ = (scan.ScanInfo.Field & key).fetch(
+            "KEY", "field_z", order_by="field_z"
+        )
 
         if method == "suite2p":
             suite2p_dataset = imaging_dataset
@@ -416,11 +602,15 @@ class MotionCorrection(dj.Imported):
                     rigid_correction["y_shifts"] = np.vstack(
                         [rigid_correction["y_shifts"], s2p.ops["yoff"]]
                     )
-                    rigid_correction["y_std"] = np.nanstd(rigid_correction["y_shifts"].flatten())
+                    rigid_correction["y_std"] = np.nanstd(
+                        rigid_correction["y_shifts"].flatten()
+                    )
                     rigid_correction["x_shifts"] = np.vstack(
                         [rigid_correction["x_shifts"], s2p.ops["xoff"]]
                     )
-                    rigid_correction["x_std"] = np.nanstd(rigid_correction["x_shifts"].flatten())
+                    rigid_correction["x_std"] = np.nanstd(
+                        rigid_correction["x_shifts"].flatten()
+                    )
                     rigid_correction["outlier_frames"] = np.logical_or(
                         rigid_correction["outlier_frames"], s2p.ops["badframes"]
                     )
@@ -503,7 +693,9 @@ class MotionCorrection(dj.Imported):
         elif method == "caiman":
             caiman_dataset = imaging_dataset
 
-            self.insert1({**key, "motion_correct_channel": caiman_dataset.alignment_channel})
+            self.insert1(
+                {**key, "motion_correct_channel": caiman_dataset.alignment_channel}
+            )
 
             is3D = caiman_dataset.params.motion["is3D"]
             if not caiman_dataset.params.motion["pw_rigid"]:
@@ -515,10 +707,16 @@ class MotionCorrection(dj.Imported):
                     "z_shifts": (
                         caiman_dataset.motion_correction["shifts_rig"][:, 2]
                         if is3D
-                        else np.full_like(caiman_dataset.motion_correction["shifts_rig"][:, 0], 0)
+                        else np.full_like(
+                            caiman_dataset.motion_correction["shifts_rig"][:, 0], 0
+                        )
                     ),
-                    "x_std": np.nanstd(caiman_dataset.motion_correction["shifts_rig"][:, 0]),
-                    "y_std": np.nanstd(caiman_dataset.motion_correction["shifts_rig"][:, 1]),
+                    "x_std": np.nanstd(
+                        caiman_dataset.motion_correction["shifts_rig"][:, 0]
+                    ),
+                    "y_std": np.nanstd(
+                        caiman_dataset.motion_correction["shifts_rig"][:, 1]
+                    ),
                     "z_std": (
                         np.nanstd(caiman_dataset.motion_correction["shifts_rig"][:, 2])
                         if is3D
@@ -553,7 +751,13 @@ class MotionCorrection(dj.Imported):
                         set(caiman_dataset.motion_correction["coord_shifts_els"][:, 2])
                     ),
                     "block_count_z": (
-                        len(set(caiman_dataset.motion_correction["coord_shifts_els"][:, 4]))
+                        len(
+                            set(
+                                caiman_dataset.motion_correction["coord_shifts_els"][
+                                    :, 4
+                                ]
+                            )
+                        )
                         if is3D
                         else 1
                     ),
@@ -561,51 +765,72 @@ class MotionCorrection(dj.Imported):
                 }
 
                 nonrigid_blocks = []
-                for b_id in range(len(caiman_dataset.motion_correction["x_shifts_els"][0, :])):
+                for b_id in range(
+                    len(caiman_dataset.motion_correction["x_shifts_els"][0, :])
+                ):
                     nonrigid_blocks.append(
                         {
                             **key,
                             "block_id": b_id,
                             "block_x": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][b_id, 0:2]
+                                *caiman_dataset.motion_correction["coord_shifts_els"][
+                                    b_id, 0:2
+                                ]
                             ),
                             "block_y": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][b_id, 2:4]
+                                *caiman_dataset.motion_correction["coord_shifts_els"][
+                                    b_id, 2:4
+                                ]
                             ),
                             "block_z": (
                                 np.arange(
-                                    *caiman_dataset.motion_correction["coord_shifts_els"][
-                                        b_id, 4:6
-                                    ]
+                                    *caiman_dataset.motion_correction[
+                                        "coord_shifts_els"
+                                    ][b_id, 4:6]
                                 )
                                 if is3D
                                 else np.full_like(
                                     np.arange(
-                                        *caiman_dataset.motion_correction["coord_shifts_els"][
-                                            b_id, 0:2
-                                        ]
+                                        *caiman_dataset.motion_correction[
+                                            "coord_shifts_els"
+                                        ][b_id, 0:2]
                                     ),
                                     0,
                                 )
                             ),
-                            "x_shifts": caiman_dataset.motion_correction["x_shifts_els"][:, b_id],
-                            "y_shifts": caiman_dataset.motion_correction["y_shifts_els"][:, b_id],
+                            "x_shifts": caiman_dataset.motion_correction[
+                                "x_shifts_els"
+                            ][:, b_id],
+                            "y_shifts": caiman_dataset.motion_correction[
+                                "y_shifts_els"
+                            ][:, b_id],
                             "z_shifts": (
-                                caiman_dataset.motion_correction["z_shifts_els"][:, b_id]
+                                caiman_dataset.motion_correction["z_shifts_els"][
+                                    :, b_id
+                                ]
                                 if is3D
                                 else np.full_like(
-                                    caiman_dataset.motion_correction["x_shifts_els"][:, b_id], 0
+                                    caiman_dataset.motion_correction["x_shifts_els"][
+                                        :, b_id
+                                    ],
+                                    0,
                                 )
                             ),
                             "x_std": np.nanstd(
-                                caiman_dataset.motion_correction["x_shifts_els"][:, b_id]
+                                caiman_dataset.motion_correction["x_shifts_els"][
+                                    :, b_id
+                                ]
                             ),
                             "y_std": np.nanstd(
-                                caiman_dataset.motion_correction["y_shifts_els"][:, b_id]
+                                caiman_dataset.motion_correction["y_shifts_els"][
+                                    :, b_id
+                                ]
                             ),
                             "z_std": (
                                 np.nanstd(
-                                    caiman_dataset.motion_correction["z_shifts_els"][:, b_id]
+                                    caiman_dataset.motion_correction["z_shifts_els"][
+                                        :, b_id
+                                    ]
                                 )
                                 if is3D
                                 else np.nan
@@ -628,22 +853,30 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.motion_correction["reference_image"].transpose(2, 0, 1)
+                    caiman_dataset.motion_correction["reference_image"].transpose(
+                        2, 0, 1
+                    )
                     if is3D
                     else caiman_dataset.motion_correction["reference_image"][...][
                         np.newaxis, ...
                     ],
                     caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
                     if is3D
-                    else caiman_dataset.motion_correction["average_image"][...][np.newaxis, ...],
-                    caiman_dataset.motion_correction["correlation_image"].transpose(2, 0, 1)
+                    else caiman_dataset.motion_correction["average_image"][...][
+                        np.newaxis, ...
+                    ],
+                    caiman_dataset.motion_correction["correlation_image"].transpose(
+                        2, 0, 1
+                    )
                     if is3D
                     else caiman_dataset.motion_correction["correlation_image"][...][
                         np.newaxis, ...
                     ],
                     caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
                     if is3D
-                    else caiman_dataset.motion_correction["max_image"][...][np.newaxis, ...],
+                    else caiman_dataset.motion_correction["max_image"][...][
+                        np.newaxis, ...
+                    ],
                 )
             ]
             self.Summary.insert(summary_images)
@@ -656,11 +889,34 @@ class MotionCorrection(dj.Imported):
 
 @schema
 class Segmentation(dj.Computed):
-    definition = """ # Different mask segmentations.
+    """Result of the Segmentation process.
+
+    Attributes:
+        Processing (foreign key): Primary key from Processing.
+    """
+
+    definition = """# Different mask segmentations.
     -> Processing
     """
 
     class Mask(dj.Part):
+        """Details of the masks identified from the Segmentation procedure.
+
+        Attributes:
+            Segmentation (foreign key): Primary key from Segmentation.
+            mask (int): Unique mask ID.
+            scan.Channel.proj(segmentation_channel='channel') (foreign key): Channel
+                used for segmentation.
+            mask_npix (int): Number of pixels in ROIs.
+            mask_center_x (int): Center x coordinate in pixel.
+            mask_center_y (int): Center y coordinate in pixel.
+            mask_center_z (int): Center z coordinate in pixel.
+            mask_xpix (longblob): X coordinates in pixels.
+            mask_ypix (longblob): Y coordinates in pixels.
+            mask_zpix (longblob): Z coordinates in pixels.
+            mask_weights (longblob): Weights of the mask at the indices above.
+        """
+
         definition = """ # A mask produced by segmentation.
         -> master
         mask            : smallint
@@ -677,6 +933,8 @@ class Segmentation(dj.Computed):
         """
 
     def make(self, key):
+        """Populate the Segmentation with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
@@ -782,6 +1040,12 @@ class Segmentation(dj.Computed):
 
 @schema
 class MaskClassificationMethod(dj.Lookup):
+    """Available mask classification methods.
+
+    Attributes:
+        mask_classification_method (str): Mask classification method.
+    """
+
     definition = """
     mask_classification_method: varchar(48)
     """
@@ -791,12 +1055,29 @@ class MaskClassificationMethod(dj.Lookup):
 
 @schema
 class MaskClassification(dj.Computed):
+    """Classes assigned to each mask.
+
+    Attributes:
+        Segmentation (foreign key): Primary key from Segmentation.
+        MaskClassificationMethod (foreign key): Primary key from
+            MaskClassificationMethod.
+    """
+
     definition = """
     -> Segmentation
     -> MaskClassificationMethod
     """
 
     class MaskType(dj.Part):
+        """Type assigned to each mask.
+
+        Attributes:
+            MaskClassification (foreign key): Primary key from MaskClassification.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            MaskType: Primary key from MaskType.
+            confidence (float, optional): Confidence level of the mask classification.
+        """
+
         definition = """
         -> master
         -> Segmentation.Mask
@@ -814,21 +1095,40 @@ class MaskClassification(dj.Computed):
 
 @schema
 class Fluorescence(dj.Computed):
-    definition = """  # fluorescence traces before spike extraction or filtering
+    """Fluorescence traces.
+
+    Attributes:
+        Segmentation (foreign key): Primary key from Segmentation.
+    """
+
+    definition = """# Fluorescence traces before spike extraction or filtering
     -> Segmentation
     """
 
     class Trace(dj.Part):
+        """Traces obtained from segmented region of interests.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            scan.Channel.proj(fluo_channel='channel') (int): The channel that this trace
+                comes from.
+            fluorescence (longblob): Fluorescence trace associated with this mask.
+            neuropil_fluorescence (longblob, optional): Neuropil fluorescence trace.
+        """
+
         definition = """
         -> master
         -> Segmentation.Mask
-        -> scan.Channel.proj(fluo_channel='channel')  # the channel that this trace comes from         
+        -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from
         ---
-        fluorescence                : longblob  # fluorescence trace associated with this mask
+        fluorescence                : longblob  # Fluorescence trace associated with this mask
         neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace
         """
 
     def make(self, key):
+        """Populate the Fluorescence with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
@@ -849,8 +1149,12 @@ class Fluorescence(dj.Computed):
                         }
                     )
                 if len(s2p.F_chan2):
-                    mask_chn2_count = len(fluo_chn2_traces)  # increment mask id from all planes
-                    for mask_idx, (f2, fneu2) in enumerate(zip(s2p.F_chan2, s2p.Fneu_chan2)):
+                    mask_chn2_count = len(
+                        fluo_chn2_traces
+                    )  # increment mask id from all planes
+                    for mask_idx, (f2, fneu2) in enumerate(
+                        zip(s2p.F_chan2, s2p.Fneu_chan2)
+                    ):
                         fluo_chn2_traces.append(
                             {
                                 **key,
@@ -892,8 +1196,10 @@ class Fluorescence(dj.Computed):
 
 @schema
 class ActivityExtractionMethod(dj.Lookup):
-    definition = """
-    extraction_method: varchar(32)
+    """Available activity extraction methods.
+
+    Attributes:
+        extraction_method (str): Extraction method.
     """
 
     contents = zip(["suite2p", "caiman", "FISSA"])
@@ -944,9 +1250,17 @@ class ActivityExtractionParamSet(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    definition = """  # inferred neural activity from fluorescence trace - e.g. dff, spikes
+    """Inferred neural activity from fluorescence trace (e.g. dff, spikes, etc.).
+
+    Attributes:
+        Fluorescence (foreign key): Primary key from Fluorescence.
+        ActivityExtractionMethod (foreign key): Primary key from
+            ActivityExtractionMethod.
+    """
+
+    definition = """# Neural Activity
     -> Fluorescence
-    -> ActivityExtractionParamSet
+    -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
@@ -994,7 +1308,11 @@ class Activity(dj.Computed):
                 & 'extraction_method = "FISSA"'
             ).proj()
         )
-        return suite2p_key_source.proj() + caiman_key_source.proj() + fissa_key_source.proj()
+        return (
+            suite2p_key_source.proj()
+            + caiman_key_source.proj()
+            + fissa_key_source.proj()
+        )
 
     def make(self, key):
         processing_method, imaging_dataset = get_loader_result(key, ProcessingTask)
@@ -1050,7 +1368,15 @@ class Activity(dj.Computed):
                         }
                     )
                 self.insert1(key)
-                self.Trace.insert(activities)
+                self.Trace.insert(
+                    dict(
+                        key,
+                        mask=mask["mask_id"],
+                        fluo_channel=segmentation_channel,
+                        activity_trace=mask[attr_mapper[key["extraction_method"]]],
+                    )
+                    for mask in caiman_dataset.masks
+                )
         else:
             raise NotImplementedError(
                 "Unknown/unimplemented method: {}".format(processing_method)
@@ -1066,14 +1392,21 @@ _table_attribute_mapper = {
 }
 
 
-def get_loader_result(key, table):
-    """
-    Retrieve the loaded processed imaging results from the loader (e.g. suite2p, caiman, etc.)
-        :param key: the `key` to one entry of ProcessingTask or Curation
-        :param table: the class defining the table to retrieve
-         the loaded results from (e.g. ProcessingTask, Curation)
-        :return: a loader object of the loaded results
-         (e.g. suite2p.Suite2p, caiman.CaImAn, etc.)
+def get_loader_result(key: dict, table: dj.Table):
+    """Retrieve the processed imaging results from a suite2p or caiman loader.
+
+    Args:
+        key (dict): The `key` to one entry of ProcessingTask or Curation
+        table (dj.Table): A datajoint table to retrieve the loaded results from (e.g.
+            ProcessingTask, Curation)
+
+    Raises:
+        NotImplementedError: If the processing_method is different than 'suite2p' or
+            'caiman'.
+
+    Returns:
+        A loader object of the loaded results (e.g. suite2p.Suite2p or caiman.CaImAn,
+        see element-interface for more information on the loaders.)
     """
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
         "processing_method", _table_attribute_mapper[table.__name__]

@@ -1,0 +1,30 @@
+name: u24_element_release_call
+on:
+  workflow_run:
+    workflows: ["u24_element_tag_to_release"]
+    types:
+      - completed
+jobs:
+  call_context_check:
+    uses: dj-sciops/djsciops-cicd/.github/workflows/context_check.yaml@main
+  test_call_u24_elements_release_alpine:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' && ( contains(github.event.workflow_run.head_branch, 'test') || (github.event.workflow_run.event == 'pull_request'))
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_element_release.yaml@main
+    with:
+      py_ver: 3.9
+      twine_repo: testpypi
+    secrets:
+      TWINE_USERNAME: ${{secrets.TWINE_TEST_USERNAME}}
+      TWINE_PASSWORD: ${{secrets.TWINE_TEST_PASSWORD}}
+      GOOGLE_ANALYTICS_KEY: ${{secrets.GOOGLE_ANALYTICS_KEY}}
+  call_u24_elements_release_alpine:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' && github.repository_owner == 'datajoint' && !contains(github.event.workflow_run.head_branch, 'test')
+    uses: dj-sciops/djsciops-cicd/.github/workflows/u24_element_release.yaml@main
+    with:
+      py_ver: 3.9
+    secrets:
+      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
+      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
+      GOOGLE_ANALYTICS_KEY: ${{secrets.GOOGLE_ANALYTICS_KEY}}

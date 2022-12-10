@@ -77,16 +77,196 @@ def activate(
 
 
 @schema
-class ProcessingMethod(dj.Lookup):
-    """Method, package, or analysis suite used for processing of calcium imaging data
-        (e.g. Suite2p, CaImAn, etc.).
+class PreprocessMethod(dj.Lookup):
+    """Method(s) used for preprocessing of calcium imaging data.
 
     Attributes:
-        processing_method (str): Processing method.
-        processing_method_desc (str): Processing method description.
+        preprocess_method (str): Preprocessing method.
+        preprocess_method_desc (str): Processing method description.
     """
 
-    definition = """# Method for calcium imaging processing
+    definition = """  #  Method/package used for pre-processing
+    preprocess_method: varchar(16)
+    ---
+    preprocess_method_desc: varchar(1000)
+    """
+
+
+@schema
+class PreprocessParamSet(dj.Lookup):
+    """Parameter set used for the preprocessing of the calcium imaging scans.
+
+    A hash of the parameters of the analysis suite is also stored in order
+    to avoid duplicated entries.
+
+    Attributes:
+        paramset_idx (int): Uniqiue parameter set ID.
+        PreprocessMethod (foreign key): A primary key from PreprocessMethod.
+        paramset_desc (str): Parameter set description.
+        param_set_hash (uuid): A universally unique identifier for the parameter set.
+        params (longblob): Parameter Set, a dictionary of all applicable parameters to
+            the analysis suite.
+    """
+
+    definition = """  #  Parameter set used for pre-processing of calcium imaging data
+    paramset_idx:  smallint
+    ---
+    -> PreprocessMethod
+    paramset_desc: varchar(128)
+    param_set_hash: uuid
+    unique index (param_set_hash)
+    params: longblob  # dictionary of all applicable parameters
+    """
+
+    @classmethod
+    def insert_new_params(
+        cls, preprocess_method: str, paramset_idx: int, paramset_desc: str, params: dict
+    ):
+        """Insert a parameter set into PreprocessParamSet table.
+        This function automizes the parameter set hashing and avoids insertion of an
+            existing parameter set.
+
+        Attributes:
+            preprocess_method (str): Method used for processing of calcium imaging scans.
+            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_desc (str): Parameter set description.
+            params (dict): Parameter Set, all applicable parameters.
+        """
+        param_dict = {
+            "preprocess_method": preprocess_method,
+            "paramset_idx": paramset_idx,
+            "paramset_desc": paramset_desc,
+            "params": params,
+            "param_set_hash": dict_to_uuid(params),
+        }
+        q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
+
+        if q_param:  # If the specified param-set already exists
+            pname = q_param.fetch1("paramset_idx")
+            if pname == paramset_idx:  # If the existed set has the same name: job done
+                return
+            else:  # If not same name: human error, trying to add the same paramset with different name
+                raise dj.DataJointError(
+                    "The specified param-set already exists - name: {}".format(pname)
+                )
+        else:
+            cls.insert1(param_dict)
+
+
+@schema
+class PreprocessParamSteps(dj.Manual):
+    """Ordered list of paramset_idx that will be run.
+
+    When pre-processing is not performed, do not create an entry in `Step` Part table
+
+    Attributes:
+        preprocess_param_steps_id (int):
+        preprocess_param_steps_name (str):
+        preprocess_param_steps_desc (str):
+    """
+
+    definition = """
+    preprocess_param_steps_id: smallint
+    ---
+    preprocess_param_steps_name: varchar(32)
+    preprocess_param_steps_desc: varchar(128)
+    """
+
+    class Step(dj.Part):
+        """ADD DEFINITION
+
+        Attributes:
+            PreprocessParamSteps (foreign key): A primary key from PreprocessParamSteps.
+            step_number (int):
+            PreprocessParamSet (foreign key): A primary key from PreprocessParamSet.
+        """
+
+        definition = """
+        -> master
+        step_number: smallint                  # Order of operations
+        ---
+        -> PreprocessParamSet
+        """
+
+
+@schema
+class PreprocessTask(dj.Manual):
+    """This table defines a calcium imaging preprocessing task for a combination of a
+    `Scan` and a `PreprocessParamSteps` entries, including all the inputs (scan, method,
+    steps). The task defined here is then run in the downstream table
+    Preprocess. This table supports definitions of both loading of pre-generated,
+    results, triggering of new analysis, or skipping of preprocessing step.
+
+    Attributes:
+        Scan (foreign key): A primary key from Scan.
+        PreprocessParamSteps (foreign key): A primary key from PreprocessParamSteps.
+        preprocess_output_dir (str): Output directory for the results of preprocessing.
+        task_mode (str, optional): One of 'load' (load computed analysis results), 'trigger'
+            (trigger computation), 'none' (no pre-processing). Default none.
+    """
+
+    definition = """
+    # Manual table for defining a pre-processing task ready to be run
+    -> scan.Scan
+    -> PreprocessParamSteps
+    ---
+    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
+                                         # to the root data directory
+    task_mode='none': enum('none','load', 'trigger') # 'none': no pre-processing
+                                                     # 'load': load analysis results
+                                                     # 'trigger': trigger computation
+    """
+
+
+@schema
+class Preprocess(dj.Imported):
+    """Perform the computation of an entry (task) defined in the PreprocessTask table.
+
+    + If `task_mode == "none"`: no pre-processing performed
+    + If `task_mode == "trigger"`: Not implemented
+    + If `task_mode == "load"`: Not implemented
+
+    Attributes:
+        PreprocessTask (foreign key):
+        preprocess_time (datetime, optional):
+        package_version (str, optional): Version of the analysis package used in
+            processing the data.
+    """
+
+    definition = """
+    -> PreprocessTask
+    ---
+    preprocess_time=null: datetime  # Time of generation of pre-processing results 
+    package_version='': varchar(16)
+    """
+
+    def make(self, key):
+        """Execute the preprocessing analysis steps defined in PreprocessTask."""
+
+        task_mode, output_dir = (PreprocessTask & key).fetch1(
+            "task_mode", "preprocess_output_dir"
+        )
+        preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+        if task_mode == "none":
+            print(f"No pre-processing run on entry: {key}")
+        elif task_mode in ["load", "trigger"]:
+            raise NotImplementedError(
+                "Pre-processing steps are not implemented."
+                "Please overwrite this `make` function with"
+                "desired pre-processing steps."
+            )
+        else:
+            raise ValueError(f"Unknown task mode: {task_mode}")
+
+        self.insert1(key)
+
+
+@schema
+class ProcessingMethod(dj.Lookup):
+    definition = """
+    # Method, package, analysis suite used for processing of calcium imaging
+    # data (e.g. Suite2p, CaImAn, etc.)
     processing_method: char(8)
     ---
     processing_method_desc: varchar(1000)  # Processing method description
@@ -130,7 +310,6 @@ class ProcessingParamSet(dj.Lookup):
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
         """Insert a parameter set into ProcessingParamSet table.
-
         This function automizes the parameter set hashing and avoids insertion of an
             existing parameter set.
 
@@ -198,16 +377,14 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    """A pairing of processing params and scans to be loaded or triggered
-
-    This table defines a calcium imaging processing task for a combination of a
-    `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
+    """This table defines a calcium imaging processing task for a combination of a
+    `Preprocess` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
     Processing. This table supports definitions of both loading of pre-generated results
     and the triggering of new analysis for all supported analysis methods
 
     Attributes:
-        scan.Scan (foreign key):
+        Preprocess (foreign key):
         ProcessingParamSet (foreign key):
         processing_output_dir (str):
         task_mode (str): One of 'load' (load computed analysis results) or 'trigger'
@@ -215,7 +392,7 @@ class ProcessingTask(dj.Manual):
     """
 
     definition = """# Manual table for defining a processing task ready to be run
-    -> scan.Scan
+    -> Preprocess
     -> ProcessingParamSet
     ---
     processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
@@ -229,12 +406,11 @@ class ProcessingTask(dj.Manual):
         Args:
             key (dict): Primary key from the ProcessingTask table.
             relative (bool): If True, processing_output_dir is returned relative to
-                imaging_root_dir. Default False.
+                imaging_root_dir.
             mkdir (bool): If True, create the processing_output_dir directory.
-                Default True.
 
         Returns:
-            dir (str): A default output directory for the processed results (processed_output_dir
+            A default output directory for the processed results (processed_output_dir
                 in ProcessingTask) based on the following convention:
                 processed_dir / scan_dir / {processing_method}_{paramset_idx}
                 e.g.: sub4/sess1/scan0/suite2p_0
@@ -269,10 +445,8 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet
-
-        Generate an entry in the ProcessingTask table for a particular scan using an
-        existing parameter set from the ProcessingParamSet table.
+        """Generate a default ProcessingTask entry for a particular Scan using an
+        existing parameter set in the ProcessingParamSet table.
 
         Args:
             scan_key (dict): Primary key from Scan table.
@@ -378,11 +552,34 @@ class Processing(dj.Computed):
                 "processing_method"
             )
 
-            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
-            image_files = [
-                find_full_path(get_imaging_root_data_dir(), image_file)
-                for image_file in image_files
-            ]
+            preprocess_paramsets = (
+                PreprocessParamSteps.Step()
+                & dict(preprocess_param_steps_id=key["preprocess_param_steps_id"])
+            ).fetch("paramset_idx")
+
+            if len(preprocess_paramsets) == 0:
+                # No pre-processing steps were performed on the acquired dataset, so process the raw/acquired files.
+                image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
+
+            else:
+                preprocess_output_dir = (PreprocessTask & key).fetch1(
+                    "preprocess_output_dir"
+                )
+
+                preprocess_output_dir = find_full_path(
+                    get_imaging_root_data_dir(), preprocess_output_dir
+                )
+
+                if not preprocess_output_dir.exists():
+                    raise FileNotFoundError(
+                        f"Pre-processed output directory not found ({preprocess_output_dir})"
+                    )
+
+                image_files = list(preprocess_output_dir.glob("*.tif"))
 
             if method == "suite2p":
                 import suite2p
@@ -444,9 +641,7 @@ class Processing(dj.Computed):
 
 @schema
 class Curation(dj.Manual):
-    """Curated results
-
-    If no curation is applied, the curation_output_dir can be set to
+    """Curated results. If no curation is applied, the curation_output_dir can be set to
     the value of processing_output_dir.
 
     Attributes:
@@ -467,7 +662,7 @@ class Curation(dj.Manual):
     curation_time: datetime  # Time of generation of this set of curated results 
     curation_output_dir: varchar(255)  # Output directory of the curated results, relative to root data directory
     manual_curation: bool  # Has manual curation been performed on this result?
-    curation_note='': varchar(2000)
+    curation_note='': varchar(2000)  
     """
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
@@ -1296,7 +1491,7 @@ class Activity(dj.Computed):
 
     definition = """# Neural Activity
     -> Fluorescence
-    -> ActivityExtractionParamSet
+    -> ActivityExtractionMethod
     """
 
     class Trace(dj.Part):
@@ -1311,7 +1506,6 @@ class Activity(dj.Computed):
         definition = """
         -> master
         -> Fluorescence.Trace
-        activity_type: varchar(16)  # e.g. dF/F, calcium-event
         ---
         activity_trace: longblob
         """
