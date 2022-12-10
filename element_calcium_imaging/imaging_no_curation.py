@@ -1254,7 +1254,7 @@ class ActivityExtractionParamSet(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    """Inferred neural activity from fluorescence trace (e.g. ).
+    """Inferred neural activity from fluorescence trace.
 
     Attributes:
         Fluorescence (foreign key): Primary key from Fluorescence.
@@ -1264,16 +1264,16 @@ class Activity(dj.Computed):
 
     definition = """# Neural Activity
     -> Fluorescence
-    -> ActivityExtractionParamSet
+    -> ActivityExtractionParamSet 
     """
 
     class Trace(dj.Part):
         definition = """
         -> master
         -> Fluorescence.Trace
-        activity_type: varchar(16)  # e.g. dF/F, calcium-event
+        activity_type: varchar(16)  # e.g. z_score, Fcorrected
         ---
-        activity_trace: longblob
+        activity_trace: longblob  # z score, neuropil corrected Fluorescence
         """
 
     @property
@@ -1319,7 +1319,7 @@ class Activity(dj.Computed):
     def make(self, key):
         # This code estimates the following quantities for each cell:
         # 1) neuropil corrected fluorescence,
-        # 2) dff,
+        # 2) dff (only in old Fissa where F >= 0 constraint did not exist),
         # 3) zscore.
 
         import fissa
