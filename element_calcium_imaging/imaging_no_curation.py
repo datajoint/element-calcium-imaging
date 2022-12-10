@@ -1254,13 +1254,13 @@ class Activity(dj.Computed):
 
     Attributes:
         Fluorescence (foreign key): Primary key from Fluorescence.
-        ActivityExtractionMethod (foreign key): Primary key from
-            ActivityExtractionMethod.
+        ActivityExtractionParamSet (foreign key): Primary key from
+            ActivityExtractionParamSet.
     """
 
     definition = """# Neural Activity
     -> Fluorescence
-    -> ActivityExtractionMethod
+    -> ActivityExtractionParamSet
     """
 
     class Trace(dj.Part):
