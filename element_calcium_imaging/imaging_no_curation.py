@@ -1224,14 +1224,14 @@ class ActivityExtractionParamSet(dj.Lookup):
     @classmethod
     def insert_new_params(
         cls,
-        activity_extraction_paramset_idx: int,
         extraction_method: str,
+        activity_paramset_idx: int,
         paramset_desc: str,
         params: dict,
     ):
         param_dict = {
-            "activity_extraction_paramset_idx": activity_extraction_paramset_idx,
-            "extraction_method": extraction_method,
+            "processing_method": extraction_method,
+            "paramset_idx": activity_paramset_idx,
             "paramset_desc": paramset_desc,
             "params": params,
             "param_set_hash": dict_to_uuid(params),
@@ -1239,9 +1239,9 @@ class ActivityExtractionParamSet(dj.Lookup):
         q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1("activity_extraction_paramset_idx")
+            pname = q_param.fetch1("activity_paramset_idx")
             if (
-                pname == activity_extraction_paramset_idx
+                pname == activity_paramset_idx
             ):  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
