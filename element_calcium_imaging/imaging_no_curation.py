@@ -1315,72 +1315,133 @@ class Activity(dj.Computed):
         )
 
     def make(self, key):
-        processing_method, imaging_dataset = get_loader_result(key, ProcessingTask)
+        # This code estimates the following quantities for each cell:
+        # 1) neuropil corrected fluorescence,
+        # 2) dff,
+        # 3) zscore.
 
-        if processing_method == "suite2p":
-            suite2p_dataset = imaging_dataset
-            if key["extraction_method"] == "suite2p":
-                # ---- iterate through all s2p plane outputs ----
-                spikes = []
-                for s2p in suite2p_dataset.planes.values():
-                    mask_count = len(spikes)  # increment mask id from all "plane"
-                    for mask_idx, spks in enumerate(s2p.spks):
-                        spikes.append(
-                            {
-                                **key,
-                                "mask": mask_idx + mask_count,
-                                "fluo_channel": 0,
-                                "activity_type": "spike",
-                                "activity_trace": spks,
-                            }
-                        )
+        import fissa
+        from collections import Counter
+        from utils import calculate_dff, calculate_zscore, combine_trials
 
-                self.insert1(key)  # FIX THIS
-                self.Trace.insert(spikes)  # FIX THIS
-        elif processing_method == "caiman":
-            caiman_dataset = imaging_dataset
+        fissa_params = (ActivityExtractionParamSet & key).fetch1("params")
 
-            if key["extraction_method"] == "caiman":
-                # infer "segmentation_channel" - from params if available, else from caiman loader
-                params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
-                segmentation_channel = params.get(
-                    "segmentation_channel", caiman_dataset.segmentation_channel
-                )
+        # processing_output_dir contains the paramset_id. The upload & ingest should be done accordingly.
+        output_dir = find_full_path(
+            get_imaging_root_data_dir(),
+            (ProcessingTask & key).fetch("processing_output_dir", limit=1)[0],
+        )
 
-                activities = []
-                for mask in caiman_dataset.masks:
-                    activities.append(
-                        {
-                            **key,
-                            "mask": mask["mask_id"],
-                            "fluo_channel": segmentation_channel,
-                            "activity_type": "dff",
-                            "activity_trace": mask["dff"],
-                        }
-                    )
-                    activities.append(
-                        {
-                            **key,
-                            "mask": mask["mask_id"],
-                            "fluo_channel": segmentation_channel,
-                            "activity_type": "spike",
-                            "activity_trace": mask["spikes"],
-                        }
-                    )
-                self.insert1(key)
-                self.Trace.insert(
-                    dict(
-                        key,
-                        mask=mask["mask_id"],
-                        fluo_channel=segmentation_channel,
-                        activity_trace=mask[attr_mapper[key["extraction_method"]]],
-                    )
-                    for mask in caiman_dataset.masks
-                )
-        else:
-            raise NotImplementedError(
-                "Unknown/unimplemented method: {}".format(processing_method)
+        reg_img_dir = output_dir / "suite2p/plane0/reg_tif"
+        fissa_output_dir = output_dir / "FISSA_Suite2p"
+
+        # Required even though the FISSA is not triggered
+        cell_ids, mask_xpixs, mask_ypixs = (
+            Segmentation.Mask & MaskClassification.MaskType & key
+        ).fetch("mask", "mask_xpix", "mask_ypix")
+
+        # Trigger Condition
+        if not any(
+            (fissa_output_dir / p).exists() for p in ["separated.npy", "separated.npz"]
+        ):
+            fissa_output_dir.mkdir(parents=True, exist_ok=True)
+
+            Ly, Lx = (
+                (MotionCorrection.Summary & key)
+                .fetch("average_image", limit=1)[0]
+                .shape
             )
+            rois = [np.zeros((Ly, Lx), dtype=bool) for n in range(len(cell_ids))]
+
+            # Find overlapping pixels to remove
+            pixel_counts = Counter(
+                list(zip(np.hstack(mask_xpixs), np.hstack(mask_ypixs)))
+            )
+            overlapping_pixels = [k for k, v in pixel_counts.items() if v > 1]
+
+            for i, (mask_xpix, mask_ypix) in enumerate(zip(mask_xpixs, mask_ypixs)):
+                is_pixel_overlapping = np.array(
+                    [
+                        True if (x, y) in overlapping_pixels else False
+                        for x, y in zip(mask_xpix, mask_ypix)
+                    ]
+                )
+                rois[i][
+                    mask_ypix[~is_pixel_overlapping], mask_xpix[~is_pixel_overlapping]
+                ] = 1
+
+            experiment = fissa.Experiment(
+                reg_img_dir.as_posix(),
+                [rois],
+                fissa_output_dir.as_posix(),
+                **fissa_params["init"],
+            )
+            experiment.separate(**fissa_params["exec"])
+
+        # Load the results
+        fissa_output_file = list(fissa_output_dir.glob("separated.np*"))[0]
+        fissa_output = np.load(fissa_output_file, allow_pickle=True)
+
+        # Old and new FISSA outputs are stored differently
+        # Two versions can be distinguised with the output file suffix.
+        trace_list = []
+        if fissa_output_file.suffix == ".npy":
+            for cell_id, result in zip(
+                cell_ids, fissa_output[3]
+            ):  # LuLab uses the 3rd component.
+                trace_list.append(
+                    dict(
+                        **key,
+                        mask=cell_id,
+                        fluo_channel=0,
+                        activity_type="corrected_fluorescence",
+                        activity_trace=result[0][0][0],
+                    )
+                )
+                dff = calculate_dff(result[0][0][0])
+                trace_list.append(
+                    dict(
+                        **key,
+                        mask=cell_id,
+                        fluo_channel=0,
+                        activity_type="dff",
+                        activity_trace=dff,
+                    )
+                )
+                trace_list.append(
+                    dict(
+                        **key,
+                        mask=cell_id,
+                        fluo_channel=0,
+                        activity_type="z_score",
+                        activity_trace=calculate_zscore(dff),
+                    )
+                )
+
+        else:
+            traces = combine_trials(fissa_output)
+            for cell_id, trace in zip(cell_ids, traces):
+                trace_list.append(
+                    dict(
+                        **key,
+                        mask=cell_id,
+                        fluo_channel=0,
+                        activity_type="Fcorrected",
+                        activity_trace=trace,
+                    )
+                )
+                trace_list.append(
+                    dict(
+                        **key,
+                        mask=cell_id,
+                        fluo_channel=0,
+                        activity_type="z_score",
+                        activity_trace=calculate_zscore(trace),
+                    )
+                )
+
+        self.insert1(key)
+        self.Trace.insert(trace_list)
 
 
 # ---------------- HELPER FUNCTIONS ----------------
