@@ -1322,7 +1322,7 @@ class Activity(dj.Computed):
 
         import fissa
         from collections import Counter
-        from utils import calculate_dff, calculate_zscore, combine_trials
+        from .utils import calculate_dff, calculate_zscore, combine_trials
 
         fissa_params = (ActivityExtractionParamSet & key).fetch1("params")
 
