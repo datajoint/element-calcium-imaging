@@ -1202,6 +1202,10 @@ class ActivityExtractionMethod(dj.Lookup):
         extraction_method (str): Extraction method.
     """
 
+    definition = """
+    extraction_method: varchar(32)
+    """
+
     contents = zip(["suite2p", "caiman", "FISSA"])
 
 
