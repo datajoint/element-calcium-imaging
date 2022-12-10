@@ -1279,7 +1279,6 @@ class Activity(dj.Computed):
             ks
             & (
                 Fluorescence
-                * ActivityExtractionMethod
                 * ActivityExtractionParamSet
                 * ProcessingParamSet.proj("processing_method")
                 & 'processing_method = "suite2p"'
@@ -1290,7 +1289,6 @@ class Activity(dj.Computed):
             ks
             & (
                 Fluorescence
-                * ActivityExtractionMethod
                 * ActivityExtractionParamSet
                 * ProcessingParamSet.proj("processing_method")
                 & 'processing_method = "caiman"'
