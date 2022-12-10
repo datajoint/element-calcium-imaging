@@ -1254,7 +1254,7 @@ class ActivityExtractionParamSet(dj.Lookup):
 
 @schema
 class Activity(dj.Computed):
-    """Inferred neural activity from fluorescence trace (e.g. dff, spikes, etc.).
+    """Inferred neural activity from fluorescence trace (e.g. ).
 
     Attributes:
         Fluorescence (foreign key): Primary key from Fluorescence.
@@ -1386,6 +1386,7 @@ class Activity(dj.Computed):
 
         # Old and new FISSA outputs are stored differently
         # Two versions can be distinguised with the output file suffix.
+        # The new version infers non-zero traces; therefore no need for dff calculation.
         trace_list = []
         if fissa_output_file.suffix == ".npy":
             for cell_id, result in zip(
