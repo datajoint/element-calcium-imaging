@@ -1448,22 +1448,43 @@ class Activity(dj.Computed):
 
 @schema
 class SpikeStat(dj.Computed):
+    """Spike Statistics
+
+    Attributes:
+        Activity (foreign key): Primary key from Activity.
+    """
+
     definition = """
     -> Activity
     """
 
     class Trace(dj.Part):
+        """Deconvolve the neuropil corrected calcium traces with OASIS to infer the spikes,
+        and calculate inter-event interval and area under the spike.
+
+        Attributes:
+            SpikeStat (Primary key): Parent key from SpikeStat
+            Activity.Trace (Foreign key): Primary key from Activity.Trace.
+            spikes (longblob): Discretized deconvolved neural activity.
+            reconstructed_trace (longblob): Reconstructed fluorescence trace.
+            baseline (float): Inferred baseline calcium strength.
+            lambda (float): Optimal Lagrange multiplier for noise constraint (sparsity parameter).
+            g (float): Parameters of the autoregressive model, cardinality equivalent to p.
+            interevent_interval (longblob): Interevent interval calculated from the spikes.
+            area_under_spike (longblob): Area under the spike.
+        """
+
         definition = """
         -> master
         -> Activity.Trace
         ---
-        spikes: longblob
-        convolved_trace: longblob
-        background: float
-        lambda: float
-        g: float
-        interevent_interval: longblob
-        area_under_spike: longblob
+        spikes: longblob                # Discretized deconvolved neural activity.
+        reconstructed_trace: longblob   # Reconstructed fluorescence trace.
+        baseline: float                 # Inferred baseline calcium strength.
+        lambda: float                   # Optimal Lagrange multiplier for noise constraint (sparsity parameter).
+        g: float                        # Parameters of the autoregressive model, cardinality equivalent to p.
+        interevent_interval: longblob   # Interevent interval calculated from the spikes.
+        area_under_spike: longblob      # Area under the spike.
         """
 
     def make(self, key):
@@ -1485,14 +1506,14 @@ class SpikeStat(dj.Computed):
 
             spike_times = np.where(s > 1e-3)[0]
             grps = np.split(spike_times, np.where(np.diff(spike_times) != 1)[0] + 1)
-            area_under_spike = np.array([s[grp].sum() / fps for grp in grps])
+            area_under_spike = np.array([s[grp].sum() for grp in grps]) / fps
 
             traces.append(
                 {
                     **trace_key,
                     "spikes": s,
-                    "convolved_trace": c,
-                    "background": b,
+                    "reconstructed_trace": c,
+                    "baseline": b,
                     "g": g,
                     "lambda": lam,
                     "interevent_interval": interevent_interval,
