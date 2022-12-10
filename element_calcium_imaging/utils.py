@@ -48,9 +48,3 @@ def calculate_zscore(dff, n_quiet_frames=153):
     mean_dff_quiet = dff[:n_quiet_frames].mean()
     std_dff_quiet = dff[:n_quiet_frames].std()
     return (dff - mean_dff_quiet) / std_dff_quiet
-
-
-# This was in the matlab codes, will be used later.
-def filter_cells(dff, pct=0.05):
-    n_nonzeros = np.count_nonzero(dff, -1)
-    return dff[n_nonzeros > dff.shape[1] * 0.05]
