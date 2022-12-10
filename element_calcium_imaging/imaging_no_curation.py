@@ -1442,6 +1442,64 @@ class Activity(dj.Computed):
         self.Trace.insert(trace_list)
 
 
+@schema
+class SpikeStat(dj.Computed):
+    definition = """
+    -> Activity
+    """
+
+    class Trace(dj.Part):
+        definition = """
+        -> master
+        -> Activity.Trace
+        ---
+        spikes: longblob
+        convolved_trace: longblob
+        background: float
+        lambda: float
+        g: float
+        interevent_interval: longblob
+        area_under_spike: longblob
+        """
+
+    def make(self, key):
+        from oasis.functions import deconvolve
+
+        trace_keys, Fcorrecteds = np.stack(
+            (Activity.Trace & key & "activity_type='Fcorrected'").fetch(
+                "KEY", "activity_trace"
+            )
+        )
+        fps = (scan.ScanInfo & key).fetch1("fps")
+
+        traces = []
+        for trace_key, Fcorrected in zip(trace_keys, Fcorrecteds):
+            c, s, b, g, lam = deconvolve(Fcorrected, penalty=0, optimize_g=5)
+
+            interevent_interval = np.diff(np.where(s > 1e-3)[0])
+            interevent_interval = interevent_interval[interevent_interval > 1] / fps
+
+            spike_times = np.where(s > 1e-3)[0]
+            grps = np.split(spike_times, np.where(np.diff(spike_times) != 1)[0] + 1)
+            area_under_spike = np.array([s[grp].sum() / fps for grp in grps])
+
+            traces.append(
+                {
+                    **trace_key,
+                    "spikes": s,
+                    "convolved_trace": c,
+                    "background": b,
+                    "g": g,
+                    "lambda": lam,
+                    "interevent_interval": interevent_interval,
+                    "area_under_spike": area_under_spike,
+                }
+            )
+
+        self.insert1(key)
+        self.Trace.insert(traces)
+
+
 # ---------------- HELPER FUNCTIONS ----------------
 
 
