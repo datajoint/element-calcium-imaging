@@ -1225,13 +1225,13 @@ class ActivityExtractionParamSet(dj.Lookup):
     def insert_new_params(
         cls,
         extraction_method: str,
-        activity_paramset_idx: int,
+        activity_extraction_paramset_idx: int,
         paramset_desc: str,
         params: dict,
     ):
         param_dict = {
-            "processing_method": extraction_method,
-            "paramset_idx": activity_paramset_idx,
+            "extraction_method": extraction_method,
+            "activity_extraction_paramset_idx": activity_extraction_paramset_idx,
             "paramset_desc": paramset_desc,
             "params": params,
             "param_set_hash": dict_to_uuid(params),
@@ -1239,9 +1239,9 @@ class ActivityExtractionParamSet(dj.Lookup):
         q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1("activity_paramset_idx")
+            pname = q_param.fetch1("activity_extraction_paramset_idx")
             if (
-                pname == activity_paramset_idx
+                pname == activity_extraction_paramset_idx
             ):  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
@@ -1275,46 +1275,6 @@ class Activity(dj.Computed):
         ---
         activity_trace: longblob  # z score, neuropil corrected Fluorescence
         """
-
-    @property
-    def key_source(self):
-        ks = Fluorescence * ActivityExtractionParamSet
-        suite2p_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method = "suite2p"'
-                & 'extraction_method = "suite2p"'
-            ).proj()
-        )
-        caiman_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method = "caiman"'
-                & 'extraction_method = "caiman"'
-            ).proj()
-        )
-        fissa_key_source = (
-            ks
-            & (
-                Fluorescence
-                * ActivityExtractionMethod
-                * ActivityExtractionParamSet
-                * ProcessingParamSet.proj("processing_method")
-                & 'processing_method in ("suite2p")'
-                & 'extraction_method = "FISSA"'
-            ).proj()
-        )
-        return (
-            suite2p_key_source.proj()
-            + caiman_key_source.proj()
-            + fissa_key_source.proj()
-        )
 
     def make(self, key):
         # This code estimates the following quantities for each cell:
@@ -1467,7 +1427,7 @@ class SpikeStat(dj.Computed):
             SpikeStat (Primary key): Parent key from SpikeStat
             Activity.Trace (Foreign key): Primary key from Activity.Trace.
             spikes (longblob): Discretized deconvolved neural activity.
-            reconstructed_trace (longblob): Reconstructed fluorescence trace.
+            inferred_trace (longblob): Inferred fluorescence trace.
             baseline (float): Inferred baseline calcium strength.
             lambda (float): Optimal Lagrange multiplier for noise constraint (sparsity parameter).
             g (float): Parameters of the autoregressive model, cardinality equivalent to p.
@@ -1480,7 +1440,7 @@ class SpikeStat(dj.Computed):
         -> Activity.Trace
         ---
         spikes: longblob                # Discretized deconvolved neural activity.
-        reconstructed_trace: longblob   # Reconstructed fluorescence trace.
+        inferred_trace: longblob        # Inferred fluorescence trace.
         baseline: float                 # Inferred baseline calcium strength.
         lambda: float                   # Optimal Lagrange multiplier for noise constraint (sparsity parameter).
         g: float                        # Parameters of the autoregressive model, cardinality equivalent to p.
@@ -1498,7 +1458,7 @@ class SpikeStat(dj.Computed):
         )
         fps = (scan.ScanInfo & key).fetch1("fps")
 
-        traces = []
+        entry = []
         for trace_key, Fcorrected in zip(trace_keys, Fcorrecteds):
             c, s, b, g, lam = deconvolve(Fcorrected, penalty=0, optimize_g=5)
 
@@ -1509,11 +1469,11 @@ class SpikeStat(dj.Computed):
             grps = np.split(spike_times, np.where(np.diff(spike_times) != 1)[0] + 1)
             area_under_spike = np.array([s[grp].sum() for grp in grps]) / fps
 
-            traces.append(
+            entry.append(
                 {
                     **trace_key,
                     "spikes": s,
-                    "reconstructed_trace": c,
+                    "inferred_trace": c,
                     "baseline": b,
                     "g": g,
                     "lambda": lam,
@@ -1523,7 +1483,7 @@ class SpikeStat(dj.Computed):
             )
 
         self.insert1(key)
-        self.Trace.insert(traces)
+        self.Trace.insert(entry)
 
 
 # ---------------- HELPER FUNCTIONS ----------------
