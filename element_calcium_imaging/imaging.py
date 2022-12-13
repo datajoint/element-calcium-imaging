@@ -308,6 +308,10 @@ class ProcessingTask(dj.Manual):
                 from element_interface import caiman_loader
 
                 caiman_loader.CaImAn(output_dir)
+            elif method == "extract":
+                from element_interface import extract_loader
+
+                extract_loader.EXTRACT(output_dir)
             else:
                 raise NotImplementedError(
                     "Unknown/unimplemented method: {}".format(method)
@@ -448,6 +452,31 @@ class Processing(dj.Computed):
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
+
+            elif method == "extract":
+                # Motion Correction with Suite2p
+                import suite2p
+
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+
+                params["suite2p"]["save_path0"] = output_dir
+                (
+                    params["suite2p"]["fs"],
+                    params["suite2p"]["nplanes"],
+                    params["suitw2p"]["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+
+                input_format = pathlib.Path(image_files[0]).suffix
+                suite2p_params["input_format"] = input_format[1:]
+
+                suite2p_paths = {
+                    "data_path": [image_files[0].parent.as_posix()],
+                    "tiff_list": [f.as_posix() for f in image_files],
+                }
+
+                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
+
+                # Cell & Signal extraction with EXTRACT
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
