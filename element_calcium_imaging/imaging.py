@@ -478,28 +478,26 @@ class Processing(dj.Computed):
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)
 
                 # Convert data.bin to registered_scans.mat
-                savemat(
-                    "registered_scans.mat",
-                )
+                savemat("registered_scans.mat")
 
-                # Cell & Signal extraction with EXTRACT
-                from element_interface.extract_utils import EXTRACT
-
+                # Save the registered movie data.bin in a .mat file
                 scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
 
                 data_shape = (scan.ScanInfo & scan.ScanInfo.Field).fetch(
                     "nframes", "px_height", "px_width"
                 )
-
                 data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
                 # TODO: Check if data needs to be permuted for matlab.
-                scanfile_matlab_fullpath = (
-                    scanfile_fullpath.parent / "registered_scan.mat"
-                )
-                savemat(scanfile_matlab_fullpath, {"M": data})
 
-                ex = EXTRACT(scanfile_matlab_fullpath, params["extract"], output_dir)
-                ex.run()
+                scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
+
+                savemat(scan_matlab_fullpath, {"M": data})
+
+                # Execute EXTRACT
+                from element_interface.extract_utils import EXTRACT
+
+                ex = EXTRACT(scan_matlab_fullpath, params["extract"], output_dir)
+                key["processing_time"] = ex.run_status["processing_time"]
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
