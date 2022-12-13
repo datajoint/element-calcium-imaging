@@ -13,6 +13,7 @@ from .scan import (
     get_scan_image_files,
     get_scan_box_files,
     get_nd2_files,
+    get_prairieview_files,
 )
 
 schema = dj.Schema()
