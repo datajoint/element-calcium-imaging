@@ -1,6 +1,6 @@
 import datajoint as dj
 from collections import abc
-from .pipeline import session
+from element_session import session_with_datetime as session  # If pipeline, circular
 from element_interface.utils import find_full_path
 
 

@@ -60,7 +60,7 @@ def dj_config():
     dj.config["safemode"] = False
 
     environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
-    if environ_root or not isinstance(environ_root, list):
+    if environ_root or (environ_root and not isinstance(environ_root, list)):
         environ_root = list(environ_root)
     config_root = dj.config["custom"]["imaging_root_data_dir"]
     if not isinstance(config_root, list):
