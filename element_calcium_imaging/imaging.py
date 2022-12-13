@@ -483,22 +483,23 @@ class Processing(dj.Computed):
                 )
 
                 # Cell & Signal extraction with EXTRACT
-                import matlab.engine
                 from element_interface.extract_utils import EXTRACT
 
-                scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0"
+                scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
 
                 data_shape = (scan.ScanInfo & scan.ScanInfo.Field).fetch(
                     "nframes", "px_height", "px_width"
                 )
 
-                data = np.memmap(
-                    "suite2p/plane0/data.bin", shape=data_shape, dtype=np.int16
+                data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
+                # TODO: Check if data needs to be permuted for matlab.
+                scanfile_matlab_fullpath = (
+                    scanfile_fullpath.parent / "registered_scan.mat"
                 )
-                savemat("registered_scan.mat", {"M": data})
+                savemat(scanfile_matlab_fullpath, {"M": data})
 
-                ex = EXTRACT(scanfile_fullpath, params["extract"], output_dir)
-                eng = matlab.engine.start_matlab()
+                ex = EXTRACT(scanfile_matlab_fullpath, params["extract"], output_dir)
+                ex.run()
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
