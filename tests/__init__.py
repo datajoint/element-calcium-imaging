@@ -58,13 +58,15 @@ def dj_config():
     if pathlib.Path("./dj_local_conf.json").exists():
         dj.config.load("./dj_local_conf.json")
     dj.config["safemode"] = False
+    environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
+    if environ_root:
+        environ_root = list(environ_root)
     dj.config["custom"] = {
         "database.prefix": (
             os.environ.get("DATABASE_PREFIX") or dj.config["custom"]["database.prefix"]
         ),
         "imaging_root_data_dir": (
-            list(os.environ.get("IMAGING_ROOT_DATA_DIR"))
-            or dj.config["custom"]["imaging_root_data_dir"]
+            environ_root or dj.config["custom"]["imaging_root_data_dir"]
         ),
     }
     return
@@ -75,6 +77,7 @@ def pipeline():
     with verbose_context:
         print("\n")
         from workflow_calcium_imaging import pipeline
+        from workflow_calcium_imaging import paths
 
     global is_multi_scan_processing
     is_multi_scan_processing = (
@@ -88,7 +91,7 @@ def pipeline():
         "scan": pipeline.scan,
         "session": pipeline.session,
         "Equipment": pipeline.Equipment,
-        "get_imaging_root_data_dir": pipeline.get_imaging_root_data_dir,
+        "get_imaging_root_data_dir": paths.get_imaging_root_data_dir,
     }
 
     if _tear_down:
