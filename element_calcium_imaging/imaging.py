@@ -309,9 +309,9 @@ class ProcessingTask(dj.Manual):
 
                 caiman_loader.CaImAn(output_dir)
             elif method == "extract":
-                from element_interface import extract_loader
+                # TODO: Fill this part.
+                from element_interface import extract_utils
 
-                extract_loader.EXTRACT(output_dir)
             else:
                 raise NotImplementedError(
                     "Unknown/unimplemented method: {}".format(method)
@@ -456,6 +456,7 @@ class Processing(dj.Computed):
             elif method == "extract":
                 # Motion Correction with Suite2p
                 import suite2p
+                from scipy.io import savemat
 
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
 
@@ -463,7 +464,7 @@ class Processing(dj.Computed):
                 (
                     params["suite2p"]["fs"],
                     params["suite2p"]["nplanes"],
-                    params["suitw2p"]["nchannels"],
+                    params["suite2p"]["nchannels"],
                 ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
@@ -474,9 +475,30 @@ class Processing(dj.Computed):
                     "tiff_list": [f.as_posix() for f in image_files],
                 }
 
-                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
+                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)
+
+                # Convert data.bin to registered_scans.mat
+                savemat(
+                    "registered_scans.mat",
+                )
 
                 # Cell & Signal extraction with EXTRACT
+                import matlab.engine
+                from element_interface.extract_utils import EXTRACT
+
+                scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0"
+
+                data_shape = (scan.ScanInfo & scan.ScanInfo.Field).fetch(
+                    "nframes", "px_height", "px_width"
+                )
+
+                data = np.memmap(
+                    "suite2p/plane0/data.bin", shape=data_shape, dtype=np.int16
+                )
+                savemat("registered_scan.mat", {"M": data})
+
+                ex = EXTRACT(scanfile_fullpath, params["extract"], output_dir)
+                eng = matlab.engine.start_matlab()
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
