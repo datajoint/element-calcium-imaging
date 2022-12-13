@@ -556,6 +556,9 @@ class Curation(dj.Manual):
         elif method == "caiman":
             caiman_dataset = imaging_dataset
             curation_time = caiman_dataset.creation_time
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            curation_time = extract_dataset.creation_time
         else:
             raise NotImplementedError("Unknown method: {}".format(method))
 
