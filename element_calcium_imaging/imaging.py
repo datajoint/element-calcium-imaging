@@ -478,9 +478,6 @@ class Processing(dj.Computed):
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)
 
                 # Convert data.bin to registered_scans.mat
-                savemat("registered_scans.mat")
-
-                # Save the registered movie data.bin in a .mat file
                 scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
 
                 data_shape = (scan.ScanInfo & scan.ScanInfo.Field).fetch(
@@ -491,6 +488,7 @@ class Processing(dj.Computed):
 
                 scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
 
+                # Save the registered movie data.bin in a .mat file
                 savemat(scan_matlab_fullpath, {"M": data})
 
                 # Execute EXTRACT
