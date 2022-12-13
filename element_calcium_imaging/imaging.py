@@ -718,7 +718,7 @@ class MotionCorrection(dj.Imported):
             "KEY", "field_z", order_by="field_z"
         )
 
-        if method == "suite2p":
+        if method in ["suite2p", "extract"]:
             suite2p_dataset = imaging_dataset
 
             motion_correct_channel = suite2p_dataset.planes[0].alignment_channel
