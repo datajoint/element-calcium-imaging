@@ -58,16 +58,19 @@ def dj_config():
     if pathlib.Path("./dj_local_conf.json").exists():
         dj.config.load("./dj_local_conf.json")
     dj.config["safemode"] = False
+
     environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
-    if environ_root:
+    if environ_root or not isinstance(environ_root, list):
         environ_root = list(environ_root)
+    config_root = dj.config["custom"]["imaging_root_data_dir"]
+    if not isinstance(config_root, list):
+        config_root = list(config_root)
+
     dj.config["custom"] = {
         "database.prefix": (
             os.environ.get("DATABASE_PREFIX") or dj.config["custom"]["database.prefix"]
         ),
-        "imaging_root_data_dir": (
-            environ_root or dj.config["custom"]["imaging_root_data_dir"]
-        ),
+        "imaging_root_data_dir": (environ_root or config_root),
     }
     return
 
