@@ -489,7 +489,7 @@ class Processing(dj.Computed):
                 scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
 
                 # Save the registered movie data.bin in a .mat file
-                savemat(scan_matlab_fullpath, {"M": data})
+                savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
 
                 # Execute EXTRACT
                 from element_interface.extract_utils import EXTRACT
@@ -1325,6 +1325,23 @@ class Fluorescence(dj.Computed):
                         "fluorescence": mask["inferred_trace"],
                     }
                 )
+
+            self.insert1(key)
+            self.Trace.insert(fluo_traces)
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+
+            fluo_traces = [
+                {
+                    **key,
+                    "mask": mask_id,
+                    "fluo_channel": 0,
+                    "fluorescence": fluorescence,
+                }
+                for mask_id, fluorescence in enumerate(
+                    extract_dataset.get_temporal_matrix()
+                )
+            ]
 
             self.insert1(key)
             self.Trace.insert(fluo_traces)
