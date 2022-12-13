@@ -5,6 +5,12 @@ warnings.filterwarnings("ignore")
 
 
 def run(display_progress=True):
+    """Run all `make` methods from element-calcium imaging
+
+    Args:
+        display_progress (bool, optional): Whether to display the progress. Default is
+            True.
+    """
 
     populate_settings = {
         "display_progress": display_progress,

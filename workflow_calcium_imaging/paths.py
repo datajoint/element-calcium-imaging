@@ -5,6 +5,7 @@ from element_interface.utils import find_full_path
 
 
 def get_imaging_root_data_dir():
+    """Retrieve imaging root data directory."""
     imaging_root_dirs = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
     if not imaging_root_dirs:
         return None
@@ -24,6 +25,17 @@ def _find_files_by_type(scan_key, filetype: str):
 
 
 def get_scan_image_files(scan_key):
+    """Retrieve the list of ScanImage files associated with a given Scan.
+
+    Args:
+        scan_key (dict): Primary key from Scan.
+
+    Returns:
+        path (list): Absolute path(s) of the scan files.
+
+    Raises:
+        FileNotFoundError: If the session directory or tiff files are not found.
+    """
     # Folder structure: root / subject / session / .tif (raw)
     sess_dir, tiff_filepaths = _find_files_by_type(scan_key, "*.tif")
     if tiff_filepaths:
@@ -33,6 +45,18 @@ def get_scan_image_files(scan_key):
 
 
 def get_scan_box_files(scan_key):
+    """Retrieve the list of Scanbox files associated with a given Scan.
+
+    Args:
+        scan_key (dict): Primary key from Scan.
+
+    Returns:
+        path (list): Absolute path(s) of the scan files.
+
+    Raises:
+        FileNotFoundError: If the session directory or scanbox files are not found.
+    """
+
     # Folder structure: root / subject / session / .sbx
     sess_dir, sbx_filepaths = _find_files_by_type(scan_key, "*.sbx")
     if sbx_filepaths:
@@ -42,6 +66,17 @@ def get_scan_box_files(scan_key):
 
 
 def get_nd2_files(scan_key):
+    """Retrieve the list of Nikon files associated with a given Scan.
+
+    Args:
+        scan_key (dict): Primary key from Scan.
+
+    Returns:
+        path (list): Absolute path(s) of the scan files.
+
+    Raises:
+        FileNotFoundError: If the session directory or nd2 files are not found.
+    """
     # Folder structure: root / subject / session / .nd2
     sess_dir, nd2_filepaths = _find_files_by_type(scan_key, "*.nd2")
     if nd2_filepaths:
@@ -51,6 +86,17 @@ def get_nd2_files(scan_key):
 
 
 def get_prairieview_files(scan_key):
+    """Retrieve the list of PrairieView files associated with a given Scan.
+
+    Args:
+        scan_key (dict): Primary key from Scan.
+
+    Returns:
+        path (list): Absolute path(s) of the scan files.
+
+    Raises:
+        FileNotFoundError: If the session directory or tiff files are not found.
+    """
     # Folder structure: root / subject / session / .tif
     sess_dir, pv_filepaths = _find_files_by_type(scan_key, "*.tif")
     if pv_filepaths:

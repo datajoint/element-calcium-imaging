@@ -12,18 +12,18 @@ _linking_module = None
 def activate(
     schema_name, *, create_schema=True, create_tables=True, linking_module=None
 ):
-    """
-    activate(schema_name, *, create_schema=True, create_tables=True,
-             linking_module=None)
-        :param schema_name: schema name on the database server to activate the
-                            `subject` element
-        :param create_schema: when True (default), create schema in the
-                              database if it does not yet exist.
-        :param create_tables: when True (default), create tables in the
-                              database if they do not yet exist.
-        :param linking_module: a module name or a module containing the
-         required dependencies to activate the `subject` element:
-             Upstream schema: scan, session, trial
+    """Activate this schema.
+
+    Args:
+        schema_name (str): Schema name on the database server to activate the `subject`
+            element.
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
+        linking_module (str): A module name or a module containing the required
+            dependencies to activate the `subject` element: Upstream schema: scan,
+            session, trial.
     """
     if isinstance(linking_module, str):
         linking_module = importlib.import_module(linking_module)
@@ -44,6 +44,16 @@ def activate(
 
 @schema
 class ActivityAlignmentCondition(dj.Manual):
+    """Activity alignment condition.
+
+    Attributes:
+        imaging.Activity (foreign key): Primary key from imaging.Activity.
+        event.AlignmentEvent (foreign key): Primary key from event.AlignmentEvent.
+        trial_condition (str): User-friendly name of condition.
+        condition_description (str, optional). Description. Default is ''.
+        bin_size (float): bin-size (in second) used to compute the PSTH,
+    """
+
     definition = """
     -> imaging.Activity
     -> event.AlignmentEvent
@@ -54,6 +64,14 @@ class ActivityAlignmentCondition(dj.Manual):
     """
 
     class Trial(dj.Part):
+        """Trial
+
+        Attributes:
+            ActivityAlignmentCondition (foreign key): Primary key from
+                ActivityAlignmentCondition.
+            trial.Trial: Primary key from trial.Trial.
+        """
+
         definition = """  # Trials (or subset) to compute event-aligned activity
         -> master
         -> trial.Trial
@@ -62,6 +80,13 @@ class ActivityAlignmentCondition(dj.Manual):
 
 @schema
 class ActivityAlignment(dj.Computed):
+    """
+    Attributes:
+        ActivityAlignmentCondition (foreign key): Primary key from
+            ActivityAlignmentCondition.
+        aligned_timestamps (longblob): Aligned timestamps.
+    """
+
     definition = """
     -> ActivityAlignmentCondition
     ---
@@ -69,6 +94,17 @@ class ActivityAlignment(dj.Computed):
     """
 
     class AlignedTrialActivity(dj.Part):
+        """Aligned trial activity.
+
+        Attributes:
+            ActivityAlignment (foriegn key): Primary key from ActivityAlignment.
+            imaging.Activity.Trace (foriegn key): Primary key from
+                imaging.Activity.Trace.
+            ActivityAlignmentCondition.Trial (foreign key): Primary key from
+                ActivityAlignmentCondition.Trial.
+            aligned_trace (longblob): Calcium activity aligned to the event time (s).
+        """
+
         definition = """
         -> master
         -> imaging.Activity.Trace
@@ -130,14 +166,18 @@ class ActivityAlignment(dj.Computed):
         self.AlignedTrialActivity.insert(aligned_trial_activities)
 
     def plot_aligned_activities(self, key, roi, axs=None, title=None):
-        """
-        Plot event-aligned activities for selected trials, and trial-averaged activity
-        e.g. dF/F, neuropil-corrected dF/F, Calcium events, etc.
-        :param key: key of ActivityAlignment master table
-        :param roi: imaging segmentation mask
-        :param axs: optional definition of axes for plot.
-                    Default is plt.subplots(2, 1, figsize=(12, 8))
-        :param title: Optional title label
+        """Plot event-aligned activities for selected trials, and trial-averaged
+            activity (e.g. dF/F, neuropil-corrected dF/F, Calcium events, etc.).
+
+        Args:
+            key (dict): key of ActivityAlignment master table
+            roi (int): imaging segmentation mask
+            axs (matplotlib.ax): optional definition of axes for plot.
+                Default is plt.subplots(2, 1, figsize=(12, 8))
+            title (str): Optional title label
+
+        Returns:
+            fig (matplotlib.pyplot.figure): Figure of the event aligned activities.
         """
         import matplotlib.pyplot as plt
 
