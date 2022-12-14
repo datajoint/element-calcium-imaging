@@ -483,7 +483,7 @@ class Processing(dj.Computed):
                 # Convert data.bin to registered_scans.mat
                 scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
 
-                data_shape = (scan.ScanInfo & scan.ScanInfo.Field).fetch(
+                data_shape = (scan.ScanInfo * scan.ScanInfo.Field & key).fetch(
                     "nframes", "px_height", "px_width"
                 )
                 data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
