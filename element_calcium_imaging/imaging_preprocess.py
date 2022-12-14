@@ -420,6 +420,7 @@ class ProcessingTask(dj.Manual):
             "NIS": get_nd2_files,
             "ScanImage": get_scan_image_files,
             "Scanbox": get_scan_box_files,
+            "PrairieView": get_prairieview_files
         }
         image_locator = image_locators[(scan.Scan & key).fetch1("acq_software")]
 

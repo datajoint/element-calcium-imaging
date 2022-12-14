@@ -60,7 +60,7 @@ Major features of the Calcium Imaging Element include:
 + Calcium-imaging scanning metadata, also compatible with mesoscale imaging and multi-ROI scanning mode
 + Tables for all processing steps: motion correction, segmentation, cell spatial footprint, fluorescence trace extraction, spike inference and cell classification
 + Store/track/manage different curations of the segmentation results
-+ Ingestion support for data acquired with ScanImage and Scanbox acquisition systems
++ Ingestion support for data acquired with ScanImage, Scanbox, Nikon NIS, and Bruker acquisition systems
 + Ingestion support for processing outputs from both Suite2p and CaImAn analysis suites
 + Sample data and complete test suite for quality assurance
 

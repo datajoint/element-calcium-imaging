@@ -2,6 +2,9 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.4.3] = 2022-12-14
++ Update - Added file locator functions for Bruker PrairieView data. 
+
 ## [0.4.2] - 2022-11-02
 + Bugfix - Add plotting package to the requirements to generate the figures
 + Add - Scan date parser from nd2 files
