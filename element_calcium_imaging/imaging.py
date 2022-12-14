@@ -1181,24 +1181,20 @@ class Segmentation(dj.Computed):
                 )
         elif method == "extract":
             extract_dataset = imaging_dataset
-            masks, cells = [], []
+            masks = [dict(**key,
+                            segmentation_channel=0,
+                            mask=mask["mask_id"],
+                            mask_npix=mask["mask_npix"],
+                            mask_center_x=mask["mask_center_x"],
+                            mask_center_y=mask["mask_center_y"],
+                            mask_center_z=mask["mask_center_z"],
+                            mask_xpix=mask["mask_xpix"],
+                            mask_ypix=mask["mask_ypix"],
+                            mask_zpix=mask["mask_zpix"],
+                            mask_weights=mask["mask_weights"]
+                            )
 
-            for mask in extract_dataset.load_results():
-                masks.append(
-                    dict(
-                        **key,
-                        segmentation_channel=0,
-                        mask=mask["mask_id"],
-                        mask_npix=mask["mask_npix"],
-                        mask_center_x=mask["mask_center_x"],
-                        mask_center_y=mask["mask_center_y"],
-                        mask_center_z=mask["mask_center_z"],
-                        mask_xpix=mask["mask_xpix"],
-                        mask_ypix=mask["mask_ypix"],
-                        mask_zpix=mask["mask_zpix"],
-                        mask_weights=mask["mask_weights"],
-                    )
-                )
+                            for mask in extract_dataset.load_results()]
 
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
