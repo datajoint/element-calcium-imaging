@@ -150,7 +150,7 @@ class ProcessingParamSet(dj.Lookup):
                 "Please provide the processing paramaters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
             )
 
-            # Force to run suite2p to do only Motion Correction.
+            # Force Suite2p to only run motion correction.
             params["suite2p"]["do_registration"] = True
             params["suite2p"]["roidetect"] = False
 
