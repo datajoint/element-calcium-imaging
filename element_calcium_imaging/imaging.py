@@ -490,7 +490,7 @@ class Processing(dj.Computed):
 
                 scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
 
-                # Save the registered movie data.bin in a .mat file
+                # Save the motion corrected movie (data.bin) in a .mat file
                 savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
 
                 # Execute EXTRACT
