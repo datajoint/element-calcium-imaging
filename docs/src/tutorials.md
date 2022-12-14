@@ -54,4 +54,4 @@ demonstrates event- and trial-based analysis.
 Analysis with the EXTRACT package is currently supported for single channel, single plane scans with using Suite2p for
 motion correction. For processing with EXTRACT, please refer to the notebook 03-Process, set `processing_method="extract"`
 in the ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet in the `{'suite2p': {...}, 'extract': {...}}`
-dictionary format. Please also install [MATLAB engine](https://pypi.org/project/matlabengine/) API for Python.
+dictionary format. Please also install the [MATLAB engine](https://pypi.org/project/matlabengine/) API for Python.
