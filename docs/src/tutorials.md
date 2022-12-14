@@ -50,7 +50,8 @@ provides the steps for dropping all the tables to start fresh.
 - [07-DownStreamAnalysis](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/07-downstream-analysis-optional.ipynb)
 demonstrates event- and trial-based analysis.
 
+## EXTRACT
 Analysis with the EXTRACT packages is currently supported for single channel, single plane scans with using Suite2p for
-motion correction. For processing with EXTRACT, please refer to the notebook 03-Process, set processing_method="extract"
-in the ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet in the {'suite2p': {...}, 'extract': {...}}
-dictionary format.
+motion correction. For processing with EXTRACT, please refer to the notebook 03-Process, set `processing_method="extract"`
+in the ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet in the `{'suite2p': {...}, 'extract': {...}}`
+dictionary format. Please also install [MATLAB engine](https://pypi.org/project/matlabengine/) API for Python.
