@@ -1196,6 +1196,8 @@ class Segmentation(dj.Computed):
 
                             for mask in extract_dataset.load_results()]
 
+            self.insert1(key)
+            self.Mask.insert(masks, ignore_extra_fields=True)
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
 
