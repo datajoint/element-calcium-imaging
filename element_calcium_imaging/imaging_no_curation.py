@@ -95,6 +95,7 @@ class ProcessingMethod(dj.Lookup):
     contents = [
         ("suite2p", "suite2p analysis suite"),
         ("caiman", "caiman analysis suite"),
+        ("extract", "extract analysis suite"),
     ]
 
 
@@ -130,6 +131,7 @@ class ProcessingParamSet(dj.Lookup):
         cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
     ):
         """Insert a parameter set into ProcessingParamSet table.
+
         This function automizes the parameter set hashing and avoids insertion of an
             existing parameter set.
 
@@ -141,6 +143,17 @@ class ProcessingParamSet(dj.Lookup):
             params (dict): Parameter Set, all applicable parameters to the analysis
                 suite.
         """
+        if processing_method == "extract":
+            assert (
+                params.get("extract") != None and params.get("suite2p") != None
+            ), ValueError(
+                "Please provide the processing parameters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
+            )
+
+            # Force Suite2p to only run motion correction.
+            params["suite2p"]["do_registration"] = True
+            params["suite2p"]["roidetect"] = False
+
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
@@ -197,7 +210,9 @@ class MaskType(dj.Lookup):
 
 @schema
 class ProcessingTask(dj.Manual):
-    """This table defines a calcium imaging processing task for a combination of a
+    """A pairing of processing params and scans to be loaded or triggered
+
+    This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
     Processing. This table supports definitions of both loading of pre-generated results
@@ -226,11 +241,12 @@ class ProcessingTask(dj.Manual):
         Args:
             key (dict): Primary key from the ProcessingTask table.
             relative (bool): If True, processing_output_dir is returned relative to
-                imaging_root_dir.
+                imaging_root_dir. Default False.
             mkdir (bool): If True, create the processing_output_dir directory.
+                Default True.
 
         Returns:
-            A default output directory for the processed results (processed_output_dir
+            dir (str): A default output directory for the processed results (processed_output_dir
                 in ProcessingTask) based on the following convention:
                 processed_dir / scan_dir / {processing_method}_{paramset_idx}
                 e.g.: sub4/sess1/scan0/suite2p_0
@@ -265,8 +281,10 @@ class ProcessingTask(dj.Manual):
 
     @classmethod
     def generate(cls, scan_key, paramset_idx=0):
-        """Generate a default ProcessingTask entry for a particular Scan using an
-        existing parameter set in the ProcessingParamSet table.
+        """Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet
+
+        Generate an entry in the ProcessingTask table for a particular scan using an
+        existing parameter set from the ProcessingParamSet table.
 
         Args:
             scan_key (dict): Primary key from Scan table.
@@ -289,6 +307,11 @@ class ProcessingTask(dj.Manual):
                 from element_interface import caiman_loader
 
                 caiman_loader.CaImAn(output_dir)
+            elif method == "extract":
+                from element_interface import extract_loader
+
+                extract_loader.EXTRACT(output_dir)
+
             else:
                 raise NotImplementedError(
                     "Unknown/unimplemented method: {}".format(method)
@@ -364,6 +387,10 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 caiman_dataset = imaging_dataset
                 key = {**key, "processing_time": caiman_dataset.creation_time}
+            elif method == "extract":
+                raise NotImplementedError(
+                    "To use EXTRACT with this DataJoint Element please set `task_mode=trigger`"
+                )
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
@@ -429,6 +456,54 @@ class Processing(dj.Computed):
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
+
+            elif method == "extract":
+                import suite2p
+                from scipy.io import savemat
+                from element_interface.extract_trigger import EXTRACT_trigger
+
+                # Motion Correction with Suite2p
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+
+                params["suite2p"]["save_path0"] = output_dir
+                (
+                    params["suite2p"]["fs"],
+                    params["suite2p"]["nplanes"],
+                    params["suite2p"]["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+
+                input_format = pathlib.Path(image_files[0]).suffix
+                params["suite2p"]["input_format"] = input_format[1:]
+
+                suite2p_paths = {
+                    "data_path": [image_files[0].parent.as_posix()],
+                    "tiff_list": [f.as_posix() for f in image_files],
+                }
+
+                suite2p.run_s2p(ops=params["suite2p"], db=suite2p_paths)
+
+                # Convert data.bin to registered_scans.mat
+                scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
+
+                data_shape = (scan.ScanInfo * scan.ScanInfo.Field & key).fetch1(
+                    "nframes", "px_height", "px_width"
+                )
+                data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
+
+                scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
+
+                # Save the motion corrected movie (data.bin) in a .mat file
+                savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
+
+                # Execute EXTRACT
+
+                ex = EXTRACT_trigger(
+                    scan_matlab_fullpath, params["extract"], output_dir
+                )
+                ex.run()
+
+                _, extract_dataset = get_loader_result(key, ProcessingTask)
+                key["processing_time"] = extract_dataset.creation_time
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
@@ -523,11 +598,11 @@ class MotionCorrection(dj.Imported):
             block_z (longblob): z_start and z_end in pixels for this block
             y_shifts (longblob): y motion correction shifts for every frame in pixels
             x_shifts (longblob): x motion correction shifts for every frame in pixels
-            z_shifts (longblob, optional): x motion correction shifts for every frame
+            z_shift=null (longblob, optional): x motion correction shifts for every frame
                 in pixels
             y_std (float): standard deviation of y shifts across all frames in pixels
             x_std (float): standard deviation of x shifts across all frames in pixels
-            z_std (float, optional): standard deviation of z shifts across all frames
+            z_std=null (float, optional): standard deviation of z shifts across all frames
                 in pixels
         """
 
@@ -1034,6 +1109,27 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(
                     cells, ignore_extra_fields=True, allow_direct_insert=True
                 )
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            masks = [
+                dict(
+                    **key,
+                    segmentation_channel=0,
+                    mask=mask["mask_id"],
+                    mask_npix=mask["mask_npix"],
+                    mask_center_x=mask["mask_center_x"],
+                    mask_center_y=mask["mask_center_y"],
+                    mask_center_z=mask["mask_center_z"],
+                    mask_xpix=mask["mask_xpix"],
+                    mask_ypix=mask["mask_ypix"],
+                    mask_zpix=mask["mask_zpix"],
+                    mask_weights=mask["mask_weights"],
+                )
+                for mask in extract_dataset.load_results()
+            ]
+
+            self.insert1(key)
+            self.Mask.insert(masks, ignore_extra_fields=True)
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
 
@@ -1189,6 +1285,21 @@ class Fluorescence(dj.Computed):
 
             self.insert1(key)
             self.Trace.insert(fluo_traces)
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+
+            fluo_traces = [
+                {
+                    **key,
+                    "mask": mask_id,
+                    "fluo_channel": 0,
+                    "fluorescence": fluorescence,
+                }
+                for mask_id, fluorescence in enumerate(extract_dataset.T)
+            ]
+
+            self.insert1(key)
+            self.Trace.insert(fluo_traces)
 
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
@@ -1341,7 +1452,9 @@ def get_loader_result(key: dict, table: dj.Table):
 
     output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
 
-    if method == "suite2p":
+    if method == "suite2p" or (
+        method == "extract" and table.__name__ == "MotionCorrection"
+    ):
         from element_interface import suite2p_loader
 
         loaded_dataset = suite2p_loader.Suite2p(output_path)
@@ -1349,6 +1462,10 @@ def get_loader_result(key: dict, table: dj.Table):
         from element_interface import caiman_loader
 
         loaded_dataset = caiman_loader.CaImAn(output_path)
+    elif method == "extract":
+        from element_interface import extract_loader
+
+        loaded_dataset = extract_loader.EXTRACT(output_path)
     else:
         raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
