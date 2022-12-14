@@ -388,7 +388,9 @@ class Processing(dj.Computed):
                 caiman_dataset = imaging_dataset
                 key = {**key, "processing_time": caiman_dataset.creation_time}
             elif method == "extract":
-                raise NotImplementedError("To use EXTRACT with this DataJoint Element please set `task_mode=trigger`)
+                raise NotImplementedError(
+                    "To use EXTRACT with this DataJoint Element please set `task_mode=trigger`"
+                )
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
@@ -483,7 +485,7 @@ class Processing(dj.Computed):
                 # Convert data.bin to registered_scans.mat
                 scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
 
-                data_shape = (scan.ScanInfo * scan.ScanInfo.Field & key).fetch(
+                data_shape = (scan.ScanInfo * scan.ScanInfo.Field & key).fetch1(
                     "nframes", "px_height", "px_width"
                 )
                 data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
@@ -1181,20 +1183,22 @@ class Segmentation(dj.Computed):
                 )
         elif method == "extract":
             extract_dataset = imaging_dataset
-            masks = [dict(**key,
-                            segmentation_channel=0,
-                            mask=mask["mask_id"],
-                            mask_npix=mask["mask_npix"],
-                            mask_center_x=mask["mask_center_x"],
-                            mask_center_y=mask["mask_center_y"],
-                            mask_center_z=mask["mask_center_z"],
-                            mask_xpix=mask["mask_xpix"],
-                            mask_ypix=mask["mask_ypix"],
-                            mask_zpix=mask["mask_zpix"],
-                            mask_weights=mask["mask_weights"]
-                            )
-
-                            for mask in extract_dataset.load_results()]
+            masks = [
+                dict(
+                    **key,
+                    segmentation_channel=0,
+                    mask=mask["mask_id"],
+                    mask_npix=mask["mask_npix"],
+                    mask_center_x=mask["mask_center_x"],
+                    mask_center_y=mask["mask_center_y"],
+                    mask_center_z=mask["mask_center_z"],
+                    mask_xpix=mask["mask_xpix"],
+                    mask_ypix=mask["mask_ypix"],
+                    mask_zpix=mask["mask_zpix"],
+                    mask_weights=mask["mask_weights"],
+                )
+                for mask in extract_dataset.load_results()
+            ]
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
