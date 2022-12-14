@@ -147,7 +147,7 @@ class ProcessingParamSet(dj.Lookup):
             assert (
                 params.get("extract") != None and params.get("suite2p") != None
             ), ValueError(
-                "Please provide the processing paramaters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
+                "Please provide the processing parameters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
             )
 
             # Force Suite2p to only run motion correction.
