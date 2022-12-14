@@ -456,10 +456,11 @@ class Processing(dj.Computed):
                 key["processing_time"] = caiman_dataset.creation_time
 
             elif method == "extract":
-                # Motion Correction with Suite2p
                 import suite2p
                 from scipy.io import savemat
+                from element_interface.extract_trigger import EXTRACT_trigger
 
+                # Motion Correction with Suite2p
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
 
                 params["suite2p"]["save_path0"] = output_dir
@@ -493,7 +494,6 @@ class Processing(dj.Computed):
                 savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
 
                 # Execute EXTRACT
-                from element_interface.extract_trigger import EXTRACT_trigger
 
                 ex = EXTRACT_trigger(
                     scan_matlab_fullpath, params["extract"], output_dir
