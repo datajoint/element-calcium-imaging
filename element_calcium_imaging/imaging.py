@@ -478,7 +478,7 @@ class Processing(dj.Computed):
                     "tiff_list": [f.as_posix() for f in image_files],
                 }
 
-                suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)
+                suite2p.run_s2p(ops=params["suite2p"], db=suite2p_paths)
 
                 # Convert data.bin to registered_scans.mat
                 scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
