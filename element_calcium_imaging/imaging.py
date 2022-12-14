@@ -147,13 +147,12 @@ class ProcessingParamSet(dj.Lookup):
             assert (
                 params.get("extract") != None and params.get("suite2p") != None
             ), ValueError(
-                "Please provide the processing paramaters in the {'suite2p':{...}, 'extract': {...}} dictionary format."
+                "Please provide the processing paramaters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
             )
 
-            assert params["suite2p"]["do_registration"] == True
-            if params["suite2p"]["roidetect"]:
-                "Suite2p's ROI detection step cannot be run. Instead, EXTRACT will be used."
-                params["roidetect"] = False
+            # Force to run suite2p to do only Motion Correction.
+            params["suite2p"]["do_registration"] = True
+            params["suite2p"]["roidetect"] = False
 
         param_dict = {
             "processing_method": processing_method,
@@ -309,8 +308,9 @@ class ProcessingTask(dj.Manual):
 
                 caiman_loader.CaImAn(output_dir)
             elif method == "extract":
-                # TODO: Fill this part.
-                from element_interface import extract_utils
+                from element_interface import extract_loader
+
+                extract_loader.EXTRACT(output_dir)
 
             else:
                 raise NotImplementedError(
@@ -387,6 +387,8 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 caiman_dataset = imaging_dataset
                 key = {**key, "processing_time": caiman_dataset.creation_time}
+            elif method == "extract":
+                raise NotImplementedError("Unsupported load method: {}".format(method))
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
@@ -484,7 +486,6 @@ class Processing(dj.Computed):
                     "nframes", "px_height", "px_width"
                 )
                 data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
-                # TODO: Check if data needs to be permuted for matlab.
 
                 scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
 
@@ -492,10 +493,15 @@ class Processing(dj.Computed):
                 savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
 
                 # Execute EXTRACT
-                from element_interface.extract_utils import EXTRACT
+                from element_interface.extract_trigger import EXTRACT_trigger
 
-                ex = EXTRACT(scan_matlab_fullpath, params["extract"], output_dir)
-                key["processing_time"] = ex.run_status["processing_time"]
+                ex = EXTRACT_trigger(
+                    scan_matlab_fullpath, params["extract"], output_dir
+                )
+                ex.run()
+
+                _, extract_dataset = get_loader_result(key, ProcessingTask)
+                key["processing_time"] = extract_dataset.creation_time
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
@@ -1173,6 +1179,27 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(
                     cells, ignore_extra_fields=True, allow_direct_insert=True
                 )
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            masks, cells = [], []
+
+            for mask in extract_dataset.load_results():
+                masks.append(
+                    dict(
+                        **key,
+                        segmentation_channel=0,
+                        mask=mask["mask_id"],
+                        mask_npix=mask["mask_npix"],
+                        mask_center_x=mask["mask_center_x"],
+                        mask_center_y=mask["mask_center_y"],
+                        mask_center_z=mask["mask_center_z"],
+                        mask_xpix=mask["mask_xpix"],
+                        mask_ypix=mask["mask_ypix"],
+                        mask_zpix=mask["mask_zpix"],
+                        mask_weights=mask["mask_weights"],
+                    )
+                )
+
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
 
@@ -1338,9 +1365,7 @@ class Fluorescence(dj.Computed):
                     "fluo_channel": 0,
                     "fluorescence": fluorescence,
                 }
-                for mask_id, fluorescence in enumerate(
-                    extract_dataset.get_temporal_matrix()
-                )
+                for mask_id, fluorescence in enumerate(extract_dataset.T)
             ]
 
             self.insert1(key)
@@ -1505,6 +1530,10 @@ def get_loader_result(key: dict, table: dj.Table):
         from element_interface import caiman_loader
 
         loaded_dataset = caiman_loader.CaImAn(output_path)
+    elif method == "extract":
+        from element_interface import extract_loader
+
+        loaded_dataset = extract_loader.EXTRACT(output_path)
     else:
         raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
