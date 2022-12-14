@@ -1524,7 +1524,9 @@ def get_loader_result(key: dict, table: dj.Table):
 
     output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
 
-    if method == "suite2p":
+    if method == "suite2p" or (
+        method == "extract" and table.__name__ == "MotionCorrection"
+    ):
         from element_interface import suite2p_loader
 
         loaded_dataset = suite2p_loader.Suite2p(output_path)
