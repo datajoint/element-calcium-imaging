@@ -388,7 +388,7 @@ class Processing(dj.Computed):
                 caiman_dataset = imaging_dataset
                 key = {**key, "processing_time": caiman_dataset.creation_time}
             elif method == "extract":
-                raise NotImplementedError("Unsupported load method: {}".format(method))
+                raise NotImplementedError("To use EXTRACT with this DataJoint Element please set `task_mode=trigger`)
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
