@@ -471,7 +471,7 @@ class Processing(dj.Computed):
                 ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 input_format = pathlib.Path(image_files[0]).suffix
-                suite2p_params["input_format"] = input_format[1:]
+                params["suite2p"]["input_format"] = input_format[1:]
 
                 suite2p_paths = {
                     "data_path": [image_files[0].parent.as_posix()],
