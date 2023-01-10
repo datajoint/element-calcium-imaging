@@ -4,7 +4,7 @@
 
 Installation of the Element requires an integrated development environment and database.
 Instructions to setup each of the components can be found on the 
-[User Instructions](datajoint.com/docs/elements/user-instructions) page. These 
+[User Instructions](https://datajoint.com/docs/elements/user-instructions) page. These 
 instructions use the example 
 [workflow for Element Calcium Imaging](https://github.com/datajoint/workflow-calcium-imaging), 
 which can be modified for a user's specific experimental requirements. This example
