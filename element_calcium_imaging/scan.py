@@ -605,20 +605,7 @@ class ScanInfo(dj.Imported):
             )
 
             self.Field.insert(
-                [
                     dict(
-                        key,
-                        field_idx=0,
-                        px_height=pvscan_info["height_in_pixels"],
-                        px_width=pvscan_info["width_in_pixels"],
-                        um_height=pvscan_info["height_in_um"],
-                        um_width=pvscan_info["width_in_um"],
-                        field_x=pvscan_info["fieldX"],
-                        field_y=pvscan_info["fieldY"],
-                        field_z=pvscan_info["fieldZ"],
-                    )
-                    if pvscan_info["num_planes"] == 1
-                    else dict(
                         key,
                         field_idx=plane_idx,
                         px_height=pvscan_info["height_in_pixels"],
@@ -627,10 +614,9 @@ class ScanInfo(dj.Imported):
                         um_width=pvscan_info["width_in_um"],
                         field_x=pvscan_info["fieldX"],
                         field_y=pvscan_info["fieldY"],
-                        field_z=pvscan_info["fieldZ"][plane_idx],
+                        field_z=pvscan_info["fieldZ"] if pvscan_info["num_planes"] == 1 else pvscan_info["fieldZ"][plane_idx],
                     )
                     for plane_idx in range(pvscan_info["num_planes"])
-                ]
             )
         else:
             raise NotImplementedError(
