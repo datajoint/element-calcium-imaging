@@ -584,79 +584,54 @@ class ScanInfo(dj.Imported):
 
             scan_filepaths = get_prairieview_files(key)
             pvscan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
-            if pvscan_info["num_planes"] != 1:
-                self.insert1(
+            self.insert1(
+                dict(
+                    key,
+                    nfields=pvscan_info["num_fields"],
+                    nchannels=pvscan_info["num_channels"],
+                    ndepths=pvscan_info["num_planes"],
+                    nframes=pvscan_info["num_frames"],
+                    nrois=pvscan_info["num_rois"],
+                    x=pvscan_info["x_pos"],
+                    y=pvscan_info["y_pos"],
+                    z=pvscan_info["z_pos"],
+                    fps=pvscan_info["frame_rate"],
+                    bidirectional=pvscan_info["bidirectional"],
+                    bidirectional_z=pvscan_info["bidirectional_z"],
+                    usecs_per_line=pvscan_info["usecs_per_line"],
+                    scan_datetime=pvscan_info["scan_datetime"],
+                    scan_duration=pvscan_info["scan_duration"],
+                )
+            )
+
+            self.Field.insert(
+                [
                     dict(
                         key,
-                        nfields=pvscan_info["num_fields"],
-                        nchannels=pvscan_info["num_channels"],
-                        ndepths=pvscan_info["num_planes"],
-                        nframes=pvscan_info["num_frames"],
-                        nrois=pvscan_info["num_rois"],
-                        x=pvscan_info["x_pos"],
-                        y=pvscan_info["y_pos"],
-                        z=pvscan_info["z_pos"],
-                        fps=pvscan_info["frame_rate"],
-                        bidirectional=pvscan_info["bidirectional"],
-                        bidirectional_z=pvscan_info["bidirectional_z"],
-                        usecs_per_line=pvscan_info["usecs_per_line"],
-                        scan_datetime=pvscan_info["scan_datetime"],
-                        scan_duration=pvscan_info["scan_duration"],
+                        field_idx=0,
+                        px_height=pvscan_info["height_in_pixels"],
+                        px_width=pvscan_info["width_in_pixels"],
+                        um_height=pvscan_info["height_in_um"],
+                        um_width=pvscan_info["width_in_um"],
+                        field_x=pvscan_info["fieldX"],
+                        field_y=pvscan_info["fieldY"],
+                        field_z=pvscan_info["fieldZ"],
                     )
-                )
-
-                self.Field.insert(
-                    [
-                        dict(
-                            key,
-                            field_idx=plane_index,
-                            px_height=pvscan_info["height_in_pixels"],
-                            px_width=pvscan_info["width_in_pixels"],
-                            um_height=pvscan_info["height_in_um"],
-                            um_width=pvscan_info["width_in_um"],
-                            field_x=pvscan_info["fieldX"],
-                            field_y=pvscan_info["fieldY"],
-                            field_z=pvscan_info["fieldZ"][plane_index],
-                        )
-                        for plane_index in range(pvscan_info["num_planes"])
-                    ]
-                )
-            elif pvscan_info["num_planes"] == 1:
-                self.insert1(
-                    dict(
+                    if pvscan_info["num_planes"] == 1
+                    else dict(
                         key,
-                        nfields=pvscan_info["num_fields"],
-                        nchannels=pvscan_info["num_channels"],
-                        ndepths=pvscan_info["num_planes"],
-                        nframes=pvscan_info["num_frames"],
-                        nrois=pvscan_info["num_rois"],
-                        x=pvscan_info["x_pos"],
-                        y=pvscan_info["y_pos"],
-                        z=pvscan_info["z_pos"],
-                        fps=pvscan_info["frame_rate"],
-                        bidirectional=pvscan_info["bidirectional"],
-                        bidirectional_z=pvscan_info["bidirectional_z"],
-                        usecs_per_line=pvscan_info["usecs_per_line"],
-                        scan_datetime=pvscan_info["scan_datetime"],
-                        scan_duration=pvscan_info["scan_duration"],
+                        field_idx=plane_idx,
+                        px_height=pvscan_info["height_in_pixels"],
+                        px_width=pvscan_info["width_in_pixels"],
+                        um_height=pvscan_info["height_in_um"],
+                        um_width=pvscan_info["width_in_um"],
+                        field_x=pvscan_info["fieldX"],
+                        field_y=pvscan_info["fieldY"],
+                        field_z=pvscan_info["fieldZ"][plane_idx],
                     )
-                )
-
-                self.Field.insert(
-                    [
-                        dict(
-                            key,
-                            field_idx=0,
-                            px_height=pvscan_info["height_in_pixels"],
-                            px_width=pvscan_info["width_in_pixels"],
-                            um_height=pvscan_info["height_in_um"],
-                            um_width=pvscan_info["width_in_um"],
-                            field_x=pvscan_info["fieldX"],
-                            field_y=pvscan_info["fieldY"],
-                            field_z=pvscan_info["fieldZ"],
-                        )
-                    ]
-                )
+                    for plane_idx in range(pvscan_info["num_planes"])
+                ]
+            )
         else:
             raise NotImplementedError(
                 f"Loading routine not implemented for {acq_software} "
