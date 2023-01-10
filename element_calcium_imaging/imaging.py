@@ -294,6 +294,7 @@ class ProcessingTask(dj.Manual):
         """
         key = {**scan_key, "paramset_idx": paramset_idx}
 
+        processed_dir = get_processed_root_data_dir()
         output_dir = cls.infer_output_dir(key, relative=False, mkdir=True)
 
         method = (ProcessingParamSet & {"paramset_idx": paramset_idx}).fetch1(
@@ -326,7 +327,9 @@ class ProcessingTask(dj.Manual):
         cls.insert1(
             {
                 **key,
-                "processing_output_dir": output_dir,
+                "processing_output_dir": output_dir.relative_to(
+                    processed_dir
+                ).as_posix(),
                 "task_mode": task_mode,
             }
         )
