@@ -20,8 +20,14 @@ with open(path.join(here, pkg_name, "version.py")) as f:
 subprocess.call(["pip", "install", "numpy", "Cython"])
 
 extras_require = {
-    "suite2p": ["suite2p @ git+https://github.com/datajoint-company/suite2p.git"],
-    "caiman": ["caiman @ git+https://github.com/datajoint-company/CaImAn.git"],
+    "suite2p": "suite2p @ git+https://github.com/datajoint-company/suite2p.git",
+    "caiman": "caiman @ git+https://github.com/datajoint-company/CaImAn.git",
+    "readers": [
+        "nd2==0.1.6",
+        "tifffile==2021.11.2",
+        "sbxreader==0.1.6.post1",
+        "scanreader @ git+https://github.com/atlab/scanreader.git",
+    ],
 }
 
 setup(
