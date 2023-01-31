@@ -4,7 +4,11 @@ import importlib
 import numpy as np
 
 import datajoint as dj
-from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
+from element_interface.utils import (
+    find_full_path,
+    dict_to_uuid,
+    find_root_directory,
+)
 
 from . import scan, imaging_report
 from .scan import (
@@ -129,7 +133,11 @@ class ProcessingParamSet(dj.Lookup):
 
     @classmethod
     def insert_new_params(
-        cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
+        cls,
+        processing_method: str,
+        paramset_idx: int,
+        paramset_desc: str,
+        params: dict,
     ):
         """Insert a parameter set into ProcessingParamSet table.
 
@@ -439,17 +447,33 @@ class Processing(dj.Computed):
 
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
+                from element_interface.caiman_loader import (
+                    _process_scanimage_tiff,
+                )
 
                 caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
                 )
-                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
+                sampling_rate, ndepths, nchannels = (scan.ScanInfo & key).fetch1(
+                    "fps", "ndepths", "nchannels"
+                )
 
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
+
+                # handle multi-channel tiff image before running CaImAn
+                if nchannels > 1:
+                    channel_idx = caiman_params.get("channel_to_process", 0)
+                    tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
+                    tmp_dir.mkdir(exist_ok=True)
+                    _process_scanimage_tiff(
+                        [f.as_posix() for f in image_files], output_dir=tmp_dir
+                    )
+                    image_files = tmp_dir.glob(f"*_chn{channel_idx}.tif")
+
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
                     parameters=caiman_params,
@@ -498,7 +522,10 @@ class Processing(dj.Computed):
                 scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
 
                 # Save the motion corrected movie (data.bin) in a .mat file
-                savemat(scan_matlab_fullpath, {"M": np.transpose(data, axes=[1, 2, 0])})
+                savemat(
+                    scan_matlab_fullpath,
+                    {"M": np.transpose(data, axes=[1, 2, 0])},
+                )
 
                 # Execute EXTRACT
 
@@ -709,7 +736,8 @@ class MotionCorrection(dj.Imported):
                         }
                     else:
                         nonrigid_correction["outlier_frames"] = np.logical_or(
-                            nonrigid_correction["outlier_frames"], s2p.ops["badframes"]
+                            nonrigid_correction["outlier_frames"],
+                            s2p.ops["badframes"],
                         )
                     for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
                         zip(
@@ -742,7 +770,11 @@ class MotionCorrection(dj.Imported):
                                 "y_shifts": bshift_y,
                                 "x_shifts": bshift_x,
                                 "z_shifts": np.full(
-                                    (len(suite2p_dataset.planes), len(bshift_x)), 0
+                                    (
+                                        len(suite2p_dataset.planes),
+                                        len(bshift_x),
+                                    ),
+                                    0,
                                 ),
                                 "y_std": np.nanstd(bshift_y),
                                 "x_std": np.nanstd(bshift_x),
@@ -774,7 +806,10 @@ class MotionCorrection(dj.Imported):
             caiman_dataset = imaging_dataset
 
             self.insert1(
-                {**key, "motion_correct_channel": caiman_dataset.alignment_channel}
+                {
+                    **key,
+                    "motion_correct_channel": caiman_dataset.alignment_channel,
+                }
             )
 
             is3D = caiman_dataset.params.motion["is3D"]
@@ -788,7 +823,8 @@ class MotionCorrection(dj.Imported):
                         caiman_dataset.motion_correction["shifts_rig"][:, 2]
                         if is3D
                         else np.full_like(
-                            caiman_dataset.motion_correction["shifts_rig"][:, 0], 0
+                            caiman_dataset.motion_correction["shifts_rig"][:, 0],
+                            0,
                         )
                     ),
                     "x_std": np.nanstd(
@@ -1039,7 +1075,8 @@ class Segmentation(dj.Computed):
                             "mask_xpix": mask_stat["xpix"],
                             "mask_ypix": mask_stat["ypix"],
                             "mask_zpix": np.full(
-                                mask_stat["npix"], mask_stat.get("iplane", plane)
+                                mask_stat["npix"],
+                                mask_stat.get("iplane", plane),
                             ),
                             "mask_weights": mask_stat["lam"],
                         }
@@ -1060,7 +1097,10 @@ class Segmentation(dj.Computed):
 
             if cells:
                 MaskClassification.insert1(
-                    {**key, "mask_classification_method": "suite2p_default_classifier"},
+                    {
+                        **key,
+                        "mask_classification_method": "suite2p_default_classifier",
+                    },
                     allow_direct_insert=True,
                 )
                 MaskClassification.MaskType.insert(
@@ -1108,7 +1148,10 @@ class Segmentation(dj.Computed):
 
             if cells:
                 MaskClassification.insert1(
-                    {**key, "mask_classification_method": "caiman_default_classifier"},
+                    {
+                        **key,
+                        "mask_classification_method": "caiman_default_classifier",
+                    },
                     allow_direct_insert=True,
                 )
                 MaskClassification.MaskType.insert(
@@ -1403,8 +1446,14 @@ class Activity(dj.Computed):
         elif method == "caiman":
             caiman_dataset = imaging_dataset
 
-            if key["extraction_method"] in ("caiman_deconvolution", "caiman_dff"):
-                attr_mapper = {"caiman_deconvolution": "spikes", "caiman_dff": "dff"}
+            if key["extraction_method"] in (
+                "caiman_deconvolution",
+                "caiman_dff",
+            ):
+                attr_mapper = {
+                    "caiman_deconvolution": "spikes",
+                    "caiman_dff": "dff",
+                }
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
                 params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
