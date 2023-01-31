@@ -455,7 +455,7 @@ class Processing(dj.Computed):
                 # handle multi-channel tiff image before running CaImAn
                 if nchannels > 1:
                     channel_idx = caiman_params.get("channel_to_process", 0)
-                    tmp_dir = output_dir / 'channel_separated_tif'
+                    tmp_dir = pathlib.Path(output_dir) / 'channel_separated_tif'
                     tmp_dir.mkdir(exist_ok=True)
                     _process_scanimage_tiff(image_files, output_dir=tmp_dir) 
                     image_files = tmp_dir.glob(f'*_chn{channel_idx}.tif')
@@ -467,7 +467,7 @@ class Processing(dj.Computed):
                     output_dir=output_dir,
                     is3D=is3D,
                 )
-                
+
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
