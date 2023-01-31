@@ -642,17 +642,27 @@ class Processing(dj.Computed):
 
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
+                from element_interface.caiman_loader import _process_scanimage_tiff
 
                 caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
                 )
-                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
+                sampling_rate, ndepths, nchannels = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
 
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
+
+                # handle multi-channel tiff image before running CaImAn
+                if nchannels > 1:
+                    channel_idx = caiman_params.get("channel_to_process", 0)
+                    tmp_dir = output_dir / 'channel_separated_tif'
+                    tmp_dir.mkdir(exist_ok=True)
+                    _process_scanimage_tiff(image_files, output_dir=tmp_dir) 
+                    image_files = tmp_dir.glob(f'*_chn{channel_idx}.tif')
+                
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
                     parameters=caiman_params,
@@ -660,7 +670,7 @@ class Processing(dj.Computed):
                     output_dir=output_dir,
                     is3D=is3D,
                 )
-
+                
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
