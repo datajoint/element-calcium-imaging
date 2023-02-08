@@ -379,13 +379,13 @@ class Processing(dj.Computed):
             "task_mode", "processing_output_dir"
         )
 
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
             # update processing_output_dir
             ProcessingTask.update1(
                 {**key, "processing_output_dir": output_dir.as_posix()}
             )
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
