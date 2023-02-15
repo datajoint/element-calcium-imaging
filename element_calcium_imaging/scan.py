@@ -4,7 +4,9 @@ import pathlib
 import importlib
 from typing import Union
 from datetime import datetime
+from compress_multiphoton import compute_quantal_size
 
+import numpy as np
 import datajoint as dj
 from element_interface.utils import find_root_directory, find_full_path
 
@@ -334,19 +336,13 @@ class ScanInfo(dj.Imported):
 
             # Insert in ScanInfo
             x_zero = (
-                scan.motor_position_at_zero[0]
-                if scan.motor_position_at_zero
-                else None
+                scan.motor_position_at_zero[0] if scan.motor_position_at_zero else None
             )
             y_zero = (
-                scan.motor_position_at_zero[1]
-                if scan.motor_position_at_zero
-                else None
+                scan.motor_position_at_zero[1] if scan.motor_position_at_zero else None
             )
             z_zero = (
-                scan.motor_position_at_zero[2]
-                if scan.motor_position_at_zero
-                else None
+                scan.motor_position_at_zero[2] if scan.motor_position_at_zero else None
             )
 
             self.insert1(
@@ -403,12 +399,8 @@ class ScanInfo(dj.Imported):
                             field_idx=plane_idx,
                             px_height=scan.image_height,
                             px_width=scan.image_width,
-                            um_height=getattr(
-                                scan, "image_height_in_microns", None
-                            ),
-                            um_width=getattr(
-                                scan, "image_width_in_microns", None
-                            ),
+                            um_height=getattr(scan, "image_height_in_microns", None),
+                            um_width=getattr(scan, "image_width_in_microns", None),
                             field_x=x_zero if x_zero else None,
                             field_y=y_zero if y_zero else None,
                             field_z=z_zero + scan.scanning_depths[plane_idx]
@@ -452,9 +444,7 @@ class ScanInfo(dj.Imported):
                     fps=sbx_meta["frame_rate"],
                     bidirectional=sbx_meta == "bidirectional",
                     nrois=sbx_meta["num_rois"] if is_multiROI else 0,
-                    scan_duration=(
-                        sbx_meta["num_frames"] / sbx_meta["frame_rate"]
-                    ),
+                    scan_duration=(sbx_meta["num_frames"] / sbx_meta["frame_rate"]),
                 )
             )
             # Insert Field(s)
@@ -490,12 +480,7 @@ class ScanInfo(dj.Imported):
 
             # Frame per second
             try:
-                fps = (
-                    1000
-                    / nd2_file.experiment[0]
-                    .parameters.periods[0]
-                    .periodDiff.avg
-                )
+                fps = 1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
             except:
                 fps = 1000 / nd2_file.experiment[0].parameters.periodDiff.avg
 
@@ -516,8 +501,7 @@ class ScanInfo(dj.Imported):
                 return (tf - ti) * 86400 + 1 / fps
 
             scan_duration = sum(
-                estimate_nd2_scan_duration(nd2.ND2File(f))
-                for f in scan_filepaths
+                estimate_nd2_scan_duration(nd2.ND2File(f)) for f in scan_filepaths
             )
 
             try:
@@ -528,9 +512,7 @@ class ScanInfo(dj.Imported):
                     if re.search(("AM|PM"), scan_datetime)
                     else "%m/%d/%Y %H:%M:%S",
                 )
-                scan_datetime = datetime.strftime(
-                    scan_datetime, "%Y-%m-%d %H:%M:%S"
-                )
+                scan_datetime = datetime.strftime(scan_datetime, "%Y-%m-%d %H:%M:%S")
             except:
                 scan_datetime = None
 
@@ -605,18 +587,20 @@ class ScanInfo(dj.Imported):
             )
 
             self.Field.insert(
-                    dict(
-                        key,
-                        field_idx=plane_idx,
-                        px_height=pvscan_info["height_in_pixels"],
-                        px_width=pvscan_info["width_in_pixels"],
-                        um_height=pvscan_info["height_in_um"],
-                        um_width=pvscan_info["width_in_um"],
-                        field_x=pvscan_info["fieldX"],
-                        field_y=pvscan_info["fieldY"],
-                        field_z=pvscan_info["fieldZ"] if pvscan_info["num_planes"] == 1 else pvscan_info["fieldZ"][plane_idx],
-                    )
-                    for plane_idx in range(pvscan_info["num_planes"])
+                dict(
+                    key,
+                    field_idx=plane_idx,
+                    px_height=pvscan_info["height_in_pixels"],
+                    px_width=pvscan_info["width_in_pixels"],
+                    um_height=pvscan_info["height_in_um"],
+                    um_width=pvscan_info["width_in_um"],
+                    field_x=pvscan_info["fieldX"],
+                    field_y=pvscan_info["fieldY"],
+                    field_z=pvscan_info["fieldZ"]
+                    if pvscan_info["num_planes"] == 1
+                    else pvscan_info["fieldZ"][plane_idx],
+                )
+                for plane_idx in range(pvscan_info["num_planes"])
             )
         else:
             raise NotImplementedError(
@@ -625,13 +609,10 @@ class ScanInfo(dj.Imported):
             )
 
         # Insert file(s)
-        root_dir = find_root_directory(
-            get_imaging_root_data_dir(), scan_filepaths[0]
-        )
+        root_dir = find_root_directory(get_imaging_root_data_dir(), scan_filepaths[0])
 
         scan_files = [
-            pathlib.Path(f).relative_to(root_dir).as_posix()
-            for f in scan_filepaths
+            pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
         ]
         self.ScanFile.insert([{**key, "file_path": f} for f in scan_files])
 
@@ -646,42 +627,28 @@ class ScanQualityMetrics(dj.Computed):
     -> ScanInfo.Field
     """
 
-    class MeanIntensity(dj.Part):
-        """
-        Mean intensity values across time
-        """
-
-        definition = """ 
+    class FrameMetrics(dj.Part):
+        definition = """
         -> master
-        channel: int
         ---
-        intensities                 : longblob
-        """
-
-    class Contrast(dj.Part):
-        """
-        Difference between 99 and 1 percentile across time
-        """
-
-        definition = """ 
-        -> master
-        channel: int
-        ---
-        contrasts: longblob
+        min_intensity: longlob
+        mean_intensity: longblob
+        max_intensiy: longblob
+        constrast: longblob
         """
 
     class QuantalSize(dj.Part):
         """
-        Quantal size in images
+        Quantities inferred from Photon Transfer Curve.
         """
 
         definition = """ 
         -> master
         channel: int
         ---
-        min_intensity   : int      # min value in movie
-        max_intensity   : int      # max value in movie
-        quantal_size    : float    # variance slope, corresponds to quantal size
+        min_intensity   : int      # Min value in movie.
+        max_intensity   : int      # Max value in movie.
+        quantal_size    : float    # Quantal size (variance/mean intensity slope), gain.
         zero_level      : int      # level corresponding to zero (computed from variance dependence)
         quantal_frame   : longblob # average frame expressed in quanta
         """
@@ -694,15 +661,50 @@ class ScanQualityMetrics(dj.Computed):
 
             # Read the scan
             scan_filepaths = get_scan_image_files(key)
-            scan = scanreader.read_scan(scan_filepaths)
+            scan = scanreader.read_scan(scan_filepaths).asarray()
         elif acq_software == "Scanbox":
             import sbxreader
 
             # Read the scan
             scan_filepaths = get_scan_box_files(key)
+            scan = ""
         elif acq_software == "NIS":
             import nd2
 
             # Read the scan
             scan_filepaths = get_nd2_files(key)
-            nd2_file = nd2.ND2File(scan_filepaths[0])
+            scan = nd2.ND2File(scan_filepaths[0]).asarray()
+
+        flat_scan = scan.reshape(scan.shape[0], -1)
+
+        self.FrameMetrics.insert(
+            dict(
+                **key,
+                min_intensity=flat_scan.min(-1),
+                mean_intensity=flat_scan.mean(-1),
+                max_intensity=flat_scan.max(-1),
+                contrast=np.diff(np.percentile(flat_scan, [1, 99], axis=1), axis=0)[0],
+            )
+        )
+
+        (
+            _,
+            min_intensity,
+            max_intensity,
+            _,
+            _,
+            quantal_size,
+            zero_level,
+        ) = compute_quantal_size(
+            scan
+        )  # Convert this to dictionary in the compress-multiphoton side.
+        self.QuantalSize.insert(
+            dict(
+                **key,
+                min_intensity=min_intensity,
+                max_intensity=max_intensity,
+                quantal_size=quantal_size,
+                zero_level=zero_level,
+                quantal_frame="",  # I need to understand this.
+            )
+        )
