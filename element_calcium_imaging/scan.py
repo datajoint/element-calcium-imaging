@@ -335,15 +335,7 @@ class ScanInfo(dj.Imported):
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero = (
-                scan.motor_position_at_zero[0] if scan.motor_position_at_zero else None
-            )
-            y_zero = (
-                scan.motor_position_at_zero[1] if scan.motor_position_at_zero else None
-            )
-            z_zero = (
-                scan.motor_position_at_zero[2] if scan.motor_position_at_zero else None
-            )
+            x_zero, y_zero, z_zero = scan.motor_position_at_zero or (None, None, None)
 
             self.insert1(
                 dict(
@@ -630,6 +622,7 @@ class ScanQualityMetrics(dj.Computed):
     class FrameMetrics(dj.Part):
         definition = """
         -> master
+        channel: int
         ---
         min_intensity: longlob
         mean_intensity: longblob
@@ -655,56 +648,64 @@ class ScanQualityMetrics(dj.Computed):
 
     def make(self, key):
         acq_software = (Scan & key).fetch1("acq_software")
+        # key["field_idx"] Field idx
+        nchannels = (ScanInfo * ScanInfo.Field & key).fetch("nchannels")
 
-        if acq_software == "ScanImage":
-            import scanreader
+        for channel in range(nchannels):
+            if acq_software == "ScanImage":
+                import scanreader
 
-            # Read the scan
-            scan_filepaths = get_scan_image_files(key)
-            scan = scanreader.read_scan(scan_filepaths).asarray()
-        elif acq_software == "Scanbox":
-            import sbxreader
+                # Read the scan
+                scan_filepaths = get_scan_image_files(key)
+                scan = scanreader.read_scan(scan_filepaths).asarray()
+                scan = scan[key["field_idx"], :, :, channel, :]
+            elif acq_software == "Scanbox":
+                import sbxreader
 
-            # Read the scan
-            scan_filepaths = get_scan_box_files(key)
-            scan = ""
-        elif acq_software == "NIS":
-            import nd2
+                # Read the scan
+                scan_filepaths = get_scan_box_files(key)
+                scan = sbxreader
+            elif acq_software == "NIS":
+                import nd2
 
-            # Read the scan
-            scan_filepaths = get_nd2_files(key)
-            scan = nd2.ND2File(scan_filepaths[0]).asarray()
+                # Read the scan
+                scan_filepaths = get_nd2_files(key)
+                scan = nd2.ND2File(scan_filepaths[0]).asarray()
 
-        flat_scan = scan.reshape(scan.shape[0], -1)
+            flat_scan = scan.reshape(scan.shape[0], -1)
 
-        self.FrameMetrics.insert(
-            dict(
-                **key,
-                min_intensity=flat_scan.min(-1),
-                mean_intensity=flat_scan.mean(-1),
-                max_intensity=flat_scan.max(-1),
-                contrast=np.diff(np.percentile(flat_scan, [1, 99], axis=1), axis=0)[0],
+            self.FrameMetrics.insert1(
+                dict(
+                    **key,
+                    channel=channel,
+                    min_intensity=flat_scan.min(-1),
+                    mean_intensity=flat_scan.mean(-1),
+                    max_intensity=flat_scan.max(-1),
+                    contrast=np.diff(np.percentile(flat_scan, [1, 99], axis=1), axis=0)[
+                        0
+                    ],
+                )
             )
-        )
 
-        (
-            _,
-            min_intensity,
-            max_intensity,
-            _,
-            _,
-            quantal_size,
-            zero_level,
-        ) = compute_quantal_size(
-            scan
-        )  # Convert this to dictionary in the compress-multiphoton side.
-        self.QuantalSize.insert(
-            dict(
-                **key,
-                min_intensity=min_intensity,
-                max_intensity=max_intensity,
-                quantal_size=quantal_size,
-                zero_level=zero_level,
-                quantal_frame="",  # I need to understand this.
+            (
+                _,
+                min_intensity,
+                max_intensity,
+                _,
+                _,
+                quantal_size,
+                zero_level,
+            ) = compute_quantal_size(
+                scan
+            )  # Convert this to dictionary in the compress-multiphoton side.
+            self.QuantalSize.insert(
+                dict(
+                    **key,
+                    channel=channel,
+                    min_intensity=min_intensity,
+                    max_intensity=max_intensity,
+                    quantal_size=quantal_size,
+                    zero_level=zero_level,
+                    quantal_frame="",  # I need to understand this.
+                )
             )
-        )
