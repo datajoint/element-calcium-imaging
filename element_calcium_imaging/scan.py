@@ -657,7 +657,7 @@ class ScanQualityMetrics(dj.Computed):
 
                 scan_filepaths = get_scan_image_files(key)
                 scan = scanreader.read_scan(scan_filepaths).asarray()
-                scan = scan.transpose(2, 0, 1)[key["field_idx"], :, :, channel, :]
+                scan = scan[key["field_idx"], :, :, channel, :].transpose(2, 0, 1)
             elif acq_software == "Scanbox":
                 import sbxreader
 
