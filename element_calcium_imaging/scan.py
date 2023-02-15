@@ -685,25 +685,15 @@ class ScanQualityMetrics(dj.Computed):
                 )
             )
 
-            (
-                _,
-                min_intensity,
-                max_intensity,
-                _,
-                _,
-                quantal_size,
-                zero_level,
-            ) = compute_quantal_size(
-                scan
-            )  # Convert this to dictionary in the compress-multiphoton side.
+            quantalsize_results = compute_quantal_size(scan)
             self.QuantalSize.insert(
                 dict(
                     **key,
                     channel=channel,
-                    min_intensity=min_intensity,
-                    max_intensity=max_intensity,
-                    quantal_size=quantal_size,
-                    zero_level=zero_level,
+                    min_intensity=quantalsize_results["min_intensity"],
+                    max_intensity=quantalsize_results["max_intensity"],
+                    quantal_size=quantalsize_results["quantal_size"],
+                    zero_level=quantalsize_results["zero_level"],
                     quantal_frame="",  # I need to understand this.
                 )
             )
