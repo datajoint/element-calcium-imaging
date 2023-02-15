@@ -647,9 +647,9 @@ class ScanQualityMetrics(dj.Computed):
         """
 
     def make(self, key):
-        acq_software = (Scan & key).fetch1("acq_software")
-        # key["field_idx"] Field idx
-        nchannels = (ScanInfo * ScanInfo.Field & key).fetch("nchannels")
+        acq_software, nchannels = (Scan * ScanInfo * ScanInfo.Field & key).fetch1(
+            "acq_software", "nchannels"
+        )
 
         for channel in range(nchannels):
             if acq_software == "ScanImage":
