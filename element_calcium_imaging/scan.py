@@ -647,7 +647,7 @@ class ScanQualityMetrics(dj.Computed):
         """
 
     def make(self, key):
-        acq_software, nchannels = (Scan * ScanInfo * ScanInfo.Field & key).fetch1(
+        acq_software, nchannels = (Scan * ScanInfo & key).fetch1(
             "acq_software", "nchannels"
         )
 
