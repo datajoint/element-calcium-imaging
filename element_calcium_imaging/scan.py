@@ -624,10 +624,10 @@ class ScanQualityMetrics(dj.Computed):
         -> master
         channel: int
         ---
-        min_intensity: longlob
-        mean_intensity: longblob
-        max_intensiy: longblob
-        constrast: longblob
+        min_intensity: longlob    # Minimum value of each frame
+        mean_intensity: longblob  # Mean value at each frame
+        max_intensiy: longblob    # Maximum value at each frame
+        constrast: longblob       # Contrast of each frame, difference of 99 and 1 percentiles.
         """
 
     class QuantalSize(dj.Part):
@@ -639,11 +639,11 @@ class ScanQualityMetrics(dj.Computed):
         -> master
         channel: int
         ---
-        min_intensity   : int      # Min value in movie.
-        max_intensity   : int      # Max value in movie.
+        min_intensity   : int      # Minimum value in movie.
+        max_intensity   : int      # Maximum value in movie.
         quantal_size    : float    # Quantal size (variance/mean intensity slope), gain.
-        zero_level      : int      # level corresponding to zero (computed from variance dependence)
-        quantal_frame   : longblob # average frame expressed in quanta
+        zero_level      : int      # Level corresponding to zero (computed from variance dependence)
+        quantal_frame   : longblob # Average frame expressed in quanta
         """
 
     def make(self, key):
