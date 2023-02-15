@@ -655,20 +655,19 @@ class ScanQualityMetrics(dj.Computed):
             if acq_software == "ScanImage":
                 import scanreader
 
-                # Read the scan
                 scan_filepaths = get_scan_image_files(key)
                 scan = scanreader.read_scan(scan_filepaths).asarray()
                 scan = scan[key["field_idx"], :, :, channel, :]
             elif acq_software == "Scanbox":
                 import sbxreader
 
-                # Read the scan
                 scan_filepaths = get_scan_box_files(key)
-                scan = sbxreader
+                scan = sbxreader(scan_filepaths)
+                scan = scan.transpose(1, 2, 0)
+                scan = scan[:, key["field_idx"], channel, :, :]
             elif acq_software == "NIS":
                 import nd2
 
-                # Read the scan
                 scan_filepaths = get_nd2_files(key)
                 scan = nd2.ND2File(scan_filepaths[0]).asarray()
 
