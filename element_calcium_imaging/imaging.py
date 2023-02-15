@@ -4,7 +4,11 @@ import importlib
 import numpy as np
 
 import datajoint as dj
-from element_interface.utils import find_full_path, dict_to_uuid, find_root_directory
+from element_interface.utils import (
+    find_full_path,
+    dict_to_uuid,
+    find_root_directory,
+)
 
 from . import scan, imaging_report
 from .scan import (
@@ -13,6 +17,7 @@ from .scan import (
     get_scan_image_files,
     get_scan_box_files,
     get_nd2_files,
+    get_prairieview_files,
 )
 
 schema = dj.Schema()
@@ -95,6 +100,7 @@ class ProcessingMethod(dj.Lookup):
     contents = [
         ("suite2p", "suite2p analysis suite"),
         ("caiman", "caiman analysis suite"),
+        ("extract", "extract analysis suite"),
     ]
 
 
@@ -127,7 +133,11 @@ class ProcessingParamSet(dj.Lookup):
 
     @classmethod
     def insert_new_params(
-        cls, processing_method: str, paramset_idx: int, paramset_desc: str, params: dict
+        cls,
+        processing_method: str,
+        paramset_idx: int,
+        paramset_desc: str,
+        params: dict,
     ):
         """Insert a parameter set into ProcessingParamSet table.
 
@@ -142,6 +152,17 @@ class ProcessingParamSet(dj.Lookup):
             params (dict): Parameter Set, all applicable parameters to the analysis
                 suite.
         """
+        if processing_method == "extract":
+            assert (
+                params.get("extract") != None and params.get("suite2p") != None
+            ), ValueError(
+                "Please provide the processing parameters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
+            )
+
+            # Force Suite2p to only run motion correction.
+            params["suite2p"]["do_registration"] = True
+            params["suite2p"]["roidetect"] = False
+
         param_dict = {
             "processing_method": processing_method,
             "paramset_idx": paramset_idx,
@@ -243,6 +264,7 @@ class ProcessingTask(dj.Manual):
             "NIS": get_nd2_files,
             "ScanImage": get_scan_image_files,
             "Scanbox": get_scan_box_files,
+            "PrairieView": get_prairieview_files,
         }
         image_locator = image_locators[(scan.Scan & key).fetch1("acq_software")]
 
@@ -280,6 +302,7 @@ class ProcessingTask(dj.Manual):
         """
         key = {**scan_key, "paramset_idx": paramset_idx}
 
+        processed_dir = get_processed_root_data_dir()
         output_dir = cls.infer_output_dir(key, relative=False, mkdir=True)
 
         method = (ProcessingParamSet & {"paramset_idx": paramset_idx}).fetch1(
@@ -295,6 +318,11 @@ class ProcessingTask(dj.Manual):
                 from element_interface import caiman_loader
 
                 caiman_loader.CaImAn(output_dir)
+            elif method == "extract":
+                from element_interface import extract_loader
+
+                extract_loader.EXTRACT(output_dir)
+
             else:
                 raise NotImplementedError(
                     "Unknown/unimplemented method: {}".format(method)
@@ -307,7 +335,9 @@ class ProcessingTask(dj.Manual):
         cls.insert1(
             {
                 **key,
-                "processing_output_dir": output_dir,
+                "processing_output_dir": output_dir.relative_to(
+                    processed_dir
+                ).as_posix(),
                 "task_mode": task_mode,
             }
         )
@@ -349,13 +379,13 @@ class Processing(dj.Computed):
             "task_mode", "processing_output_dir"
         )
 
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
             # update processing_output_dir
             ProcessingTask.update1(
                 {**key, "processing_output_dir": output_dir.as_posix()}
             )
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
@@ -370,6 +400,10 @@ class Processing(dj.Computed):
             elif method == "caiman":
                 caiman_dataset = imaging_dataset
                 key = {**key, "processing_time": caiman_dataset.creation_time}
+            elif method == "extract":
+                raise NotImplementedError(
+                    "To use EXTRACT with this DataJoint Element please set `task_mode=trigger`"
+                )
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
@@ -413,17 +447,33 @@ class Processing(dj.Computed):
 
             elif method == "caiman":
                 from element_interface.run_caiman import run_caiman
+                from element_interface.caiman_loader import (
+                    _process_scanimage_tiff,
+                )
 
                 caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
                 )
-                sampling_rate, ndepths = (scan.ScanInfo & key).fetch1("fps", "ndepths")
+                sampling_rate, ndepths, nchannels = (scan.ScanInfo & key).fetch1(
+                    "fps", "ndepths", "nchannels"
+                )
 
                 is3D = bool(ndepths > 1)
                 if is3D:
                     raise NotImplementedError(
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
+
+                # handle multi-channel tiff image before running CaImAn
+                if nchannels > 1:
+                    channel_idx = caiman_params.get("channel_to_process", 0)
+                    tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
+                    tmp_dir.mkdir(exist_ok=True)
+                    _process_scanimage_tiff(
+                        [f.as_posix() for f in image_files], output_dir=tmp_dir
+                    )
+                    image_files = tmp_dir.glob(f"*_chn{channel_idx}.tif")
+
                 run_caiman(
                     file_paths=[f.as_posix() for f in image_files],
                     parameters=caiman_params,
@@ -435,6 +485,57 @@ class Processing(dj.Computed):
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
+
+            elif method == "extract":
+                import suite2p
+                from scipy.io import savemat
+                from element_interface.extract_trigger import EXTRACT_trigger
+
+                # Motion Correction with Suite2p
+                params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+
+                params["suite2p"]["save_path0"] = output_dir
+                (
+                    params["suite2p"]["fs"],
+                    params["suite2p"]["nplanes"],
+                    params["suite2p"]["nchannels"],
+                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+
+                input_format = pathlib.Path(image_files[0]).suffix
+                params["suite2p"]["input_format"] = input_format[1:]
+
+                suite2p_paths = {
+                    "data_path": [image_files[0].parent.as_posix()],
+                    "tiff_list": [f.as_posix() for f in image_files],
+                }
+
+                suite2p.run_s2p(ops=params["suite2p"], db=suite2p_paths)
+
+                # Convert data.bin to registered_scans.mat
+                scanfile_fullpath = pathlib.Path(output_dir) / "suite2p/plane0/data.bin"
+
+                data_shape = (scan.ScanInfo * scan.ScanInfo.Field & key).fetch1(
+                    "nframes", "px_height", "px_width"
+                )
+                data = np.memmap(scanfile_fullpath, shape=data_shape, dtype=np.int16)
+
+                scan_matlab_fullpath = scanfile_fullpath.parent / "registered_scan.mat"
+
+                # Save the motion corrected movie (data.bin) in a .mat file
+                savemat(
+                    scan_matlab_fullpath,
+                    {"M": np.transpose(data, axes=[1, 2, 0])},
+                )
+
+                # Execute EXTRACT
+
+                ex = EXTRACT_trigger(
+                    scan_matlab_fullpath, params["extract"], output_dir
+                )
+                ex.run()
+
+                _, extract_dataset = get_loader_result(key, ProcessingTask)
+                key["processing_time"] = extract_dataset.creation_time
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
@@ -493,6 +594,9 @@ class Curation(dj.Manual):
         elif method == "caiman":
             caiman_dataset = imaging_dataset
             curation_time = caiman_dataset.creation_time
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            curation_time = extract_dataset.creation_time
         else:
             raise NotImplementedError("Unknown method: {}".format(method))
 
@@ -594,15 +698,17 @@ class MotionCorrection(dj.Imported):
             NonRigidMotionCorrection (foreign key): Primary key from
                 NonRigidMotionCorrection.
             block_id (int): Unique block ID.
-            block_y         : longblob  # (y_start, y_end) in pixel of this block
-            block_x         : longblob  # (x_start, x_end) in pixel of this block
-            block_z         : longblob  # (z_start, z_end) in pixel of this block
-            y_shifts        : longblob  # (pixels) y motion correction shifts for every frame
-            x_shifts        : longblob  # (pixels) x motion correction shifts for every frame
-            z_shifts=null   : longblob  # (pixels) x motion correction shifts for every frame
-            y_std           : float     # (pixels) standard deviation of y shifts across all frames
-            x_std           : float     # (pixels) standard deviation of x shifts across all frames
-            z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
+            block_y (longblob): y_start and y_end in pixels for this block
+            block_x (longblob): x_start and x_end in pixels for this block
+            block_z (longblob): z_start and z_end in pixels for this block
+            y_shifts (longblob): y motion correction shifts for every frame in pixels
+            x_shifts (longblob): x motion correction shifts for every frame in pixels
+            z_shift=null (longblob, optional): x motion correction shifts for every frame
+                in pixels
+            y_std (float): standard deviation of y shifts across all frames in pixels
+            x_std (float): standard deviation of x shifts across all frames in pixels
+            z_std=null (float, optional): standard deviation of z shifts across all frames
+                in pixels
         """
 
         definition = """# FOV-tiled blocks used for non-rigid motion correction
@@ -652,7 +758,7 @@ class MotionCorrection(dj.Imported):
             "KEY", "field_z", order_by="field_z"
         )
 
-        if method == "suite2p":
+        if method in ["suite2p", "extract"]:
             suite2p_dataset = imaging_dataset
 
             motion_correct_channel = suite2p_dataset.planes[0].alignment_channel
@@ -704,7 +810,8 @@ class MotionCorrection(dj.Imported):
                         }
                     else:
                         nonrigid_correction["outlier_frames"] = np.logical_or(
-                            nonrigid_correction["outlier_frames"], s2p.ops["badframes"]
+                            nonrigid_correction["outlier_frames"],
+                            s2p.ops["badframes"],
                         )
                     for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
                         zip(
@@ -737,7 +844,11 @@ class MotionCorrection(dj.Imported):
                                 "y_shifts": bshift_y,
                                 "x_shifts": bshift_x,
                                 "z_shifts": np.full(
-                                    (len(suite2p_dataset.planes), len(bshift_x)), 0
+                                    (
+                                        len(suite2p_dataset.planes),
+                                        len(bshift_x),
+                                    ),
+                                    0,
                                 ),
                                 "y_std": np.nanstd(bshift_y),
                                 "x_std": np.nanstd(bshift_x),
@@ -769,7 +880,10 @@ class MotionCorrection(dj.Imported):
             caiman_dataset = imaging_dataset
 
             self.insert1(
-                {**key, "motion_correct_channel": caiman_dataset.alignment_channel}
+                {
+                    **key,
+                    "motion_correct_channel": caiman_dataset.alignment_channel,
+                }
             )
 
             is3D = caiman_dataset.params.motion["is3D"]
@@ -783,7 +897,8 @@ class MotionCorrection(dj.Imported):
                         caiman_dataset.motion_correction["shifts_rig"][:, 2]
                         if is3D
                         else np.full_like(
-                            caiman_dataset.motion_correction["shifts_rig"][:, 0], 0
+                            caiman_dataset.motion_correction["shifts_rig"][:, 0],
+                            0,
                         )
                     ),
                     "x_std": np.nanstd(
@@ -994,17 +1109,17 @@ class Segmentation(dj.Computed):
 
         definition = """ # A mask produced by segmentation.
         -> master
-        mask            : smallint
+        mask               : smallint
         ---
         -> scan.Channel.proj(segmentation_channel='channel')  # channel used for segmentation
-        mask_npix       : int       # number of pixels in ROIs
-        mask_center_x   : int       # center x coordinate in pixel
-        mask_center_y   : int       # center y coordinate in pixel
-        mask_center_z   : int       # center z coordinate in pixel
-        mask_xpix       : longblob  # x coordinates in pixels
-        mask_ypix       : longblob  # y coordinates in pixels      
-        mask_zpix       : longblob  # z coordinates in pixels        
-        mask_weights    : longblob  # weights of the mask at the indices above
+        mask_npix          : int       # number of pixels in ROIs
+        mask_center_x      : int       # center x coordinate in pixel
+        mask_center_y      : int       # center y coordinate in pixel
+        mask_center_z=null : int       # center z coordinate in pixel
+        mask_xpix          : longblob  # x coordinates in pixels
+        mask_ypix          : longblob  # y coordinates in pixels      
+        mask_zpix=null     : longblob  # z coordinates in pixels        
+        mask_weights       : longblob  # weights of the mask at the indices above
         """
 
     def make(self, key):
@@ -1034,7 +1149,8 @@ class Segmentation(dj.Computed):
                             "mask_xpix": mask_stat["xpix"],
                             "mask_ypix": mask_stat["ypix"],
                             "mask_zpix": np.full(
-                                mask_stat["npix"], mask_stat.get("iplane", plane)
+                                mask_stat["npix"],
+                                mask_stat.get("iplane", plane),
                             ),
                             "mask_weights": mask_stat["lam"],
                         }
@@ -1055,7 +1171,10 @@ class Segmentation(dj.Computed):
 
             if cells:
                 MaskClassification.insert1(
-                    {**key, "mask_classification_method": "suite2p_default_classifier"},
+                    {
+                        **key,
+                        "mask_classification_method": "suite2p_default_classifier",
+                    },
                     allow_direct_insert=True,
                 )
                 MaskClassification.MaskType.insert(
@@ -1103,12 +1222,36 @@ class Segmentation(dj.Computed):
 
             if cells:
                 MaskClassification.insert1(
-                    {**key, "mask_classification_method": "caiman_default_classifier"},
+                    {
+                        **key,
+                        "mask_classification_method": "caiman_default_classifier",
+                    },
                     allow_direct_insert=True,
                 )
                 MaskClassification.MaskType.insert(
                     cells, ignore_extra_fields=True, allow_direct_insert=True
                 )
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            masks = [
+                dict(
+                    **key,
+                    segmentation_channel=0,
+                    mask=mask["mask_id"],
+                    mask_npix=mask["mask_npix"],
+                    mask_center_x=mask["mask_center_x"],
+                    mask_center_y=mask["mask_center_y"],
+                    mask_center_z=mask["mask_center_z"],
+                    mask_xpix=mask["mask_xpix"],
+                    mask_ypix=mask["mask_ypix"],
+                    mask_zpix=mask["mask_zpix"],
+                    mask_weights=mask["mask_weights"],
+                )
+                for mask in extract_dataset.load_results()
+            ]
+
+            self.insert1(key)
+            self.Mask.insert(masks, ignore_extra_fields=True)
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
 
@@ -1264,6 +1407,21 @@ class Fluorescence(dj.Computed):
 
             self.insert1(key)
             self.Trace.insert(fluo_traces)
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+
+            fluo_traces = [
+                {
+                    **key,
+                    "mask": mask_id,
+                    "fluo_channel": 0,
+                    "fluorescence": fluorescence,
+                }
+                for mask_id, fluorescence in enumerate(extract_dataset.T)
+            ]
+
+            self.insert1(key)
+            self.Trace.insert(fluo_traces)
 
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
@@ -1362,8 +1520,14 @@ class Activity(dj.Computed):
         elif method == "caiman":
             caiman_dataset = imaging_dataset
 
-            if key["extraction_method"] in ("caiman_deconvolution", "caiman_dff"):
-                attr_mapper = {"caiman_deconvolution": "spikes", "caiman_dff": "dff"}
+            if key["extraction_method"] in (
+                "caiman_deconvolution",
+                "caiman_dff",
+            ):
+                attr_mapper = {
+                    "caiman_deconvolution": "spikes",
+                    "caiman_dff": "dff",
+                }
 
                 # infer "segmentation_channel" - from params if available, else from caiman loader
                 params = (ProcessingParamSet * ProcessingTask & key).fetch1("params")
@@ -1416,7 +1580,9 @@ def get_loader_result(key: dict, table: dj.Table):
 
     output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
 
-    if method == "suite2p":
+    if method == "suite2p" or (
+        method == "extract" and table.__name__ == "MotionCorrection"
+    ):
         from element_interface import suite2p_loader
 
         loaded_dataset = suite2p_loader.Suite2p(output_path)
@@ -1424,6 +1590,10 @@ def get_loader_result(key: dict, table: dj.Table):
         from element_interface import caiman_loader
 
         loaded_dataset = caiman_loader.CaImAn(output_path)
+    elif method == "extract":
+        from element_interface import extract_loader
+
+        loaded_dataset = extract_loader.EXTRACT(output_path)
     else:
         raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 

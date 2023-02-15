@@ -17,6 +17,7 @@ For a long time, most labs developed custom processing pipelines, sharing them w
 
 - [CaImAn](https://github.com/flatironinstitute/CaImAn) (Originally developed by Andrea Giovannucci, current support by FlatIron Institute: Eftychios A. Pnevmatikakis, Johannes Friedrich)
 - [Suite2p](https://github.com/MouseLand/suite2p) (Carsen Stringer and Marius Pachitariu at Janelia), 200+ users, active support
+- [EXTRACT](https://github.com/schnitzer-lab/EXTRACT-public) (Hakan Inan et al. 2017, 2021).
 
 Element Calcium Imaging encapsulates these packages to ease the management of data and its analysis.
 
@@ -60,9 +61,10 @@ Major features of the Calcium Imaging Element include:
 + Calcium-imaging scanning metadata, also compatible with mesoscale imaging and multi-ROI scanning mode
 + Tables for all processing steps: motion correction, segmentation, cell spatial footprint, fluorescence trace extraction, spike inference and cell classification
 + Store/track/manage different curations of the segmentation results
-+ Ingestion support for data acquired with ScanImage and Scanbox acquisition systems
++ Ingestion support for data acquired with ScanImage, Scanbox, Nikon NIS, and PrairieView acquisition systems
 + Ingestion support for processing outputs from both Suite2p and CaImAn analysis suites
 + Sample data and complete test suite for quality assurance
++ Cell extraction with the EXTRACT analysis package.
 
 The processing workflow is typically performed on a per-scan basis, however, depending on the nature of the research questions, different labs may opt to perform processing/segmentation on a concatenated set of data from multiple scans. To this end, we have extended the Calcium Imaging Element and provided a design version capable of supporting a multi-scan processing scheme.
 

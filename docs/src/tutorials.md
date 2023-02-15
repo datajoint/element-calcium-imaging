@@ -4,7 +4,7 @@
 
 Installation of the Element requires an integrated development environment and database.
 Instructions to setup each of the components can be found on the 
-[User Instructions](datajoint.com/docs/elements/user-instructions) page. These 
+[User Instructions](https://datajoint.com/docs/elements/user-guide/) page. These 
 instructions use the example 
 [workflow for Element Calcium Imaging](https://github.com/datajoint/workflow-calcium-imaging), 
 which can be modified for a user's specific experimental requirements. This example
@@ -49,3 +49,9 @@ provides the steps for dropping all the tables to start fresh.
 
 - [07-DownStreamAnalysis](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/07-downstream-analysis-optional.ipynb)
 demonstrates event- and trial-based analysis.
+
+## EXTRACT
+Analysis with the EXTRACT package is currently supported for single channel, single plane scans with using Suite2p for
+motion correction. For processing with EXTRACT, please refer to the notebook 03-Process, set `processing_method="extract"`
+in the ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet table in the `{'suite2p': {...}, 'extract': {...}}`
+dictionary format. Please also install the [MATLAB engine](https://pypi.org/project/matlabengine/) API for Python.
