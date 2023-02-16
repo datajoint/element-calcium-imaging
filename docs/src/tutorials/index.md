@@ -22,33 +22,40 @@ To try out Elements notebooks in an online Jupyter environment with access to ex
 
 ## Notebooks
 
-Each of the 
-[notebooks](https://github.com/datajoint/workflow-calcium-imaging/tree/main/notebooks) in 
-the workflow steps through ways to interact with the Element itself.
+Each of the notebooks in the workflow
+([download here](https://github.com/datajoint/workflow-calcium-imaging/tree/main/notebooks)
+steps through ways to interact with the Element itself. For convenience, these notebooks
+are also rendered as part of this site. To try out the Elements notebooks in an online
+Jupyter environment with access to example data, visit
+[CodeBook](https://codebook.datajoint.io/). 
 
-- [00-DataDownload](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/00-datadownload_optional.ipynb)
+- [Data Download](./00-data-download_optional.ipynb)
 highlights how to use DataJoint tools to download a sample model for trying out the Element.
 
-- [01-Configure](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/01-configure.ipynb)
+- [Configure](./01-configure.ipynb)
 helps configure your local DataJoint installation to point to the correct database.
 
-- [02-WorkflowStructure](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/02-workflow-structure-optional.ipynb)
+- [WorkflowStructure](./02-workflow-structure-optional.ipynb)
 demonstrates the table architecture of the Element and key DataJoint basics for interacting with these tables.
 
-- [03-Process](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/03-process.ipynb)
+- [Process](./03-process.ipynb)
 steps through adding data to the tables and analyzing a calcium imaging scan.
 
-- [04-Automate](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/04-automate-optional.ipynb)
+- [Automate](./04-automate-optional.ipynb)
 highlights the same steps as above, but utilizing all built-in automation tools.
 
-- [05-Explore](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/05-explore.ipynb)
-demonstrates the steps to fetch the results stored in the tables and plot them.
+<!-- TODO: FIX UNICODE STRING ON ORIGINAL NOTEBOOK CAUSING CONVERSION ERROR
+- [Explore](./05-explore.ipynb)
+demonstrates the steps to fetch the results stored in the tables and plot them. -->
 
-- [06-Drop](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/06-drop-optional.ipynb)
+- [Drop](./06-drop-optional.ipynb)
 provides the steps for dropping all the tables to start fresh.
 
-- [07-DownStreamAnalysis](https://github.com/datajoint/workflow-calcium-imaging/blob/main/notebooks/07-downstream-analysis-optional.ipynb)
+- [Downstream Analysis](./07-downstream-analysis-optional.ipynb)
 demonstrates event- and trial-based analysis.
+
+- [Workshop Demo](./2022-allen-institute-workshop.ipynb) provides a brief
+ overview of all of the above for a workshop setting.
 
 ## EXTRACT
 Analysis with the EXTRACT package is currently supported for single channel, single plane scans with using Suite2p for

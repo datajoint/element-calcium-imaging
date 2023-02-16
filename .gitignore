@@ -112,6 +112,7 @@ workflow_calcium_imaging/
 
 # docs
 /docs/site
+/docs/src/tutorials/*ipynb
 
 # emacs
 **/*~
