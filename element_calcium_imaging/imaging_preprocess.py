@@ -1,23 +1,19 @@
+import importlib
 import inspect
 import pathlib
-import importlib
-import numpy as np
 
 import datajoint as dj
-from element_interface.utils import (
-    find_full_path,
-    dict_to_uuid,
-    find_root_directory,
-)
+import numpy as np
+from element_interface.utils import dict_to_uuid, find_full_path, find_root_directory
 
-from . import scan, imaging_report
+from . import imaging_report, scan
 from .scan import (
     get_imaging_root_data_dir,
-    get_processed_root_data_dir,
-    get_scan_image_files,
-    get_scan_box_files,
     get_nd2_files,
     get_prairieview_files,
+    get_processed_root_data_dir,
+    get_scan_box_files,
+    get_scan_image_files,
 )
 
 schema = dj.Schema()
@@ -105,7 +101,7 @@ class PreprocessParamSet(dj.Lookup):
     to avoid duplicated entries.
 
     Attributes:
-        paramset_idx (int): Uniqiue parameter set ID.
+        paramset_idx (int): Unique parameter set ID.
         PreprocessMethod (foreign key): A primary key from PreprocessMethod.
         paramset_desc (str): Parameter set description.
         param_set_hash (uuid): A universally unique identifier for the parameter set.
@@ -132,12 +128,12 @@ class PreprocessParamSet(dj.Lookup):
         params: dict,
     ):
         """Insert a parameter set into PreprocessParamSet table.
-        This function automizes the parameter set hashing and avoids insertion of an
+        This function automates the parameter set hashing and avoids insertion of an
             existing parameter set.
 
         Attributes:
             preprocess_method (str): Method used for processing of calcium imaging scans.
-            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_idx (int): Unique parameter set ID.
             paramset_desc (str): Parameter set description.
             params (dict): Parameter Set, all applicable parameters.
         """
@@ -151,12 +147,12 @@ class PreprocessParamSet(dj.Lookup):
         q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1("paramset_idx")
-            if pname == paramset_idx:  # If the existed set has the same name: job done
+            p_name = q_param.fetch1("paramset_idx")
+            if p_name == paramset_idx:  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
                 raise dj.DataJointError(
-                    "The specified param-set already exists - name: {}".format(pname)
+                    "The specified param-set already exists - name: {}".format(p_name)
                 )
         else:
             cls.insert1(param_dict)
@@ -219,7 +215,7 @@ class PreprocessTask(dj.Manual):
     -> scan.Scan
     -> PreprocessParamSteps
     ---
-    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative 
+    preprocess_output_dir: varchar(255)  # Pre-processing output directory relative
                                          # to the root data directory
     task_mode='none': enum('none','load', 'trigger') # 'none': no pre-processing
                                                      # 'load': load analysis results
@@ -245,7 +241,7 @@ class Preprocess(dj.Imported):
     definition = """
     -> PreprocessTask
     ---
-    preprocess_time=null: datetime  # Time of generation of pre-processing results 
+    preprocess_time=null: datetime  # Time of generation of pre-processing results
     package_version='': varchar(16)
     """
 
@@ -255,7 +251,7 @@ class Preprocess(dj.Imported):
         task_mode, output_dir = (PreprocessTask & key).fetch1(
             "task_mode", "preprocess_output_dir"
         )
-        preprocess_output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+        _ = find_full_path(get_imaging_root_data_dir(), output_dir)
 
         if task_mode == "none":
             print(f"No pre-processing run on entry: {key}")
@@ -297,7 +293,7 @@ class ProcessingParamSet(dj.Lookup):
     to avoid duplicated entries.
 
     Attributes:
-        paramset_idx (int): Uniqiue parameter set ID.
+        paramset_idx (int): Unique parameter set ID.
         ProcessingMethod (foreign key): A primary key from ProcessingMethod.
         paramset_desc (str): Parameter set description.
         param_set_hash (uuid): A universally unique identifier for the parameter set.
@@ -306,7 +302,7 @@ class ProcessingParamSet(dj.Lookup):
     """
 
     definition = """# Processing Parameter Set
-    paramset_idx: smallint  # Uniqiue parameter set ID.
+    paramset_idx: smallint  # Unique parameter set ID.
     ---
     -> ProcessingMethod
     paramset_desc: varchar(1280)  # Parameter-set description
@@ -325,20 +321,20 @@ class ProcessingParamSet(dj.Lookup):
     ):
         """Insert a parameter set into ProcessingParamSet table.
 
-        This function automizes the parameter set hashing and avoids insertion of an
+        This function automates the parameter set hashing and avoids insertion of an
             existing parameter set.
 
         Attributes:
             processing_method (str): Processing method/package used for processing of
                 calcium imaging.
-            paramset_idx (int): Uniqiue parameter set ID.
+            paramset_idx (int): Unique parameter set ID.
             paramset_desc (str): Parameter set description.
             params (dict): Parameter Set, all applicable parameters to the analysis
                 suite.
         """
         if processing_method == "extract":
             assert (
-                params.get("extract") != None and params.get("suite2p") != None
+                params.get("extract") is not None and params.get("suite2p") is not None
             ), ValueError(
                 "Please provide the processing parameters in the {'suite2p': {...}, 'extract': {...}} dictionary format."
             )
@@ -357,12 +353,12 @@ class ProcessingParamSet(dj.Lookup):
         q_param = cls & {"param_set_hash": param_dict["param_set_hash"]}
 
         if q_param:  # If the specified param-set already exists
-            pname = q_param.fetch1("paramset_idx")
-            if pname == paramset_idx:  # If the existed set has the same name: job done
+            p_name = q_param.fetch1("paramset_idx")
+            if p_name == paramset_idx:  # If the existed set has the same name: job done
                 return
             else:  # If not same name: human error, trying to add the same paramset with different name
                 raise dj.DataJointError(
-                    "The specified param-set already exists - name: {}".format(pname)
+                    "The specified param-set already exists - name: {}".format(p_name)
                 )
         else:
             cls.insert1(param_dict)
@@ -576,8 +572,8 @@ class Processing(dj.Computed):
             if method == "suite2p":
                 if (scan.ScanInfo & key).fetch1("nrois") > 0:
                     raise NotImplementedError(
-                        f"Suite2p ingestion error - Unable to handle"
-                        f" ScanImage multi-ROI scanning mode yet"
+                        "Suite2p ingestion error - Unable to handle"
+                        + " ScanImage multi-ROI scanning mode yet"
                     )
                 suite2p_dataset = imaging_dataset
                 key = {**key, "processing_time": suite2p_dataset.creation_time}
@@ -653,10 +649,8 @@ class Processing(dj.Computed):
                 key = {**key, "processing_time": suite2p_dataset.creation_time}
 
             elif method == "caiman":
+                from element_interface.caiman_loader import _process_scanimage_tiff
                 from element_interface.run_caiman import run_caiman
-                from element_interface.caiman_loader import (
-                    _process_scanimage_tiff,
-                )
 
                 caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
@@ -695,8 +689,8 @@ class Processing(dj.Computed):
 
             elif method == "extract":
                 import suite2p
-                from scipy.io import savemat
                 from element_interface.extract_trigger import EXTRACT_trigger
+                from scipy.io import savemat
 
                 # Motion Correction with Suite2p
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
@@ -772,10 +766,10 @@ class Curation(dj.Manual):
     -> Processing
     curation_id: int
     ---
-    curation_time: datetime  # Time of generation of this set of curated results 
+    curation_time: datetime  # Time of generation of this set of curated results
     curation_output_dir: varchar(255)  # Output directory of the curated results, relative to root data directory
     manual_curation: bool  # Has manual curation been performed on this result?
-    curation_note='': varchar(2000)  
+    curation_note='': varchar(2000)
     """
 
     def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
@@ -864,7 +858,7 @@ class MotionCorrection(dj.Imported):
         outlier_frames=null : longblob  # mask with true for frames with outlier shifts (already corrected)
         y_shifts            : longblob  # (pixels) y motion correction shifts
         x_shifts            : longblob  # (pixels) x motion correction shifts
-        z_shifts=null       : longblob  # (pixels) z motion correction shifts (z-drift) 
+        z_shifts=null       : longblob  # (pixels) z motion correction shifts (z-drift)
         y_std               : float     # (pixels) standard deviation of y shifts across all frames
         x_std               : float     # (pixels) standard deviation of x shifts across all frames
         z_std=null          : float     # (pixels) standard deviation of z shifts across all frames
@@ -1324,8 +1318,8 @@ class Segmentation(dj.Computed):
         mask_center_y      : int       # center y coordinate in pixel
         mask_center_z=null : int       # center z coordinate in pixel
         mask_xpix          : longblob  # x coordinates in pixels
-        mask_ypix          : longblob  # y coordinates in pixels      
-        mask_zpix=null     : longblob  # z coordinates in pixels        
+        mask_ypix          : longblob  # y coordinates in pixels
+        mask_zpix=null     : longblob  # z coordinates in pixels
         mask_weights       : longblob  # weights of the mask at the indices above
         """
 
@@ -1545,7 +1539,7 @@ class Fluorescence(dj.Computed):
         definition = """
         -> master
         -> Segmentation.Mask
-        -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from         
+        -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from
         ---
         fluorescence                : longblob  # Fluorescence trace associated with this mask
         neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace
@@ -1642,7 +1636,7 @@ class ActivityExtractionMethod(dj.Lookup):
         extraction_method (str): Extraction method.
     """
 
-    definition = """# Activity extraction method 
+    definition = """# Activity extraction method
     extraction_method: varchar(32)
     """
 
@@ -1670,7 +1664,7 @@ class Activity(dj.Computed):
         Attributes:
             Activity (foreign key): Primary key from Activity.
             Fluorescence.Trace (foreign key): Fluorescence.Trace.
-            activity_trace (longblob): Neural activity from fluoresence trace.
+            activity_trace (longblob): Neural activity from fluorescence trace.
         """
 
         definition = """

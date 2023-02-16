@@ -1,6 +1,7 @@
 import numpy as np
-from matplotlib import colors
 import plotly.graph_objects as go
+from matplotlib import colors
+
 from .. import scan
 
 

@@ -1,4 +1,5 @@
 import datajoint as dj
+
 from .plotting import cell_plot
 
 schema = dj.Schema()
