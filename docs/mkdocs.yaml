@@ -118,6 +118,7 @@ plugins:
         - "*/navigation.md"
   - mkdocs-jupyter:
       ignore_h1_titles: True
+      include: ["*.ipynb"]
 markdown_extensions:
   - attr_list
   - md_in_html

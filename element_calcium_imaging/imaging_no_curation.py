@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import pathlib
+from collections.abc import Callable
 
 import datajoint as dj
 import numpy as np
@@ -1478,7 +1479,7 @@ _table_attribute_mapper = {
 }
 
 
-def get_loader_result(key: dict, table: dj.Table):
+def get_loader_result(key: dict, table: dj.Table) -> Callable:
     """Retrieve the processed imaging results from a suite2p or caiman loader.
 
     Args:

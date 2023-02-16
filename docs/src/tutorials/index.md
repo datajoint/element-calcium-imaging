@@ -29,7 +29,7 @@ are also rendered as part of this site. To try out the Elements notebooks in an 
 Jupyter environment with access to example data, visit
 [CodeBook](https://codebook.datajoint.io/).
 
-- [Data Download](./00-data-download_optional.ipynb) highlights how to use DataJoint
+- [Data Download](./00-data-download-optional.ipynb) highlights how to use DataJoint
   tools to download a sample model for trying out the Element.
 
 - [Configure](./01-configure.ipynb) helps configure your local DataJoint installation to

@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import pathlib
+from collections.abc import Callable
 
 import datajoint as dj
 import numpy as np
@@ -22,12 +23,12 @@ _linking_module = None
 
 
 def activate(
-    imaging_schema_name,
-    scan_schema_name=None,
+    imaging_schema_name: str,
+    scan_schema_name: str = None,
     *,
-    create_schema=True,
-    create_tables=True,
-    linking_module=None,
+    create_schema: bool = True,
+    create_tables: bool = True,
+    linking_module: str = None,
 ):
     """Activate this schema.
 
@@ -1759,7 +1760,7 @@ _table_attribute_mapper = {
 }
 
 
-def get_loader_result(key: dict, table: dj.Table):
+def get_loader_result(key: dict, table: dj.Table) -> Callable:
     """Retrieve the processed imaging results from a suite2p or caiman loader.
 
     Args:

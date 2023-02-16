@@ -14,11 +14,11 @@ _linking_module = None
 
 
 def activate(
-    scan_schema_name,
+    scan_schema_name: str,
     *,
-    create_schema=True,
-    create_tables=True,
-    linking_module=None,
+    create_schema: bool = True,
+    create_tables: bool = True,
+    linking_module: str = None,
 ):
     """Activate this schema.
 

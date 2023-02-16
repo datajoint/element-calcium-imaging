@@ -8,7 +8,11 @@ imaging = None
 
 
 def activate(
-    schema_name, imaging_schema_name, *, create_schema=True, create_tables=True
+    schema_name: str,
+    imaging_schema_name: str,
+    *,
+    create_schema: bool = True,
+    create_tables: bool = True
 ):
     """Activate this schema.
 
@@ -17,10 +21,10 @@ def activate(
             `imaging_report` schema
         imaging_schema_name (str): Schema name of the activated imaging element for
             which this imaging_report schema will be downstream from
-        create_schema: When True (default), create schema in the database if it does not
-            yet exist.
-        create_tables: When True (default), create tables in the database if they do not
-            yet exist.
+        create_schema (bool): When True (default), create schema in the database if it
+            does not yet exist.
+        create_tables (bool): When True (default), create tables in the database if they
+            do not yet exist.
     """
     global imaging
     imaging = dj.create_virtual_module("imaging", imaging_schema_name)

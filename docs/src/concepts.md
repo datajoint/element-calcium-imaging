@@ -23,8 +23,6 @@ artifact correction, cropping and stitching operations.
   </figcaption>
 </figure>
 
-<!-- TODO: CHECK BREAK ABOVE -->
-
 For a long time, most labs developed custom processing pipelines, sharing them with
 others as academic open-source projects. This has changed recently with the emerging of
 a few leaders as the standardization candidates for the initial preprocessing.
