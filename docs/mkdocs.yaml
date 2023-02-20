@@ -17,7 +17,6 @@ nav:
     # - Explore:  tutorials/05-explore.ipynb
     - Drop:  tutorials/06-drop-optional.ipynb
     - Downstream Analysis: tutorials/07-downstream-analysis-optional.ipynb
-    - Workshop Demo: tutorials/2022-allen-institute-workshop.ipynb
   - Citation: citation.md
   - API: api/ # defer to gen-files + literate-nav
   - Changelog: changelog.md
