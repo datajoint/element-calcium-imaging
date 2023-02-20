@@ -36,6 +36,7 @@ services:
           mv /main/delete/workflow_$${ELEMENT_UNDERSCORE} /main/
           mv /main/delete/notebooks/*ipynb /main/docs/src/tutorials/
           rm /main/docs/src/tutorials/05*ipynb # CURRENTLY HAS PROBLEMATIC UNICODE STRING
+          rm /main/docs/src/tutorials/2022-allen*ipynb # DUPLICATES OTHER NOTEBOOKS
           rm -fR /main/delete
         fi 
         if echo "$${MODE}" | grep -i live &>/dev/null; then
