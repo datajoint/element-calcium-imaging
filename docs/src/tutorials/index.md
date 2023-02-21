@@ -15,27 +15,25 @@ imaging scans.
 ## Videos
 
 Our [YouTube tutorial](https://www.youtube.com/watch?v=gFLn0GB1L30) gives an overview of
-the workflow files, notebooks, as well as core concepts related to calcium imaging
-analysis. To try out Elements notebooks in an online Jupyter environment with access to
-example data, visit
-[CodeBook](https://codebook.datajoint.io/). (Calcium Imaging notebooks coming soon!)
+the workflow files and notebooks, as well as core concepts related to calcium imaging
+analysis.
 
 ## Notebooks
 
 Each of the notebooks in the workflow
 ([download here](https://github.com/datajoint/workflow-calcium-imaging/tree/main/notebooks)
 steps through ways to interact with the Element itself. For convenience, these notebooks
-are also rendered as part of this site. To try out the Elements notebooks in an online
+are also rendered as part of this site. To try out the notebooks in an online
 Jupyter environment with access to example data, visit
 [CodeBook](https://codebook.datajoint.io/).
 
 - [Data Download](./00-data-download-optional.ipynb) highlights how to use DataJoint
-  tools to download a sample model for trying out the Element.
+  tools to download an example dataset to try out the Element.
 
 - [Configure](./01-configure.ipynb) helps configure your local DataJoint installation to
   point to the correct database.
 
-- [WorkflowStructure](./02-workflow-structure-optional.ipynb) demonstrates the table
+- [Workflow Structure](./02-workflow-structure-optional.ipynb) demonstrates the table
   architecture of the Element and key DataJoint basics for interacting with these
   tables.
 
@@ -55,8 +53,6 @@ Jupyter environment with access to example data, visit
 - [Downstream Analysis](./07-downstream-analysis-optional.ipynb) demonstrates event- and
   trial-based analysis.
 
-- [Workshop Demo](./2022-allen-institute-workshop.ipynb) provides a brief overview of
-  all of the above for a workshop setting.
 
 ## EXTRACT
 
