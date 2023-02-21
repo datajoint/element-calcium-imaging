@@ -19,9 +19,9 @@
 #
 # + DataJoint needs to be pre-configured before running this notebook, if you haven't set up the configuration, refer to notebook [01-configure](01-configure.ipynb).
 #
-# + If you are familar with DataJoint and the workflow structure, proceed to the next notebook [03-process](03-process.ipynb) directly to run the workflow.
+# + If you are familiar with DataJoint and the workflow structure, proceed to the next notebook [03-process](03-process.ipynb) directly to run the workflow.
 #
-# + For a more thorough introduction of DataJoint functionings, please visit our [general tutorial site](https://playground.datajoint.io)
+# + For a more thorough introduction of DataJoint functions, please visit our [general tutorial site](https://playground.datajoint.io)
 #
 # To load the local configuration, we will change the directory to the package root.
 

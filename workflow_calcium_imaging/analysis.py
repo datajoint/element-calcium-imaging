@@ -50,7 +50,7 @@ class ActivityAlignmentCondition(dj.Manual):
         imaging.Activity (foreign key): Primary key from imaging.Activity.
         event.AlignmentEvent (foreign key): Primary key from event.AlignmentEvent.
         trial_condition (str): User-friendly name of condition.
-        condition_description (str, optional). Description. Default is ''.
+        condition_description (str). Optional. Description. Default is ''.
         bin_size (float): bin-size (in second) used to compute the PSTH,
     """
 

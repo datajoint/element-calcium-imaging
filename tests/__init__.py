@@ -1,4 +1,4 @@
-# run tests: pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging -p no:warnings
+# run tests: pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings
 
 import os
 import sys

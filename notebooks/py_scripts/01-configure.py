@@ -33,7 +33,7 @@ import datajoint as dj
 import getpass
 dj.config["database.host"] = "{YOUR_HOST}" # CodeBook users should omit this
 dj.config["database.user"] = "{YOUR_USERNAME}"
-dj.config["database.password"] = getpass.getpass()  # enter the password securily
+dj.config["database.password"] = getpass.getpass()  # enter the password securely
 
 # You should be able to connect to the database at this stage.
 
@@ -47,7 +47,7 @@ dj.conn()
 #
 # Giving a prefix to schema could help on the configuration of privilege settings. For example, if we set prefix `neuro_`, every schema created with the current workflow will start with `neuro_`, e.g. `neuro_lab`, `neuro_subject`, `neuro_scan` etc.
 #
-# The prefix could be configurated in `dj.config` as follows. CodeBook users should keep their username as the prefix for schema declaration permissions.
+# The prefix could be configured in `dj.config` as follows. CodeBook users should keep their username as the prefix for schema declaration permissions.
 
 username_as_prefix = dj.config["database.user"] + "_"
 dj.config["custom"] = {"database.prefix": username_as_prefix}
