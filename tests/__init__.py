@@ -854,7 +854,8 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     newkey["session_datetime"] = newkey["session_datetime"].strftime("%Y%m%dT%H%M%S")
     output_dir = "demo/" + "_".join(str(newkey[x]) for x in newkey)
     imaging.ProcessingTask.insert1(
-        {**key, "processing_output_dir": output_dir, "task_mode": "trigger"}
+        {**key, "processing_output_dir": output_dir, "task_mode": "trigger"},
+        skip_duplicates=not _tear_down,
     )
     try:
         os.makedirs(subj1_root / output_dir)
