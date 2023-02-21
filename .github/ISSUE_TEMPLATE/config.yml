@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: DataJoint Contribution Guideline
+    url: https://datajoint.com/docs/community/contribute/
+    about: Please make sure to review the DataJoint Contribution Guidelines

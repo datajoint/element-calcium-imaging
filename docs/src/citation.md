@@ -1,7 +1,7 @@
 # Citation
 
 If your work uses this Element, please cite the following manuscript and Research
-Resource Identifier (RRID).
+Resource Identifier (RRID):
 
 + Yatsenko D, Nguyen T, Shen S, Gunalan K, Turner CA, Guzman R, Sasaki M, Sitonic D,
   Reimer J, Walker EY, Tolias AS. DataJoint Elements: Data Workflows for

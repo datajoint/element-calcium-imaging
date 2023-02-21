@@ -1,19 +1,28 @@
 # Changelog
 
-Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
+Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.5.3] - Unreleased
+
++ Add - spelling, markdown, and pre-commit config files
++ Add - Notebook rendering to docs
 
 ## [0.5.2] - 2023-01-11
+
 + Bugfix - fix errors in ingesting single-plane PrairieView scans into `ScanInfo`
 + Add - Optional installation of caiman and suite2p through pip
 
 ## [0.5.1] - 2022-12-15
+
 + Add - Imports for prairieview loader
 
 ## [0.5.0] - 2022-12-14
+
 + Add - Cell extraction with EXTRACT package
 
 ## [0.4.2] - 2022-11-02
+
 + Bugfix - Add plotting package to the requirements to generate the figures
 + Add - Scan date parser from nd2 files
 
@@ -70,6 +79,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.5.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.3
 [0.5.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.2
 [0.5.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.1
 [0.5.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.0

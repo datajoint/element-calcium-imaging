@@ -7,7 +7,16 @@ repo_name: datajoint/element-calcium-imaging
 nav:
   - Element Calcium Imaging: index.md
   - Concepts: concepts.md
-  - Tutorials: tutorials.md
+  - Tutorials: 
+    - Overview: tutorials/index.md
+    - Data Download: tutorials/00-data-download-optional.ipynb
+    - Configure:  tutorials/01-configure.ipynb
+    - Workflow Structure: tutorials/02-workflow-structure-optional.ipynb
+    - Process:  tutorials/03-process.ipynb
+    - Automate:  tutorials/04-automate-optional.ipynb
+    # - Explore:  tutorials/05-explore.ipynb
+    - Drop:  tutorials/06-drop-optional.ipynb
+    - Downstream Analysis: tutorials/07-downstream-analysis-optional.ipynb
   - Citation: citation.md
   - API: api/ # defer to gen-files + literate-nav
   - Changelog: changelog.md
@@ -43,7 +52,7 @@ nav:
 #     HOST_UID=$(id -u) docker compose -f docs/docker-compose.yaml up --build
 #     ```
 # 02. Site analytics depend on a local environment variable GOOGLE_ANALYTICS_KEY
-#     You can find this in LastPass or declare with any string to suprress errors
+#     You can find this in LastPass or declare with any string to suppress errors
 # 03. The API section will pull docstrings.
 #     A. Follow google styleguide e.g., 
 #        https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
@@ -92,6 +101,12 @@ plugins:
   #       "index.md": "getting_started.md"
   - mkdocstrings:
       default_handler: python
+      handlers:
+        python:
+          options:
+            members_order: source
+            group_by_category: false
+            line_length: 88
   - gen-files:
       scripts:
       - ./src/api/make_pages.py
@@ -100,6 +115,9 @@ plugins:
   - exclude-search:
       exclude:
         - "*/navigation.md"
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
+      include: ["*.ipynb"]
 markdown_extensions:
   - attr_list
   - md_in_html
