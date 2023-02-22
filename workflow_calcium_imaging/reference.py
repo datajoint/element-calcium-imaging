@@ -1,4 +1,5 @@
 import datajoint as dj
+
 from . import db_prefix
 
 schema = dj.Schema(db_prefix + "reference")

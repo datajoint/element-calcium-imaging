@@ -1,8 +1,8 @@
-import datajoint as dj
-import numpy as np
 import importlib
 import inspect
 
+import datajoint as dj
+import numpy as np
 
 schema = dj.schema()
 

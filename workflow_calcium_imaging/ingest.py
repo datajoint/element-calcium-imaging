@@ -1,21 +1,23 @@
 import csv
 import pathlib
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 from element_interface.utils import (
     find_full_path,
     find_root_directory,
     ingest_csv_to_table,
 )
+
+from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 from workflow_calcium_imaging.pipeline import (
-    subject,
+    Equipment,
+    event,
     scan,
     session,
-    Equipment,
+    subject,
     trial,
-    event,
 )
-from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects(

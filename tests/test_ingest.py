@@ -1,23 +1,25 @@
-import sys
 import pathlib
+import sys
+
+from element_interface.utils import find_full_path, find_root_directory
+
 from . import (
-    dj_config,
-    pipeline,
-    test_data,
-    subjects_csv,
-    ingest_subjects,
-    sessions_csv,
-    ingest_sessions,
-    testdata_paths,
-    suite2p_paramset,
     caiman2D_paramset,
     caiman3D_paramset,
-    scan_info,
-    processing_tasks,
-    processing,
     curations,
+    dj_config,
+    ingest_sessions,
+    ingest_subjects,
+    pipeline,
+    processing,
+    processing_tasks,
+    scan_info,
+    sessions_csv,
+    subjects_csv,
+    suite2p_paramset,
+    test_data,
+    testdata_paths,
 )
-from element_interface.utils import find_full_path, find_root_directory
 
 
 def test_ingest_subjects(pipeline, ingest_subjects):

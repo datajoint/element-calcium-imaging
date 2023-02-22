@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
 from os import path
-import sys
+
+from setuptools import find_packages, setup
 
 pkg_name = "workflow_calcium_imaging"
 here = path.abspath(path.dirname(__file__))
@@ -25,7 +25,7 @@ with open(path.join(here, pkg_name, "version.py")) as f:
 
 setup(
     name="workflow-calcium-imaging",
-    version=__version__,
+    version=__version__,  # noqa: F821
     description="Calcium imaging workflow using the DataJoint elements",
     long_description=long_description,
     long_description_content_type="text/markdown",

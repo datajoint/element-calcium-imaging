@@ -1,7 +1,7 @@
 # DataJoint Workflow - Calcium Imaging
 
 Workflow for calcium imaging data acquired with
-[ScanImage](http://scanimage.vidriotechnologies.com),  
+[ScanImage](http://scanimage.vidriotechnologies.com),
 [Scanbox](https://scanbox.org), or `Nikon NIS` software and processed with
 [Suite2p](https://github.com/MouseLand/suite2p) or
 [CaImAn](https://github.com/flatironinstitute/CaImAn).

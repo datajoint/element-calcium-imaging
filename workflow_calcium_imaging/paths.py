@@ -1,7 +1,8 @@
-import datajoint as dj
 from collections import abc
-from element_session import session_with_datetime as session  # If pipeline, circular
+
+import datajoint as dj
 from element_interface.utils import find_full_path
+from element_session import session_with_datetime as session  # If pipeline, circular
 
 
 def get_imaging_root_data_dir():
