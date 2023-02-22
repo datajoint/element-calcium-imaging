@@ -1560,7 +1560,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_size (float): Mask area in micrometer^2.
+        mask_size (float): Mask area in square micrometer.
         """
 
     class FluorescenceTraceMetrics(dj.Part):
@@ -1571,6 +1571,49 @@ class PostProcessingQualityMetrics(dj.Computed):
         skewness: float
         variance: float
         """
+
+    def make(self, key):
+        from scipy.stats import skew
+
+        (
+            fluorescence,
+            fluo_channel,
+            mask_id,
+            mask_npix,
+            px_height,
+            px_width,
+            um_height,
+            um_width,
+        ) = (Segmentation.Mask * scan.ScanInfo.Field * Fluorescence.Trace & key).fetch(
+            "fluorescence",
+            "fluo_channel",
+            "mask",
+            "mask_npix",
+            "px_height",
+            "px_width",
+            "um_height",
+            "um_width",
+        )
+
+        self.insert1(key)
+        self.MaskMetrics.insert(
+            dict(
+                **key,
+                mask=mask_id,
+                mask_size=mask_npix * (um_height / px_height) * (um_width / px_width),
+            )
+        )
+
+        fluorescence = np.stack(fluorescence)
+        self.FluorescenceTraceMetrics.insert(
+            dict(
+                **key,
+                fluo_channel=fluo_channel,
+                mask=mask_id,
+                skewness=skew(fluorescence, axis=1),
+                variance=fluorescence.std(axis=1),
+            )
+        )
 
 
 # ---------------- HELPER FUNCTIONS ----------------
