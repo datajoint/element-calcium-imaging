@@ -1560,7 +1560,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_area: float  # Mask area in square micrometer.
+        mask_area: float  # Mask area in square micromete. Stringer & Pachitariu (2019).
         """
 
     class FluorescenceTraceMetrics(dj.Part):
@@ -1568,8 +1568,8 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> master
         -> Fluorescence.Trace
         ---
-        skewness: float
-        variance: float
+        skewness: float   # Stringer & Pachitariu (2019)
+        variance: float   # Stringer & Pachitariu (2019)
         """
 
     def make(self, key):
