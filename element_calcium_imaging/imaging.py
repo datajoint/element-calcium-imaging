@@ -1560,13 +1560,13 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_npix (int): Number of pixels in ROIs.
+        mask_size (float): Mask area in micrometer^2.
         """
 
-    class TraceMetrics(dj.Part):
+    class FluorescenceTraceMetrics(dj.Part):
         definition = """
         -> master
-        -> Activity.Trace
+        -> Fluorescence.Trace
         ---
         skewness: float
         variance: float
