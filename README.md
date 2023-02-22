@@ -16,15 +16,17 @@ A complete calcium imaging workflow can be built using the DataJoint Elements.
 This repository provides demonstrations for:
 
 1. Set up a workflow using DataJoint Elements (see
-[workflow_calcium_imaging/pipeline.py](workflow_calcium_imaging/pipeline.py))
+  [workflow_calcium_imaging/pipeline.py](workflow_calcium_imaging/pipeline.py))
 2. Ingestion of data/metadata based on a predefined file structure, file naming
-convention, and directory lookup methods (see
-[workflow_calcium_imaging/paths.py](workflow_calcium_imaging/paths.py)).
+  convention, and directory lookup methods (see
+  [workflow_calcium_imaging/paths.py](workflow_calcium_imaging/paths.py)).
 3. Ingestion of segmentation and deconvolution results.
 
 See the [Element Calcium Imaging documentation](https://elements.datajoint.org/description/calcium_imaging/) for the background information and development timeline.
 
-For more information on the DataJoint Elements project, please visit <https://elements.datajoint.org>.  This work is supported by the National Institutes of Health.
+For more information on the DataJoint Elements project, please visit
+<https://elements.datajoint.org>.  This work is supported by the National Institutes of
+Health.
 
 ## Workflow architecture
 
@@ -40,14 +42,14 @@ assembled together to form a fully functional workflow.
 ## Installation instructions
 
 + The installation instructions can be found at the
-[DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
+  [DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
 
 ## Interacting with the DataJoint workflow
 
-+ Please refer to the following workflow-specific
-[Jupyter notebooks](/notebooks) for an in-depth explanation of how to run the
-workflow ([03-process.ipynb](notebooks/03-process.ipynb)) and explore the data
-([05-explore.ipynb](notebooks/05-explore.ipynb)).
++ Please refer to the following workflow-specific [Jupyter notebooks](/notebooks) for an
+  in-depth explanation of how to run the workflow
+  ([03-process.ipynb](notebooks/03-process.ipynb)) and explore the data
+  ([05-explore.ipynb](notebooks/05-explore.ipynb)).
 
 + See our YouTube tutorial for a walkthrough of the schemas and functions:
 
