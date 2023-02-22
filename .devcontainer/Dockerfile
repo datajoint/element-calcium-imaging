@@ -27,13 +27,13 @@ RUN \
     alias ll='ls -aGg' && \
     echo "--- ELEMENTS ---" && \
     if [ $INSTALL_EDITABLE = true ]; then \
-        for f in lab animal session interface $ELEMENT; do \
+        for f in lab animal session event interface $ELEMENT; do \
             git clone https://github.com/${GITHUB_USER}/element-${f} /workspaces/element-${f} || \
             true && \
             pip install -e /workspaces/element-${f}; \
         done; \
     else  \
-        for f in lab animal session interface $ELEMENT; do \
+        for f in lab animal session event interface $ELEMENT; do \
             pip install git+https://github.com/${GITHUB_USER}/element-${f}.git; \
         done; \
     fi && \
@@ -41,7 +41,11 @@ RUN \
         echo "--- CAIMAN ---" && \
         /bin/bash -c 'conda install -n base -c conda-forge -c anaconda -y mamba' && \
         git clone --branch master https://github.com/datajoint-company/CaImAn /workspaces/CaImAn/ || true && \
-        /bin/bash -c 'conda env update --n base -f /workspaces/CaImAn/environment-minimal.yml -y' && \
-        pip install /workspaces/CaImAn/ && pip install numpy==1.21; \
+        /bin/bash -c 'conda update --all -y' && \
+        /bin/bash -c 'conda env update -n base -f /workspaces/CaImAn/environment-minimal.yml' || true && \
+        pip install cython && pip install /workspaces/CaImAn/ && pip install numpy==1.21; \
+    fi && \
+    if [ ! conda -v ]; then \
+        echo "--- NO CONDA ---";\
     fi && \
     echo "--- DONE ---"
