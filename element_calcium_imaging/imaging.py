@@ -1560,7 +1560,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_size (float): Mask area in square micrometer.
+        mask_size: float  # Mask area in square micrometer.
         """
 
     class FluorescenceTraceMetrics(dj.Part):
