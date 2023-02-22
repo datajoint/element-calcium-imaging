@@ -1577,7 +1577,7 @@ class PostProcessingQualityMetrics(dj.Computed):
 
         (
             fluorescence,
-            fluo_channel,
+            fluo_channels,
             mask_ids,
             mask_npix,
             px_height,
@@ -1600,7 +1600,8 @@ class PostProcessingQualityMetrics(dj.Computed):
             [
                 dict(**key, mask=mask_id, mask_area=mask_area)
                 for mask_id, mask_area in zip(
-                    mask_ids, (um_height / px_height) * (um_width / px_width)
+                    mask_ids,
+                    mask_npix * (um_height / px_height) * (um_width / px_width),
                 )
             ]
         )
@@ -1615,8 +1616,11 @@ class PostProcessingQualityMetrics(dj.Computed):
                     skewness=skewness,
                     variance=variance,
                 )
-                for mask_id, skewness, variance in zip(
-                    mask_ids, skew(fluorescence, axis=1), fluorescence.std(axis=1)
+                for fluo_channel, mask_id, skewness, variance in zip(
+                    fluo_channels,
+                    mask_ids,
+                    skew(fluorescence, axis=1),
+                    fluorescence.std(axis=1),
                 )
             ]
         )
