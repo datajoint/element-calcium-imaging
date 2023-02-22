@@ -1,8 +1,8 @@
 datajoint>=0.13.0
 element-animal>=0.1.2
 element-calcium-imaging>=0.3.0
-element-event @ git+https://github.com/datajoint/element-event.git
-element-interface @ git+https://github.com/datajoint/element-interface.git
+element-event
+element-interface
 element-lab>=0.1.1
 element-session>=0.1.2
 ipykernel>=6.0.1

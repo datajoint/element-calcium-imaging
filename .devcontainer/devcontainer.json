@@ -16,10 +16,10 @@
 		"ghcr.io/guiyomh/features/vim:0": {},
 		// CONDA ISSUES WITH M1. https://github.com/jroes/streamlit-getting-started-m1/
 		// "ghcr.io/devcontainers/features/anaconda:1": {},
-		// "ghcr.io/devcontainers/features/conda:1": {},
-		"ghcr.io/rocker-org/devcontainer-features/miniforge:1": {}
+		"ghcr.io/devcontainers/features/conda:1": {}
+		// "ghcr.io/rocker-org/devcontainer-features/miniforge:1": {}
 	},
-	"onCreateCommand": "pip install -e .",
+	// "onCreateCommand": "pip install -e .",
 	"postStartCommand": "MYSQL_VER=8.0 MINIO_VER=RELEASE.2022-08-11T04-37-28Z docker compose -f ./.devcontainer/local-docker-compose.yaml down && MYSQL_VER=8.0 MINIO_VER=RELEASE.2022-08-11T04-37-28Z docker compose -f ./.devcontainer/local-docker-compose.yaml up --build --wait",
 	"forwardPorts": [
 		80,

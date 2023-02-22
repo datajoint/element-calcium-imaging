@@ -13,13 +13,17 @@ ENV INSTALL_CAIMAN false
 ENV GITHUB_USER datajoint
 
 # CAIMAN NOTES - M1 had issues with:
-# apt-get install git gcc g++ ffmpeg libsm6 libxext6 libhdf5-dev pkg-config -y && \
+# apt-get install ffmpeg libhdf5-dev -y && \
+# FFMPEG https://stackoverflow.com/questions/42589892/how-to-install-ffmpeg-for-ubuntu-using-command-line
 # CONDA: linux-aarch64 cannot find z5py or tensorflow
+# ND2 installation issues
+    # conda install -c conda-forge imagecodecs && \
 
 RUN \
     echo "--- DATAJOINT ---" && \
     apt update && \
     apt-get install bash-completion graphviz default-mysql-client -y && \
+    apt-get install gcc -y && \
     pip install --upgrade pip && \
     pip install flake8 black faker ipykernel pytest pytest-cov pre-commit datajoint && \
     alias ll='ls -aGg' && \
@@ -34,7 +38,6 @@ RUN \
         for f in lab animal session interface $ELEMENT; do \
             pip install git+https://github.com/${GITHUB_USER}/element-${f}.git; \
         done; \
-        pip install /workspaces/element-${f}; \
     fi && \
     if [ $INSTALL_CAIMAN = true ]; then \
         echo "--- CAIMAN ---" && \
@@ -44,4 +47,3 @@ RUN \
         pip install /workspaces/CaImAn/ && pip install numpy==1.21; \
     fi && \
     echo "--- DONE ---"
-    
