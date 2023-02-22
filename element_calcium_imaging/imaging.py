@@ -1549,6 +1549,30 @@ class Activity(dj.Computed):
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
 
+@schema
+class PostProcessingQualityMetrics(dj.Computed):
+    definition = """
+    -> Segmentation
+    """
+
+    class MaskMetrics(dj.Part):
+        definition = """
+        -> master
+        -> Segmentation.Mask
+        ---
+        mask_npix (int): Number of pixels in ROIs.
+        """
+
+    class TraceMetrics(dj.Part):
+        definition = """
+        -> master
+        -> Activity.Trace
+        ---
+        skewness: float
+        variance: float
+        """
+
+
 # ---------------- HELPER FUNCTIONS ----------------
 
 
