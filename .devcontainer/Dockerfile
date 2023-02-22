@@ -8,15 +8,15 @@ ENV DJ_PASS simple
 
 # --- ELEMENT OPTIONS --
 ENV ELEMENT calcium-imaging
-ENV INSTALL_EDITABLE false
-ENV INSTALL_CAIMAN false
+ENV INSTALL_EDITABLE true
+ENV INSTALL_CAIMAN true
 ENV GITHUB_USER datajoint
 
 # CAIMAN NOTES - M1 had issues with:
 # apt-get install ffmpeg libhdf5-dev -y && \
 # FFMPEG https://stackoverflow.com/questions/42589892/how-to-install-ffmpeg-for-ubuntu-using-command-line
 # CONDA: linux-aarch64 cannot find z5py or tensorflow
-# ND2 installation issues
+# ND2 installation issues 
     # conda install -c conda-forge imagecodecs && \
 
 RUN \
