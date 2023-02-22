@@ -1578,7 +1578,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         (
             fluorescence,
             fluo_channel,
-            mask_id,
+            mask_ids,
             mask_npix,
             px_height,
             px_width,
@@ -1597,22 +1597,28 @@ class PostProcessingQualityMetrics(dj.Computed):
 
         self.insert1(key)
         self.MaskMetrics.insert(
-            dict(
-                **key,
-                mask=mask_id,
-                mask_size=mask_npix * (um_height / px_height) * (um_width / px_width),
-            )
+            [
+                dict(**key, mask=mask_id, mask_area=mask_area)
+                for mask_id, mask_area in zip(
+                    mask_ids, (um_height / px_height) * (um_width / px_width)
+                )
+            ]
         )
 
         fluorescence = np.stack(fluorescence)
         self.FluorescenceTraceMetrics.insert(
-            dict(
-                **key,
-                fluo_channel=fluo_channel,
-                mask=mask_id,
-                skewness=skew(fluorescence, axis=1),
-                variance=fluorescence.std(axis=1),
-            )
+            [
+                dict(
+                    **key,
+                    fluo_channel=fluo_channel,
+                    mask=mask_id,
+                    skewness=skewness,
+                    variance=variance,
+                )
+                for mask_id, skewness, variance in zip(
+                    mask_ids, skew(fluorescence, axis=1), fluorescence.std(axis=1)
+                )
+            ]
         )
 
 
