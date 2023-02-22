@@ -97,8 +97,8 @@ class ActivityAlignment(dj.Computed):
         """Aligned trial activity.
 
         Attributes:
-            ActivityAlignment (foriegn key): Primary key from ActivityAlignment.
-            imaging.Activity.Trace (foriegn key): Primary key from
+            ActivityAlignment (foreign key): Primary key from ActivityAlignment.
+            imaging.Activity.Trace (foreign key): Primary key from
                 imaging.Activity.Trace.
             ActivityAlignmentCondition.Trial (foreign key): Primary key from
                 ActivityAlignmentCondition.Trial.

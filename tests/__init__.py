@@ -139,7 +139,7 @@ def test_data(dj_config, pipeline):
         workflow_version = version.__version__
 
         client.download(
-            "workflow-calcium-ephys-test-set",
+            "workflow-calcium-imaging-test-set",
             workflow_version.replace(".", "_"),
             str(test_data_dir),
             create_target=False,

@@ -19,7 +19,9 @@ from workflow_calcium_imaging.paths import get_imaging_root_data_dir
 
 
 def ingest_subjects(
-    subject_csv_path:str="./user_data/subjects.csv", skip_duplicates:bool=True, verbose:bool=True
+    subject_csv_path: str = "./user_data/subjects.csv",
+    skip_duplicates: bool = True,
+    verbose: bool = True,
 ):
     """Inserts ./user_data/subject.csv data into corresponding subject schema tables.
 
@@ -157,7 +159,7 @@ def ingest_events(
     Ingest session, block, trial, and event data.
 
     Ingest each level of experiment hierarchy for element-trial: recording, block (i.e.,
-    phases of trials), trials (repeated units), events (optionally 0-duration occurances
+    phases of trials), trials (repeated units), events (optionally 0-duration occurrences
     within trial).
 
     This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging.
@@ -212,7 +214,7 @@ def ingest_alignment(
     alignment_csv_path="./user_data/alignments.csv", skip_duplicates=True, verbose=True
 ):
     """Ingest event alignment information
-    
+
     This is duplicated across wf-array-ephys and wf-calcium-imaging.
 
     Args:
