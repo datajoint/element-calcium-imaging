@@ -1,13 +1,14 @@
 # run tests: pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings
 
 import os
-import sys
-import pytest
 import pathlib
+import sys
+from contextlib import nullcontext
+
+import datajoint as dj
 import numpy as np
 import pandas as pd
-import datajoint as dj
-from contextlib import nullcontext
+import pytest
 from element_interface.utils import find_full_path, find_root_directory
 
 # ------------------- SOME CONSTANTS -------------------
@@ -60,7 +61,7 @@ def dj_config():
     dj.config["safemode"] = False
 
     environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
-    if environ_root or (environ_root and not isinstance(environ_root, list)):
+    if environ_root and not isinstance(environ_root, list):
         environ_root = list(environ_root)
     config_root = dj.config["custom"]["imaging_root_data_dir"]
     if not isinstance(config_root, list):
@@ -79,8 +80,7 @@ def dj_config():
 def pipeline():
     with verbose_context:
         print("\n")
-        from workflow_calcium_imaging import pipeline
-        from workflow_calcium_imaging import paths
+        from workflow_calcium_imaging import paths, pipeline
 
     global is_multi_scan_processing
     is_multi_scan_processing = (
@@ -133,13 +133,14 @@ def test_data(dj_config, pipeline):
             )
 
         import djarchive_client
+
         from workflow_calcium_imaging import version
 
         client = djarchive_client.client()
         workflow_version = version.__version__
 
         client.download(
-            "workflow-calcium-ephys-test-set",
+            "workflow-calcium-imaging-test-set",
             workflow_version.replace(".", "_"),
             str(test_data_dir),
             create_target=False,

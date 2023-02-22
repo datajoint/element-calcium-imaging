@@ -1,23 +1,24 @@
 import datajoint as dj
-from element_lab import lab
 from element_animal import subject
-from element_session import session_with_datetime as session
-from element_event import trial, event
-from element_calcium_imaging import scan, imaging
-from element_lab.lab import Source, Lab, Protocol, User, Location, Project
 from element_animal.subject import Subject
+from element_calcium_imaging import imaging, scan
+from element_event import event, trial
+from element_lab import lab
+from element_lab.lab import Lab, Location, Project, Protocol, Source, User
+from element_session import session_with_datetime as session
+
+from . import analysis, db_prefix
 from .paths import (
     get_imaging_root_data_dir,
-    get_scan_image_files,
-    get_scan_box_files,
     get_nd2_files,
     get_prairieview_files,
+    get_scan_box_files,
+    get_scan_image_files,
 )
-from . import analysis
 from .reference import Equipment
-from . import db_prefix
 
 __all__ = [
+    "dj",
     "subject",
     "lab",
     "session",

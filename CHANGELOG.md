@@ -1,6 +1,6 @@
 # Changelog
 
-Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and 
+Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
 ## [0.2.0] - 2022-10-14
@@ -20,9 +20,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Code of conduct
 + Add - CICD workflows
 + Add - sbxreader requirement
-+ Update - notebooks for codebook deploymnet
++ Update - notebooks for codebook deployment
 + Update - csv session datetime for codebook data
-
 
 ## [0.1.0] - 2022-06-29
 
@@ -49,7 +48,6 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 [0.2.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.2.0
 [0.1.4]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.4
-[0.1.3]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.3
 [0.1.2]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.2
 [0.1.1]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.1
 [0.1.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.0

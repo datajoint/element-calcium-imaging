@@ -1,5 +1,6 @@
-from workflow_calcium_imaging.pipeline import imaging, scan
 import warnings
+
+from workflow_calcium_imaging.pipeline import imaging, scan
 
 warnings.filterwarnings("ignore")
 
