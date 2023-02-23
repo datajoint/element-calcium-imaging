@@ -100,7 +100,7 @@ def get_tracelayout(key, width=600, height=600) -> dict:
     )
 
 
-def figure_data(imaging, segmentation_key) -> Tuple(np.array, np.array):
+def figure_data(imaging, segmentation_key) -> Tuple[np.array, np.array]:
     """Prepare the images for a given segmentation_key.
 
     Args:
