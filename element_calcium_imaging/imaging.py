@@ -1599,7 +1599,7 @@ class PostProcessingQualityMetrics(dj.Computed):
 
         self.insert1(key)
 
-        roundnesses = np.empty(len(mask_xpixs))
+        roundnesses = np.empty_like(mask_xpixs)
         for i, (mask_xpix, mask_ypix, mask_weight) in enumerate(
             zip(mask_xpixs, mask_ypixs, mask_weights)
         ):
