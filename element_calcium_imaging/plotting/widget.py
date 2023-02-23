@@ -1,13 +1,15 @@
 from functools import partial
-from plotly.io import from_json
-from plotly import graph_objects as go
-from ipywidgets import widgets as wg
-from ..imaging_report import TraceReport, ScanLevelReport
+from types import ModuleType
 
+from ipywidgets import widgets as wg
+from plotly import graph_objects as go
+from plotly.io import from_json
+
+from ..imaging_report import ScanLevelReport, TraceReport
 from . import cell_plot
 
 
-def main(imaging, usedb=False):
+def main(imaging: ModuleType, usedb: bool = False) -> wg:
     """Display the widget.
 
     Args:

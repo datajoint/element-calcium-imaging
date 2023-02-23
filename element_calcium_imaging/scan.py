@@ -1,14 +1,14 @@
-import re
+import importlib
 import inspect
 import pathlib
-import importlib
-from typing import Union
+import re
 from datetime import datetime
-from compress_multiphoton import compute_quantal_size
+from typing import Union
 
 import numpy as np
 import datajoint as dj
-from element_interface.utils import find_root_directory, find_full_path
+from element_interface.utils import find_root_directory
+from compress_multiphoton import compute_quantal_size
 
 schema = dj.schema()
 
@@ -16,11 +16,11 @@ _linking_module = None
 
 
 def activate(
-    scan_schema_name,
+    scan_schema_name: str,
     *,
-    create_schema=True,
-    create_tables=True,
-    linking_module=None,
+    create_schema: bool = True,
+    create_tables: bool = True,
+    linking_module: str = None,
 ):
     """Activate this schema.
 
@@ -95,7 +95,7 @@ def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
     locations).
 
     Returns:
-        dir (str| pathlib.Path): Absolute path of the pocessed imaging root data
+        dir (str| pathlib.Path): Absolute path of the processed imaging root data
             directory.
     """
 
@@ -163,11 +163,11 @@ class AcquisitionSoftware(dj.Lookup):
     Required to define a scan.
 
     Attributes:
-        acq_software (str): Acquistion software
+        acq_software (str): Acquisition software
     """
 
     definition = """  # Acquisition softwares
-    acq_software: varchar(24)    
+    acq_software: varchar(24)
     """
     contents = zip(["ScanImage", "Scanbox", "NIS", "PrairieView"])
 
@@ -197,7 +197,7 @@ class Scan(dj.Manual):
         Session (foreign key): A primary key from Session.
         scan_id (int): Unique Scan ID.
         Equipment (foreign key, optional): A primary key from Equipment.
-        AcquisitionSoftware (foreign key): A primary key from AcquisitonSoftware.
+        AcquisitionSoftware (foreign key): A primary key from AcquisitionSoftware.
         scan_notes (str, optional): Notes of the experimenter regarding the scan.
     """
 
@@ -221,9 +221,9 @@ class ScanLocation(dj.Manual):
     """
 
     definition = """ # Anatomical location
-    -> Scan   
+    -> Scan
     ---
-    -> Location      
+    -> Location
     """
 
 
@@ -252,7 +252,7 @@ class ScanInfo(dj.Imported):
         bidirectional_z (bool, optional): True = bidirectional z-scan.
     """
 
-    definition = """ # General data about the reso/meso scans from header
+    definition = """ # General data about the resoscans/mesoscans from header
     -> Scan
     ---
     nfields              : tinyint   # number of fields
@@ -263,7 +263,7 @@ class ScanInfo(dj.Imported):
     x=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
-    fps                  : float     # (Hz) frames per second - Volumetric Scan Rate 
+    fps                  : float     # (Hz) frames per second - Volumetric Scan Rate
     bidirectional        : boolean   # true = bidirectional scanning
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
@@ -473,7 +473,7 @@ class ScanInfo(dj.Imported):
             # Frame per second
             try:
                 fps = 1000 / nd2_file.experiment[0].parameters.periods[0].periodDiff.avg
-            except:
+            except:  # noqa: E722
                 fps = 1000 / nd2_file.experiment[0].parameters.periodDiff.avg
 
             # Estimate ND2 file scan duration
@@ -505,7 +505,7 @@ class ScanInfo(dj.Imported):
                     else "%m/%d/%Y %H:%M:%S",
                 )
                 scan_datetime = datetime.strftime(scan_datetime, "%Y-%m-%d %H:%M:%S")
-            except:
+            except:  # noqa: E722
                 scan_datetime = None
 
             # Insert in ScanInfo
@@ -557,24 +557,24 @@ class ScanInfo(dj.Imported):
             from element_interface import prairieviewreader
 
             scan_filepaths = get_prairieview_files(key)
-            pvscan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
+            PVScan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
             self.insert1(
                 dict(
                     key,
-                    nfields=pvscan_info["num_fields"],
-                    nchannels=pvscan_info["num_channels"],
-                    ndepths=pvscan_info["num_planes"],
-                    nframes=pvscan_info["num_frames"],
-                    nrois=pvscan_info["num_rois"],
-                    x=pvscan_info["x_pos"],
-                    y=pvscan_info["y_pos"],
-                    z=pvscan_info["z_pos"],
-                    fps=pvscan_info["frame_rate"],
-                    bidirectional=pvscan_info["bidirectional"],
-                    bidirectional_z=pvscan_info["bidirectional_z"],
-                    usecs_per_line=pvscan_info["usecs_per_line"],
-                    scan_datetime=pvscan_info["scan_datetime"],
-                    scan_duration=pvscan_info["scan_duration"],
+                    nfields=PVScan_info["num_fields"],
+                    nchannels=PVScan_info["num_channels"],
+                    ndepths=PVScan_info["num_planes"],
+                    nframes=PVScan_info["num_frames"],
+                    nrois=PVScan_info["num_rois"],
+                    x=PVScan_info["x_pos"],
+                    y=PVScan_info["y_pos"],
+                    z=PVScan_info["z_pos"],
+                    fps=PVScan_info["frame_rate"],
+                    bidirectional=PVScan_info["bidirectional"],
+                    bidirectional_z=PVScan_info["bidirectional_z"],
+                    usecs_per_line=PVScan_info["usecs_per_line"],
+                    scan_datetime=PVScan_info["scan_datetime"],
+                    scan_duration=PVScan_info["scan_duration"],
                 )
             )
 
@@ -582,17 +582,17 @@ class ScanInfo(dj.Imported):
                 dict(
                     key,
                     field_idx=plane_idx,
-                    px_height=pvscan_info["height_in_pixels"],
-                    px_width=pvscan_info["width_in_pixels"],
-                    um_height=pvscan_info["height_in_um"],
-                    um_width=pvscan_info["width_in_um"],
-                    field_x=pvscan_info["fieldX"],
-                    field_y=pvscan_info["fieldY"],
-                    field_z=pvscan_info["fieldZ"]
-                    if pvscan_info["num_planes"] == 1
-                    else pvscan_info["fieldZ"][plane_idx],
+                    px_height=PVScan_info["height_in_pixels"],
+                    px_width=PVScan_info["width_in_pixels"],
+                    um_height=PVScan_info["height_in_um"],
+                    um_width=PVScan_info["width_in_um"],
+                    field_x=PVScan_info["fieldX"],
+                    field_y=PVScan_info["fieldY"],
+                    field_z=PVScan_info["fieldZ"]
+                    if PVScan_info["num_planes"] == 1
+                    else PVScan_info["fieldZ"][plane_idx],
                 )
-                for plane_idx in range(pvscan_info["num_planes"])
+                for plane_idx in range(PVScan_info["num_planes"])
             )
         else:
             raise NotImplementedError(

@@ -1,6 +1,9 @@
+from typing import Tuple
+
 import numpy as np
-from matplotlib import colors
 import plotly.graph_objects as go
+from matplotlib import colors
+
 from .. import scan
 
 
@@ -23,7 +26,7 @@ def mask_overlayed_image(
     return image, maskid_image
 
 
-def get_tracelayout(key, width=600, height=600):
+def get_tracelayout(key, width=600, height=600) -> dict:
     """Returns a dictionary of layout settings for the trace figures."""
     text = f"Trace for Cell {key['mask']}" if isinstance(key, dict) else "Trace"
 
@@ -97,7 +100,7 @@ def get_tracelayout(key, width=600, height=600):
     )
 
 
-def figure_data(imaging, segmentation_key):
+def figure_data(imaging, segmentation_key) -> Tuple(np.array, np.array):
     """Prepare the images for a given segmentation_key.
 
     Args:
@@ -126,7 +129,7 @@ def figure_data(imaging, segmentation_key):
     return background_with_cells, cells_maskid_image
 
 
-def plot_cell_overlayed_image(imaging, segmentation_key):
+def plot_cell_overlayed_image(imaging, segmentation_key) -> go.Figure:
     """_summary_
 
     Args:
@@ -168,7 +171,7 @@ def plot_cell_overlayed_image(imaging, segmentation_key):
     return image_fig
 
 
-def plot_cell_traces(imaging, cell_key):
+def plot_cell_traces(imaging, cell_key) -> go.Figure:
     """Prepare plotly trace figure.
 
     Args:

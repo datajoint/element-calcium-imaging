@@ -7,24 +7,10 @@ https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 import mkdocs_gen_files
 from pathlib import Path
 import os
-import subprocess
 
 package = os.getenv("PACKAGE")
 
 element = package.split("_", 1)[1]
-if not Path(f"workflow_{element}").is_dir():
-    try:
-        subprocess.run(
-            f"git clone https://github.com/tdincer/workflow-{element.replace('_','-')}.git /main/delete".split(
-                " "
-            ),
-            check=True,
-            timeout=5,
-        )
-        os.system(f"mv /main/delete/workflow_{element} /main/")
-        os.system("rm -fR /main/delete")
-    except subprocess.CalledProcessError:
-        pass  # no repo found
 
 nav = mkdocs_gen_files.Nav()
 for path in sorted(Path(package).glob("**/*.py")) + sorted(
