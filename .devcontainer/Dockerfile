@@ -15,7 +15,7 @@ ENV GITHUB_USER datajoint
 # CAIMAN NOTES - M1 had issues with: apt-get install ffmpeg libhdf5-dev -y && \
 # CONDA EITHER MISSING ITSEMF OR CANNOT FIND: z5py, tensorflow
 # ND2 PIP INSTALLATION: cannot find 'libaec.h' or 'Nd2ReadSdk.h'
-#   installation of imagecodecs resolves the former
+#   installation of imagecodecs resolves the former, not always the latter
 
 RUN \
     echo "--- DATAJOINT ---" && \
