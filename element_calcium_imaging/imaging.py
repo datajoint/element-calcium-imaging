@@ -1598,8 +1598,8 @@ class PostProcessingQualityMetrics(dj.Computed):
         self.insert1(key)
 
         roundnesses = np.empty(len(mask_xpixs))
-        for i, (mask_xpix, mask_xpix) in enumerate(zip(mask_xpixs, mask_ypixs)):
-            eigen_values = np.linalg.eig(np.cov(mask_xpix, mask_xpix))[0]
+        for i, (mask_xpix, mask_ypix) in enumerate(zip(mask_xpixs, mask_ypixs)):
+            eigen_values = np.linalg.eig(np.cov(mask_xpix, mask_ypix))[0]
             roundnesses[i] = eigen_values.sum() / (2 * np.max(eigen_values))
 
         self.MaskMetrics.insert(
