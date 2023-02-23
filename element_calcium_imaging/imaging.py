@@ -1556,6 +1556,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         -> Segmentation.Mask
         ---
         mask_area: float  # Mask area in square micromete. Stringer & Pachitariu (2019).
+        roundness: float  # Roundness between 0 and 1, closer to 1 the rounder. Tegtmeier et al. (2018).
         """
 
     class FluorescenceTraceMetrics(dj.Part):
@@ -1571,6 +1572,8 @@ class PostProcessingQualityMetrics(dj.Computed):
         from scipy.stats import skew
 
         (
+            mask_xpixs,
+            mask_ypixs,
             fluorescence,
             fluo_channels,
             mask_ids,
@@ -1580,6 +1583,8 @@ class PostProcessingQualityMetrics(dj.Computed):
             um_height,
             um_width,
         ) = (Segmentation.Mask * scan.ScanInfo.Field * Fluorescence.Trace & key).fetch(
+            "mask_xpix",
+            "mask_ypix",
             "fluorescence",
             "fluo_channel",
             "mask",
@@ -1591,12 +1596,19 @@ class PostProcessingQualityMetrics(dj.Computed):
         )
 
         self.insert1(key)
+
+        roundnesses = np.empty(len(mask_xpixs))
+        for i, (mx, my) in enumerate(zip(mask_xpixs, mask_ypixs)):
+            eigen_values = np.linalg.eig(np.cov(mx, my))[0]
+            roundnesses[i] = eigen_values.sum() / (2 * np.max(eigen_values))
+
         self.MaskMetrics.insert(
             [
-                dict(**key, mask=mask_id, mask_area=mask_area)
-                for mask_id, mask_area in zip(
+                dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
+                for mask_id, mask_area, roundness in zip(
                     mask_ids,
                     mask_npix * (um_height / px_height) * (um_width / px_width),
+                    roundnesses,
                 )
             ]
         )
