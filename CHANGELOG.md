@@ -7,6 +7,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 + Add - spelling, markdown, and pre-commit config files
 + Add - Notebook rendering to docs
++ Bugfix - Typing format
 
 ## [0.5.2] - 2023-01-11
 
