@@ -1574,6 +1574,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         (
             mask_xpixs,
             mask_ypixs,
+            mask_weights,
             fluorescence,
             fluo_channels,
             mask_ids,
@@ -1585,6 +1586,7 @@ class PostProcessingQualityMetrics(dj.Computed):
         ) = (Segmentation.Mask * scan.ScanInfo.Field * Fluorescence.Trace & key).fetch(
             "mask_xpix",
             "mask_ypix",
+            "mask_weights",
             "fluorescence",
             "fluo_channel",
             "mask",
@@ -1598,8 +1600,12 @@ class PostProcessingQualityMetrics(dj.Computed):
         self.insert1(key)
 
         roundnesses = np.empty(len(mask_xpixs))
-        for i, (mask_xpix, mask_ypix) in enumerate(zip(mask_xpixs, mask_ypixs)):
-            eigen_values = np.linalg.eigvals(np.cov(mask_xpix, mask_ypix))
+        for i, (mask_xpix, mask_ypix, mask_weight) in enumerate(
+            zip(mask_xpixs, mask_ypixs, mask_weights)
+        ):
+            eigen_values = np.linalg.eigvals(
+                np.cov(mask_xpix, mask_ypix, aweights=mask_weight)
+            )
             roundnesses[i] = eigen_values.mean() / eigen_values.max()
 
         self.MaskMetrics.insert(
