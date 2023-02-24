@@ -1,0 +1,4 @@
+djarchive-client @ git+https://github.com/datajoint/djarchive-client.git
+pytest
+pytest-cov
+shutils

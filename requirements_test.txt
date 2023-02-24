@@ -1,4 +1,0 @@
-pytest
-pytest-cov
-djarchive-client @ git+https://github.com/datajoint/djarchive-client.git
-shutils

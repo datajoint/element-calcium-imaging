@@ -1,21 +1,24 @@
-import sys
 import pathlib
+import sys
+
+from element_interface.utils import find_full_path, find_root_directory
+
 from . import (
-    dj_config,
-    pipeline,
-    test_data,
-    subjects_csv,
-    ingest_subjects,
-    sessions_csv,
-    ingest_sessions,
-    testdata_paths,
-    suite2p_paramset,
     caiman2D_paramset,
     caiman3D_paramset,
-    scan_info,
-    processing_tasks,
-    processing,
     curations,
+    dj_config,
+    ingest_sessions,
+    ingest_subjects,
+    pipeline,
+    processing,
+    processing_tasks,
+    scan_info,
+    sessions_csv,
+    subjects_csv,
+    suite2p_paramset,
+    test_data,
+    testdata_paths,
 )
 
 
@@ -33,63 +36,56 @@ def test_ingest_sessions(pipeline, sessions_csv, ingest_sessions):
     assert len(scan.Scan()) == 5
 
     sessions, _ = sessions_csv
-    sess = sessions.iloc[4]
-    sess_dir = pathlib.Path(sess.session_dir).relative_to(get_imaging_root_data_dir())
-    assert (session.SessionDirectory & {"subject": sess.name}).fetch1(
+    sess_dir_full = sessions.iloc[4].session_dir
+    sess_dir_root = find_root_directory(get_imaging_root_data_dir(), sess_dir_full)
+    assert (session.SessionDirectory & {"subject": sessions.iloc[4].name}).fetch1(
         "session_dir"
-    ) == sess_dir.as_posix()
+    ) == str(sess_dir_full.relative_to(sess_dir_root))
 
 
 def test_find_valid_full_path(pipeline, sessions_csv):
-    from element_interface.utils import find_full_path
-
     get_imaging_root_data_dir = pipeline["get_imaging_root_data_dir"]
 
     # add more options for root directories
     if sys.platform == "win32":
-        ephys_root_data_dir = [get_imaging_root_data_dir(), "J:/", "M:/"]
+        imaging_root_data_dirs = get_imaging_root_data_dir() + ["J:/", "M:/"]
     else:
-        ephys_root_data_dir = [get_imaging_root_data_dir(), "mnt/j", "mnt/m"]
+        imaging_root_data_dirs = get_imaging_root_data_dir() + ["mnt/j", "mnt/m"]
 
     # test: providing relative-path: correctly search for the full-path
     sessions, _ = sessions_csv
-    sess = sessions.iloc[0]
-    session_full_path = pathlib.Path(sess.session_dir)
+    sess_dir_full = sessions.iloc[0].session_dir
+    sess_dir_root = find_root_directory(get_imaging_root_data_dir(), sess_dir_full)
+    sess_dir_rel = sess_dir_full.relative_to(sess_dir_root)
+    full_path = find_full_path(imaging_root_data_dirs, sess_dir_rel)
 
-    rel_path = pathlib.Path(session_full_path).relative_to(
-        pathlib.Path(get_imaging_root_data_dir())
-    )
-    full_path = find_full_path(ephys_root_data_dir, rel_path)
-
-    assert full_path == session_full_path
+    assert full_path == sess_dir_full
 
 
 def test_find_root_directory(pipeline, sessions_csv):
-    from element_interface.utils import find_root_directory
-
     get_imaging_root_data_dir = pipeline["get_imaging_root_data_dir"]
 
     # add more options for root directories
     if sys.platform == "win32":
-        ephys_root_data_dir = [get_imaging_root_data_dir(), "J:/", "M:/"]
+        imaging_root_data_dirs = get_imaging_root_data_dir() + ["J:/", "M:/"]
     else:
-        ephys_root_data_dir = [get_imaging_root_data_dir(), "mnt/j", "mnt/m"]
+        imaging_root_data_dirs = get_imaging_root_data_dir() + ["mnt/j", "mnt/m"]
 
     # test: providing full-path: correctly search for the root_dir
     sessions, _ = sessions_csv
-    sess = sessions.iloc[0]
-    session_full_path = pathlib.Path(sess.session_dir)
+    sess_dir_full = sessions.iloc[0].session_dir
+    sess_dir_root = find_root_directory(get_imaging_root_data_dir(), sess_dir_full)
 
-    root_dir = find_root_directory(ephys_root_data_dir, session_full_path)
+    test_root_dir = find_root_directory(imaging_root_data_dirs, sess_dir_full)
 
-    assert root_dir == get_imaging_root_data_dir()
+    assert test_root_dir == sess_dir_root
 
 
 def test_paramset_insert(
     suite2p_paramset, caiman2D_paramset, caiman3D_paramset, pipeline
 ):
     imaging = pipeline["imaging"]
-    from element_calcium_imaging.imaging import dict_to_uuid
+    from element_interface.utils import dict_to_uuid
 
     method, desc, paramset_hash = (
         imaging.ProcessingParamSet & {"paramset_idx": 0}

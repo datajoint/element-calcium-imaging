@@ -1,12 +1,15 @@
-# run tests: pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging -p no:warnings
+# run tests: pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings
 
 import os
-import pytest
 import pathlib
+import sys
+from contextlib import nullcontext
+
+import datajoint as dj
 import numpy as np
 import pandas as pd
-import datajoint as dj
-from workflow_calcium_imaging.paths import get_imaging_root_data_dir
+import pytest
+from element_interface.utils import find_full_path, find_root_directory
 
 # ------------------- SOME CONSTANTS -------------------
 
@@ -25,6 +28,29 @@ sessions_dirs = [
 
 is_multi_scan_processing = False
 
+verbose = False
+
+logger = dj.logger
+
+# ------------------ GENERAL FUCNTION ------------------
+
+
+class QuietStdOut:
+    """If verbose set to false, used to quiet tear_down table.delete prints"""
+
+    def __enter__(self):
+        logger.setLevel("ERROR")
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, "w")
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logger.setLevel("INFO")
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
+
+
+verbose_context = nullcontext() if verbose else QuietStdOut()
+
 # ------------------- FIXTURES -------------------
 
 
@@ -33,25 +59,56 @@ def dj_config():
     if pathlib.Path("./dj_local_conf.json").exists():
         dj.config.load("./dj_local_conf.json")
     dj.config["safemode"] = False
+
+    environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
+    if environ_root and not isinstance(environ_root, list):
+        environ_root = list(environ_root)
+    config_root = dj.config["custom"]["imaging_root_data_dir"]
+    if not isinstance(config_root, list):
+        config_root = list(config_root)
+
     dj.config["custom"] = {
         "database.prefix": (
             os.environ.get("DATABASE_PREFIX") or dj.config["custom"]["database.prefix"]
         ),
-        "imaging_root_data_dir": (
-            os.environ.get("IMAGING_ROOT_DATA_DIR")
-            or dj.config["custom"]["imaging_root_data_dir"]
-        ),
+        "imaging_root_data_dir": (environ_root or config_root),
     }
     return
 
 
+@pytest.fixture
+def pipeline():
+    with verbose_context:
+        print("\n")
+        from workflow_calcium_imaging import paths, pipeline
+
+    global is_multi_scan_processing
+    is_multi_scan_processing = (
+        "processing_task_id" in pipeline.imaging.ProcessingTask.heading.names
+    )
+
+    yield {
+        "subject": pipeline.subject,
+        "lab": pipeline.lab,
+        "imaging": pipeline.imaging,
+        "scan": pipeline.scan,
+        "session": pipeline.session,
+        "Equipment": pipeline.Equipment,
+        "get_imaging_root_data_dir": paths.get_imaging_root_data_dir,
+    }
+
+    if _tear_down:
+        with verbose_context:
+            pipeline.subject.Subject.delete()
+
+
 @pytest.fixture(autouse=True)
-def test_data(dj_config):
-    test_data_dir = pathlib.Path(dj.config["custom"]["imaging_root_data_dir"])
-
-    test_data_exists = np.all([(test_data_dir / p).exists() for p in sessions_dirs])
-
-    if not test_data_exists:
+def test_data(dj_config, pipeline):
+    root_dirs = pipeline["get_imaging_root_data_dir"]
+    try:
+        _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
+    except FileNotFoundError:
+        test_data_dir = "/main/test_data/"
         try:
             dj.config["custom"].update(
                 {
@@ -76,41 +133,19 @@ def test_data(dj_config):
             )
 
         import djarchive_client
+
         from workflow_calcium_imaging import version
 
         client = djarchive_client.client()
         workflow_version = version.__version__
 
         client.download(
-            "workflow-calcium-ephys-test-set",
+            "workflow-calcium-imaging-test-set",
             workflow_version.replace(".", "_"),
             str(test_data_dir),
             create_target=False,
         )
     return
-
-
-@pytest.fixture
-def pipeline():
-    from workflow_calcium_imaging import pipeline
-
-    global is_multi_scan_processing
-    is_multi_scan_processing = (
-        "processing_task_id" in pipeline.imaging.ProcessingTask.heading.names
-    )
-
-    yield {
-        "subject": pipeline.subject,
-        "lab": pipeline.lab,
-        "imaging": pipeline.imaging,
-        "scan": pipeline.scan,
-        "session": pipeline.session,
-        "Equipment": pipeline.Equipment,
-        "get_imaging_root_data_dir": pipeline.get_imaging_root_data_dir,
-    }
-
-    if _tear_down:
-        pipeline.subject.Subject.delete()
 
 
 @pytest.fixture
@@ -136,7 +171,8 @@ def subjects_csv():
     yield input_subjects, subjects_csv_path
 
     if _tear_down:
-        subjects_csv_path.unlink()  # delete csv file after use
+        with verbose_context:
+            subjects_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
@@ -144,14 +180,15 @@ def ingest_subjects(pipeline, subjects_csv):
     from workflow_calcium_imaging.ingest import ingest_subjects
 
     _, subjects_csv_path = subjects_csv
-    ingest_subjects(subjects_csv_path)
+    with verbose_context:
+        ingest_subjects(subjects_csv_path)
     return
 
 
 @pytest.fixture
-def sessions_csv(test_data):
+def sessions_csv(test_data, pipeline):
     """Create a 'sessions.csv' file"""
-    root_dir = pathlib.Path(get_imaging_root_data_dir())
+    root_dirs = pipeline["get_imaging_root_data_dir"]
 
     input_sessions = pd.DataFrame(columns=["subject", "session_dir"])
     input_sessions.subject = [
@@ -162,7 +199,7 @@ def sessions_csv(test_data):
         "subject3",
     ]
     input_sessions.session_dir = [
-        (root_dir / sess_dir).as_posix() for sess_dir in sessions_dirs
+        find_full_path(root_dirs(), sess_dir) for sess_dir in sessions_dirs
     ]
     input_sessions = input_sessions.set_index("subject")
 
@@ -172,7 +209,8 @@ def sessions_csv(test_data):
     yield input_sessions, sessions_csv_path
 
     if _tear_down:
-        sessions_csv_path.unlink()  # delete csv file after use
+        with verbose_context:
+            sessions_csv_path.unlink()  # delete csv file after use
 
 
 @pytest.fixture
@@ -180,7 +218,8 @@ def ingest_sessions(ingest_subjects, sessions_csv):
     from workflow_calcium_imaging.ingest import ingest_sessions
 
     _, sessions_csv_path = sessions_csv
-    ingest_sessions(sessions_csv_path)
+    with verbose_context:
+        ingest_sessions(sessions_csv_path)
     return
 
 
@@ -277,7 +316,8 @@ def suite2p_paramset(pipeline):
     yield params_suite2p
 
     if _tear_down:
-        (imaging.ProcessingParamSet & "paramset_idx = 0").delete()
+        with verbose_context:
+            (imaging.ProcessingParamSet & "paramset_idx = 0").delete()
 
 
 @pytest.fixture
@@ -484,7 +524,8 @@ def caiman2D_paramset(pipeline):
     yield params_caiman_2d
 
     if _tear_down:
-        (imaging.ProcessingParamSet & "paramset_idx = 1").delete()
+        with verbose_context:
+            (imaging.ProcessingParamSet & "paramset_idx = 1").delete()
 
 
 @pytest.fixture
@@ -691,7 +732,8 @@ def caiman3D_paramset(pipeline):
     yield params_caiman_3d
 
     if _tear_down:
-        (imaging.ProcessingParamSet & "paramset_idx = 2").delete()
+        with verbose_context:
+            (imaging.ProcessingParamSet & "paramset_idx = 2").delete()
 
 
 @pytest.fixture
@@ -703,7 +745,8 @@ def scan_info(pipeline, ingest_sessions):
     yield
 
     if _tear_down:
-        scan.ScanInfo.delete()
+        with verbose_context:
+            scan.ScanInfo.delete()
 
 
 @pytest.fixture
@@ -716,14 +759,14 @@ def processing_tasks(
     scan = pipeline["scan"]
     session = pipeline["session"]
     get_imaging_root_data_dir = pipeline["get_imaging_root_data_dir"]
-    root_dir = pathlib.Path(get_imaging_root_data_dir())
+    root_dirs = get_imaging_root_data_dir()
 
     if is_multi_scan_processing:
         for session_key in (
             session.Session & scan.ScanInfo - imaging.ProcessingTask
         ).fetch("KEY"):
-            scan_file = (
-                root_dir / (scan.ScanInfo.ScanFile & session_key).fetch("file_path")[0]
+            scan_file = find_full_path(
+                root_dirs, (scan.ScanInfo.ScanFile & session_key).fetch("file_path")[0]
             )
             recording_dir = scan_file.parent
             # suite2p
@@ -761,8 +804,8 @@ def processing_tasks(
         for scan_key in (scan.Scan & scan.ScanInfo - imaging.ProcessingTask).fetch(
             "KEY"
         ):
-            scan_file = (
-                root_dir / (scan.ScanInfo.ScanFile & scan_key).fetch("file_path")[0]
+            scan_file = find_full_path(
+                root_dirs, (scan.ScanInfo.ScanFile & scan_key).fetch("file_path")[0]
             )
             recording_dir = scan_file.parent
             # suite2p
@@ -790,7 +833,8 @@ def processing_tasks(
     yield
 
     if _tear_down:
-        imaging.ProcessingTask.delete()
+        with verbose_context:
+            imaging.ProcessingTask.delete()
 
 
 @pytest.fixture
@@ -798,11 +842,14 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
     """Triggers suite2p pipeline on subject1 data"""
     imaging = pipeline["imaging"]
     scan = pipeline["scan"]
+    get_imaging_root_data_dir = pipeline["get_imaging_root_data_dir"]
 
     # This is to use 1 tif out of 2 - So do not change this to fetch1("KEY")!!!
     key = (scan.ScanInfo * imaging.ProcessingParamSet & "subject='subject1'").fetch(
         "KEY"
     )[0]
+    subj1_fullpath = find_full_path(get_imaging_root_data_dir(), sessions_dirs[1])
+    subj1_root = find_root_directory(get_imaging_root_data_dir(), subj1_fullpath)
 
     newkey = key.copy()
     newkey["session_datetime"] = newkey["session_datetime"].strftime("%Y%m%dT%H%M%S")
@@ -811,44 +858,50 @@ def trigger_processing_suite2p_2D(pipeline, suite2p_paramset, scan_info):
         {**key, "processing_output_dir": output_dir, "task_mode": "trigger"}
     )
     try:
-        os.makedirs(get_imaging_root_data_dir() / output_dir)
+        os.makedirs(subj1_root / output_dir)
     except OSError as error:
         print(error)
 
-    imaging.Processing.populate(key)
+    with verbose_context:
+        imaging.Processing.populate(key)
 
     yield
 
     if _tear_down:
-        (imaging.ProcessingTask & key).delete()
-        (imaging.Processing & key).delete()
+        with verbose_context:
+            (imaging.ProcessingTask & key).delete()
+            (imaging.Processing & key).delete()
 
 
 @pytest.fixture
 def processing(processing_tasks, pipeline):
     imaging = pipeline["imaging"]
 
-    errors = imaging.Processing.populate(suppress_errors=True)
-
-    if errors:
-        print(
-            f'Populate ERROR: {len(errors)} errors in "imaging.Processing.populate()" - {errors[0][-1]}'
-        )
+    with verbose_context:
+        errors = imaging.Processing.populate(suppress_errors=True)
+        if errors:
+            print(
+                f"Populate ERROR: {len(errors)} errors in "
+                + f'"imaging.Processing.populate()" - {errors[0][-1]}'
+            )
 
     yield
 
     if _tear_down:
-        imaging.Processing.delete()
+        with verbose_context:
+            imaging.Processing.delete()
 
 
 @pytest.fixture
 def curations(processing, pipeline):
     imaging = pipeline["imaging"]
 
-    for key in (imaging.Processing - imaging.Curation).fetch("KEY"):
-        imaging.Curation().create1_from_processing_task(key)
+    with verbose_context:
+        for key in (imaging.Processing - imaging.Curation).fetch("KEY"):
+            imaging.Curation().create1_from_processing_task(key)
 
     yield
 
     if _tear_down:
-        imaging.Curation.delete()
+        with verbose_context:
+            imaging.Curation.delete()

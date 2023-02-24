@@ -40,7 +40,7 @@ from workflow_calcium_imaging.pipeline import session, imaging, trial, event, an
 # - A block is a continuous phase of an experiment that contains repeated instances of a condition, or trials. 
 # - Events may occur within or outside of conditions, either instantaneous or continuous.
 #
-# The diagram below shows (a) the levels of hierarchy and (b) how the bounds may not completely overlap. A block may not fully capure trials and events may occur outside both blocks/trials.
+# The diagram below shows (a) the levels of hierarchy and (b) how the bounds may not completely overlap. A block may not fully capture trials and events may occur outside both blocks/trials.
 
 # ```
 # |----------------------------------------------------------------------------|
