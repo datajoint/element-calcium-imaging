@@ -688,8 +688,13 @@ class ScanQualityMetrics(dj.Computed):
 
             quantalsize_results = compute_quantal_size(scan)
             middle_frame = scan.shape[0] // 2
+            HALF_SHIFT = 250
+            HALF_SHIFT = min(HALF_SHIFT, middle_frame)
             quantal_frame = (
-                np.mean(scan[max(middle_frame - 250, 0) : middle_frame + 250], axis=0)
+                np.mean(
+                    scan[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
+                    axis=0,
+                )
                 - quantalsize_results["zero_level"]
             ) / quantalsize_results["quantal_size"]
 
