@@ -1,0 +1,35 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+{
+	"name": "Development",
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+	// https://containers.dev/features
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {},
+		"ghcr.io/guiyomh/features/vim:0": {}
+	},
+	// "onCreateCommand": "pip install -e .",
+	"postStartCommand": "MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait && s3fs djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2 /home/vscode/example_data -o multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "4gb"
+	},
+	"forwardPorts": [
+		3306,
+		8080
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python"
+			]
+		}
+	}
+}
