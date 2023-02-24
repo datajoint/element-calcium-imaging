@@ -655,48 +655,48 @@ class ScanQualityMetrics(dj.Computed):
             if acq_software == "ScanImage":
                 import scanreader
 
-                scan = scanreader.read_scan(get_scan_image_files(key))[
+                movie = scanreader.read_scan(get_scan_image_files(key))[
                     key["field_idx"], :, :, channel, :
                 ].transpose(2, 0, 1)
             elif acq_software == "Scanbox":
                 import sbxreader
 
-                scan = sbxreader(get_scan_box_files(key))[
+                movie = sbxreader(get_scan_box_files(key))[
                     :, key["field_idx"], channel, :, :
                 ]
             elif acq_software == "NIS":
                 import nd2
 
-                scan = nd2.ND2File(get_nd2_files(key)[0]).asarray()
+                movie = nd2.ND2File(get_nd2_files(key)[0]).asarray()
 
-            flat_scan = scan.reshape(scan.shape[0], -1)
+            flat_movie = movie.reshape(movie.shape[0], -1)
 
             self.FrameMetrics.insert1(
                 dict(
-                    **key,
+                    key,
                     channel=channel,
-                    min_intensity=flat_scan.min(-1),
-                    mean_intensity=flat_scan.mean(-1),
-                    max_intensity=flat_scan.max(-1),
-                    contrast=np.diff(np.percentile(flat_scan, [1, 99], axis=1), axis=0)[
-                        0
-                    ],
+                    min_intensity=flat_movie.min(-1),
+                    mean_intensity=flat_movie.mean(-1),
+                    max_intensity=flat_movie.max(-1),
+                    contrast=np.diff(
+                        np.percentile(flat_movie, [1, 99], axis=1), axis=0
+                    )[0],
                 )
             )
 
-            quantalsize_results = compute_quantal_size(scan)
-            middle_frame = scan.shape[0] // 2
+            quantalsize_results = compute_quantal_size(movie)
+            middle_frame = movie.shape[0] // 2
             HALF_SHIFT = 250
             HALF_SHIFT = min(HALF_SHIFT, middle_frame)
             quantal_frame = (
                 np.mean(
-                    scan[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
+                    movie[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
                     axis=0,
                 )
                 - quantalsize_results["zero_level"]
             ) / quantalsize_results["quantal_size"]
 
-            self.QuantalSize.insert(
+            self.QuantalSize.insert1(
                 dict(
                     **key,
                     channel=channel,
