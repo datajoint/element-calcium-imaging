@@ -1545,7 +1545,7 @@ class Activity(dj.Computed):
 
 
 @schema
-class PostProcessingQualityMetrics(dj.Computed):
+class ProcessingQualityMetrics(dj.Computed):
     definition = """
     -> Segmentation
     """
