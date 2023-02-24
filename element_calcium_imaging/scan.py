@@ -651,6 +651,8 @@ class ScanQualityMetrics(dj.Computed):
             "acq_software", "nchannels"
         )
 
+        self.insert1(key)
+
         for channel in range(nchannels):
             if acq_software == "ScanImage":
                 import scanreader
