@@ -624,10 +624,10 @@ class ScanQualityMetrics(dj.Computed):
         -> master
         channel: int
         ---
-        min_intensity: longblob    # Minimum value of each frame
+        min_intensity: longblob   # Minimum value of each frame
         mean_intensity: longblob  # Mean value at each frame
-        max_intensity: longblob    # Maximum value at each frame
-        constrast: longblob       # Contrast of each frame, difference of 99 and 1 percentiles.
+        max_intensity: longblob   # Maximum value at each frame
+        contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
         """
 
     class QuantalSize(dj.Part):
