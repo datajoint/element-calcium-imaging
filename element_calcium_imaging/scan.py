@@ -687,6 +687,12 @@ class ScanQualityMetrics(dj.Computed):
             )
 
             quantalsize_results = compute_quantal_size(scan)
+            middle_frame = scan.shape[0] // 2
+            quantal_frame = (
+                np.mean(scan[max(middle_frame - 250, 0) : middle_frame + 250], axis=0)
+                - quantalsize_results["zero_level"]
+            ) / quantalsize_results["quantal_size"]
+
             self.QuantalSize.insert(
                 dict(
                     **key,
@@ -695,6 +701,6 @@ class ScanQualityMetrics(dj.Computed):
                     max_intensity=quantalsize_results["max_intensity"],
                     quantal_size=quantalsize_results["quantal_size"],
                     zero_level=quantalsize_results["zero_level"],
-                    quantal_frame="",  # I need to understand this.
+                    quantal_frame=quantal_frame,
                 )
             )
