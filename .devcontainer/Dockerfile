@@ -42,7 +42,7 @@ RUN \
         pip install Pygments==2.14.0  && \
         git clone https://github.com/datajoint/CaImAn.git  && \
         pip install -r ./CaImAn/requirements.txt  && \
-        pip install ./CaImAn --use-feature=in-tree-build  && \
+        pip install ./CaImAn && \
         rm -rf /tmp/CaImAn; \
     fi && \
     if [ ! conda -v ]; then \
