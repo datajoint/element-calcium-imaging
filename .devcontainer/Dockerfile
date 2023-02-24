@@ -9,7 +9,7 @@ ENV DJ_PASS simple
 # --- ELEMENT OPTIONS --
 ENV ELEMENT calcium-imaging
 ENV INSTALL_EDITABLE true
-ENV INSTALL_CAIMAN false
+ENV INSTALL_CAIMAN true
 ENV GITHUB_USER datajoint
 
 # CAIMAN NOTES - M1 had issues with: apt-get install ffmpeg libhdf5-dev -y && \
@@ -39,11 +39,11 @@ RUN \
     fi && \
     if [ $INSTALL_CAIMAN = true ]; then \
         echo "--- CAIMAN ---" && \
-        /bin/bash -c 'conda install -n base -c conda-forge -c anaconda -y mamba' && \
-        git clone --branch master https://github.com/datajoint-company/CaImAn /workspaces/CaImAn/ || true && \
-        /bin/bash -c 'conda update --all -y' && \
-        /bin/bash -c 'conda env update -n base -f /workspaces/CaImAn/environment-minimal.yml' || true && \
-        pip install cython && pip install /workspaces/CaImAn/ && pip install numpy==1.21; \
+        pip install Pygments==2.14.0  && \
+        git clone https://github.com/datajoint/CaImAn.git  && \
+        pip install -r ./CaImAn/requirements.txt  && \
+        pip install ./CaImAn --use-feature=in-tree-build  && \
+        rm -rf /tmp/CaImAn; \
     fi && \
     if [ ! conda -v ]; then \
         echo "--- NO CONDA ---";\
