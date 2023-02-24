@@ -1,0 +1,17 @@
+# MYSQL_VER=8.0 docker compose up --build
+version: "2.4"
+services:
+  db:
+    image: datajoint/mysql:${MYSQL_VER}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DJ_PASS}
+    ports:
+      - "3306:3306"
+    # To persist MySQL data
+    # volumes:
+    #   - ./mysql/data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 15s
+      retries: 5
+      interval: 15s

@@ -13,39 +13,22 @@
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {},
-		"ghcr.io/guiyomh/features/vim:0": {},
-		// CONDA ISSUES WITH M1. https://github.com/jroes/streamlit-getting-started-m1/
-		"ghcr.io/rocker-org/devcontainer-features/miniforge:1": {}
+		"ghcr.io/guiyomh/features/vim:0": {}
 	},
 	// "onCreateCommand": "pip install -e .",
-	"postStartCommand": "MYSQL_VER=8.0 MINIO_VER=RELEASE.2022-08-11T04-37-28Z docker compose -f ./.devcontainer/local-docker-compose.yaml down && MYSQL_VER=8.0 MINIO_VER=RELEASE.2022-08-11T04-37-28Z docker compose -f ./.devcontainer/local-docker-compose.yaml up --build --wait",
+	"postStartCommand": "MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait && s3fs djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2 /home/vscode/example_data -o multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "4gb"
+	},
 	"forwardPorts": [
-		80,
-		443,
 		3306,
-		8080,
-		9000
+		8080
 	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-python.python",
-				"ms-python.black-formatter",
-				"streetsidesoftware.code-spell-checker",
-				"ms-toolsai.jupyter"
-			],
-			"python.formatting.provider": "none",
-			"black-formatter.args": [
-				"--line-length=88"
-			],
-			"[python]": {
-				"editor.defaultFormatter": "ms-python.black-formatter",
-				"editor.formatOnSave": true
-			},
-			"python.terminal.launchArgs": [
-				"-m",
-				"IPython",
-				"--no-autoindent"
+				"ms-python.python"
 			]
 		}
 	}
