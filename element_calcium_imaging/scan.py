@@ -669,7 +669,27 @@ class ScanQualityMetrics(dj.Computed):
             elif acq_software == "NIS":
                 import nd2
 
-                movie = nd2.ND2File(get_nd2_files(key)[0]).asarray()
+                nd2_file = nd2.ND2File(get_nd2_files(key)[0])
+
+                get_dim_pos = {k: i for i, k in enumerate(nd2_file.sizes)}
+
+                known_fields = ["T", "Z", "C", "Y", "X"]
+                fields_in_data = [x for x in known_fields if x in get_dim_pos]
+                assert len(fields_in_data) == len(
+                    get_dim_pos
+                ), f"Unknown dimension is detected in {get_dim_pos}"
+                movie = nd2_file.asarray().transpose(
+                    [get_dim_pos[x] for x in fields_in_data]
+                )
+
+                if "T" not in fields_in_data:
+                    movie = np.expand_dims(movie, 0)
+                if "Z" not in fields_in_data:
+                    movie = np.expand_dims(movie, 1)
+                if "C" not in fields_in_data:
+                    movie = np.expand_dims(movie, 2)
+
+                movie = movie[:, key["field_idx"], channel, :, :]
 
             flat_movie = movie.reshape(movie.shape[0], -1)
 
