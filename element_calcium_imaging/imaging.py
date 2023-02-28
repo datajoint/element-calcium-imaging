@@ -1555,7 +1555,7 @@ class ProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_area=None: float  # Mask area in square micromete. Stringer & Pachitariu (2019).
+        mask_area=null: float  # Mask area in square micromete. Stringer & Pachitariu (2019).
         roundness: float       # Roundness between 0 and 1, closer to 1 the rounder. Tegtmeier et al. (2018).
         """
 
