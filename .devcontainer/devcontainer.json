@@ -16,7 +16,7 @@
 		"ghcr.io/guiyomh/features/vim:0": {}
 	},
 	// "onCreateCommand": "pip install -e .",
-	"postStartCommand": "MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait && s3fs djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2 /home/vscode/example_data -o multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
+	"postStartCommand": "mkdir -p example_data && s3fs djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2 example_data -o multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1 && MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait",
 	"hostRequirements": {
 		"cpus": 2,
 		"memory": "4gb"
