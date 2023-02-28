@@ -1609,14 +1609,12 @@ class ProcessingQualityMetrics(dj.Computed):
             roundnesses[i] = eigen_values.mean() / eigen_values.max()
 
         self.MaskMetrics.insert(
-            [
-                dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
-                for mask_id, mask_area, roundness in zip(
-                    mask_ids,
-                    mask_npix * (um_height / px_height) * (um_width / px_width),
-                    roundnesses,
-                )
-            ]
+            dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
+            for mask_id, mask_area, roundness in zip(
+                mask_ids,
+                mask_npix * (um_height / px_height) * (um_width / px_width),
+                roundnesses,
+            )
         )
 
         fluorescence = np.stack(fluorescence)
