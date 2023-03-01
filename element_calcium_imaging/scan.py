@@ -671,19 +671,19 @@ class ScanQualityMetrics(dj.Computed):
 
                 nd2_file = nd2.ND2File(get_nd2_files(key)[0])
 
-                get_dim_pos = {k: i for i, k in enumerate(nd2_file.sizes)}
+                nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
                 valid_dimensions = set("TZCYX")
-                assert valid_dimensions == set(get_dim_pos), f"Unknown or missing dimension in {get_dim_pos}"
+                assert valid_dimensions == set(nd2_dims), f"Unknown or missing dimension in {nd2_dims}"
                 movie = nd2_file.asarray().transpose(
-                    [get_dim_pos[x] for x in fields_in_data]
+                    [nd2_dims[x] for x in valid_dimensions]
                 )
 
-                if "T" not in fields_in_data:
+                if "T" not in nd2_dims:
                     movie = np.expand_dims(movie, 0)
-                if "Z" not in fields_in_data:
+                if "Z" not in nd2_dims:
                     movie = np.expand_dims(movie, 1)
-                if "C" not in fields_in_data:
+                if "C" not in nd2_dims:
                     movie = np.expand_dims(movie, 2)
 
                 movie = movie[:, key["field_idx"], channel, :, :]
