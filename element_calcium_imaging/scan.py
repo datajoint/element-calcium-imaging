@@ -719,10 +719,8 @@ class ScanQualityMetrics(dj.Computed):
                 dict(
                     **key,
                     channel=channel,
-                    min_intensity=quantalsize_results["min_intensity"],
-                    max_intensity=quantalsize_results["max_intensity"],
-                    quantal_size=quantalsize_results["quantal_size"],
-                    zero_level=quantalsize_results["zero_level"],
+                    **quantalsize_results,
                     quantal_frame=quantal_frame,
-                )
+                ),
+                ignore_extra_fields=True,
             )

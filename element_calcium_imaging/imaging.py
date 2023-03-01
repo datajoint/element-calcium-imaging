@@ -1546,20 +1546,43 @@ class Activity(dj.Computed):
 
 @schema
 class ProcessingQualityMetrics(dj.Computed):
+    """Quality metrics used to evaluate the results of a calcium imaging analysis pipeline.
+
+    Attributes:
+        Segmentation (foreign key): Primary key from Segmentation.
+    """
+
     definition = """
     -> Segmentation
     """
 
     class MaskMetrics(dj.Part):
+        """Quality metrics used to evaluate the Masks.
+
+        Attributes:
+            ProcessingQualityMetrics (foreign key): Primary key from ProcessingQualityMetrics.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            mask_area (float): Mask area in square micrometer.
+            roundness (float): Roundness between 0 and 1, closer to 1 the rounder.
+
+        """
+
         definition = """
         -> master
         -> Segmentation.Mask
         ---
-        mask_area=null: float  # Mask area in square micromete. Stringer & Pachitariu (2019).
+        mask_area=null: float  # Mask area in square micrometer. Stringer & Pachitariu (2019).
         roundness: float       # Roundness between 0 and 1, closer to 1 the rounder. Tegtmeier et al. (2018).
         """
 
     class FluorescenceTraceMetrics(dj.Part):
+        """Quality metrics used to evaluate the Fluorescence Traces.
+
+        Attributes:
+            skewness (float): Skewness of the Fluorescence trace.
+            variance (float): Variance of the Fluorescence trace.
+        """
+
         definition = """
         -> master
         -> Fluorescence.Trace
@@ -1569,6 +1592,7 @@ class ProcessingQualityMetrics(dj.Computed):
         """
 
     def make(self, key):
+        """Populate the ProcessingQualityMetrics table and its part tables."""
         from scipy.stats import skew
 
         (
