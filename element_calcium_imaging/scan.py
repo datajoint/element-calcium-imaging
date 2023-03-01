@@ -739,7 +739,7 @@ class ScanQualityMetrics(dj.Computed):
 
             self.QuantalSize.insert1(
                 dict(
-                    **key,
+                    key,
                     channel=channel,
                     **quantalsize_results,
                     quantal_frame=quantal_frame,
