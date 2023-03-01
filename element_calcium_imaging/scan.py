@@ -691,18 +691,16 @@ class ScanQualityMetrics(dj.Computed):
 
                 movie = movie[:, key["field_idx"], channel, :, :]
 
-            flat_movie = movie.reshape(movie.shape[0], -1)
-
             self.FrameMetrics.insert1(
                 dict(
                     key,
                     channel=channel,
-                    min_intensity=flat_movie.min(-1),
-                    mean_intensity=flat_movie.mean(-1),
-                    max_intensity=flat_movie.max(-1),
+                    min_intensity=movie.min(axis=(1, 2)),
+                    mean_intensity=movie.mean(axis=(1, 2)),
+                    max_intensity=movie.max(axis=(1, 2)),
                     contrast=np.diff(
-                        np.percentile(flat_movie, [1, 99], axis=1), axis=0
-                    )[0],
+                        np.percentile(movie, [1, 99], axis=(1, 2)), axis=0
+                    ).squeeze()
                 )
             )
 
