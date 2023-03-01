@@ -703,12 +703,9 @@ class ScanQualityMetrics(dj.Computed):
                     [nd2_dims[x] for x in valid_dimensions]
                 )
 
-                if "T" not in nd2_dims:
-                    movie = np.expand_dims(movie, 0)
-                if "Z" not in nd2_dims:
-                    movie = np.expand_dims(movie, 1)
-                if "C" not in nd2_dims:
-                    movie = np.expand_dims(movie, 2)
+                for i, dim in enumerate("TZC"):
+                    if dim not in nd2_dims:
+                        movie = np.expand_dims(movie, i)
 
                 movie = movie[:, key["field_idx"], channel, :, :]
 
