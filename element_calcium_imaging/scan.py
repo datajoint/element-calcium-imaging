@@ -674,7 +674,9 @@ class ScanQualityMetrics(dj.Computed):
                 nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
                 valid_dimensions = set("TZCYX")
-                assert valid_dimensions == set(nd2_dims), f"Unknown or missing dimension in {nd2_dims}"
+                assert valid_dimensions == set(
+                    nd2_dims
+                ), f"Unknown or missing dimension in {nd2_dims}"
                 movie = nd2_file.asarray().transpose(
                     [nd2_dims[x] for x in valid_dimensions]
                 )
@@ -697,7 +699,7 @@ class ScanQualityMetrics(dj.Computed):
                     max_intensity=movie.max(axis=(1, 2)),
                     contrast=np.diff(
                         np.percentile(movie, [1, 99], axis=(1, 2)), axis=0
-                    ).squeeze()
+                    ).squeeze(),
                 )
             )
 

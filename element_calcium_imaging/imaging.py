@@ -1601,8 +1601,9 @@ class ProcessingQualityMetrics(dj.Computed):
 
         norm_mean = lambda x: x.mean() / x.max()
         roundnesses = [
-            norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w))) 
-            for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)]  
+            norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w)))
+            for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)
+        ]
 
         self.MaskMetrics.insert(
             dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
@@ -1615,21 +1616,19 @@ class ProcessingQualityMetrics(dj.Computed):
 
         fluorescence = np.stack(fluorescence)
         self.FluorescenceTraceMetrics.insert(
-            [
-                dict(
-                    key,
-                    fluo_channel=fluo_channel,
-                    mask=mask_id,
-                    skewness=skewness,
-                    variance=variance,
-                )
-                for fluo_channel, mask_id, skewness, variance in zip(
-                    fluo_channels,
-                    mask_ids,
-                    skew(fluorescence, axis=1),
-                    fluorescence.std(axis=1),
-                )
-            ]
+            dict(
+                key,
+                fluo_channel=fluo_channel,
+                mask=mask_id,
+                skewness=skewness,
+                variance=variance,
+            )
+            for fluo_channel, mask_id, skewness, variance in zip(
+                fluo_channels,
+                mask_ids,
+                skew(fluorescence, axis=1),
+                fluorescence.std(axis=1),
+            )
         )
 
 
