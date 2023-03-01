@@ -1599,10 +1599,10 @@ class ProcessingQualityMetrics(dj.Computed):
 
         self.insert1(key)
 
-       norm_mean = lambda x: x.mean() / x.max()
-       roundnesses = [
-           norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w))) 
-           for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)]  
+        norm_mean = lambda x: x.mean() / x.max()
+        roundnesses = [
+            norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w))) 
+            for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)]  
 
         self.MaskMetrics.insert(
             dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
