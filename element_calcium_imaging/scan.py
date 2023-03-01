@@ -714,9 +714,7 @@ class ScanQualityMetrics(dj.Computed):
                     min_intensity=movie.min(axis=(1, 2)),
                     mean_intensity=movie.mean(axis=(1, 2)),
                     max_intensity=movie.max(axis=(1, 2)),
-                    contrast=np.diff(
-                        np.percentile(movie, [1, 99], axis=(1, 2)), axis=0
-                    ).squeeze(),
+                    contrast=np.percentile(movie, 99, axis=(1, 2)) - np.percentile(movie, 1, axis=(1, 2))
                 )
             )
 
