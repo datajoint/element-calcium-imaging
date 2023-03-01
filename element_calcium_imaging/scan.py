@@ -722,17 +722,20 @@ class ScanQualityMetrics(dj.Computed):
                 )
             )
 
-            quantalsize_results = compute_quantal_size(movie)
+            quantalsize_results = compute_quantal_size(movie.transpose(1, 2, 0))
             middle_frame = movie.shape[0] // 2
             HALF_SHIFT = 250
             HALF_SHIFT = min(HALF_SHIFT, middle_frame)
-            quantal_frame = (
-                np.mean(
-                    movie[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
-                    axis=0,
+            quantal_frame = np.int(
+                (
+                    np.mean(
+                        movie[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
+                        axis=0,
+                    )
+                    - quantalsize_results["zero_level"]
                 )
-                - quantalsize_results["zero_level"]
-            ) / quantalsize_results["quantal_size"]
+                / quantalsize_results["quantal_size"]
+            )
 
             self.QuantalSize.insert1(
                 dict(
