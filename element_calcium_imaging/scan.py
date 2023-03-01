@@ -684,9 +684,7 @@ class ScanQualityMetrics(dj.Computed):
         elif acq_software == "Scanbox":
             import sbxreader
 
-            movie = sbxreader(get_scan_box_files(key))[
-                :, key["field_idx"], channel, :, :
-            ]
+            movie = sbxreader(get_scan_box_files(key))[:, key["field_idx"]]
         elif acq_software == "NIS":
             import nd2
 
