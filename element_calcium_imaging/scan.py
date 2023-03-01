@@ -611,8 +611,10 @@ class ScanInfo(dj.Imported):
 
 @schema
 class ScanQualityMetrics(dj.Computed):
-    """
-    Metrics to assess quality of Scan.
+    """Metrics to assess quality of Scan.
+
+    Attributes:
+        ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
     """
 
     definition = """
@@ -620,30 +622,50 @@ class ScanQualityMetrics(dj.Computed):
     """
 
     class FrameMetrics(dj.Part):
+        """Metrics used to evaluate frames.
+
+        Attributes:
+            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+            channel (int): Channel index.
+            min_intensity (longblob): Minimum value of each frame.
+            mean_intensity (longblob): Mean value at each frame.
+            max_intensity (longblob): Maximum value at each frame.
+            contrast (longblob): Contrast of each frame, difference of 99 and 1 percentiles.
+        """
+
         definition = """
         -> master
-        channel: int
+        channel: int              # Channel index.
         ---
-        min_intensity: longblob   # Minimum value of each frame
-        mean_intensity: longblob  # Mean value at each frame
-        max_intensity: longblob   # Maximum value at each frame
+        min_intensity: longblob   # Minimum value of each frame.
+        mean_intensity: longblob  # Mean value at each frame.
+        max_intensity: longblob   # Maximum value at each frame.
         contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
         """
 
     class QuantalSize(dj.Part):
-        """
-        Quantities inferred from Photon Transfer Curve.
+        """Quantities inferred from Photon Transfer Curve.
+
+        Attributes:
+            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+            channel (int): Channel index.
+            min_intensity (int): Minimum value in movie.
+            max_intensity (int): Maximum value in movie.
+            quantal_size (float): Quantal size (variance/mean intensity slope), gain.
+            zero_level (int): Level corresponding to zero (computed from variance dependence).
+            quantal_frame (longblob): Average frame expressed in quanta.
+
         """
 
         definition = """ 
         -> master
-        channel: int
+        channel         : int      # Channel index
         ---
         min_intensity   : int      # Minimum value in movie.
         max_intensity   : int      # Maximum value in movie.
         quantal_size    : float    # Quantal size (variance/mean intensity slope), gain.
         zero_level      : int      # Level corresponding to zero (computed from variance dependence)
-        quantal_frame   : longblob # Average frame expressed in quanta
+        quantal_frame   : longblob # Average frame expressed in quanta.
         """
 
     def make(self, key):

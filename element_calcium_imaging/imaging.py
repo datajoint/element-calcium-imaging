@@ -1560,7 +1560,7 @@ class ProcessingQualityMetrics(dj.Computed):
         """Quality metrics used to evaluate the Masks.
 
         Attributes:
-            ProcessingQualityMetrics (foreign key): Primary key from ProcessingQualityMetrics.
+            Segmentation (foreign key): Primary key from Segmentation.
             Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
             mask_area (float): Mask area in square micrometer.
             roundness (float): Roundness between 0 and 1, closer to 1 the rounder.
@@ -1579,6 +1579,8 @@ class ProcessingQualityMetrics(dj.Computed):
         """Quality metrics used to evaluate the Fluorescence Traces.
 
         Attributes:
+            Segmentation (foreign key): Primary key from Segmentation.
+            Fluorescence.Trace (foreign key): Primary key from Fluorescence.Trace.
             skewness (float): Skewness of the Fluorescence trace.
             variance (float): Variance of the Fluorescence trace.
         """
