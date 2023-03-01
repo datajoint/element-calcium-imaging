@@ -678,13 +678,13 @@ class ScanQualityMetrics(dj.Computed):
         if acq_software == "ScanImage":
             import scanreader
 
-            movie = scanreader.read_scan(get_scan_image_files(key))[
+            data = scanreader.read_scan(get_scan_image_files(key))[
                 key["field_idx"]
             ].transpose(3, 2, 0, 1)
         elif acq_software == "Scanbox":
             import sbxreader
 
-            movie = sbxreader(get_scan_box_files(key))[:, key["field_idx"]]
+            data = sbxreader(get_scan_box_files(key))[:, key["field_idx"]]
         elif acq_software == "NIS":
             import nd2
 
@@ -696,18 +696,16 @@ class ScanQualityMetrics(dj.Computed):
             assert valid_dimensions == set(
                 nd2_dims
             ), f"Unknown or missing dimension in {nd2_dims}"
-            movie = nd2_file.asarray().transpose(
-                [nd2_dims[x] for x in valid_dimensions]
-            )
+            data = nd2_file.asarray().transpose([nd2_dims[x] for x in valid_dimensions])
 
             for i, dim in enumerate("TZC"):
                 if dim not in nd2_dims:
-                    movie = np.expand_dims(movie, i)
+                    data = np.expand_dims(data, i)
 
-            movie = movie[:, key["field_idx"]]
+            data = data[:, key["field_idx"]]
 
         for channel in range(nchannels):
-            movie = movie[:, key["field_idx"], channel, :, :]
+            movie = data[:, key["field_idx"], channel, :, :]
 
             self.FrameMetrics.insert1(
                 dict(
