@@ -673,7 +673,7 @@ class ScanQualityMetrics(dj.Computed):
 
                 get_dim_pos = {k: i for i, k in enumerate(nd2_file.sizes)}
 
-                known_fields = ["T", "Z", "C", "Y", "X"]
+                valid_dimensions = set("TZCYX")
                 fields_in_data = [x for x in known_fields if x in get_dim_pos]
                 assert len(fields_in_data) == len(
                     get_dim_pos
