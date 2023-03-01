@@ -1632,7 +1632,7 @@ class ProcessingQualityMetrics(dj.Computed):
         ]
 
         self.MaskMetrics.insert(
-            dict(**key, mask=mask_id, mask_area=mask_area, roundness=roundness)
+            dict(key, mask=mask_id, mask_area=mask_area, roundness=roundness)
             for mask_id, mask_area, roundness in zip(
                 mask_ids,
                 mask_npix * (um_height / px_height) * (um_width / px_width),
