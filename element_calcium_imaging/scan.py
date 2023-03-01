@@ -674,10 +674,7 @@ class ScanQualityMetrics(dj.Computed):
                 get_dim_pos = {k: i for i, k in enumerate(nd2_file.sizes)}
 
                 valid_dimensions = set("TZCYX")
-                fields_in_data = [x for x in known_fields if x in get_dim_pos]
-                assert len(fields_in_data) == len(
-                    get_dim_pos
-                ), f"Unknown dimension is detected in {get_dim_pos}"
+                assert valid_dimensions == set(get_dim_pos), f"Unknown or missing dimension in {get_dim_pos}"
                 movie = nd2_file.asarray().transpose(
                     [get_dim_pos[x] for x in fields_in_data]
                 )
