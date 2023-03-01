@@ -1621,7 +1621,7 @@ class ProcessingQualityMetrics(dj.Computed):
         self.FluorescenceTraceMetrics.insert(
             [
                 dict(
-                    **key,
+                    key,
                     fluo_channel=fluo_channel,
                     mask=mask_id,
                     skewness=skewness,
