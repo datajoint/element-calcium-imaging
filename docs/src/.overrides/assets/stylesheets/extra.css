@@ -11,6 +11,10 @@
     display: none
 }
 
+.md-typeset figure img {
+    display: inline;
+}
+
 /* footer social icons */
 html a[title="DataJoint"].md-social__link svg {
     color: var(--dj-primary);
