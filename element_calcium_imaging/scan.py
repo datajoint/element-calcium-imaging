@@ -626,7 +626,7 @@ class ScanQualityMetrics(dj.Computed):
 
         Attributes:
             ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
-            channel (int): Channel index.
+            Channel (foreign key): Primary key from Channel.
             min_intensity (longblob): Minimum value of each frame.
             mean_intensity (longblob): Mean value at each frame.
             max_intensity (longblob): Maximum value at each frame.
