@@ -3,11 +3,12 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+
 ## [0.6.0] - 2023-03-02
 
 + Add - Quality metrics
 
-## [0.5.3] - Unreleased
+## [0.5.3] - 2023-02-23
 
 + Add - spelling, markdown, and pre-commit config files
 + Add - Notebook rendering to docs
