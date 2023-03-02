@@ -648,7 +648,7 @@ class ScanQualityMetrics(dj.Computed):
 
         Attributes:
             ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
-            channel (int): Channel index.
+            Channel (foreign key): Primary key from Channel.
             min_intensity (int): Minimum value in movie.
             max_intensity (int): Maximum value in movie.
             quantal_size (float): Quantal size (variance/mean intensity slope), gain.
