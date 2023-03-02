@@ -635,7 +635,7 @@ class ScanQualityMetrics(dj.Computed):
 
         definition = """
         -> master
-        channel: int              # Channel index.
+        -> Channel
         ---
         min_intensity: longblob   # Minimum value of each frame.
         mean_intensity: longblob  # Mean value at each frame.
