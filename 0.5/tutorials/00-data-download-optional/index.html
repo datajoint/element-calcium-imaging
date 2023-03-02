@@ -834,6 +834,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/workflow_calcium_imaging/reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/workflow_calcium_imaging/version/" class="md-nav__link">
         version.py
       </a>
@@ -2007,10 +2021,12 @@ pip install git+https://github.com/datajoint/djarchive-client.git</div>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">djarchive_client</span>
+
 <span class="n">client</span> <span class="o">=</span> <span class="n">djarchive_client</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
 </pre></div>
 <div id="cell-2" class="clipboard-copy-txt">import os
 import djarchive_client
+
 client = djarchive_client.client()</div>
     
         </div>
@@ -2141,9 +2157,9 @@ client = djarchive_client.client()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mkdir</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">example_data</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mkdir</span> <span class="o">/</span> <span class="n">tmp</span> <span class="o">/</span> <span class="n">example_data</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt">mkdir /tmp/example_data</div>
+<div id="cell-5" class="clipboard-copy-txt">mkdir / tmp / example_data</div>
     
         </div>
     </div>
@@ -2186,11 +2202,13 @@ client = djarchive_client.client()</div>
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">workflow_calcium_imaging</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="n">revision</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+<span class="n">revision</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 <span class="n">revision</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt">from workflow_calcium_imaging import version
-revision = version.__version__.replace('.', '_')
+
+revision = version.__version__.replace(".", "_")
 revision</div>
     
         </div>
@@ -2233,9 +2251,17 @@ revision</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;workflow-calcium-imaging-test-set&#39;</span><span class="p">,</span> <span class="n">target_directory</span><span class="o">=</span><span class="s1">&#39;/tmp/example_data&#39;</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">revision</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+    <span class="s2">&quot;workflow-calcium-imaging-test-set&quot;</span><span class="p">,</span>
+    <span class="n">target_directory</span><span class="o">=</span><span class="s2">&quot;/tmp/example_data&quot;</span><span class="p">,</span>
+    <span class="n">revision</span><span class="o">=</span><span class="n">revision</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-7" class="clipboard-copy-txt">client.download('workflow-calcium-imaging-test-set', target_directory='/tmp/example_data', revision=revision)</div>
+<div id="cell-7" class="clipboard-copy-txt">client.download(
+    "workflow-calcium-imaging-test-set",
+    target_directory="/tmp/example_data",
+    revision=revision,
+)</div>
     
         </div>
     </div>

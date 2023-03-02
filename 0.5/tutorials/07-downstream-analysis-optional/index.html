@@ -820,6 +820,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/workflow_calcium_imaging/reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/workflow_calcium_imaging/version/" class="md-nav__link">
         version.py
       </a>
@@ -1962,16 +1976,24 @@ Licensed under the Apache License, Version 2.0.
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
 <span class="c1"># change to the upper level folder to detect dj_local_conf.json</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span><span class="o">==</span><span class="s1">&#39;notebooks&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
 <span class="c1"># We&#39;ll be working with long tables, so we&#39;ll make visualization easier with a limit</span>
-<span class="kn">import</span> <span class="nn">datajoint</span> <span class="k">as</span> <span class="nn">dj</span><span class="p">;</span> <span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;display.limit&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">10</span>
+<span class="kn">import</span> <span class="nn">datajoint</span> <span class="k">as</span> <span class="nn">dj</span>
+
+<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;display.limit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt">import os
+
 # change to the upper level folder to detect dj_local_conf.json
-if os.path.basename(os.getcwd())=='notebooks': os.chdir('..')
+if os.path.basename(os.getcwd()) == "notebooks":
+    os.chdir("..")
 # We'll be working with long tables, so we'll make visualization easier with a limit
-import datajoint as dj; dj.config['display.limit']=10</div>
+import datajoint as dj
+
+dj.config["display.limit"] = 10</div>
     
         </div>
     </div>
@@ -2071,7 +2093,7 @@ import datajoint as dj; dj.config['display.limit']=10</div>
 <li>A block is a continuous phase of an experiment that contains repeated instances of a condition, or trials. </li>
 <li>Events may occur within or outside of conditions, either instantaneous or continuous.</li>
 </ul>
-<p>The diagram below shows (a) the levels of hierarchy and (b) how the bounds may not completely overlap. A block may not fully capure trials and events may occur outside both blocks/trials.</p>
+<p>The diagram below shows (a) the levels of hierarchy and (b) how the bounds may not completely overlap. A block may not fully capture trials and events may occur outside both blocks/trials.</p>
 
 </div>
 </div>
@@ -2128,11 +2150,19 @@ import datajoint as dj; dj.config['display.limit']=10</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">workflow_calcium_imaging.ingest</span> <span class="kn">import</span> <span class="n">ingest_subjects</span><span class="p">,</span> <span class="n">ingest_sessions</span><span class="p">,</span>\
-                                            <span class="n">ingest_events</span><span class="p">,</span> <span class="n">ingest_alignment</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">workflow_calcium_imaging.ingest</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ingest_subjects</span><span class="p">,</span>
+    <span class="n">ingest_sessions</span><span class="p">,</span>
+    <span class="n">ingest_events</span><span class="p">,</span>
+    <span class="n">ingest_alignment</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">from workflow_calcium_imaging.ingest import ingest_subjects, ingest_sessions,\
-                                            ingest_events, ingest_alignment</div>
+<div id="cell-3" class="clipboard-copy-txt">from workflow_calcium_imaging.ingest import (
+    ingest_subjects,
+    ingest_sessions,
+    ingest_events,
+    ingest_alignment,
+)</div>
     
         </div>
     </div>
@@ -2446,9 +2476,9 @@ ingest_events()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">trial</span><span class="o">.</span><span class="n">TrialEvent</span><span class="p">()</span> <span class="o">&amp;</span> <span class="s1">&#39;trial_id&lt;5&#39;</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">trial</span><span class="o">.</span><span class="n">TrialEvent</span><span class="p">()</span> <span class="o">&amp;</span> <span class="s2">&quot;trial_id&lt;5&quot;</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">trial.TrialEvent() & 'trial_id<5'</div>
+<div id="cell-6" class="clipboard-copy-txt">trial.TrialEvent() & "trial_id<5"</div>
     
         </div>
     </div>
@@ -3037,11 +3067,13 @@ ingest_events()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ca_activity_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s1">&#39;subject&#39;</span><span class="p">:</span> <span class="s1">&#39;subject3&#39;</span><span class="p">,</span> <span class="s1">&#39;scan_id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-                  <span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s1">&#39;KEY&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ca_activity_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="s2">&quot;subject3&quot;</span><span class="p">,</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+    <span class="s2">&quot;KEY&quot;</span>
+<span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
-<div id="cell-10" class="clipboard-copy-txt">ca_activity_key = (imaging.Activity & {'subject': 'subject3', 'scan_id': 0}
-                  ).fetch('KEY')[0]</div>
+<div id="cell-10" class="clipboard-copy-txt">ca_activity_key = (imaging.Activity & {"subject": "subject3", "scan_id": 0}).fetch(
+    "KEY"
+)[0]</div>
     
         </div>
     </div>
@@ -3473,12 +3505,14 @@ ctrl_trials</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alignment_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">AlignmentEvent</span> <span class="o">&amp;</span> <span class="s1">&#39;alignment_name = &quot;center_button&quot;&#39;</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">fetch1</span><span class="p">(</span><span class="s1">&#39;KEY&#39;</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alignment_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">AlignmentEvent</span> <span class="o">&amp;</span> <span class="s1">&#39;alignment_name = &quot;center_button&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch1</span><span class="p">(</span>
+    <span class="s2">&quot;KEY&quot;</span>
+<span class="p">)</span>
 <span class="n">alignment_key</span>
 </pre></div>
-<div id="cell-13" class="clipboard-copy-txt">alignment_key = (event.AlignmentEvent & 'alignment_name = "center_button"'
-                ).fetch1('KEY')
+<div id="cell-13" class="clipboard-copy-txt">alignment_key = (event.AlignmentEvent & 'alignment_name = "center_button"').fetch1(
+    "KEY"
+)
 alignment_key</div>
     
         </div>
@@ -3534,12 +3568,18 @@ alignment_key</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alignment_condition</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span> <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span> 
-                       <span class="s1">&#39;trial_condition&#39;</span><span class="p">:</span> <span class="s1">&#39;ctrl_center_button&#39;</span><span class="p">}</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alignment_condition</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span>
+    <span class="s2">&quot;trial_condition&quot;</span><span class="p">:</span> <span class="s2">&quot;ctrl_center_button&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 <span class="n">alignment_condition</span>
 </pre></div>
-<div id="cell-14" class="clipboard-copy-txt">alignment_condition = {**ca_activity_key, **alignment_key, 
-                       'trial_condition': 'ctrl_center_button'}
+<div id="cell-14" class="clipboard-copy-txt">alignment_condition = {
+    **ca_activity_key,
+    **alignment_key,
+    "trial_condition": "ctrl_center_button",
+}
 alignment_condition</div>
     
         </div>
@@ -3811,10 +3851,14 @@ alignment_condition</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignmentCondition</span> <span class="o">*</span> <span class="n">ctrl_trials</span> <span class="o">&amp;</span> <span class="n">alignment_condition</span><span class="p">)</span><span class="o">.</span><span class="n">proj</span><span class="p">()</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignmentCondition</span> <span class="o">*</span> <span class="n">ctrl_trials</span> <span class="o">&amp;</span> <span class="n">alignment_condition</span>
+<span class="p">)</span><span class="o">.</span><span class="n">proj</span><span class="p">()</span>
 <span class="n">sample</span>
 </pre></div>
-<div id="cell-17" class="clipboard-copy-txt">sample = (analysis.ActivityAlignmentCondition * ctrl_trials & alignment_condition).proj()
+<div id="cell-17" class="clipboard-copy-txt">sample = (
+    analysis.ActivityAlignmentCondition * ctrl_trials & alignment_condition
+).proj()
 sample</div>
     
         </div>
@@ -4305,20 +4349,28 @@ analysis.ActivityAlignmentCondition.Trial()</div>
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">stim_trials</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">Trial</span> <span class="o">&amp;</span> <span class="n">ca_activity_key</span> <span class="o">&amp;</span> <span class="s1">&#39;trial_type = &quot;stim&quot;&#39;</span>
-<span class="n">alignment_condition</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span> <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span> 
-                       <span class="s1">&#39;trial_condition&#39;</span><span class="p">:</span> <span class="s1">&#39;stim_center_button&#39;</span><span class="p">}</span>
+<span class="n">alignment_condition</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span>
+    <span class="s2">&quot;trial_condition&quot;</span><span class="p">:</span> <span class="s2">&quot;stim_center_button&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 <span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignmentCondition</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="n">alignment_condition</span><span class="p">,</span> <span class="n">skip_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignmentCondition</span><span class="o">.</span><span class="n">Trial</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
     <span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignmentCondition</span> <span class="o">*</span> <span class="n">stim_trials</span> <span class="o">&amp;</span> <span class="n">alignment_condition</span><span class="p">)</span><span class="o">.</span><span class="n">proj</span><span class="p">(),</span>
-    <span class="n">skip_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">skip_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div id="cell-19" class="clipboard-copy-txt">stim_trials = trial.Trial & ca_activity_key & 'trial_type = "stim"'
-alignment_condition = {**ca_activity_key, **alignment_key, 
-                       'trial_condition': 'stim_center_button'}
+alignment_condition = {
+    **ca_activity_key,
+    **alignment_key,
+    "trial_condition": "stim_center_button",
+}
 analysis.ActivityAlignmentCondition.insert1(alignment_condition, skip_duplicates=True)
 analysis.ActivityAlignmentCondition.Trial.insert(
     (analysis.ActivityAlignmentCondition * stim_trials & alignment_condition).proj(),
-    skip_duplicates=True)</div>
+    skip_duplicates=True,
+)</div>
     
         </div>
     </div>
@@ -5378,9 +5430,9 @@ plot_aligned_activities(key, roi, axs=None, title=None) method of workflow_calci
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Segmentation</span><span class="o">.</span><span class="n">Mask</span> <span class="o">&amp;</span> <span class="s1">&#39;mask&lt;3&#39;</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Segmentation</span><span class="o">.</span><span class="n">Mask</span> <span class="o">&amp;</span> <span class="s2">&quot;mask&lt;3&quot;</span>
 </pre></div>
-<div id="cell-26" class="clipboard-copy-txt">imaging.Segmentation.Mask & 'mask<3'</div>
+<div id="cell-26" class="clipboard-copy-txt">imaging.Segmentation.Mask & "mask<3"</div>
     
         </div>
     </div>
@@ -5593,25 +5645,43 @@ plot_aligned_activities(key, roi, axs=None, title=None) method of workflow_calci
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">workflow_calcium_imaging</span> <span class="kn">import</span> <span class="n">analysis</span>
 <span class="kn">from</span> <span class="nn">workflow_calcium_imaging.pipeline</span> <span class="kn">import</span> <span class="n">session</span><span class="p">,</span> <span class="n">imaging</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">event</span>
-<span class="n">ca_activity_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s1">&#39;subject&#39;</span><span class="p">:</span> <span class="s1">&#39;subject3&#39;</span><span class="p">,</span> <span class="s1">&#39;scan_id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-                  <span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s1">&#39;KEY&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">alignment_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">AlignmentEvent</span> <span class="o">&amp;</span> <span class="s1">&#39;alignment_name = &quot;center_button&quot;&#39;</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">fetch1</span><span class="p">(</span><span class="s1">&#39;KEY&#39;</span><span class="p">)</span>
-<span class="n">alignment_condition_ctrl</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span> <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span> 
-                            <span class="s1">&#39;trial_condition&#39;</span><span class="p">:</span> <span class="s1">&#39;ctrl_center_button&#39;</span><span class="p">}</span>
-<span class="n">alignment_condition_stim</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span> <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span> 
-                            <span class="s1">&#39;trial_condition&#39;</span><span class="p">:</span> <span class="s1">&#39;stim_center_button&#39;</span><span class="p">}</span>
+
+<span class="n">ca_activity_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="s2">&quot;subject3&quot;</span><span class="p">,</span> <span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+    <span class="s2">&quot;KEY&quot;</span>
+<span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">alignment_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">AlignmentEvent</span> <span class="o">&amp;</span> <span class="s1">&#39;alignment_name = &quot;center_button&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch1</span><span class="p">(</span>
+    <span class="s2">&quot;KEY&quot;</span>
+<span class="p">)</span>
+<span class="n">alignment_condition_ctrl</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span>
+    <span class="s2">&quot;trial_condition&quot;</span><span class="p">:</span> <span class="s2">&quot;ctrl_center_button&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">alignment_condition_stim</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">**</span><span class="n">ca_activity_key</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">alignment_key</span><span class="p">,</span>
+    <span class="s2">&quot;trial_condition&quot;</span><span class="p">:</span> <span class="s2">&quot;stim_center_button&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 <div id="cell-27" class="clipboard-copy-txt">from workflow_calcium_imaging import analysis
 from workflow_calcium_imaging.pipeline import session, imaging, trial, event
-ca_activity_key = (imaging.Activity & {'subject': 'subject3', 'scan_id': 0}
-                  ).fetch('KEY')[0]
-alignment_key = (event.AlignmentEvent & 'alignment_name = "center_button"'
-                ).fetch1('KEY')
-alignment_condition_ctrl = {**ca_activity_key, **alignment_key, 
-                            'trial_condition': 'ctrl_center_button'}
-alignment_condition_stim = {**ca_activity_key, **alignment_key, 
-                            'trial_condition': 'stim_center_button'}</div>
+
+ca_activity_key = (imaging.Activity & {"subject": "subject3", "scan_id": 0}).fetch(
+    "KEY"
+)[0]
+alignment_key = (event.AlignmentEvent & 'alignment_name = "center_button"').fetch1(
+    "KEY"
+)
+alignment_condition_ctrl = {
+    **ca_activity_key,
+    **alignment_key,
+    "trial_condition": "ctrl_center_button",
+}
+alignment_condition_stim = {
+    **ca_activity_key,
+    **alignment_key,
+    "trial_condition": "stim_center_button",
+}</div>
     
         </div>
     </div>
@@ -5641,15 +5711,19 @@ alignment_condition_stim = {**ca_activity_key, **alignment_key,
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignment</span><span class="p">()</span><span class="o">.</span><span class="n">plot_aligned_activities</span><span class="p">(</span><span class="n">alignment_condition_stim</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                                     <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Stimulus Center Button&#39;</span><span class="p">);</span>
-<span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignment</span><span class="p">()</span><span class="o">.</span><span class="n">plot_aligned_activities</span><span class="p">(</span><span class="n">alignment_condition_ctrl</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                                     <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Control Center Button&#39;</span><span class="p">);</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignment</span><span class="p">()</span><span class="o">.</span><span class="n">plot_aligned_activities</span><span class="p">(</span>
+    <span class="n">alignment_condition_stim</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Stimulus Center Button&quot;</span>
+<span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">ActivityAlignment</span><span class="p">()</span><span class="o">.</span><span class="n">plot_aligned_activities</span><span class="p">(</span>
+    <span class="n">alignment_condition_ctrl</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Control Center Button&quot;</span>
+<span class="p">);</span>
 </pre></div>
-<div id="cell-28" class="clipboard-copy-txt">analysis.ActivityAlignment().plot_aligned_activities(alignment_condition_stim, roi=2,
-                                                     title='Stimulus Center Button');
-analysis.ActivityAlignment().plot_aligned_activities(alignment_condition_ctrl, roi=2,
-                                                     title='Control Center Button');</div>
+<div id="cell-28" class="clipboard-copy-txt">analysis.ActivityAlignment().plot_aligned_activities(
+    alignment_condition_stim, roi=2, title="Stimulus Center Button"
+)
+analysis.ActivityAlignment().plot_aligned_activities(
+    alignment_condition_ctrl, roi=2, title="Control Center Button"
+);</div>
     
         </div>
     </div>

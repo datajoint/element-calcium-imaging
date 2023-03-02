@@ -959,6 +959,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/workflow_calcium_imaging/reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/workflow_calcium_imaging/version/" class="md-nav__link">
         version.py
       </a>
@@ -2102,11 +2116,15 @@ Licensed under the Apache License, Version 2.0.
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt">import os
-if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
+
+if os.path.basename(os.getcwd()) == "notebooks":
+    os.chdir("..")
 import numpy as np</div>
     
         </div>
@@ -2219,9 +2237,19 @@ from workflow_calcium_imaging.pipeline import *</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="p">(</span>
+    <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">dj.Diagram(subject.Subject) + dj.Diagram(session.Session) + dj.Diagram(scan) + dj.Diagram(imaging.Processing)</div>
+<div id="cell-3" class="clipboard-copy-txt">(
+    dj.Diagram(subject.Subject)
+    + dj.Diagram(session.Session)
+    + dj.Diagram(scan)
+    + dj.Diagram(imaging.Processing)
+)</div>
     
         </div>
     </div>
@@ -2496,15 +2524,23 @@ subject_description=&#34;&#34; : varchar(1024)                # </pre>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> 
-                             <span class="n">sex</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> 
-                             <span class="n">subject_birth_date</span><span class="o">=</span><span class="s1">&#39;2020-01-01&#39;</span><span class="p">,</span> 
-                             <span class="n">subject_description</span><span class="o">=</span><span class="s1">&#39;Scanbox acquisition. Suite2p processing.&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span>
+        <span class="n">sex</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">,</span>
+        <span class="n">subject_birth_date</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
+        <span class="n">subject_description</span><span class="o">=</span><span class="s2">&quot;Scanbox acquisition. Suite2p processing.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt">subject.Subject.insert1(dict(subject='subject3', 
-                             sex='F', 
-                             subject_birth_date='2020-01-01', 
-                             subject_description='Scanbox acquisition. Suite2p processing.'))</div>
+<div id="cell-5" class="clipboard-copy-txt">subject.Subject.insert1(
+    dict(
+        subject="subject3",
+        sex="F",
+        subject_birth_date="2020-01-01",
+        subject_description="Scanbox acquisition. Suite2p processing.",
+    )
+)</div>
     
         </div>
     </div>
@@ -2545,9 +2581,9 @@ subject_description=&#34;&#34; : varchar(1024)                # </pre>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Equipment</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">scanner</span><span class="o">=</span><span class="s1">&#39;Scanbox&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Equipment</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">scanner</span><span class="o">=</span><span class="s2">&quot;Scanbox&quot;</span><span class="p">))</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">Equipment.insert1(dict(scanner='Scanbox'))</div>
+<div id="cell-6" class="clipboard-copy-txt">Equipment.insert1(dict(scanner="Scanbox"))</div>
     
         </div>
     </div>
@@ -2704,13 +2740,13 @@ session_datetime     : datetime(3)                  # </pre>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session_key</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> <span class="n">session_datetime</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session_key</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span> <span class="n">session_datetime</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">)</span>
 
 <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="n">session_key</span><span class="p">)</span>
 
 <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
 </pre></div>
-<div id="cell-9" class="clipboard-copy-txt">session_key = dict(subject='subject3', session_datetime='2021-04-30 12:22:15.032')
+<div id="cell-9" class="clipboard-copy-txt">session_key = dict(subject="subject3", session_datetime="2021-04-30 12:22:15.032")
 
 session.Session.insert1(session_key)
 
@@ -2969,15 +3005,23 @@ session_dir          : varchar(256)                 # Path to the data directory
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">SessionDirectory</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> 
-                                      <span class="n">session_datetime</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">,</span> 
-                                      <span class="n">session_dir</span><span class="o">=</span><span class="s1">&#39;subject3/210107_run00_orientation_8dir&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">SessionDirectory</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span>
+        <span class="n">session_datetime</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">,</span>
+        <span class="n">session_dir</span><span class="o">=</span><span class="s2">&quot;subject3/210107_run00_orientation_8dir&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 
 <span class="n">session</span><span class="o">.</span><span class="n">SessionDirectory</span><span class="p">()</span>
 </pre></div>
-<div id="cell-12" class="clipboard-copy-txt">session.SessionDirectory.insert1(dict(subject='subject3', 
-                                      session_datetime='2021-04-30 12:22:15.032', 
-                                      session_dir='subject3/210107_run00_orientation_8dir'))
+<div id="cell-12" class="clipboard-copy-txt">session.SessionDirectory.insert1(
+    dict(
+        subject="subject3",
+        session_datetime="2021-04-30 12:22:15.032",
+        session_dir="subject3/210107_run00_orientation_8dir",
+    )
+)
 
 session.SessionDirectory()</div>
     
@@ -3177,20 +3221,28 @@ scan_notes=&#34;&#34;        : varchar(4095)                # free-notes</pre>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scan</span><span class="o">.</span><span class="n">Scan</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> 
-                       <span class="n">session_datetime</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">,</span> 
-                       <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
-                       <span class="n">scanner</span><span class="o">=</span><span class="s1">&#39;Scanbox&#39;</span><span class="p">,</span> 
-                       <span class="n">acq_software</span><span class="o">=</span><span class="s1">&#39;Scanbox&#39;</span><span class="p">,</span>
-                       <span class="n">scan_notes</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scan</span><span class="o">.</span><span class="n">Scan</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span>
+        <span class="n">session_datetime</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">scanner</span><span class="o">=</span><span class="s2">&quot;Scanbox&quot;</span><span class="p">,</span>
+        <span class="n">acq_software</span><span class="o">=</span><span class="s2">&quot;Scanbox&quot;</span><span class="p">,</span>
+        <span class="n">scan_notes</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 <span class="n">scan</span><span class="o">.</span><span class="n">Scan</span><span class="p">()</span>
 </pre></div>
-<div id="cell-14" class="clipboard-copy-txt">scan.Scan.insert1(dict(subject='subject3', 
-                       session_datetime='2021-04-30 12:22:15.032', 
-                       scan_id=0, 
-                       scanner='Scanbox', 
-                       acq_software='Scanbox',
-                       scan_notes=''))
+<div id="cell-14" class="clipboard-copy-txt">scan.Scan.insert1(
+    dict(
+        subject="subject3",
+        session_datetime="2021-04-30 12:22:15.032",
+        scan_id=0,
+        scanner="Scanbox",
+        acq_software="Scanbox",
+        scan_notes="",
+    )
+)
 scan.Scan()</div>
     
         </div>
@@ -3486,9 +3538,9 @@ fill_fraction=null   : float                        # raster scan temporal fill 
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">populate_settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;display_progress&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">populate_settings</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;display_progress&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 </pre></div>
-<div id="cell-17" class="clipboard-copy-txt">populate_settings = {'display_progress': True}</div>
+<div id="cell-17" class="clipboard-copy-txt">populate_settings = {"display_progress": True}</div>
     
         </div>
     </div>
@@ -3723,129 +3775,133 @@ scan.ScanInfo()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">params_suite2p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;look_one_level_down&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                  <span class="s1">&#39;fast_disk&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                  <span class="s1">&#39;delete_bin&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;mesoscan&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;h5py&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                  <span class="s1">&#39;h5py_key&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;save_path0&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                  <span class="s1">&#39;subfolders&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                  <span class="s1">&#39;nplanes&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="s1">&#39;nchannels&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="s1">&#39;functional_chan&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                  <span class="s1">&#39;fs&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
-                  <span class="s1">&#39;force_sktiff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;preclassify&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                  <span class="s1">&#39;save_mat&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;combined&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                  <span class="s1">&#39;aspect&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                  <span class="s1">&#39;do_bidiphase&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;bidiphase&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                  <span class="s1">&#39;do_registration&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                  <span class="s1">&#39;keep_movie_raw&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;nimg_init&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
-                  <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
-                  <span class="s1">&#39;maxregshift&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-                  <span class="s1">&#39;align_by_chan&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="s1">&#39;reg_tif&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;reg_tif_chan2&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;subpixel&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-                  <span class="s1">&#39;smooth_sigma&#39;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
-                  <span class="s1">&#39;th_badframes&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                  <span class="s1">&#39;pad_fft&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;nonrigid&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                  <span class="s1">&#39;block_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
-                  <span class="s1">&#39;snr_thresh&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
-                  <span class="s1">&#39;maxregshiftNR&#39;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
-                  <span class="s1">&#39;1Preg&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;spatial_hp&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
-                  <span class="s1">&#39;pre_smooth&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
-                  <span class="s1">&#39;spatial_taper&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
-                  <span class="s1">&#39;roidetect&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                  <span class="s1">&#39;sparse_mode&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;diameter&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
-                  <span class="s1">&#39;spatial_scale&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                  <span class="s1">&#39;connected&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                  <span class="s1">&#39;nbinned&#39;</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
-                  <span class="s1">&#39;max_iterations&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-                  <span class="s1">&#39;threshold_scaling&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                  <span class="s1">&#39;max_overlap&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
-                  <span class="s1">&#39;high_pass&#39;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
-                  <span class="s1">&#39;inner_neuropil_radius&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-                  <span class="s1">&#39;min_neuropil_pixels&#39;</span><span class="p">:</span> <span class="mi">350</span><span class="p">,</span>
-                  <span class="s1">&#39;allow_overlap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="s1">&#39;chan2_thres&#39;</span><span class="p">:</span> <span class="mf">0.65</span><span class="p">,</span>
-                  <span class="s1">&#39;baseline&#39;</span><span class="p">:</span> <span class="s1">&#39;maximin&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;win_baseline&#39;</span><span class="p">:</span> <span class="mf">60.0</span><span class="p">,</span>
-                  <span class="s1">&#39;sig_baseline&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
-                  <span class="s1">&#39;prctile_baseline&#39;</span><span class="p">:</span> <span class="mf">8.0</span><span class="p">,</span>
-                  <span class="s1">&#39;neucoeff&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
-                  <span class="s1">&#39;xrange&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-                  <span class="s1">&#39;yrange&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])}</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">params_suite2p</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;look_one_level_down&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;fast_disk&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;delete_bin&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;mesoscan&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;h5py&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;h5py_key&quot;</span><span class="p">:</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save_path0&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;subfolders&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;nplanes&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;nchannels&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;functional_chan&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;tau&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;fs&quot;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="s2">&quot;force_sktiff&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;preclassify&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;save_mat&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;combined&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;do_bidiphase&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;bidiphase&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;do_registration&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;keep_movie_raw&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;nimg_init&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="s2">&quot;maxregshift&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s2">&quot;align_by_chan&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;reg_tif&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;reg_tif_chan2&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;subpixel&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s2">&quot;smooth_sigma&quot;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
+    <span class="s2">&quot;th_badframes&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;pad_fft&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;nonrigid&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;block_size&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
+    <span class="s2">&quot;snr_thresh&quot;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+    <span class="s2">&quot;maxregshiftNR&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+    <span class="s2">&quot;1Preg&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;spatial_hp&quot;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
+    <span class="s2">&quot;pre_smooth&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="s2">&quot;spatial_taper&quot;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
+    <span class="s2">&quot;roidetect&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;sparse_mode&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;diameter&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="s2">&quot;spatial_scale&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;connected&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;nbinned&quot;</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s2">&quot;threshold_scaling&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;max_overlap&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
+    <span class="s2">&quot;high_pass&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+    <span class="s2">&quot;inner_neuropil_radius&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;min_neuropil_pixels&quot;</span><span class="p">:</span> <span class="mi">350</span><span class="p">,</span>
+    <span class="s2">&quot;allow_overlap&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;chan2_thres&quot;</span><span class="p">:</span> <span class="mf">0.65</span><span class="p">,</span>
+    <span class="s2">&quot;baseline&quot;</span><span class="p">:</span> <span class="s2">&quot;maximin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;win_baseline&quot;</span><span class="p">:</span> <span class="mf">60.0</span><span class="p">,</span>
+    <span class="s2">&quot;sig_baseline&quot;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="s2">&quot;prctile_baseline&quot;</span><span class="p">:</span> <span class="mf">8.0</span><span class="p">,</span>
+    <span class="s2">&quot;neucoeff&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="s2">&quot;xrange&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+    <span class="s2">&quot;yrange&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+<span class="p">}</span>
 </pre></div>
-<div id="cell-19" class="clipboard-copy-txt">params_suite2p = {'look_one_level_down': 0.0,
-                  'fast_disk': [],
-                  'delete_bin': False,
-                  'mesoscan': False,
-                  'h5py': [],
-                  'h5py_key': 'data',
-                  'save_path0': [],
-                  'subfolders': [],
-                  'nplanes': 1,
-                  'nchannels': 1,
-                  'functional_chan': 1,
-                  'tau': 1.0,
-                  'fs': 10.0,
-                  'force_sktiff': False,
-                  'preclassify': 0.0,
-                  'save_mat': False,
-                  'combined': True,
-                  'aspect': 1.0,
-                  'do_bidiphase': False,
-                  'bidiphase': 0.0,
-                  'do_registration': True,
-                  'keep_movie_raw': False,
-                  'nimg_init': 300,
-                  'batch_size': 500,
-                  'maxregshift': 0.1,
-                  'align_by_chan': 1,
-                  'reg_tif': False,
-                  'reg_tif_chan2': False,
-                  'subpixel': 10,
-                  'smooth_sigma': 1.15,
-                  'th_badframes': 1.0,
-                  'pad_fft': False,
-                  'nonrigid': True,
-                  'block_size': [128, 128],
-                  'snr_thresh': 1.2,
-                  'maxregshiftNR': 5.0,
-                  '1Preg': False,
-                  'spatial_hp': 50.0,
-                  'pre_smooth': 2.0,
-                  'spatial_taper': 50.0,
-                  'roidetect': True,
-                  'sparse_mode': False,
-                  'diameter': 12,
-                  'spatial_scale': 0,
-                  'connected': True,
-                  'nbinned': 5000,
-                  'max_iterations': 20,
-                  'threshold_scaling': 1.0,
-                  'max_overlap': 0.75,
-                  'high_pass': 100.0,
-                  'inner_neuropil_radius': 2,
-                  'min_neuropil_pixels': 350,
-                  'allow_overlap': False,
-                  'chan2_thres': 0.65,
-                  'baseline': 'maximin',
-                  'win_baseline': 60.0,
-                  'sig_baseline': 10.0,
-                  'prctile_baseline': 8.0,
-                  'neucoeff': 0.7,
-                  'xrange': np.array([0, 0]),
-                  'yrange': np.array([0, 0])}</div>
+<div id="cell-19" class="clipboard-copy-txt">params_suite2p = {
+    "look_one_level_down": 0.0,
+    "fast_disk": [],
+    "delete_bin": False,
+    "mesoscan": False,
+    "h5py": [],
+    "h5py_key": "data",
+    "save_path0": [],
+    "subfolders": [],
+    "nplanes": 1,
+    "nchannels": 1,
+    "functional_chan": 1,
+    "tau": 1.0,
+    "fs": 10.0,
+    "force_sktiff": False,
+    "preclassify": 0.0,
+    "save_mat": False,
+    "combined": True,
+    "aspect": 1.0,
+    "do_bidiphase": False,
+    "bidiphase": 0.0,
+    "do_registration": True,
+    "keep_movie_raw": False,
+    "nimg_init": 300,
+    "batch_size": 500,
+    "maxregshift": 0.1,
+    "align_by_chan": 1,
+    "reg_tif": False,
+    "reg_tif_chan2": False,
+    "subpixel": 10,
+    "smooth_sigma": 1.15,
+    "th_badframes": 1.0,
+    "pad_fft": False,
+    "nonrigid": True,
+    "block_size": [128, 128],
+    "snr_thresh": 1.2,
+    "maxregshiftNR": 5.0,
+    "1Preg": False,
+    "spatial_hp": 50.0,
+    "pre_smooth": 2.0,
+    "spatial_taper": 50.0,
+    "roidetect": True,
+    "sparse_mode": False,
+    "diameter": 12,
+    "spatial_scale": 0,
+    "connected": True,
+    "nbinned": 5000,
+    "max_iterations": 20,
+    "threshold_scaling": 1.0,
+    "max_overlap": 0.75,
+    "high_pass": 100.0,
+    "inner_neuropil_radius": 2,
+    "min_neuropil_pixels": 350,
+    "allow_overlap": False,
+    "chan2_thres": 0.65,
+    "baseline": "maximin",
+    "win_baseline": 60.0,
+    "sig_baseline": 10.0,
+    "prctile_baseline": 8.0,
+    "neucoeff": 0.7,
+    "xrange": np.array([0, 0]),
+    "yrange": np.array([0, 0]),
+}</div>
     
         </div>
     </div>
@@ -3890,16 +3946,18 @@ scan.ScanInfo()</div>
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">ProcessingParamSet</span><span class="o">.</span><span class="n">insert_new_params</span><span class="p">(</span>
-    <span class="n">processing_method</span><span class="o">=</span><span class="s1">&#39;suite2p&#39;</span><span class="p">,</span> 
-    <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+    <span class="n">processing_method</span><span class="o">=</span><span class="s2">&quot;suite2p&quot;</span><span class="p">,</span>
+    <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">params</span><span class="o">=</span><span class="n">params_suite2p</span><span class="p">,</span>
-    <span class="n">paramset_desc</span><span class="o">=</span><span class="s1">&#39;Calcium imaging analysis with Suite2p using default Suite2p parameters&#39;</span><span class="p">)</span>
+    <span class="n">paramset_desc</span><span class="o">=</span><span class="s2">&quot;Calcium imaging analysis with Suite2p using default Suite2p parameters&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div id="cell-20" class="clipboard-copy-txt">imaging.ProcessingParamSet.insert_new_params(
-    processing_method='suite2p', 
-    paramset_idx=0, 
+    processing_method="suite2p",
+    paramset_idx=0,
     params=params_suite2p,
-    paramset_desc='Calcium imaging analysis with Suite2p using default Suite2p parameters')</div>
+    paramset_desc="Calcium imaging analysis with Suite2p using default Suite2p parameters",
+)</div>
     
         </div>
     </div>
@@ -3954,17 +4012,25 @@ scan.ScanInfo()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">ProcessingTask</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> 
-                                    <span class="n">session_datetime</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">,</span> 
-                                    <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                                    <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                                    <span class="n">processing_output_dir</span><span class="o">=</span><span class="s1">&#39;subject3/210107_run00_orientation_8dir/suite2p&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">ProcessingTask</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span>
+        <span class="n">session_datetime</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">processing_output_dir</span><span class="o">=</span><span class="s2">&quot;subject3/210107_run00_orientation_8dir/suite2p&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-21" class="clipboard-copy-txt">imaging.ProcessingTask.insert1(dict(subject='subject3', 
-                                    session_datetime='2021-04-30 12:22:15.032', 
-                                    scan_id=0,
-                                    paramset_idx=0,
-                                    processing_output_dir='subject3/210107_run00_orientation_8dir/suite2p'))</div>
+<div id="cell-21" class="clipboard-copy-txt">imaging.ProcessingTask.insert1(
+    dict(
+        subject="subject3",
+        session_datetime="2021-04-30 12:22:15.032",
+        scan_id=0,
+        paramset_idx=0,
+        processing_output_dir="subject3/210107_run00_orientation_8dir/suite2p",
+    )
+)</div>
     
         </div>
     </div>
@@ -4085,25 +4151,33 @@ scan.ScanInfo()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Curation</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject3&#39;</span><span class="p">,</span> 
-                              <span class="n">session_datetime</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">,</span> 
-                              <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">curation_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">curation_time</span><span class="o">=</span><span class="s1">&#39;2021-04-30 12:22:15.032&#39;</span><span class="p">,</span> 
-                              <span class="n">curation_output_dir</span><span class="o">=</span><span class="s1">&#39;subject3/210107_run00_orientation_8dir/suite2p&#39;</span><span class="p">,</span>
-                              <span class="n">manual_curation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                              <span class="n">curation_note</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Curation</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;subject3&quot;</span><span class="p">,</span>
+        <span class="n">session_datetime</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">curation_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">curation_time</span><span class="o">=</span><span class="s2">&quot;2021-04-30 12:22:15.032&quot;</span><span class="p">,</span>
+        <span class="n">curation_output_dir</span><span class="o">=</span><span class="s2">&quot;subject3/210107_run00_orientation_8dir/suite2p&quot;</span><span class="p">,</span>
+        <span class="n">manual_curation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">curation_note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-23" class="clipboard-copy-txt">imaging.Curation.insert1(dict(subject='subject3', 
-                              session_datetime='2021-04-30 12:22:15.032', 
-                              scan_id=0,
-                              paramset_idx=0,
-                              curation_id=0,
-                              curation_time='2021-04-30 12:22:15.032', 
-                              curation_output_dir='subject3/210107_run00_orientation_8dir/suite2p',
-                              manual_curation=False,
-                              curation_note=''))</div>
+<div id="cell-23" class="clipboard-copy-txt">imaging.Curation.insert1(
+    dict(
+        subject="subject3",
+        session_datetime="2021-04-30 12:22:15.032",
+        scan_id=0,
+        paramset_idx=0,
+        curation_id=0,
+        curation_time="2021-04-30 12:22:15.032",
+        curation_output_dir="subject3/210107_run00_orientation_8dir/suite2p",
+        manual_curation=False,
+        curation_note="",
+    )
+)</div>
     
         </div>
     </div>

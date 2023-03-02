@@ -865,6 +865,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../version/" class="md-nav__link">
         version.py
       </a>
@@ -1184,7 +1198,7 @@ session, trial.</p></td>
 <span class="sd">        imaging.Activity (foreign key): Primary key from imaging.Activity.</span>
 <span class="sd">        event.AlignmentEvent (foreign key): Primary key from event.AlignmentEvent.</span>
 <span class="sd">        trial_condition (str): User-friendly name of condition.</span>
-<span class="sd">        condition_description (str, optional). Description. Default is &#39;&#39;.</span>
+<span class="sd">        condition_description (str). Optional. Description. Default is &#39;&#39;.</span>
 <span class="sd">        bin_size (float): bin-size (in second) used to compute the PSTH,</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1534,8 +1548,8 @@ ActivityAlignmentCondition.</p></td>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Aligned trial activity.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            ActivityAlignment (foriegn key): Primary key from ActivityAlignment.</span>
-<span class="sd">            imaging.Activity.Trace (foriegn key): Primary key from</span>
+<span class="sd">            ActivityAlignment (foreign key): Primary key from ActivityAlignment.</span>
+<span class="sd">            imaging.Activity.Trace (foreign key): Primary key from</span>
 <span class="sd">                imaging.Activity.Trace.</span>
 <span class="sd">            ActivityAlignmentCondition.Trial (foreign key): Primary key from</span>
 <span class="sd">                ActivityAlignmentCondition.Trial.</span>
@@ -1699,14 +1713,14 @@ ActivityAlignmentCondition.</p></td>
         <tr>
           <td><code>ActivityAlignment</code></td>
           <td>
-                <code>foriegn key</code>
+                <code>foreign key</code>
           </td>
           <td><p>Primary key from ActivityAlignment.</p></td>
         </tr>
         <tr>
           <td><code>imaging.Activity.Trace</code></td>
           <td>
-                <code>foriegn key</code>
+                <code>foreign key</code>
           </td>
           <td><p>Primary key from
 imaging.Activity.Trace.</p></td>
@@ -1754,8 +1768,8 @@ ActivityAlignmentCondition.Trial.</p></td>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Aligned trial activity.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        ActivityAlignment (foriegn key): Primary key from ActivityAlignment.</span>
-<span class="sd">        imaging.Activity.Trace (foriegn key): Primary key from</span>
+<span class="sd">        ActivityAlignment (foreign key): Primary key from ActivityAlignment.</span>
+<span class="sd">        imaging.Activity.Trace (foreign key): Primary key from</span>
 <span class="sd">            imaging.Activity.Trace.</span>
 <span class="sd">        ActivityAlignmentCondition.Trial (foreign key): Primary key from</span>
 <span class="sd">            ActivityAlignmentCondition.Trial.</span>

@@ -861,6 +861,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/workflow_calcium_imaging/reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/workflow_calcium_imaging/version/" class="md-nav__link">
         version.py
       </a>
@@ -1982,11 +1996,15 @@ Licensed under the Apache License, Version 2.0.
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">datajoint</span> <span class="k">as</span> <span class="nn">dj</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt">import os
-if os.path.basename(os.getcwd()) == "notebooks": os.chdir("..")
+
+if os.path.basename(os.getcwd()) == "notebooks":
+    os.chdir("..")
 import datajoint as dj</div>
     
         </div>
@@ -2062,14 +2080,16 @@ import datajoint as dj</div>
             </clipboard-copy>
         </div>
             <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">getpass</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;database.host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{YOUR_HOST}</span><span class="s2">&quot;</span> <span class="c1"># CodeBook users should omit this</span>
+
+<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;database.host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{YOUR_HOST}</span><span class="s2">&quot;</span>  <span class="c1"># CodeBook users should omit this</span>
 <span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;database.user&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{YOUR_USERNAME}</span><span class="s2">&quot;</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;database.password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">()</span>  <span class="c1"># enter the password securily</span>
+<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;database.password&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">()</span>  <span class="c1"># enter the password securely</span>
 </pre></div>
 <div id="cell-3" class="clipboard-copy-txt">import getpass
-dj.config["database.host"] = "{YOUR_HOST}" # CodeBook users should omit this
+
+dj.config["database.host"] = "{YOUR_HOST}"  # CodeBook users should omit this
 dj.config["database.user"] = "{YOUR_USERNAME}"
-dj.config["database.password"] = getpass.getpass()  # enter the password securily</div>
+dj.config["database.password"] = getpass.getpass()  # enter the password securely</div>
     
         </div>
     </div>
@@ -2131,7 +2151,7 @@ dj.config["database.password"] = getpass.getpass()  # enter the password securil
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="setup-djconfigcustom">Setup - <code>dj.config['custom']</code><a class="anchor-link" href="#setup-djconfigcustom">&#182;</a></h2><p>The major component of the current workflow is the <a href="https://github.com/datajoint/element-array-ephys">DataJoint Calcium Imaging Element</a>. Calcium Imaging Element requires configurations in the field <code>custom</code> in <code>dj.config</code>:</p>
 <h3 id="database-prefix">Database prefix<a class="anchor-link" href="#database-prefix">&#182;</a></h3><p>Giving a prefix to schema could help on the configuration of privilege settings. For example, if we set prefix <code>neuro_</code>, every schema created with the current workflow will start with <code>neuro_</code>, e.g. <code>neuro_lab</code>, <code>neuro_subject</code>, <code>neuro_scan</code> etc.</p>
-<p>The prefix could be configurated in <code>dj.config</code> as follows. CodeBook users should keep their username as the prefix for schema declaration permissions.</p>
+<p>The prefix could be configured in <code>dj.config</code> as follows. CodeBook users should keep their username as the prefix for schema declaration permissions.</p>
 
 </div>
 </div>
@@ -2249,11 +2269,11 @@ dj.config["custom"] = {"database.prefix": username_as_prefix}</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;custom&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_root_data_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/tmp/example_data&#39;</span> <span class="c1"># local download</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;custom&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_root_data_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/home/inbox/0_1_0a2/&#39;</span> <span class="c1"># on CodeBook</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;custom&quot;</span><span class="p">][</span><span class="s2">&quot;imaging_root_data_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/tmp/example_data&quot;</span>  <span class="c1"># local download</span>
+<span class="n">dj</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;custom&quot;</span><span class="p">][</span><span class="s2">&quot;imaging_root_data_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/home/inbox/0_1_0a2/&quot;</span>  <span class="c1"># on CodeBook</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">dj.config['custom']['imaging_root_data_dir'] = '/tmp/example_data' # local download
-dj.config['custom']['imaging_root_data_dir'] = '/home/inbox/0_1_0a2/' # on CodeBook</div>
+<div id="cell-6" class="clipboard-copy-txt">dj.config["custom"]["imaging_root_data_dir"] = "/tmp/example_data"  # local download
+dj.config["custom"]["imaging_root_data_dir"] = "/home/inbox/0_1_0a2/"  # on CodeBook</div>
     
         </div>
     </div>

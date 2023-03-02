@@ -839,6 +839,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        reference.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../version/" class="md-nav__link">
         version.py
       </a>
@@ -968,21 +982,25 @@
 
       <details class="quote">
         <summary>Source code in <code>workflow_calcium_imaging/ingest.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_subjects</span><span class="p">(</span>
-    <span class="n">subject_csv_path</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;./user_data/subjects.csv&quot;</span><span class="p">,</span> <span class="n">skip_duplicates</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_subjects</span><span class="p">(</span>
+    <span class="n">subject_csv_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./user_data/subjects.csv&quot;</span><span class="p">,</span>
+    <span class="n">skip_duplicates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inserts ./user_data/subject.csv data into corresponding subject schema tables.</span>
 
@@ -1067,15 +1085,7 @@
 
       <details class="quote">
         <summary>Source code in <code>workflow_calcium_imaging/ingest.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
 <span class="normal"> 42</span>
 <span class="normal"> 43</span>
 <span class="normal"> 44</span>
@@ -1175,7 +1185,15 @@
 <span class="normal">138</span>
 <span class="normal">139</span>
 <span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_sessions</span><span class="p">(</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_sessions</span><span class="p">(</span>
     <span class="n">session_csv_path</span><span class="o">=</span><span class="s2">&quot;./user_data/sessions.csv&quot;</span><span class="p">,</span> <span class="n">skip_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ingests all the manual table starting from session schema from</span>
@@ -1186,8 +1204,7 @@
 <span class="sd">        skip_duplicates (bool): Default True. Passed to DataJoint insert.</span>
 <span class="sd">        verbose (bool): Default True. Display number of entries inserted when ingesting.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">root_data_dir</span> <span class="o">=</span> <span class="n">get_imaging_root_data_dir</span><span class="p">()</span>
+    <span class="n">root_data_dirs</span> <span class="o">=</span> <span class="n">get_imaging_root_data_dir</span><span class="p">()</span>
 
     <span class="c1"># ---------- Insert new &quot;Session&quot; and &quot;Scan&quot; ---------</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">session_csv_path</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -1197,7 +1214,8 @@
     <span class="n">session_list</span><span class="p">,</span> <span class="n">session_dir_list</span><span class="p">,</span> <span class="n">scan_list</span><span class="p">,</span> <span class="n">scanner_list</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">sess</span> <span class="ow">in</span> <span class="n">input_sessions</span><span class="p">:</span>
-        <span class="n">sess_dir</span> <span class="o">=</span> <span class="n">find_full_path</span><span class="p">(</span><span class="n">root_data_dir</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">sess</span><span class="p">[</span><span class="s2">&quot;session_dir&quot;</span><span class="p">]))</span>
+        <span class="n">sess_dir</span> <span class="o">=</span> <span class="n">find_full_path</span><span class="p">(</span><span class="n">root_data_dirs</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">sess</span><span class="p">[</span><span class="s2">&quot;session_dir&quot;</span><span class="p">]))</span>
+        <span class="n">root_data_dir</span> <span class="o">=</span> <span class="n">find_root_directory</span><span class="p">(</span><span class="n">root_data_dirs</span><span class="p">,</span> <span class="n">sess_dir</span><span class="p">)</span>
 
         <span class="c1"># search for either ScanImage or Scanbox files (in that order)</span>
         <span class="k">for</span> <span class="n">scan_pattern</span><span class="p">,</span> <span class="n">scan_type</span><span class="p">,</span> <span class="n">glob_func</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
@@ -1309,7 +1327,7 @@
   
       <p>Ingest session, block, trial, and event data.</p>
 <p>Ingest each level of experiment hierarchy for element-trial: recording, block (i.e.,
-phases of trials), trials (repeated units), events (optionally 0-duration occurances
+phases of trials), trials (repeated units), events (optionally 0-duration occurrences
 within trial).</p>
 <p>This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging.</p>
 
@@ -1390,15 +1408,7 @@ Default True.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>workflow_calcium_imaging/ingest.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
@@ -1450,7 +1460,15 @@ Default True.</p></td>
 <span class="normal">201</span>
 <span class="normal">202</span>
 <span class="normal">203</span>
-<span class="normal">204</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_events</span><span class="p">(</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_events</span><span class="p">(</span>
     <span class="n">recording_csv_path</span><span class="o">=</span><span class="s2">&quot;./user_data/behavior_recordings.csv&quot;</span><span class="p">,</span>
     <span class="n">block_csv_path</span><span class="o">=</span><span class="s2">&quot;./user_data/blocks.csv&quot;</span><span class="p">,</span>
     <span class="n">trial_csv_path</span><span class="o">=</span><span class="s2">&quot;./user_data/trials.csv&quot;</span><span class="p">,</span>
@@ -1462,7 +1480,7 @@ Default True.</p></td>
 <span class="sd">    Ingest session, block, trial, and event data.</span>
 
 <span class="sd">    Ingest each level of experiment hierarchy for element-trial: recording, block (i.e.,</span>
-<span class="sd">    phases of trials), trials (repeated units), events (optionally 0-duration occurances</span>
+<span class="sd">    phases of trials), trials (repeated units), events (optionally 0-duration occurrences</span>
 <span class="sd">    within trial).</span>
 
 <span class="sd">    This ingestion function is duplicated across wf-array-ephys and wf-calcium-imaging.</span>
@@ -1584,15 +1602,7 @@ Default True.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>workflow_calcium_imaging/ingest.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">215</span>
 <span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
@@ -1601,7 +1611,15 @@ Default True.</p></td>
 <span class="normal">221</span>
 <span class="normal">222</span>
 <span class="normal">223</span>
-<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_alignment</span><span class="p">(</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">ingest_alignment</span><span class="p">(</span>
     <span class="n">alignment_csv_path</span><span class="o">=</span><span class="s2">&quot;./user_data/alignments.csv&quot;</span><span class="p">,</span> <span class="n">skip_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ingest event alignment information</span>
