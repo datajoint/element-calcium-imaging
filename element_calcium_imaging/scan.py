@@ -659,7 +659,7 @@ class ScanQualityMetrics(dj.Computed):
 
         definition = """ 
         -> master
-        channel         : int      # Channel index
+        -> Channel
         ---
         min_intensity   : int      # Minimum value in movie.
         max_intensity   : int      # Maximum value in movie.
