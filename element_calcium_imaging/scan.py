@@ -678,13 +678,15 @@ class ScanQualityMetrics(dj.Computed):
         if acq_software == "ScanImage":
             import scanreader
 
+            # Swtich from dims FYXCT to TCYX
             data = scanreader.read_scan(get_scan_image_files(key))[
                 key["field_idx"]
             ].transpose(3, 2, 0, 1)
         elif acq_software == "Scanbox":
-            import sbxreader
+            from sbxreader import sbx_memmap
 
-            data = sbxreader(get_scan_box_files(key))[:, key["field_idx"]]
+            # Switch from TFCYX to TCYX
+            data = sbx_memmap(get_scan_box_files(key))[:, key["field_idx"]]
         elif acq_software == "NIS":
             import nd2
 
@@ -700,9 +702,7 @@ class ScanQualityMetrics(dj.Computed):
 
             for i, dim in enumerate("TZC"):
                 if dim not in nd2_dims:
-                    data = np.expand_dims(data, i)
-
-            data = data[:, key["field_idx"]]
+                    data = np.expand_dims(data, i)  # final dims: TFCYX
 
         for channel in range(nchannels):
             movie = data[:, key["field_idx"], channel, :, :]
