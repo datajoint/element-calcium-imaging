@@ -22,6 +22,8 @@ def activate(
 ):
     """Activate this schema.
 
+    Required dependencies should be defined in the linking module
+
     Args:
         scan_schema_name (str): Schema name on the database server to activate the
             `scan` module
