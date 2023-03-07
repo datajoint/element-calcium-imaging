@@ -14,6 +14,7 @@ RUN \
     pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
     pip install --no-cache-dir ./CaImAn && \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
+    pip install --no-cache-dir git+https://github.com/datajoint/suite2p.git@nd2support && \
     # clean up
     rm -rf /tmp/CaImAn && \
     rm /tmp/requirements.txt && \
