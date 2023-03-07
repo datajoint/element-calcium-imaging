@@ -10,6 +10,7 @@ RUN \
     # workflow dependencies
     apt-get install gcc ffmpeg libsm6 libxext6 -y && \
     pip install --no-cache-dir Pygments==2.14.0  && \
+    pip install --no-cache-dir scipy==1.10.1  && \
     git clone https://github.com/datajoint/CaImAn.git  && \
     pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
     pip install --no-cache-dir ./CaImAn && \
