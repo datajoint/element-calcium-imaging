@@ -695,7 +695,8 @@ class ScanQualityMetrics(dj.Computed):
             nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
             valid_dimensions = "TZCYX"
-            assert set(nd2_dims) <= set(valid_dimensions) 
+            assert set(nd2_dims) <= set(
+                valid_dimensions
             ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_nd2_files(key)[0]}."
 
             # Sort the dimensions in the order of TZCYX, skipping the missing ones.
