@@ -8,6 +8,6 @@ element-session>=0.1.2
 ipykernel>=6.0.1
 jupytext>=1.13.7
 nd2
-sbxreader @ git+https://github.com/datajoint-company/sbxreader
+sbxreader @ git+https://github.com/datajoint/sbxreader
 scanreader @ git+https://github.com/atlab/scanreader.git
-suite2p @ git+https://github.com/datajoint-company/suite2p.git
+suite2p @ git+https://github.com/datajoint/suite2p.git@nd2support
