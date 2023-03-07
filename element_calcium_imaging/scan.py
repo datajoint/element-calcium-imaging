@@ -694,15 +694,21 @@ class ScanQualityMetrics(dj.Computed):
 
             nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
-            valid_dimensions = set("TZCYX")
-            assert valid_dimensions == set(
-                nd2_dims
-            ), f"Unknown or missing dimension in {nd2_dims}"
-            data = nd2_file.asarray().transpose([nd2_dims[x] for x in valid_dimensions])
+            valid_dimensions = "TZCYX"
+            assert (
+                len(set(nd2_dims) - set(valid_dimensions)) == 0
+            ), f"Unknown or missing dimension in {set(nd2_dims) - set(valid_dimensions)}"
 
+            # Sort the dimensions in the order of TZCYX, skipping the missing ones.
+            data = nd2_file.asarray().transpose(
+                [nd2_dims[x] for x in valid_dimensions if x in nd2_dims]
+            )
+
+            # Expand array to include the missing dimensions.
             for i, dim in enumerate("TZC"):
                 if dim not in nd2_dims:
                     data = np.expand_dims(data, i)
+
             data = data[:, key["field_idx"]]  # Switch from TFCYX to TCYX
 
         for channel in range(nchannels):
