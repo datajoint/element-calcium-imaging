@@ -9,7 +9,7 @@ RUN \
     pip install --no-cache-dir flake8 black pre-commit && \
     # workflow dependencies
     apt-get install gcc ffmpeg libsm6 libxext6 -y && \
-    # Comment out CaImAn installation due to Docker image size limits on Codespace
+    # Commented out CaImAn installation due to Docker image size limits on Codespace
     # pip install --no-cache-dir Pygments==2.14.0  && \
     # git clone https://github.com/datajoint/CaImAn.git  && \
     # pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
