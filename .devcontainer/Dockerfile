@@ -25,3 +25,5 @@ ENV DJ_USER root
 ENV DJ_PASS simple
 
 ENV DJ_PUBLIC_S3_MOUNT_PATH /workspaces/workflow-calcium-imaging/example_data
+ENV IMAGING_ROOT_DATA_DIR /workspaces/workflow-calcium-imaging/example_data
+ENV DATABASE_PREFIX neuro_
