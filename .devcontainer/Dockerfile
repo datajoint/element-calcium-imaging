@@ -17,7 +17,6 @@ RUN \
     pip install --no-cache-dir -r /tmp/requirements.txt && \
     # clean up
     # rm -rf /tmp/CaImAn && \
-    rm -rf /tmp/installs && \
     rm /tmp/requirements.txt && \
     apt-get clean
 
