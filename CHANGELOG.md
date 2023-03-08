@@ -3,6 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.3.0] - 2023-08-03
+
++ Add - Demo capabilities using GitHub CodeSpaces
+
 ## [0.2.0] - 2022-10-14
 
 + Add - PrairieView acquisition system loader
@@ -46,6 +50,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Containerization for pytests
 + Comment - Phase previously designated 0.1.0 -> 0.0.0
 
+[0.3.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.0
 [0.2.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.2.0
 [0.1.4]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.4
 [0.1.2]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.1.2
