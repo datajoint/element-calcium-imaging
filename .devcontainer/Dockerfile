@@ -9,6 +9,8 @@ RUN \
     pip install --no-cache-dir flake8 black pre-commit && \
     # workflow dependencies
     apt-get install gcc ffmpeg libsm6 libxext6 -y && \
+    git clone https://github.com/tdincer/suite2p.git && \
+    cd suite2p && git checkout 23c67b5 && pip install -e . && cd .. && \
     # Commented out CaImAn installation due to Docker image size limits on Codespace
     # pip install --no-cache-dir Pygments==2.14.0  && \
     # git clone https://github.com/datajoint/CaImAn.git  && \
