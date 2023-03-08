@@ -10,4 +10,4 @@ jupytext>=1.13.7
 nd2
 sbxreader @ git+https://github.com/datajoint/sbxreader
 scanreader @ git+https://github.com/atlab/scanreader.git
-suite2p @ git+https://github.com/datajoint/suite2p.git@nd2support
+suite2p @ git+https://github.com/tdincer/suite2p.git@23c67b5ff220883584379b30aeb213481b89c237
