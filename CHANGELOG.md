@@ -6,6 +6,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 ## [0.5.4] - 2023-03-08
 
 + Add - Requirement for `ipywidgets`
++ Update - Docker Compose file for docs release
 
 ## [0.5.3] - 2023-02-23
 
