@@ -8,14 +8,14 @@
       
       
       
-        <link rel="canonical" href="http://localhost/docs/elements/element-calcium-imaging/0.5/tutorials/02-workflow-structure-optional/">
+        <link rel="canonical" href="http://localhost/docs/elements/element-calcium-imaging/0.5/tutorials/demo_prepare/">
       
       <link rel="icon" href="../../assets/images/company-logo-blue.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
     
     
       
-        <title>Workflow Structure - DataJoint Documentation</title>
+        <title>Demo prepare - DataJoint Documentation</title>
       
     
     
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction-to-the-workflow-structure" class="md-skip">
+        <a href="#demo-preparation-notebook" class="md-skip">
           Skip to content
         </a>
       
@@ -131,7 +131,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Workflow Structure
+              Demo prepare
             
           </span>
         </div>
@@ -307,14 +307,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
       
       
@@ -351,7 +349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../00-data-download-optional/" class="md-nav__link">
+      <a href="../00-data-download-optional.ipynb" class="md-nav__link">
         Data Download
       </a>
     </li>
@@ -365,7 +363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-configure/" class="md-nav__link">
+      <a href="../01-configure.ipynb" class="md-nav__link">
         Configure
       </a>
     </li>
@@ -377,59 +375,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Workflow Structure
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../02-workflow-structure-optional.ipynb" class="md-nav__link">
         Workflow Structure
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#schemas-and-tables" class="md-nav__link">
-    Schemas and tables
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#datajoint-tools-to-explore-schemas-and-tables" class="md-nav__link">
-    DataJoint tools to explore schemas and tables
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -441,7 +391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../03-process/" class="md-nav__link">
+      <a href="../03-process.ipynb" class="md-nav__link">
         Process
       </a>
     </li>
@@ -455,7 +405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-automate-optional/" class="md-nav__link">
+      <a href="../04-automate-optional.ipynb" class="md-nav__link">
         Automate
       </a>
     </li>
@@ -469,7 +419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-drop-optional/" class="md-nav__link">
+      <a href="../06-drop-optional.ipynb" class="md-nav__link">
         Drop
       </a>
     </li>
@@ -483,7 +433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-downstream-analysis-optional/" class="md-nav__link">
+      <a href="../07-downstream-analysis-optional.ipynb" class="md-nav__link">
         Downstream Analysis
       </a>
     </li>
@@ -884,11 +834,13 @@
                 
                   
 
-  <a href="https://github.com/datajoint/element-calcium-imaging/edit/main/docs/src/tutorials/02-workflow-structure-optional.ipynb" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/datajoint/element-calcium-imaging/edit/main/docs/src/tutorials/demo_prepare.ipynb" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
+
+  <h1>Demo prepare</h1>
 
 <script>
 (function (global, factory) {
@@ -1927,16 +1879,9 @@ Licensed under the Apache License, Version 2.0.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="introduction-to-the-workflow-structure">Introduction to the workflow structure<a class="anchor-link" href="#introduction-to-the-workflow-structure">&#182;</a></h1><p>This notebook gives a brief overview of the workflow structure and introduces some useful DataJoint tools to facilitate the exploration.</p>
-<ul>
-<li><p>DataJoint needs to be pre-configured before running this notebook, if you haven't set up the configuration, refer to notebook <a href="01-configure.ipynb">01-configure</a>.</p>
-</li>
-<li><p>If you are familiar with DataJoint and the workflow structure, proceed to the next notebook <a href="03-process.ipynb">03-process</a> directly to run the workflow.</p>
-</li>
-<li><p>For a more thorough introduction of DataJoint functions, please visit our <a href="https://playground.datajoint.io">general tutorial site</a></p>
-</li>
-</ul>
-<p>To load the local configuration, we will change the directory to the package root.</p>
+<h3 id="demo-preparation-notebook">Demo Preparation Notebook<a class="anchor-link" href="#demo-preparation-notebook">&#182;</a></h3><p><strong>Please Note</strong>: This notebook and demo are NOT intended to be used as learning materials. To gain
+a thorough understanding of the DataJoint workflow for calcium imaging, please
+see the <a href="./tutorial.ipynb"><code>tutorial</code></a> notebook.</p>
 
 </div>
 </div>
@@ -1947,7 +1892,7 @@ Licensed under the Apache License, Version 2.0.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -1962,15 +1907,19 @@ Licensed under the Apache License, Version 2.0.
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">==</span> <span class="s2">&quot;notebooks&quot;</span><span class="p">:</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">datajoint</span> <span class="k">as</span> <span class="nn">dj</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">workflow_calcium_imaging.pipeline</span> <span class="kn">import</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">imaging</span><span class="p">,</span> <span class="n">Equipment</span>
+<span class="kn">from</span> <span class="nn">element_calcium_imaging</span> <span class="kn">import</span> <span class="n">imaging_report</span>
+<span class="kn">import</span> <span class="nn">suite2p</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">import os
-
-if os.path.basename(os.getcwd()) == "notebooks":
-    os.chdir("..")</div>
+<div id="cell-1" class="clipboard-copy-txt">import datajoint as dj
+import datetime
+import numpy as np
+from workflow_calcium_imaging.pipeline import subject, session, scan, imaging, Equipment
+from element_calcium_imaging import imaging_report
+import suite2p</div>
     
         </div>
     </div>
@@ -1979,27 +1928,13 @@ if os.path.basename(os.getcwd()) == "notebooks":
 </div>
 
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="schemas-and-tables">Schemas and tables<a class="anchor-link" href="#schemas-and-tables">&#182;</a></h2><ul>
-<li>The current workflow is composed of multiple database schemas, each of them corresponds to a module within <code>workflow_calcium_imaging.pipeline</code></li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2014,11 +1949,21 @@ if os.path.basename(os.getcwd()) == "notebooks":
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">datajoint</span> <span class="k">as</span> <span class="nn">dj</span>
-<span class="kn">from</span> <span class="nn">workflow_calcium_imaging.pipeline</span> <span class="kn">import</span> <span class="n">lab</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">imaging</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject1&#39;</span><span class="p">,</span>
+        <span class="n">subject_birth_date</span><span class="o">=</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span>
+        <span class="n">sex</span><span class="o">=</span><span class="s1">&#39;U&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-2" class="clipboard-copy-txt">import datajoint as dj
-from workflow_calcium_imaging.pipeline import lab, subject, session, scan, imaging</div>
+<div id="cell-2" class="clipboard-copy-txt">subject.Subject.insert1(
+    dict(
+        subject='subject1',
+        subject_birth_date='2023-01-01',
+        sex='U',
+    )
+)</div>
     
         </div>
     </div>
@@ -2026,51 +1971,14 @@ from workflow_calcium_imaging.pipeline import lab, subject, session, scan, imagi
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Connecting user1@127.0.0.1:3306
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li>Each module contains a schema object that enables interaction with the schema in the database.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2085,9 +1993,9 @@ from workflow_calcium_imaging.pipeline import lab, subject, session, scan, imagi
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">schema</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Equipment</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">scanner</span><span class="o">=</span><span class="s2">&quot;Mesoscope&quot;</span><span class="p">))</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">imaging.schema</div>
+<div id="cell-3" class="clipboard-copy-txt">Equipment.insert1(dict(scanner="Mesoscope"))</div>
     
         </div>
     </div>
@@ -2095,53 +2003,14 @@ from workflow_calcium_imaging.pipeline import lab, subject, session, scan, imagi
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>Schema `neuro_imaging`</pre>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li>The table classes in the module corresponds to a table in the schema in the database.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2156,11 +2025,29 @@ from workflow_calcium_imaging.pipeline import lab, subject, session, scan, imagi
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># preview columns and contents in a table</span>
-<span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="p">()</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session_key</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="s1">&#39;subject1&#39;</span><span class="p">,</span> 
+                   <span class="n">session_datetime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="n">session_key</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">SessionDirectory</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">session_key</span><span class="p">,</span> 
+        <span class="n">session_dir</span><span class="o">=</span><span class="s1">&#39;subject1/session1&#39;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-4" class="clipboard-copy-txt"># preview columns and contents in a table
-imaging.Processing()</div>
+<div id="cell-4" class="clipboard-copy-txt">session_key = dict(subject='subject1', 
+                   session_datetime=datetime.datetime.now())
+
+session.Session.insert1(session_key)
+
+session.SessionDirectory.insert1(
+    dict(
+        session_key, 
+        session_dir='subject1/session1'
+    )
+)</div>
     
         </div>
     </div>
@@ -2168,137 +2055,6 @@ imaging.Processing()</div>
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-
-
-
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
-
-    
-    <style type="text/css">
-        .Relation{
-            border-collapse:collapse;
-        }
-        .Relation th{
-            background: #A0A0A0; color: #ffffff; padding:4px; border:#f0e0e0 1px solid;
-            font-weight: normal; font-family: monospace; font-size: 100%;
-        }
-        .Relation td{
-            padding:4px; border:#f0e0e0 1px solid; font-size:100%;
-        }
-        .Relation tr:nth-child(odd){
-            background: #ffffff;
-        }
-        .Relation tr:nth-child(even){
-            background: #f3f1ff;
-        }
-        /* Tooltip container */
-        .djtooltip {
-        }
-        /* Tooltip text */
-        .djtooltip .djtooltiptext {
-            visibility: hidden;
-            width: 120px;
-            background-color: black;
-            color: #fff;
-            text-align: center;
-            padding: 5px 0;
-            border-radius: 6px;
-            /* Position the tooltip text - see examples below! */
-            position: absolute;
-            z-index: 1;
-        }
-        #primary {
-            font-weight: bold;
-            color: black;
-        }
-        #nonprimary {
-            font-weight: normal;
-            color: white;
-        }
-
-        /* Show the tooltip text when you mouse over the tooltip container */
-        .djtooltip:hover .djtooltiptext {
-            visibility: visible;
-        }
-    </style>
-    
-    <b>Processing Procedure</b>
-        <div style="max-height:1000px;max-width:1500px;overflow:auto;">
-        <table border="1" class="Relation">
-            <thead> <tr style="text-align: right;"> <th> <div class="djtooltip">
-                            <p id="primary">subject</p>
-                            <span class="djtooltiptext"></span>
-                        </div></th><th><div class="djtooltip">
-                            <p id="primary">session_datetime</p>
-                            <span class="djtooltiptext"></span>
-                        </div></th><th><div class="djtooltip">
-                            <p id="primary">scan_id</p>
-                            <span class="djtooltiptext"></span>
-                        </div></th><th><div class="djtooltip">
-                            <p id="primary">paramset_idx</p>
-                            <span class="djtooltiptext"></span>
-                        </div></th><th><div class="djtooltip">
-                            <p id="nonprimary">processing_time</p>
-                            <span class="djtooltiptext">time of generation of this set of processed, segmented results</span>
-                        </div></th><th><div class="djtooltip">
-                            <p id="nonprimary">package_version</p>
-                            <span class="djtooltiptext"></span>
-                        </div> </th> </tr> </thead>
-            <tbody> <tr>  </tr> </tbody>
-        </table>
-        
-        <p>Total: 0</p></div>
-        
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><p>By importing the modules for the first time, the schemas and tables will be created inside the database.</p>
-</li>
-<li><p>Once created, importing modules will not create schemas and tables again, but the existing schemas/tables can be accessed and manipulated by the modules.</p>
-</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="datajoint-tools-to-explore-schemas-and-tables">DataJoint tools to explore schemas and tables<a class="anchor-link" href="#datajoint-tools-to-explore-schemas-and-tables">&#182;</a></h2><ul>
-<li><code>dj.list_schemas()</code>: list all schemas a user has access to in the current database</li>
-</ul>
-
-</div>
-</div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -2306,7 +2062,7 @@ imaging.Processing()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2321,9 +2077,23 @@ imaging.Processing()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">list_schemas</span><span class="p">()</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scan</span><span class="o">.</span><span class="n">Scan</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">session_key</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">scanner</span><span class="o">=</span><span class="s2">&quot;Mesoscope&quot;</span><span class="p">,</span>
+        <span class="n">acq_software</span><span class="o">=</span><span class="s1">&#39;ScanImage&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt">dj.list_schemas()</div>
+<div id="cell-5" class="clipboard-copy-txt">scan.Scan.insert1(
+    dict(
+        session_key,
+        scan_id=0,
+        scanner="Mesoscope",
+        acq_software='ScanImage',
+    )
+)</div>
     
         </div>
     </div>
@@ -2332,27 +2102,13 @@ imaging.Processing()</div>
 </div>
 
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><code>dj.Diagram()</code>: plot tables and dependencies in a schema. </li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2367,11 +2123,13 @@ imaging.Processing()</div>
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot diagram for all tables in a schema</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">populate_settings</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;display_progress&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="n">scan</span><span class="o">.</span><span class="n">ScanInfo</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt"># plot diagram for all tables in a schema
-dj.Diagram(imaging)</div>
+<div id="cell-6" class="clipboard-copy-txt">populate_settings = {"display_progress": True}
+
+scan.ScanInfo.populate(**populate_settings)</div>
     
         </div>
     </div>
@@ -2379,376 +2137,14 @@ dj.Diagram(imaging)</div>
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="577pt" width="1490pt">
-
-
-
-
-imaging.ProcessingParamSet
-<a>
-
-imaging.ProcessingParamSet
-</a>
-
-
-
-
-imaging.ProcessingTask
-<a>
-
-imaging.ProcessingTask
-</a>
-
-
-
-
-imaging.ProcessingParamSet-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.MotionCorrection.Summary
-<a>
-
-imaging.MotionCorrection.Summary
-</a>
-
-
-
-
-imaging.MaskClassificationMethod
-<a>
-
-imaging.MaskClassificationMethod
-</a>
-
-
-
-
-imaging.MaskClassification
-<a>
-
-imaging.MaskClassification
-</a>
-
-
-
-
-imaging.MaskClassificationMethod-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Processing
-<a>
-
-imaging.Processing
-</a>
-
-
-
-
-imaging.ProcessingTask-&gt;imaging.Processing
-
-
-
-
-imaging.Curation
-<a>
-
-imaging.Curation
-</a>
-
-
-
-
-imaging.Segmentation
-<a>
-
-imaging.Segmentation
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.Segmentation
-
-
-
-
-imaging.MotionCorrection
-<a>
-
-imaging.MotionCorrection
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.MotionCorrection
-
-
-
-
-imaging.Segmentation.Mask
-<a>
-
-imaging.Segmentation.Mask
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Segmentation.Mask
-
-
-
-
-imaging.Segmentation-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Fluorescence
-<a>
-
-imaging.Fluorescence
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Fluorescence
-
-
-
-
-imaging.Fluorescence.Trace
-<a>
-
-imaging.Fluorescence.Trace
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.MaskClassification.MaskType
-<a>
-
-imaging.MaskClassification.MaskType
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.Activity.Trace
-<a>
-
-imaging.Activity.Trace
-</a>
-
-
-
-
-imaging.Fluorescence.Trace-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MaskClassification-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.MaskType
-<a>
-
-imaging.MaskType
-</a>
-
-
-
-
-imaging.MaskType-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection.Block
-<a>
-
-imaging.MotionCorrection.Block
-</a>
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection-&gt;imaging.MotionCorrection.Block
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.Activity
-<a>
-
-imaging.Activity
-</a>
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Activity
-
-
-
-
-imaging.ActivityExtractionMethod
-<a>
-
-imaging.ActivityExtractionMethod
-</a>
-
-
-
-
-imaging.ActivityExtractionMethod-&gt;imaging.Activity
-
-
-
-
-imaging.Processing-&gt;imaging.Curation
-
-
-
-
-imaging.Activity-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.Summary
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.NonRigidMotionCorrection
-
-
-
-
-imaging.MotionCorrection.RigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.RigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.RigidMotionCorrection
-
-
-
-
-imaging.CellCompartment
-<a>
-
-imaging.CellCompartment
-</a>
-
-
-
-
-imaging.ProcessingMethod
-<a>
-
-imaging.ProcessingMethod
-</a>
-
-
-
-
-imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p><strong>Table tiers</strong>:</p>
-<p>Manual table: green box, manually inserted table, expect new entries daily, e.g. Subject, ProbeInsertion.<br>
-Lookup table: gray box, pre inserted table, commonly used for general facts or parameters. e.g. Strain, ClusteringMethod, ClusteringParamSet.<br>
-Imported table: blue oval, auto-processing table, the processing depends on the importing of external files. e.g. process of Clustering requires output files from kilosort2.<br>
-Computed table: red circle, auto-processing table, the processing does not depend on files external to the database, commonly used for<br>
-Part table: plain text, as an appendix to the master table, all the part entries of a given master entry represent a intact set of the master entry. e.g. Unit of a CuratedClustering.</p>
-<p><strong>Dependencies</strong>:</p>
-<p>One-to-one primary: thick solid line, share the exact same primary key, meaning the child table inherits all the primary key fields from the parent table as its own primary key.<br>
-One-to-many primary: thin solid line, inherit the primary key from the parent table, but have additional field(s) as part of the primary key as well
-secondary dependency: dashed line, the child table inherits the primary key fields from parent table as its own secondary attribute.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2763,11 +2159,25 @@ secondary dependency: dashed line, the child table inherits the primary key fiel
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot diagram of tables in multiple schemas</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">session</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">suite2p_params</span> <span class="o">=</span> <span class="n">suite2p</span><span class="o">.</span><span class="n">default_ops</span><span class="p">()</span>
+<span class="n">suite2p_params</span><span class="p">[</span><span class="s1">&#39;nonrigid&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="n">imaging</span><span class="o">.</span><span class="n">ProcessingParamSet</span><span class="o">.</span><span class="n">insert_new_params</span><span class="p">(</span>
+    <span class="n">processing_method</span><span class="o">=</span><span class="s2">&quot;suite2p&quot;</span><span class="p">,</span>
+    <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">suite2p_params</span><span class="p">,</span>
+    <span class="n">paramset_desc</span><span class="o">=</span><span class="s1">&#39;Default parameter set for suite2p&#39;</span>
+<span class="p">)</span>
 </pre></div>
-<div id="cell-7" class="clipboard-copy-txt"># plot diagram of tables in multiple schemas
-dj.Diagram(subject) + dj.Diagram(session) + dj.Diagram(imaging)</div>
+<div id="cell-7" class="clipboard-copy-txt">suite2p_params = suite2p.default_ops()
+suite2p_params['nonrigid']=False
+
+imaging.ProcessingParamSet.insert_new_params(
+    processing_method="suite2p",
+    paramset_idx=0,
+    params=suite2p_params,
+    paramset_desc='Default parameter set for suite2p'
+)</div>
     
         </div>
     </div>
@@ -2775,626 +2185,14 @@ dj.Diagram(subject) + dj.Diagram(session) + dj.Diagram(imaging)</div>
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="648pt" width="2316pt">
-
-
-
-
-imaging.ProcessingParamSet
-<a>
-
-imaging.ProcessingParamSet
-</a>
-
-
-
-
-imaging.ProcessingTask
-<a>
-
-imaging.ProcessingTask
-</a>
-
-
-
-
-imaging.ProcessingParamSet-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.MotionCorrection.Summary
-<a>
-
-imaging.MotionCorrection.Summary
-</a>
-
-
-
-
-imaging.MaskClassificationMethod
-<a>
-
-imaging.MaskClassificationMethod
-</a>
-
-
-
-
-imaging.MaskClassification
-<a>
-
-imaging.MaskClassification
-</a>
-
-
-
-
-imaging.MaskClassificationMethod-&gt;imaging.MaskClassification
-
-
-
-
-subject.Strain
-<a>
-
-subject.Strain
-</a>
-
-
-
-
-subject.Subject.Strain
-<a>
-
-subject.Subject.Strain
-</a>
-
-
-
-
-subject.Strain-&gt;subject.Subject.Strain
-
-
-
-
-imaging.Processing
-<a>
-
-imaging.Processing
-</a>
-
-
-
-
-imaging.ProcessingTask-&gt;imaging.Processing
-
-
-
-
-imaging.Curation
-<a>
-
-imaging.Curation
-</a>
-
-
-
-
-imaging.Segmentation
-<a>
-
-imaging.Segmentation
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.Segmentation
-
-
-
-
-imaging.MotionCorrection
-<a>
-
-imaging.MotionCorrection
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.MotionCorrection
-
-
-
-
-session.Session
-<a>
-
-session.Session
-</a>
-
-
-
-
-session.ProjectSession
-<a>
-
-session.ProjectSession
-</a>
-
-
-
-
-session.Session-&gt;session.ProjectSession
-
-
-
-
-session.SessionDirectory
-<a>
-
-session.SessionDirectory
-</a>
-
-
-
-
-session.Session-&gt;session.SessionDirectory
-
-
-
-
-scan.Scan
-<a>
-
-scan.Scan
-</a>
-
-
-
-
-session.Session-&gt;scan.Scan
-
-
-
-
-subject.Allele.Source
-<a>
-
-subject.Allele.Source
-</a>
-
-
-
-
-imaging.Segmentation.Mask
-<a>
-
-imaging.Segmentation.Mask
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Segmentation.Mask
-
-
-
-
-imaging.Segmentation-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Fluorescence
-<a>
-
-imaging.Fluorescence
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Fluorescence
-
-
-
-
-imaging.Fluorescence.Trace
-<a>
-
-imaging.Fluorescence.Trace
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.MaskClassification.MaskType
-<a>
-
-imaging.MaskClassification.MaskType
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-subject.Subject.Source
-<a>
-
-subject.Subject.Source
-</a>
-
-
-
-
-imaging.Activity.Trace
-<a>
-
-imaging.Activity.Trace
-</a>
-
-
-
-
-imaging.Fluorescence.Trace-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MaskClassification-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.MaskType
-<a>
-
-imaging.MaskType
-</a>
-
-
-
-
-imaging.MaskType-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-subject.Subject.Lab
-<a>
-
-subject.Subject.Lab
-</a>
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection.Block
-<a>
-
-imaging.MotionCorrection.Block
-</a>
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection-&gt;imaging.MotionCorrection.Block
-
-
-
-
-subject.Subject
-<a>
-
-subject.Subject
-</a>
-
-
-
-
-subject.Subject-&gt;session.Session
-
-
-
-
-subject.Subject-&gt;subject.Subject.Strain
-
-
-
-
-subject.Subject-&gt;subject.Subject.Source
-
-
-
-
-subject.Subject-&gt;subject.Subject.Lab
-
-
-
-
-subject.Subject.User
-<a>
-
-subject.Subject.User
-</a>
-
-
-
-
-subject.Subject-&gt;subject.Subject.User
-
-
-
-
-subject.SubjectDeath
-<a>
-
-subject.SubjectDeath
-</a>
-
-
-
-
-subject.Subject-&gt;subject.SubjectDeath
-
-
-
-
-subject.Subject.Protocol
-<a>
-
-subject.Subject.Protocol
-</a>
-
-
-
-
-subject.Subject-&gt;subject.Subject.Protocol
-
-
-
-
-subject.Zygosity
-<a>
-
-subject.Zygosity
-</a>
-
-
-
-
-subject.Subject-&gt;subject.Zygosity
-
-
-
-
-subject.SubjectCullMethod
-<a>
-
-subject.SubjectCullMethod
-</a>
-
-
-
-
-subject.Subject-&gt;subject.SubjectCullMethod
-
-
-
-
-subject.Subject.Line
-<a>
-
-subject.Subject.Line
-</a>
-
-
-
-
-subject.Subject-&gt;subject.Subject.Line
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.Activity
-<a>
-
-imaging.Activity
-</a>
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Activity
-
-
-
-
-subject.Allele
-<a>
-
-subject.Allele
-</a>
-
-
-
-
-subject.Allele-&gt;subject.Allele.Source
-
-
-
-
-subject.Line.Allele
-<a>
-
-subject.Line.Allele
-</a>
-
-
-
-
-subject.Allele-&gt;subject.Line.Allele
-
-
-
-
-subject.Allele-&gt;subject.Zygosity
-
-
-
-
-subject.Line
-<a>
-
-subject.Line
-</a>
-
-
-
-
-subject.Line-&gt;subject.Line.Allele
-
-
-
-
-subject.Line-&gt;subject.Subject.Line
-
-
-
-
-imaging.ActivityExtractionMethod
-<a>
-
-imaging.ActivityExtractionMethod
-</a>
-
-
-
-
-imaging.ActivityExtractionMethod-&gt;imaging.Activity
-
-
-
-
-imaging.Processing-&gt;imaging.Curation
-
-
-
-
-imaging.Activity-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.Summary
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.NonRigidMotionCorrection
-
-
-
-
-imaging.MotionCorrection.RigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.RigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.RigidMotionCorrection
-
-
-
-
-scan.Scan-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.CellCompartment
-<a>
-
-imaging.CellCompartment
-</a>
-
-
-
-
-imaging.ProcessingMethod
-<a>
-
-imaging.ProcessingMethod
-</a>
-
-
-
-
-imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -3409,11 +2207,29 @@ imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot diagram of selected tables and schemas</span>
-<span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">ProcessingTask</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">session_key</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">task_mode</span><span class="o">=</span><span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="c1"># load or trigger</span>
+        <span class="n">processing_output_dir</span><span class="o">=</span><span class="s1">&#39;subject1/session1/suite2p&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
 </pre></div>
-<div id="cell-8" class="clipboard-copy-txt"># plot diagram of selected tables and schemas
-dj.Diagram(subject.Subject) + dj.Diagram(session.Session) + dj.Diagram(imaging)</div>
+<div id="cell-8" class="clipboard-copy-txt">imaging.ProcessingTask.insert1(
+    dict(
+        session_key,
+        scan_id=0,
+        paramset_idx=0,
+        task_mode='load', # load or trigger
+        processing_output_dir='subject1/session1/suite2p',
+    )
+)
+
+imaging.Processing.populate(**populate_settings)</div>
     
         </div>
     </div>
@@ -3421,411 +2237,14 @@ dj.Diagram(subject.Subject) + dj.Diagram(session.Session) + dj.Diagram(imaging)<
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="648pt" width="1490pt">
-
-
-
-
-imaging.ProcessingParamSet
-<a>
-
-imaging.ProcessingParamSet
-</a>
-
-
-
-
-imaging.ProcessingTask
-<a>
-
-imaging.ProcessingTask
-</a>
-
-
-
-
-imaging.ProcessingParamSet-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.MotionCorrection.Summary
-<a>
-
-imaging.MotionCorrection.Summary
-</a>
-
-
-
-
-imaging.MaskClassificationMethod
-<a>
-
-imaging.MaskClassificationMethod
-</a>
-
-
-
-
-imaging.MaskClassification
-<a>
-
-imaging.MaskClassification
-</a>
-
-
-
-
-imaging.MaskClassificationMethod-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Processing
-<a>
-
-imaging.Processing
-</a>
-
-
-
-
-imaging.ProcessingTask-&gt;imaging.Processing
-
-
-
-
-imaging.Curation
-<a>
-
-imaging.Curation
-</a>
-
-
-
-
-imaging.Segmentation
-<a>
-
-imaging.Segmentation
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.Segmentation
-
-
-
-
-imaging.MotionCorrection
-<a>
-
-imaging.MotionCorrection
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.MotionCorrection
-
-
-
-
-session.Session
-<a>
-
-session.Session
-</a>
-
-
-
-
-scan.Scan
-<a>
-
-scan.Scan
-</a>
-
-
-
-
-session.Session-&gt;scan.Scan
-
-
-
-
-imaging.Segmentation.Mask
-<a>
-
-imaging.Segmentation.Mask
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Segmentation.Mask
-
-
-
-
-imaging.Segmentation-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Fluorescence
-<a>
-
-imaging.Fluorescence
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.Fluorescence
-
-
-
-
-imaging.Fluorescence.Trace
-<a>
-
-imaging.Fluorescence.Trace
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.MaskClassification.MaskType
-<a>
-
-imaging.MaskClassification.MaskType
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.Activity.Trace
-<a>
-
-imaging.Activity.Trace
-</a>
-
-
-
-
-imaging.Fluorescence.Trace-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MaskClassification-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.MaskType
-<a>
-
-imaging.MaskType
-</a>
-
-
-
-
-imaging.MaskType-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-subject.Subject
-<a>
-
-subject.Subject
-</a>
-
-
-
-
-subject.Subject-&gt;session.Session
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection.Block
-<a>
-
-imaging.MotionCorrection.Block
-</a>
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection-&gt;imaging.MotionCorrection.Block
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.Activity
-<a>
-
-imaging.Activity
-</a>
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Activity
-
-
-
-
-imaging.ActivityExtractionMethod
-<a>
-
-imaging.ActivityExtractionMethod
-</a>
-
-
-
-
-imaging.ActivityExtractionMethod-&gt;imaging.Activity
-
-
-
-
-imaging.Processing-&gt;imaging.Curation
-
-
-
-
-imaging.Activity-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.Summary
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.NonRigidMotionCorrection
-
-
-
-
-imaging.MotionCorrection.RigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.RigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.RigidMotionCorrection
-
-
-
-
-scan.Scan-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.CellCompartment
-<a>
-
-imaging.CellCompartment
-</a>
-
-
-
-
-imaging.ProcessingMethod
-<a>
-
-imaging.ProcessingMethod
-</a>
-
-
-
-
-imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><code>describe()</code>: show table definition with foreign key references.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -3840,9 +2259,43 @@ imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
                 </div>
             </clipboard-copy>
         </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="o">.</span><span class="n">describe</span><span class="p">();</span>
+            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Curation</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">session_key</span><span class="p">,</span>
+        <span class="n">scan_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">paramset_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">curation_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">curation_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="n">curation_output_dir</span><span class="o">=</span><span class="s1">&#39;subject1/session1/suite2p&#39;</span><span class="p">,</span>
+        <span class="n">manual_curation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">imaging</span><span class="o">.</span><span class="n">MotionCorrection</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
+<span class="n">imaging</span><span class="o">.</span><span class="n">Segmentation</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
+<span class="n">imaging</span><span class="o">.</span><span class="n">Fluorescence</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
+<span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
+<span class="n">imaging_report</span><span class="o">.</span><span class="n">ScanLevelReport</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
+<span class="n">imaging_report</span><span class="o">.</span><span class="n">TraceReport</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="o">**</span><span class="n">populate_settings</span><span class="p">)</span>
 </pre></div>
-<div id="cell-9" class="clipboard-copy-txt">imaging.Processing.describe();</div>
+<div id="cell-9" class="clipboard-copy-txt">imaging.Curation.insert1(
+    dict(
+        session_key,
+        scan_id=0,
+        paramset_idx=0,
+        curation_id=0,
+        curation_time=datetime.datetime.now(),
+        curation_output_dir='subject1/session1/suite2p',
+        manual_curation=False,
+    )
+)
+
+imaging.MotionCorrection.populate(**populate_settings)
+imaging.Segmentation.populate(**populate_settings)
+imaging.Fluorescence.populate(**populate_settings)
+imaging.Activity.populate(**populate_settings)
+imaging_report.ScanLevelReport.populate(**populate_settings)
+imaging_report.TraceReport.populate(**populate_settings)</div>
     
         </div>
     </div>
@@ -3850,1380 +2303,6 @@ imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre># Processing Procedure
--&gt; imaging.ProcessingTask
----
-processing_time      : datetime                     # time of generation of this set of processed, segmented results
-package_version=&#34;&#34;   : varchar(16)                  
-
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><code>heading</code>: show attribute definitions regardless of foreign key references</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-10">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">imaging</span><span class="o">.</span><span class="n">Processing</span><span class="o">.</span><span class="n">heading</span>
-</pre></div>
-<div id="cell-10" class="clipboard-copy-txt">imaging.Processing.heading</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre># Processing Procedure
-subject              : varchar(32)                  # 
-session_datetime     : datetime(3)                  # 
-scan_id              : int                          # 
-paramset_idx         : smallint                     # 
----
-processing_time      : datetime                     # time of generation of this set of processed, segmented results
-package_version=&#34;&#34;   : varchar(16)                  # </pre>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="datajoint-elements-installed-in-the-workflow-calcium-imaging">DataJoint Elements installed in the <code>workflow-calcium-imaging</code><a class="anchor-link" href="#datajoint-elements-installed-in-the-workflow-calcium-imaging">&#182;</a></h1><ul>
-<li><a href="https://github.com/datajoint/element-lab"><code>lab</code></a>: lab management related information, such as Lab, User, Project, Protocol, Source.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-11">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">lab</span><span class="p">)</span>
-</pre></div>
-<div id="cell-11" class="clipboard-copy-txt">dj.Diagram(lab)</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="114pt" width="664pt">
-
-
-
-
-`neuro_lab`.`equipment`
-
-`neuro_lab`.`equipment`
-
-
-
-lab.Lab
-<a>
-
-lab.Lab
-</a>
-
-
-
-
-lab.LabMembership
-<a>
-
-lab.LabMembership
-</a>
-
-
-
-
-lab.Lab-&gt;lab.LabMembership
-
-
-
-
-lab.Location
-<a>
-
-lab.Location
-</a>
-
-
-
-
-lab.Lab-&gt;lab.Location
-
-
-
-
-lab.ProjectUser
-<a>
-
-lab.ProjectUser
-</a>
-
-
-
-
-lab.UserRole
-<a>
-
-lab.UserRole
-</a>
-
-
-
-
-lab.UserRole-&gt;lab.LabMembership
-
-
-
-
-lab.Source
-<a>
-
-lab.Source
-</a>
-
-
-
-
-lab.Project
-<a>
-
-lab.Project
-</a>
-
-
-
-
-lab.Project-&gt;lab.ProjectUser
-
-
-
-
-lab.ProtocolType
-<a>
-
-lab.ProtocolType
-</a>
-
-
-
-
-lab.Protocol
-<a>
-
-lab.Protocol
-</a>
-
-
-
-
-lab.ProtocolType-&gt;lab.Protocol
-
-
-
-
-lab.User
-<a>
-
-lab.User
-</a>
-
-
-
-
-lab.User-&gt;lab.ProjectUser
-
-
-
-
-lab.User-&gt;lab.LabMembership
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><a href="https://github.com/datajoint/element-animal"><code>subject</code></a>: general animal information, User, Genetic background, Death etc.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-12">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
-</pre></div>
-<div id="cell-12" class="clipboard-copy-txt">dj.Diagram(subject)</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="114pt" width="1460pt">
-
-
-
-
-subject.Allele
-<a>
-
-subject.Allele
-</a>
-
-
-
-
-subject.Zygosity
-<a>
-
-subject.Zygosity
-</a>
-
-
-
-
-subject.Allele-&gt;subject.Zygosity
-
-
-
-
-subject.Line.Allele
-<a>
-
-subject.Line.Allele
-</a>
-
-
-
-
-subject.Allele-&gt;subject.Line.Allele
-
-
-
-
-subject.Allele.Source
-<a>
-
-subject.Allele.Source
-</a>
-
-
-
-
-subject.Allele-&gt;subject.Allele.Source
-
-
-
-
-subject.Subject.Strain
-<a>
-
-subject.Subject.Strain
-</a>
-
-
-
-
-subject.Line
-<a>
-
-subject.Line
-</a>
-
-
-
-
-subject.Line-&gt;subject.Line.Allele
-
-
-
-
-subject.Subject.Line
-<a>
-
-subject.Subject.Line
-</a>
-
-
-
-
-subject.Line-&gt;subject.Subject.Line
-
-
-
-
-subject.Subject.Source
-<a>
-
-subject.Subject.Source
-</a>
-
-
-
-
-subject.Subject.User
-<a>
-
-subject.Subject.User
-</a>
-
-
-
-
-subject.SubjectDeath
-<a>
-
-subject.SubjectDeath
-</a>
-
-
-
-
-subject.Strain
-<a>
-
-subject.Strain
-</a>
-
-
-
-
-subject.Strain-&gt;subject.Subject.Strain
-
-
-
-
-subject.SubjectCullMethod
-<a>
-
-subject.SubjectCullMethod
-</a>
-
-
-
-
-subject.Subject.Protocol
-<a>
-
-subject.Subject.Protocol
-</a>
-
-
-
-
-subject.Subject.Lab
-<a>
-
-subject.Subject.Lab
-</a>
-
-
-
-
-subject.Subject
-<a>
-
-subject.Subject
-</a>
-
-
-
-
-subject.Subject-&gt;subject.Subject.Strain
-
-
-
-
-subject.Subject-&gt;subject.Zygosity
-
-
-
-
-subject.Subject-&gt;subject.Subject.Source
-
-
-
-
-subject.Subject-&gt;subject.Subject.User
-
-
-
-
-subject.Subject-&gt;subject.SubjectDeath
-
-
-
-
-subject.Subject-&gt;subject.SubjectCullMethod
-
-
-
-
-subject.Subject-&gt;subject.Subject.Protocol
-
-
-
-
-subject.Subject-&gt;subject.Subject.Lab
-
-
-
-
-subject.Subject-&gt;subject.Subject.Line
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-13">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">subject</span><span class="o">.</span><span class="n">Subject</span><span class="o">.</span><span class="n">describe</span><span class="p">();</span>
-</pre></div>
-<div id="cell-13" class="clipboard-copy-txt">subject.Subject.describe();</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre># Animal Subject
-subject              : varchar(32)                  
----
-sex                  : enum(&#39;M&#39;,&#39;F&#39;,&#39;U&#39;)            
-subject_birth_date   : date                         
-subject_description=&#34;&#34; : varchar(1024)                
-
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><a href="https://github.com/datajoint/element-session"><code>session</code></a>: General information of experimental sessions.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-14">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-</pre></div>
-<div id="cell-14" class="clipboard-copy-txt">dj.Diagram(session)</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[14]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="114pt" width="320pt">
-
-
-
-
-session.SessionDirectory
-<a>
-
-session.SessionDirectory
-</a>
-
-
-
-
-session.ProjectSession
-<a>
-
-session.ProjectSession
-</a>
-
-
-
-
-session.Session
-<a>
-
-session.Session
-</a>
-
-
-
-
-session.Session-&gt;session.SessionDirectory
-
-
-
-
-session.Session-&gt;session.ProjectSession
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-15">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">describe</span><span class="p">();</span>
-</pre></div>
-<div id="cell-15" class="clipboard-copy-txt">session.Session.describe();</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>-&gt; subject.Subject
-session_datetime     : datetime(3)                  
-
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
-<li><a href="https://github.com/datajoint/element-calcium-imaging"><code>imaging</code></a>: Calcium imaging raw scan and processed data</li>
-</ul>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-        
-        
-        <div class="CodeMirror cm-s-jupyter">
-        <div class="zeroclipboard-container">
-            <clipboard-copy for="cell-16">
-            <div>
-                <span class="notice" hidden>Copied!</span>
-                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
-                    <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                    <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-                </svg>
-                </div>
-            </clipboard-copy>
-        </div>
-            <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span> <span class="o">+</span> <span class="n">dj</span><span class="o">.</span><span class="n">Diagram</span><span class="p">(</span><span class="n">imaging</span><span class="p">)</span>
-</pre></div>
-<div id="cell-16" class="clipboard-copy-txt">dj.Diagram(scan) + dj.Diagram(imaging)</div>
-    
-        </div>
-    </div>
-
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
-
-
-
-<div class="jp-RenderedSVG jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="image/svg+xml">
-<svg height="586pt" width="1564pt">
-
-
-
-
-30
-
-30
-
-
-
-imaging.Segmentation.Mask
-<a>
-
-imaging.Segmentation.Mask
-</a>
-
-
-
-
-30-&gt;imaging.Segmentation.Mask
-
-
-
-
-31
-
-31
-
-
-
-imaging.MotionCorrection
-<a>
-
-imaging.MotionCorrection
-</a>
-
-
-
-
-31-&gt;imaging.MotionCorrection
-
-
-
-
-32
-
-32
-
-
-
-imaging.Fluorescence.Trace
-<a>
-
-imaging.Fluorescence.Trace
-</a>
-
-
-
-
-32-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.MaskClassification.MaskType
-<a>
-
-imaging.MaskClassification.MaskType
-</a>
-
-
-
-
-imaging.Segmentation.Mask-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.NonRigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection.Block
-<a>
-
-imaging.MotionCorrection.Block
-</a>
-
-
-
-
-imaging.MotionCorrection.NonRigidMotionCorrection-&gt;imaging.MotionCorrection.Block
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.NonRigidMotionCorrection
-
-
-
-
-imaging.MotionCorrection.Summary
-<a>
-
-imaging.MotionCorrection.Summary
-</a>
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.Summary
-
-
-
-
-imaging.MotionCorrection.RigidMotionCorrection
-<a>
-
-imaging.MotionCorrection.RigidMotionCorrection
-</a>
-
-
-
-
-imaging.MotionCorrection-&gt;imaging.MotionCorrection.RigidMotionCorrection
-
-
-
-
-imaging.Activity.Trace
-<a>
-
-imaging.Activity.Trace
-</a>
-
-
-
-
-imaging.ProcessingTask
-<a>
-
-imaging.ProcessingTask
-</a>
-
-
-
-
-imaging.Processing
-<a>
-
-imaging.Processing
-</a>
-
-
-
-
-imaging.ProcessingTask-&gt;imaging.Processing
-
-
-
-
-imaging.MaskType
-<a>
-
-imaging.MaskType
-</a>
-
-
-
-
-imaging.MaskType-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-imaging.Fluorescence
-<a>
-
-imaging.Fluorescence
-</a>
-
-
-
-
-imaging.Activity
-<a>
-
-imaging.Activity
-</a>
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Activity
-
-
-
-
-imaging.Fluorescence-&gt;imaging.Fluorescence.Trace
-
-
-
-
-imaging.ProcessingParamSet
-<a>
-
-imaging.ProcessingParamSet
-</a>
-
-
-
-
-imaging.ProcessingParamSet-&gt;imaging.ProcessingTask
-
-
-
-
-imaging.Activity-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.ActivityExtractionMethod
-<a>
-
-imaging.ActivityExtractionMethod
-</a>
-
-
-
-
-imaging.ActivityExtractionMethod-&gt;imaging.Activity
-
-
-
-
-imaging.Curation
-<a>
-
-imaging.Curation
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.MotionCorrection
-
-
-
-
-imaging.Segmentation
-<a>
-
-imaging.Segmentation
-</a>
-
-
-
-
-imaging.Curation-&gt;imaging.Segmentation
-
-
-
-
-imaging.Segmentation-&gt;imaging.Segmentation.Mask
-
-
-
-
-imaging.Segmentation-&gt;imaging.Fluorescence
-
-
-
-
-imaging.MaskClassification
-<a>
-
-imaging.MaskClassification
-</a>
-
-
-
-
-imaging.Segmentation-&gt;imaging.MaskClassification
-
-
-
-
-imaging.Fluorescence.Trace-&gt;imaging.Activity.Trace
-
-
-
-
-imaging.Processing-&gt;imaging.Curation
-
-
-
-
-imaging.ProcessingMethod
-<a>
-
-imaging.ProcessingMethod
-</a>
-
-
-
-
-imaging.ProcessingMethod-&gt;imaging.ProcessingParamSet
-
-
-
-
-imaging.CellCompartment
-<a>
-
-imaging.CellCompartment
-</a>
-
-
-
-
-imaging.MaskClassificationMethod
-<a>
-
-imaging.MaskClassificationMethod
-</a>
-
-
-
-
-imaging.MaskClassificationMethod-&gt;imaging.MaskClassification
-
-
-
-
-imaging.MaskClassification-&gt;imaging.MaskClassification.MaskType
-
-
-
-
-scan.Scan
-<a>
-
-scan.Scan
-</a>
-
-
-
-
-scan.Scan-&gt;imaging.ProcessingTask
-
-
-
-
-scan.ScanLocation
-<a>
-
-scan.ScanLocation
-</a>
-
-
-
-
-scan.Scan-&gt;scan.ScanLocation
-
-
-
-
-scan.ScanInfo
-<a>
-
-scan.ScanInfo
-</a>
-
-
-
-
-scan.Scan-&gt;scan.ScanInfo
-
-
-
-
-scan.ScanInfo.Field
-<a>
-
-scan.ScanInfo.Field
-</a>
-
-
-
-
-scan.ScanInfo.Field-&gt;imaging.MotionCorrection.Summary
-
-
-
-
-scan.ScanInfo.ScanFile
-<a>
-
-scan.ScanInfo.ScanFile
-</a>
-
-
-
-
-scan.ScanInfo-&gt;scan.ScanInfo.Field
-
-
-
-
-scan.ScanInfo-&gt;scan.ScanInfo.ScanFile
-
-
-
-
-scan.Channel
-<a>
-
-scan.Channel
-</a>
-
-
-
-
-scan.Channel-&gt;30
-
-
-
-
-scan.Channel-&gt;31
-
-
-
-
-scan.Channel-&gt;32
-
-
-
-
-scan.AcquisitionSoftware
-<a>
-
-scan.AcquisitionSoftware
-</a>
-
-
-
-
-scan.AcquisitionSoftware-&gt;scan.Scan
-
-
-
-</svg>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="summary-and-next-step">Summary and next step<a class="anchor-link" href="#summary-and-next-step">&#182;</a></h2><ul>
-<li><p>This notebook introduced the overall structures of the schemas and tables in the workflow and relevant tools to explore the schema structure and table definitions.</p>
-</li>
-<li><p>In the next notebook <a href="03-process.ipynb">03-process</a>, we will introduce the detailed steps to run through <code>workflow-calcium-imaging</code>.</p>
-</li>
-</ul>
-
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -5246,42 +2325,6 @@ scan.AcquisitionSoftware-&gt;scan.Scan
       </main>
       
         <footer class="md-footer">
-  
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../01-configure/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configure" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Configure
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../03-process/" class="md-footer__link md-footer__link--next" aria-label="Next: Process" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Process
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
