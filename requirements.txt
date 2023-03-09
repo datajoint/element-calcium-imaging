@@ -1,6 +1,6 @@
 datajoint>=0.13.0
 element-animal>=0.1.2
-element-calcium-imaging>=0.3.0
+element-calcium-imaging>=0.5.4
 element-event>=0.1.2
 element-interface>=0.5.0
 element-lab>=0.1.1
