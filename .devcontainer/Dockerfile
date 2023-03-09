@@ -6,7 +6,6 @@ RUN \
     apt update && \
     apt-get install bash-completion graphviz default-mysql-client s3fs procps -y && \
     pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir flake8 black pre-commit && \
     # workflow dependencies
     apt-get install gcc ffmpeg libsm6 libxext6 -y && \
     # Commented out CaImAn installation due to Docker image size limits on Codespace
