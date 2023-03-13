@@ -10,5 +10,4 @@ services:
       - fakeservices.datajoint.io:127.0.0.1
     volumes:
       - ../../..:/workspaces:cached
-    entrypoint: /usr/local/share/docker-init.sh
-    command: tail -f /dev/null
+    privileged: true # only because of dind
