@@ -1549,22 +1549,21 @@ class ProcessingQualityMetrics(dj.Computed):
     """Quality metrics used to evaluate the results of a calcium imaging analysis pipeline.
 
     Attributes:
-        Segmentation (foreign key): Primary key from Segmentation.
+        Fluorescence (foreign key): Primary key from Fluorescence.
     """
 
     definition = """
-    -> Segmentation
+    -> Fluorescence
     """
 
-    class MaskMetrics(dj.Part):
+    class Mask(dj.Part):
         """Quality metrics used to evaluate the Masks.
 
         Attributes:
-            Segmentation (foreign key): Primary key from Segmentation.
+            Fluorescence (foreign key): Primary key from Fluorescence.
             Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
             mask_area (float): Mask area in square micrometer.
             roundness (float): Roundness between 0 and 1, closer to 1 the rounder.
-
         """
 
         definition = """
@@ -1575,11 +1574,11 @@ class ProcessingQualityMetrics(dj.Computed):
         roundness: float       # Roundness between 0 and 1, closer to 1 the rounder. Tegtmeier et al. (2018).
         """
 
-    class FluorescenceTraceMetrics(dj.Part):
+    class Trace(dj.Part):
         """Quality metrics used to evaluate the Fluorescence Traces.
 
         Attributes:
-            Segmentation (foreign key): Primary key from Segmentation.
+            Fluorescence (foreign key): Primary key from Fluorescence.
             Fluorescence.Trace (foreign key): Primary key from Fluorescence.Trace.
             skewness (float): Skewness of the Fluorescence trace.
             variance (float): Variance of the Fluorescence trace.
@@ -1631,7 +1630,7 @@ class ProcessingQualityMetrics(dj.Computed):
             for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)
         ]
 
-        self.MaskMetrics.insert(
+        self.Mask.insert(
             dict(key, mask=mask_id, mask_area=mask_area, roundness=roundness)
             for mask_id, mask_area, roundness in zip(
                 mask_ids,
@@ -1641,7 +1640,7 @@ class ProcessingQualityMetrics(dj.Computed):
         )
 
         fluorescence = np.stack(fluorescence)
-        self.FluorescenceTraceMetrics.insert(
+        self.Trace.insert(
             dict(
                 key,
                 fluo_channel=fluo_channel,
