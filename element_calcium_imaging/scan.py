@@ -741,7 +741,7 @@ class ScanQualityMetrics(dj.Computed):
                 / quantalsize_results["quantal_size"]
             )
 
-            self.QuantalSize.insert1(
+            self.PhotonTransferCurve.insert1(
                 dict(
                     key,
                     channel=channel,
