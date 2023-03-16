@@ -2,3 +2,4 @@ datajoint>=0.13.0
 element-interface>=0.4.0
 compress-multiphoton
 plotly
+ipywidgets

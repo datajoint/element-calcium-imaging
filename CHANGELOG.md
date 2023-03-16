@@ -2,11 +2,14 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
-
-
-## [0.6.0] - 2023-03-02
+## [0.6.0] - 2023-03-16
 
 + Add - Quality metrics
+
+## [0.5.4] - 2023-03-08
+
++ Add - Requirement for `ipywidgets`
++ Update - Docker Compose file for docs release
 
 ## [0.5.3] - 2023-02-23
 
@@ -85,6 +88,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
 [0.6.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.0
+[0.5.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.4
 [0.5.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.3
 [0.5.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.2
 [0.5.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.1
