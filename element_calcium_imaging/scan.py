@@ -643,7 +643,7 @@ class ScanQualityMetrics(dj.Computed):
         contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
         """
 
-    class QuantalSize(dj.Part):
+    class PhotonTransferCurve(dj.Part):
         """Quantities inferred from Photon Transfer Curve.
 
         Attributes:
