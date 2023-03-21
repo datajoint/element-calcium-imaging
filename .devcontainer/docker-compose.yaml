@@ -12,3 +12,5 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
+volumes:
+  docker_data:
