@@ -18,8 +18,8 @@ Here are some options that provide a great experience:
 
 - **Cloud-based IDE**: (*recommended*)
   - Launch using [GitHub Codespaces](https://github.com/features/codespaces) using the `+` option which will `Create codespace on main` in the codebase repository on your fork with default options. For more control, see the `...` where you may create `New with options...`.
-  - Build time for a 4-Core codespace is **~9m**. This is done infrequently and cached for convenience.
-  - Start time for a 4-Core codespace is **~40s**. This will pull the built codespace from cache when you need it.
+  - Build time for a codespace is **~9m**. This is done infrequently and cached for convenience.
+  - Start time for a codespace is **~40s**. This will pull the built codespace from cache when you need it.
   - *Tip*: Each month, GitHub renews a [free-tier](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces#monthly-included-storage-and-core-hours-for-personal-accounts) quota of compute and storage. Typically we run into the storage limits before anything else since Codespaces consume storage while stopped. It is best to delete Codespaces when not actively in use and recreate when needed. We'll soon be creating prebuilds to avoid larger build times. Once any portion of your quota is reached, you will need to wait for it to be reset at the end of your cycle or add billing info to your GitHub account to handle overages.
   - *Tip*: GitHub auto names the codespace but you can rename the codespace so that it is easier to identify later.
 - **Local IDE**:
