@@ -6,7 +6,14 @@ NIS`, or `PrairieView` acquisition software, using [Suite2p](https://github.com/
 To get started, see below for an [interactive tutorial](#interactive-tutorial) on GitHub Codespaces.  More information can be found at the
 [Element documentation page](https://datajoint.com/docs/elements/element-calcium-imaging).
 
-![diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/diagram_flowchart.svg)
+## Experiment flowchart
+
+![flowchart](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/diagram_flowchart.svg)
+
+## Data pipeline
+
+![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
+
 
 ## Interactive tutorial
 
@@ -24,10 +31,12 @@ The easiest way to learn about DataJoint Elements is to use the tutorial noteboo
 
 6. Navigate to the `notebooks` directory on the left panel and open the `tutorial.ipynb` Jupyter notebook. Execute the cells in this notebook to begin your walk through the tutorial.
 
-7. Once you are done, GitHub will automatically terminate the Codespace after 30 minutes of inactivity or you can manually terminate the Codespace.
+7. Once you are done, GitHub will automatically stop the Codespace after 30 minutes of inactivity or you can manually stop the Codespace.
+
+8. After stopping the Codespace, we recommend deleting the Codespace to save on storage costs, which are free for the first 15 GB-month.
 
 + If you are new to GitHub and run into any errors, please contact us via email at support@datajoint.com. If you are experienced with GitHub, please create an issue on the upstream repository or issue a pull request with a thorough explanantion of the error and proposed solution.
 
 **Please Note:**
 
-+ GitHub Codespaces are limited to 120 core-hours per month for free users. Once you exceed this limit, you will have to wait for the hours to reset or pay to use Codespaces.
++ GitHub Codespaces are limited to 120 core-hours per month and 15 GB-month for free users. Once you exceed this limit, you will have to wait for the usage quota to reset or pay to use Codespaces.
