@@ -409,9 +409,9 @@ class ProcessingTask(dj.Manual):
     and the triggering of new analysis for all supported analysis methods
 
     Attributes:
-        Preprocess (foreign key):
-        ProcessingParamSet (foreign key):
-        processing_output_dir (str):
+        Preprocess (foreign key): Primary key from Preprocess.
+        ProcessingParamSet (foreign key): Primary key from ProcessingParamSet.
+        processing_output_dir (str): Output directory of the processed scan relative to the root data directory.
         task_mode (str): One of 'load' (load computed analysis results) or 'trigger'
             (trigger computation).
     """
