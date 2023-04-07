@@ -14,7 +14,6 @@ services:
       - PACKAGE
       - UPSTREAM_REPO
       - MODE
-      - GOOGLE_ANALYTICS_KEY 
       - PATCH_VERSION
     volumes:
       - ../docs:/main/docs

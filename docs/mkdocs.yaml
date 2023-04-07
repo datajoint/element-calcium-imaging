@@ -51,17 +51,14 @@ nav:
 #     UPSTREAM_REPO=https://github.com/datajoint/element-{ELEMENT}.git \
 #     HOST_UID=$(id -u) docker compose -f docs/docker-compose.yaml up --build
 #     ```
-# 02. Site analytics depend on a local environment variable GOOGLE_ANALYTICS_KEY
-#     You can find this in LastPass or declare with any string to suppress errors
-# 03. The API section will pull docstrings.
+# 02. The API section will pull docstrings.
 #     A. Follow google styleguide e.g., 
 #        https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 #        With typing suggestions: https://docs.python.org/3/library/typing.html
 #     B. To pull a specific workflow fork, change ./docs/src/api/make_pages.py#L19
-# 04. To see your fork of the workflow-{element} in this render, change the
+# 03. To see your fork of the workflow-{element} in this render, change the
 #     URL in ./docs/src/api/make_pages.py#L19 to your fork.
-# 05. For redirecting options For redirect options, see 'redirects' below.
-# 06. To deploy this site on your fork, 
+# 04. To deploy this site on your fork, 
 #     A. declare a branch called gh-pages
 #     B. go to the your fork > settings > pages 
 #     C. direct pages to render from the gh-pages branch at root
@@ -96,9 +93,6 @@ theme:
 plugins:
   - markdownextradata: {}
   - search
-  # - redirects: # OPTIONAL REDIRECTS
-  #     redirect_maps:
-  #       "index.md": "getting_started.md"
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -146,9 +140,6 @@ markdown_extensions:
 extra:
   PATCH_VERSION: !ENV PATCH_VERSION
   generator: false # Disable watermark
-  analytics:
-    provider: google
-    property: !ENV GOOGLE_ANALYTICS_KEY
   version:
     provider: mike
   social:
