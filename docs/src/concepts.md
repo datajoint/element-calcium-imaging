@@ -69,133 +69,32 @@ segmented.
 
 ### Software
 
-- ScanImage
-- ThorImageLS
+- Vidrio [ScanImage](https://docs.scanimage.org/)
+  - ScanImage is the data acquisition software for two types of home-built scanning two-photon systems, either based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version.
+- Thorlabs ThorImageLS
 - Scanbox
-- Nikon
+- Nikon NIS-Elements
+- Bruker Prairie View
 
-Vidrio’s [ScanImage](https://docs.scanimage.org/) is the data acquisition software for
-two types of home-built scanning two-photon systems, either based on Thorlabs and Sutter
-hardware. ScanImage has a free version and a licensed version. Thorlabs also provides
-their own acquisition software - ThorImageLS (probably half of the systems).
-
-## Element Features
+## Element Roadmap
 
 Through our interviews and direct collaboration on the precursor projects, we identified
-the common motifs to create the Calcium Imaging Element with the repository hosted at
-https://github.com/datajoint/element-calcium-imaging.
+the common motifs to create Element Calcium Imaging with the repository hosted on [GitHub](https://github.com/datajoint/element-calcium-imaging){:target="_blank"}. Major features include:
 
-Major features of the Calcium Imaging Element include:
-
-- Calcium-imaging scanning metadata, also compatible with mesoscale imaging and
+- [x] Ingestion of scan metadata, also compatible with mesoscale imaging and
   multi-ROI scanning mode
-- Tables for all processing steps: motion correction, segmentation, cell spatial
-  footprint, fluorescence trace extraction, spike inference and cell classification
-- Store/track/manage different curations of the segmentation results
-- Ingestion support for data acquired with ScanImage, Scanbox, Nikon NIS, and
-  PrairieView acquisition systems
-- Ingestion support for processing outputs from both Suite2p and CaImAn analysis suites
-- Sample data and complete test suite for quality assurance
-- Cell extraction with the EXTRACT analysis package.
-
-The processing workflow is typically performed on a per-scan basis, however, depending
-on the nature of the research questions, different labs may opt to perform
-processing/segmentation on a concatenated set of data from multiple scans. To this end,
-we have extended the Calcium Imaging Element and provided a design version capable of
-supporting a multi-scan processing scheme.
-
-## Element Architecture
-
-Each node in the following diagram represents the analysis code in the workflow and the
-corresponding table in the database.  Within the workflow, Element Calcium Imaging
-connects to upstream Elements including Lab, Animal, and Session. For more detailed
-documentation on each table, see the API docs for the respective schemas.
-
-The Element is composed of two main schemas, `scan` and `imaging`. To handle
-several use cases of this pipeline, we have designed two alternatives to `imaging` schemas,
-including `imaging_no_curation` and `imaging_preprocess`.
-
-- `imaging` module - Multiple scans are acquired during each session and each scan is
-processed independently.
-
-![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
-
-- `imaging_no_curation` module - Same as `imaging` module, without the Curation table.
-
-![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element.svg)
-
-- `imaging_preprocess` module - Same as `imaging` module. Additionally, pre-processing
-steps can be performed on each scan prior to processing with Suite2p or CaImAn.
-
-![element-calcium-imaging diagram](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/attached_calcium_imaging_element_preprocess.svg)
-
-### `lab` schema ([API docs](../api/workflow_calcium_imaging/pipeline/#workflow_calcium_imaging.pipeline.Equipment))
-
-| Table | Description |
-| --- | --- |
-| Equipment | Scanner metadata |
-
-### `subject` schema ([API docs](https://datajoint.com/docs/elements/element-animal/api/element_animal/subject))
-
-- Although not required, most choose to connect the `Session` table to a `Subject` table.
-
-| Table | Description |
-| --- | --- |
-| Subject | Basic information of the research subject |
-
-### `session` schema ([API docs](https://datajoint.com/docs/elements/element-session/api/element_session/session_with_datetime))
-
-| Table | Description |
-| --- | --- |
-| Session | Unique experimental session identifier |
-
-### `scan` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/api/element_calcium_imaging/scan))
-
-| Table | Description |
-| --- | --- |
-| AcquisitionSoftware | Software used in the acquisition of the imaging scans |
-| Channel | Recording Channel |
-| Scan | A set of imaging scans performed in a single session |
-| ScanLocation | Anatomical location of the region scanned |
-| ScanInfo | Metadata of the imaging scan |
-| ScanInfo.Field | Metadata of the fields imaged |
-| ScanInfo.ScanFile | Path of the scan file |
-
-### `imaging` schema ([API docs](../api/element_calcium_imaging/imaging))
-
-| Table | Description |
-| --- | --- |
-| ProcessingMethod | Available analysis suites that can be used in processing of the imaging scans |
-| ProcessingParamSet | All parameters required to process a calcium imaging scan |
-| CellCompartment | Cell compartments that can be imaged |
-| MaskType | Available labels for segmented masks |
-| ProcessingTask | Task defined by a combination of Scan and ProcessingParamSet |
-| Processing | The core table that executes a ProcessingTask |
-| Curation | Curated results |
-| MotionCorrection | Results of the motion correction procedure |
-| MotionCorrection.RigidMotionCorrection | Details of the rigid motion correction performed on the imaging data |
-| MotionCorrection.NonRigidMotionCorrection | Details of nonrigid motion correction performed on the imaging data |
-| MotionCorrection.NonRigidMotionCorrection.Block | Results of non-rigid motion correction for each block |
-| MotionCorrection.Summary | Summary images for each field and channel after motion corrections |
-| Segmentation | Results of the segmentation |
-| Segmentation.Mask | Masks identified in the segmentation procedure |
-| MaskClassificationMethod | Method used in the mask classification procedure |
-| MaskClassification | Result of the mask classification procedure |
-| MaskClassification.MaskType | Type assigned to each mask |
-| Fluorescence | Fluorescence measurements |
-| Fluorescence.Trace | Fluorescence traces for each region of interest |
-| ActivityExtractionMethod | Method used in activity extraction |
-| Activity | Inferred neural activity |
-| Activity.Trace | Inferred neural activity from fluorescence traces |
-
-## Roadmap
+- [x] Tables for all processing steps: motion correction, cell segmentation, fluorescence trace extraction, spike inference, and cell classification
+- [x] Store different curations of the segmentation results
+- [x] Ingestion of data acquired with ScanImage, Scanbox, Nikon NIS-Elements, and
+  Bruker Prairie View acquisition systems
+- [x] Ingestion of processing outputs from both Suite2p and CaImAn analysis suites
+- [x] Sample data and complete test suite for quality assurance
+- [x] Cell extraction with the EXTRACT analysis package
+- [ ] Quality metrics
+- [ ] Data compression
+- [ ] Deepinterpolation
+- [ ] Data export to NWB
+- [ ] Data publishing to DANDI
 
 Further development of this Element is community driven. Upon user requests and based on
-guidance from the Scientific Steering Group we will add the following features to this
-Element:
-
-- Data quality metrics
-- Data compression
-- Deepinterpolation
-- Data export to NWB
-- Data publishing to DANDI
+guidance from the Scientific Steering Group we will continue adding features to this Element.
