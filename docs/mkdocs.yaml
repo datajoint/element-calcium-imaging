@@ -6,17 +6,10 @@ repo_url: https://github.com/datajoint/element-calcium-imaging
 repo_name: datajoint/element-calcium-imaging
 nav:
   - Element Calcium Imaging: index.md
-  - Concepts: concepts.md
+  - Data Pipeline: pipeline.md
   - Tutorials: 
-    - Overview: tutorials/index.md
-    - Data Download: tutorials/00-data-download-optional.ipynb
-    - Configure:  tutorials/01-configure.ipynb
-    - Workflow Structure: tutorials/02-workflow-structure-optional.ipynb
-    - Process:  tutorials/03-process.ipynb
-    - Automate:  tutorials/04-automate-optional.ipynb
-    # - Explore:  tutorials/05-explore.ipynb
-    - Drop:  tutorials/06-drop-optional.ipynb
-    - Downstream Analysis: tutorials/07-downstream-analysis-optional.ipynb
+    - tutorials/index.md
+  - Concepts: concepts.md
   - Citation: citation.md
   - API: api/ # defer to gen-files + literate-nav
   - Changelog: changelog.md
