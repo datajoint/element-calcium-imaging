@@ -23,6 +23,8 @@ def run(display_progress=True):
 
     scan.ScanInfo.populate(**populate_settings)
 
+    scan.ScanQualityMetrics.populate(**populate_settings)
+
     imaging.Processing.populate(**populate_settings)
 
     imaging.MotionCorrection.populate(**populate_settings)
@@ -34,6 +36,8 @@ def run(display_progress=True):
     imaging.Fluorescence.populate(**populate_settings)
 
     imaging.Activity.populate(**populate_settings)
+
+    imaging.ProcessingQualityMetrics.populate(**populate_settings)
 
     print("\n---- Successfully completed workflow_calcium_imaging/process.py ----")
 
