@@ -5,8 +5,10 @@ import re
 from datetime import datetime
 from typing import Union
 
+import numpy as np
 import datajoint as dj
 from element_interface.utils import find_root_directory
+from compress_multiphoton import compute_quantal_size
 
 schema = dj.schema()
 
@@ -333,15 +335,7 @@ class ScanInfo(dj.Imported):
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero = (
-                scan.motor_position_at_zero[0] if scan.motor_position_at_zero else None
-            )
-            y_zero = (
-                scan.motor_position_at_zero[1] if scan.motor_position_at_zero else None
-            )
-            z_zero = (
-                scan.motor_position_at_zero[2] if scan.motor_position_at_zero else None
-            )
+            x_zero, y_zero, z_zero = scan.motor_position_at_zero or (None, None, None)
 
             self.insert1(
                 dict(
@@ -613,3 +607,146 @@ class ScanInfo(dj.Imported):
             pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
         ]
         self.ScanFile.insert([{**key, "file_path": f} for f in scan_files])
+
+
+@schema
+class ScanQualityMetrics(dj.Computed):
+    """Metrics to assess quality of Scan.
+
+    Attributes:
+        ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+    """
+
+    definition = """
+    -> ScanInfo.Field
+    """
+
+    class FrameMetrics(dj.Part):
+        """Metrics used to evaluate frames.
+
+        Attributes:
+            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+            Channel (foreign key): Primary key from Channel.
+            min_intensity (longblob): Minimum value of each frame.
+            mean_intensity (longblob): Mean value at each frame.
+            max_intensity (longblob): Maximum value at each frame.
+            contrast (longblob): Contrast of each frame, difference of 99 and 1 percentiles.
+        """
+
+        definition = """
+        -> master
+        -> Channel
+        ---
+        min_intensity: longblob   # Minimum value of each frame.
+        mean_intensity: longblob  # Mean value at each frame.
+        max_intensity: longblob   # Maximum value at each frame.
+        contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
+        """
+
+    class PhotonTransferCurve(dj.Part):
+        """Quantities inferred from Photon Transfer Curve.
+
+        Attributes:
+            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+            Channel (foreign key): Primary key from Channel.
+            min_intensity (int): Minimum value in movie.
+            max_intensity (int): Maximum value in movie.
+            quantal_size (float): Quantal size (variance/mean intensity slope), gain.
+            zero_level (int): Level corresponding to zero (computed from variance dependence).
+            quantal_frame (longblob): Average frame expressed in quanta.
+
+        """
+
+        definition = """ 
+        -> master
+        -> Channel
+        ---
+        min_intensity   : int      # Minimum value in movie.
+        max_intensity   : int      # Maximum value in movie.
+        quantal_size    : float    # Quantal size (variance/mean intensity slope), gain.
+        zero_level      : int      # Level corresponding to zero (computed from variance dependence)
+        quantal_frame   : longblob # Average frame expressed in quanta.
+        """
+
+    def make(self, key):
+        acq_software, nchannels = (Scan * ScanInfo & key).fetch1(
+            "acq_software", "nchannels"
+        )
+
+        self.insert1(key)
+
+        if acq_software == "ScanImage":
+            import scanreader
+
+            # Switch from FYXCT to TCYX
+            data = scanreader.read_scan(get_scan_image_files(key))[
+                key["field_idx"]
+            ].transpose(3, 2, 0, 1)
+        elif acq_software == "Scanbox":
+            from sbxreader import sbx_memmap
+
+            # Switch from TFCYX to TCYX
+            data = sbx_memmap(get_scan_box_files(key))[:, key["field_idx"]]
+        elif acq_software == "NIS":
+            import nd2
+
+            nd2_file = nd2.ND2File(get_nd2_files(key)[0])
+
+            nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
+
+            valid_dimensions = "TZCYX"
+            assert set(nd2_dims) <= set(
+                valid_dimensions
+            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_nd2_files(key)[0]}."
+
+            # Sort the dimensions in the order of TZCYX, skipping the missing ones.
+            data = nd2_file.asarray().transpose(
+                [nd2_dims[x] for x in valid_dimensions if x in nd2_dims]
+            )
+
+            # Expand array to include the missing dimensions.
+            for i, dim in enumerate("TZC"):
+                if dim not in nd2_dims:
+                    data = np.expand_dims(data, i)
+
+            data = data[:, key["field_idx"]]  # Switch from TFCYX to TCYX
+
+        for channel in range(nchannels):
+            movie = data[:, channel, :, :]
+
+            self.FrameMetrics.insert1(
+                dict(
+                    key,
+                    channel=channel,
+                    min_intensity=movie.min(axis=(1, 2)),
+                    mean_intensity=movie.mean(axis=(1, 2)),
+                    max_intensity=movie.max(axis=(1, 2)),
+                    contrast=np.percentile(movie, 99, axis=(1, 2))
+                    - np.percentile(movie, 1, axis=(1, 2)),
+                )
+            )
+
+            quantalsize_results = compute_quantal_size(movie.transpose(1, 2, 0))
+            middle_frame = movie.shape[0] // 2
+            HALF_SHIFT = 250
+            HALF_SHIFT = min(HALF_SHIFT, middle_frame)
+            quantal_frame = np.int(
+                (
+                    np.mean(
+                        movie[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
+                        axis=0,
+                    )
+                    - quantalsize_results["zero_level"]
+                )
+                / quantalsize_results["quantal_size"]
+            )
+
+            self.PhotonTransferCurve.insert1(
+                dict(
+                    key,
+                    channel=channel,
+                    **quantalsize_results,
+                    quantal_frame=quantal_frame,
+                ),
+                ignore_extra_fields=True,
+            )
