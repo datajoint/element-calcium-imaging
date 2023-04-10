@@ -112,6 +112,7 @@ plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
       include: ["*.ipynb"]
+  - section-index
 markdown_extensions:
   - attr_list
   - md_in_html
@@ -135,8 +136,9 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.arithmatex:
       generic: true
-
-  
+  - pymdownx.magiclink # Displays bare URLs as links
+  - pymdownx.tasklist: # Renders check boxes in tasks lists
+      custom_checkbox: true
 extra:
   PATCH_VERSION: !ENV PATCH_VERSION
   generator: false # Disable watermark
