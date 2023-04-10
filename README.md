@@ -1,8 +1,14 @@
 # DataJoint Element - Functional Calcium Imaging
 
-DataJoint Element for functional calcium imaging with `ScanImage`, `Scanbox`,
-`Nikon NIS`, or `PrairieView` acquisition software and `Suite2p`, `CaImAn`, and
-`EXTRACT` analysis software. DataJoint Elements collectively standardize and automate
+DataJoint Element for functional calcium imaging with 
+[ScanImage](https://docs.scanimage.org/), 
+[Scanbox](https://scanbox.org/),
+[Nikon NIS-Elements](https://www.microscope.healthcare.nikon.com/products/software/nis-elements), 
+and `Bruker Prairie View` acquisition software; and 
+[Suite2p](https://github.com/MouseLand/suite2p), 
+[CaImAn](https://github.com/flatironinstitute/CaImAn), and
+[EXTRACT](https://github.com/schnitzer-lab/EXTRACT-public) analysis 
+software. DataJoint Elements collectively standardize and automate
 data collection and analysis for neuroscience experiments. Each Element is a modular
 pipeline for data storage and processing with corresponding database tables that can be
 combined with other Elements to assemble a fully functional pipeline.
