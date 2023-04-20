@@ -3,6 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.3.2] - 2023-04-20
+
++ Update - Suite2p version
+
 ## [0.3.1] - 2023-03-09
 
 + Update - Simplify dependencies to reduce Docker image size for GitHub Codespaces
@@ -54,6 +58,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Containerization for pytests
 + Comment - Phase previously designated 0.1.0 -> 0.0.0
 
+[0.3.2]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.2
 [0.3.1]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.1
 [0.3.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.0
 [0.2.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.2.0
