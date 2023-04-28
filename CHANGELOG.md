@@ -3,6 +3,11 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.5.6] - 2023-04-28
+
++ Fix - `.ipynb` output in tutorials is not visible in dark mode.
++ Fix - typos in docstrings.
+
 ## [0.5.5] - 2023-04-06
 
 + Update - Bump `element-interface` requirement to `0.5.1`.
@@ -88,6 +93,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.5.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.6
 [0.5.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.5
 [0.5.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.4
 [0.5.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.3

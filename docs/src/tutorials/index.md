@@ -21,7 +21,7 @@ analysis.
 ## Notebooks
 
 Each of the notebooks in the workflow
-([download here](https://github.com/datajoint/workflow-calcium-imaging/tree/main/notebooks)
+([download here](https://github.com/datajoint/workflow-calcium-imaging/tree/main/notebooks))
 steps through ways to interact with the Element itself. For convenience, these notebooks
 are also rendered as part of this site. To try out the notebooks in an online
 Jupyter environment with access to example data, visit
