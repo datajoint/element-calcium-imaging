@@ -201,7 +201,7 @@ class MaskType(dj.Lookup):
     """Available labels for segmented masks (e.g. 'soma', 'axon', 'dendrite', 'neuropil').
 
     Attributes:
-        masky_type (str): Mask type.
+        mask_type (str): Mask type.
     """
 
     definition = """# Possible types of a segmented mask
@@ -221,8 +221,8 @@ class ProcessingTask(dj.Manual):
     This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
-    Processing. This table supports definitions of both loading of pre-generated results
-    and the triggering of new analysis for all supported analysis methods
+    `Processing`. This table supports definitions of both loading of pre-generated results
+    and the triggering of new analysis for all supported analysis methods.
 
     Attributes:
         scan.Scan (foreign key):
