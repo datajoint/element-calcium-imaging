@@ -643,37 +643,10 @@ class ScanQualityMetrics(dj.Computed):
         contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
         """
 
-    class PhotonTransferCurve(dj.Part):
-        """Quantities inferred from Photon Transfer Curve.
-
-        Attributes:
-            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
-            Channel (foreign key): Primary key from Channel.
-            min_intensity (int): Minimum value in movie.
-            max_intensity (int): Maximum value in movie.
-            quantal_size (float): Quantal size (variance/mean intensity slope), gain.
-            zero_level (int): Level corresponding to zero (computed from variance dependence).
-            quantal_frame (longblob): Average frame expressed in quanta.
-
-        """
-
-        definition = """ 
-        -> master
-        -> Channel
-        ---
-        min_intensity   : int      # Minimum value in movie.
-        max_intensity   : int      # Maximum value in movie.
-        quantal_size    : float    # Quantal size (variance/mean intensity slope), gain.
-        zero_level      : int      # Level corresponding to zero (computed from variance dependence)
-        quantal_frame   : longblob # Average frame expressed in quanta.
-        """
-
     def make(self, key):
         acq_software, nchannels = (Scan * ScanInfo & key).fetch1(
             "acq_software", "nchannels"
         )
-
-        self.insert1(key)
 
         if acq_software == "ScanImage":
             import scanreader
@@ -711,6 +684,8 @@ class ScanQualityMetrics(dj.Computed):
 
             data = data[:, key["field_idx"]]  # Switch from TFCYX to TCYX
 
+        self.insert1(key)
+
         for channel in range(nchannels):
             movie = data[:, channel, :, :]
 
@@ -724,29 +699,4 @@ class ScanQualityMetrics(dj.Computed):
                     contrast=np.percentile(movie, 99, axis=(1, 2))
                     - np.percentile(movie, 1, axis=(1, 2)),
                 )
-            )
-
-            quantalsize_results = compute_quantal_size(movie.transpose(1, 2, 0))
-            middle_frame = movie.shape[0] // 2
-            HALF_SHIFT = 250
-            HALF_SHIFT = min(HALF_SHIFT, middle_frame)
-            quantal_frame = np.int(
-                (
-                    np.mean(
-                        movie[middle_frame - HALF_SHIFT : middle_frame + HALF_SHIFT],
-                        axis=0,
-                    )
-                    - quantalsize_results["zero_level"]
-                )
-                / quantalsize_results["quantal_size"]
-            )
-
-            self.PhotonTransferCurve.insert1(
-                dict(
-                    key,
-                    channel=channel,
-                    **quantalsize_results,
-                    quantal_frame=quantal_frame,
-                ),
-                ignore_extra_fields=True,
             )
