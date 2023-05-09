@@ -17,7 +17,7 @@ combined with other Elements to assemble a fully functional pipeline.
 
 ![flowchart](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/flowchart.svg)
 
-## Data Pipeline
+## Data Pipeline Diagram
 
 ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
@@ -29,4 +29,6 @@ combined with other Elements to assemble a fully functional pipeline.
      pip install element-calcium-imaging
      ```
 
-+ [Documentation & Tutorials](https://datajoint.com/docs/elements/element-calcium-imaging)
++ [Interactive tutorial on GitHub Codespaces](https://github.com/datajoint/workflow-calcium-imaging#interactive-tutorial)
+
++ [Documentation](https://datajoint.com/docs/elements/element-calcium-imaging)
