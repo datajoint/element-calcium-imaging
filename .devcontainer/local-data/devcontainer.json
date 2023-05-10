@@ -9,7 +9,7 @@
 	"onCreateCommand": "pip install -e . && MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait",
 	"postStartCommand": "docker volume prune -f",
 	"hostRequirements": {
-		"cpus": 4,
+		"cpus": 2,
 		"memory": "16gb",
 		"storage": "32gb"
 	},
