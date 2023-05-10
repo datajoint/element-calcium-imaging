@@ -10,7 +10,4 @@ services:
       - fakeservices.datajoint.io:127.0.0.1
     volumes:
       - ../../..:/workspaces:cached
-      - docker_data:/var/lib/docker  # persist docker images
     privileged: true # only because of dind
-volumes:
-  docker_data:
