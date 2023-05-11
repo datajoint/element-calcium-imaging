@@ -56,7 +56,6 @@ segmented.
 ### Software
 
 - Vidrio [ScanImage](https://docs.scanimage.org/)
-  - ScanImage is the data acquisition software for two types of home-built scanning two-photon systems, either based on Thorlabs and Sutter hardware. ScanImage has a free version and a licensed version.
 - Thorlabs ThorImageLS
 - Scanbox
 - Nikon NIS-Elements
