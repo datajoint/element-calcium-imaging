@@ -17,7 +17,7 @@ combined with other Elements to assemble a fully functional pipeline.
 
 ![flowchart](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/flowchart.svg)
 
-## Data Pipeline
+## Data Pipeline Diagram
 
 ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
@@ -31,8 +31,6 @@ combined with other Elements to assemble a fully functional pipeline.
 
 + [Data Pipeline](./pipeline.md) - Pipeline and table descriptions
 
-+ [Tutorials](./tutorials.md) - Start building your data pipeline
-
-+ [Concepts](./concepts.md) - Calcium imaging concepts, key partnerships, and roadmap
++ [Tutorials](./tutorials/index.md) - Start building your data pipeline
 
 + [Code Repository](https://github.com/datajoint/element-calcium-imaging/){:target="_blank"}
