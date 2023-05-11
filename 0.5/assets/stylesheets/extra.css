@@ -95,3 +95,8 @@ html a[title="YouTube"].md-social__link svg {
     /* previous/next text */
     /* --md-footer-fg-color: var(--dj-white); */
 }
+
+[data-md-color-scheme="slate"] td,
+th {
+    color: var(--dj-black)
+}
