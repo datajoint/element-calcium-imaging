@@ -1,5 +1,5 @@
 {
-	"name": "Tutorial with remote data",
+	"name": "Tutorial environment",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
