@@ -38,20 +38,6 @@ a few leaders as the standardization candidates for the initial preprocessing.
 Element Calcium Imaging encapsulates these packages to ease the management of data and
 its analysis.
 
-## Key partnerships
-
-Over the past few years, several labs have developed DataJoint-based data management and
-processing pipelines for two-photon Calcium imaging. Our team collaborated with several
-of them during their projects. Additionally, we interviewed these teams to understand
-their experiment workflow, pipeline design, associated tools, and interfaces.
-
-These teams include:
-
-- MICrONS (Andreas Tolias Lab, BCM) - https://github.com/cajal
-- BrainCoGs (Princeton) - https://github.com/BrainCOGS
-- Moser Group (Kavli Institute/NTNU) - private repository
-- Anne Churchland Lab (UCLA)
-
 ## Acquisition tools
 
 ### Hardware
@@ -75,26 +61,3 @@ segmented.
 - Scanbox
 - Nikon NIS-Elements
 - Bruker Prairie View
-
-## Element Roadmap
-
-Through our interviews and direct collaboration on the precursor projects, we identified
-the common motifs to create Element Calcium Imaging with the repository hosted on [GitHub](https://github.com/datajoint/element-calcium-imaging){:target="_blank"}. Major features include:
-
-- [x] Ingestion of scan metadata, also compatible with mesoscale imaging and
-  multi-ROI scanning mode
-- [x] Tables for all processing steps: motion correction, cell segmentation, fluorescence trace extraction, spike inference, and cell classification
-- [x] Store different curations of the segmentation results
-- [x] Ingestion of data acquired with ScanImage, Scanbox, Nikon NIS-Elements, and
-  Bruker Prairie View acquisition systems
-- [x] Ingestion of processing outputs from both Suite2p and CaImAn analysis suites
-- [x] Sample data and complete test suite for quality assurance
-- [x] Cell extraction with the EXTRACT analysis package
-- [ ] Quality metrics
-- [ ] Data compression
-- [ ] Deepinterpolation
-- [ ] Data export to NWB
-- [ ] Data publishing to DANDI
-
-Further development of this Element is community driven. Upon user requests and based on
-guidance from the Scientific Steering Group we will continue adding features to this Element.
