@@ -8,7 +8,6 @@ from typing import Union
 import numpy as np
 import datajoint as dj
 from element_interface.utils import find_root_directory
-from compress_multiphoton import compute_quantal_size
 
 schema = dj.schema()
 
