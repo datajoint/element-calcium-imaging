@@ -1,5 +1,5 @@
 {
-	"name": "Demo with local data",
+	"name": "Dev environment with local data",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",

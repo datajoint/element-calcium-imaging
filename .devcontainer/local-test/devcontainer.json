@@ -1,5 +1,5 @@
 {
-	"name": "Local test with remote data",
+	"name": "Dev environment for local pytests with remote data",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
