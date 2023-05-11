@@ -34,3 +34,7 @@ combined with other Elements to assemble a fully functional pipeline.
 + [Tutorials](./tutorials/index.md) - Start building your data pipeline
 
 + [Code Repository](https://github.com/datajoint/element-calcium-imaging/){:target="_blank"}
+
+## Support
+
++ If you need help getting started or run into any errors, please contact our team by email at support@datajoint.com.
