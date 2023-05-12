@@ -620,7 +620,7 @@ class ScanQualityMetrics(dj.Computed):
     -> ScanInfo.Field
     """
 
-    class FrameMetrics(dj.Part):
+    class Frames(dj.Part):
         """Metrics used to evaluate frames.
 
         Attributes:
@@ -688,7 +688,7 @@ class ScanQualityMetrics(dj.Computed):
         for channel in range(nchannels):
             movie = data[:, channel, :, :]
 
-            self.FrameMetrics.insert1(
+            self.Frames.insert1(
                 dict(
                     key,
                     channel=channel,
