@@ -1433,27 +1433,27 @@ class Segmentation(dj.Computed):
                 MaskClassification.MaskType.insert(
                     cells, ignore_extra_fields=True, allow_direct_insert=True
                 )
-            elif method == "extract":
-                extract_dataset = imaging_dataset
-                masks = [
-                    dict(
-                        **key,
-                        segmentation_channel=0,
-                        mask=mask["mask_id"],
-                        mask_npix=mask["mask_npix"],
-                        mask_center_x=mask["mask_center_x"],
-                        mask_center_y=mask["mask_center_y"],
-                        mask_center_z=mask["mask_center_z"],
-                        mask_xpix=mask["mask_xpix"],
-                        mask_ypix=mask["mask_ypix"],
-                        mask_zpix=mask["mask_zpix"],
-                        mask_weights=mask["mask_weights"],
-                    )
-                    for mask in extract_dataset.load_results()
-                ]
+        elif method == "extract":
+            extract_dataset = imaging_dataset
+            masks = [
+                dict(
+                    **key,
+                    segmentation_channel=0,
+                    mask=mask["mask_id"],
+                    mask_npix=mask["mask_npix"],
+                    mask_center_x=mask["mask_center_x"],
+                    mask_center_y=mask["mask_center_y"],
+                    mask_center_z=mask["mask_center_z"],
+                    mask_xpix=mask["mask_xpix"],
+                    mask_ypix=mask["mask_ypix"],
+                    mask_zpix=mask["mask_zpix"],
+                    mask_weights=mask["mask_weights"],
+                )
+                for mask in extract_dataset.load_results()
+            ]
 
-                self.insert1(key)
-                self.Mask.insert(masks, ignore_extra_fields=True)
+            self.insert1(key)
+            self.Mask.insert(masks, ignore_extra_fields=True)
         else:
             raise NotImplementedError(f"Unknown/unimplemented method: {method}")
 
@@ -1694,8 +1694,7 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        """Populate the Activity with the results parsed from analysis
-        outputs."""
+        """Populate the Activity with the results parsed from analysis outputs."""
 
         method, imaging_dataset = get_loader_result(key, Curation)
 

@@ -23,12 +23,12 @@ _linking_module = None
 
 
 def activate(
-    imaging_schema_name,
-    scan_schema_name=None,
+    imaging_schema_name: str,
+    scan_schema_name: str = None,
     *,
-    create_schema=True,
-    create_tables=True,
-    linking_module=None,
+    create_schema: bool = True,
+    create_tables: bool = True,
+    linking_module: str = None,
 ):
     """Activate this schema.
 
@@ -673,6 +673,7 @@ class MotionCorrection(dj.Imported):
 
     def make(self, key):
         """Populate MotionCorrection with results parsed from analysis outputs"""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch(
@@ -1030,17 +1031,17 @@ class Segmentation(dj.Computed):
 
         definition = """ # A mask produced by segmentation.
         -> master
-        mask            : smallint
+        mask               : smallint
         ---
         -> scan.Channel.proj(segmentation_channel='channel')  # channel used for segmentation
-        mask_npix       : int       # number of pixels in ROIs
-        mask_center_x   : int       # center x coordinate in pixel
-        mask_center_y   : int       # center y coordinate in pixel
-        mask_center_z   : int       # center z coordinate in pixel
-        mask_xpix       : longblob  # x coordinates in pixels
-        mask_ypix       : longblob  # y coordinates in pixels
-        mask_zpix       : longblob  # z coordinates in pixels
-        mask_weights    : longblob  # weights of the mask at the indices above
+        mask_npix          : int       # number of pixels in ROIs
+        mask_center_x      : int       # center x coordinate in pixel
+        mask_center_y      : int       # center y coordinate in pixel
+        mask_center_z=null : int       # center z coordinate in pixel
+        mask_xpix          : longblob  # x coordinates in pixels
+        mask_ypix          : longblob  # y coordinates in pixels
+        mask_zpix=null     : longblob  # z coordinates in pixels
+        mask_weights       : longblob  # weights of the mask at the indices above
         """
 
     def make(self, key):
@@ -1413,9 +1414,8 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        """
-        Populate the Activity with the results parsed from analysis outputs.
-        """
+        """Populate the Activity with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
