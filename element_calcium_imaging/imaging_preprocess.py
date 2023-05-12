@@ -1750,6 +1750,120 @@ class Activity(dj.Computed):
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
 
 
+@schema
+class ProcessingQualityMetrics(dj.Computed):
+    """Quality metrics used to evaluate the results of the calcium imaging analysis pipeline.
+
+    Attributes:
+        Fluorescence (foreign key): Primary key from Fluorescence.
+    """
+
+    definition = """
+    -> Fluorescence
+    """
+
+    class Mask(dj.Part):
+        """Quality metrics used to evaluate the masks.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            mask_area (float): Mask area in square micrometer.
+            roundness (float): Roundness between 0 and 1. Values closer to 1 are rounder.
+        """
+
+        definition = """
+        -> master
+        -> Segmentation.Mask
+        ---
+        mask_area=null: float  # Mask area in square micrometer.
+        roundness: float       # Roundness between 0 and 1. Values closer to 1 are rounder.
+        """
+
+    class Trace(dj.Part):
+        """Quality metrics used to evaluate the fluorescence traces.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Fluorescence.Trace (foreign key): Primary key from Fluorescence.Trace.
+            skewness (float): Skewness of the fluorescence trace.
+            variance (float): Variance of the fluorescence trace.
+        """
+
+        definition = """
+        -> master
+        -> Fluorescence.Trace
+        ---
+        skewness: float   # Skewness of the fluorescence trace.
+        variance: float   # Variance of the fluorescence trace.
+        """
+
+    def make(self, key):
+        """Populate the ProcessingQualityMetrics table and its part tables."""
+        from scipy.stats import skew
+
+        (
+            mask_xpixs,
+            mask_ypixs,
+            mask_weights,
+            fluorescence,
+            fluo_channels,
+            mask_ids,
+            mask_npix,
+            px_height,
+            px_width,
+            um_height,
+            um_width,
+        ) = (Segmentation.Mask * scan.ScanInfo.Field * Fluorescence.Trace & key).fetch(
+            "mask_xpix",
+            "mask_ypix",
+            "mask_weights",
+            "fluorescence",
+            "fluo_channel",
+            "mask",
+            "mask_npix",
+            "px_height",
+            "px_width",
+            "um_height",
+            "um_width",
+        )
+
+        norm_mean = lambda x: x.mean() / x.max()
+        roundnesses = [
+            norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w)))
+            for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)
+        ]
+
+        fluorescence = np.stack(fluorescence)
+
+        self.insert1(key)
+
+        self.Mask.insert(
+            dict(key, mask=mask_id, mask_area=mask_area, roundness=roundness)
+            for mask_id, mask_area, roundness in zip(
+                mask_ids,
+                mask_npix * (um_height / px_height) * (um_width / px_width),
+                roundnesses,
+            )
+        )
+
+        self.Trace.insert(
+            dict(
+                key,
+                fluo_channel=fluo_channel,
+                mask=mask_id,
+                skewness=skewness,
+                variance=variance,
+            )
+            for fluo_channel, mask_id, skewness, variance in zip(
+                fluo_channels,
+                mask_ids,
+                skew(fluorescence, axis=1),
+                fluorescence.std(axis=1),
+            )
+        )
+
+
 # ---------------- HELPER FUNCTIONS ----------------
 
 
