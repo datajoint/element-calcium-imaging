@@ -610,7 +610,7 @@ class ScanInfo(dj.Imported):
 
 @schema
 class ScanQualityMetrics(dj.Computed):
-    """Metrics to assess quality of Scan.
+    """Metrics to assess the quality of the scan.
 
     Attributes:
         ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
@@ -621,15 +621,15 @@ class ScanQualityMetrics(dj.Computed):
     """
 
     class Frames(dj.Part):
-        """Metrics used to evaluate frames.
+        """Metrics used to evaluate each frame.
 
         Attributes:
             ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
             Channel (foreign key): Primary key from Channel.
             min_intensity (longblob): Minimum value of each frame.
-            mean_intensity (longblob): Mean value at each frame.
-            max_intensity (longblob): Maximum value at each frame.
-            contrast (longblob): Contrast of each frame, difference of 99 and 1 percentiles.
+            mean_intensity (longblob): Mean value of each frame.
+            max_intensity (longblob): Maximum value of each frame.
+            contrast (longblob): Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
         """
 
         definition = """
@@ -637,9 +637,9 @@ class ScanQualityMetrics(dj.Computed):
         -> Channel
         ---
         min_intensity: longblob   # Minimum value of each frame.
-        mean_intensity: longblob  # Mean value at each frame.
-        max_intensity: longblob   # Maximum value at each frame.
-        contrast: longblob        # Contrast of each frame, difference of 99 and 1 percentiles.
+        mean_intensity: longblob  # Mean value of each frame.
+        max_intensity: longblob   # Maximum value of each frame.
+        contrast: longblob        # Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
         """
 
     def make(self, key):
