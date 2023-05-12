@@ -2,7 +2,7 @@ name: Development
 on:
   push:
 jobs:
-  build-codespaces:
+  devcontainer-build:
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-build.yaml@main
     # with:
     #   config-path: .github/labeler.yml
