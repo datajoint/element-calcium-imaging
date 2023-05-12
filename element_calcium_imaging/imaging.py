@@ -1487,8 +1487,7 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        """Populate the Activity with the results parsed from analysis
-        outputs."""
+        """Populate the Activity with the results parsed from analysis outputs."""
 
         method, imaging_dataset = get_loader_result(key, Curation)
 
@@ -1546,7 +1545,7 @@ class Activity(dj.Computed):
 
 @schema
 class ProcessingQualityMetrics(dj.Computed):
-    """Quality metrics used to evaluate the results of a calcium imaging analysis pipeline.
+    """Quality metrics used to evaluate the results of the calcium imaging analysis pipeline.
 
     Attributes:
         Fluorescence (foreign key): Primary key from Fluorescence.
@@ -1557,39 +1556,39 @@ class ProcessingQualityMetrics(dj.Computed):
     """
 
     class Mask(dj.Part):
-        """Quality metrics used to evaluate the Masks.
+        """Quality metrics used to evaluate the masks.
 
         Attributes:
             Fluorescence (foreign key): Primary key from Fluorescence.
             Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
             mask_area (float): Mask area in square micrometer.
-            roundness (float): Roundness between 0 and 1, closer to 1 the rounder.
+            roundness (float): Roundness between 0 and 1. Values closer to 1 are rounder.
         """
 
         definition = """
         -> master
         -> Segmentation.Mask
         ---
-        mask_area=null: float  # Mask area in square micrometer. Stringer & Pachitariu (2019).
-        roundness: float       # Roundness between 0 and 1, closer to 1 the rounder. Tegtmeier et al. (2018).
+        mask_area=null: float  # Mask area in square micrometer.
+        roundness: float       # Roundness between 0 and 1. Values closer to 1 are rounder.
         """
 
     class Trace(dj.Part):
-        """Quality metrics used to evaluate the Fluorescence Traces.
+        """Quality metrics used to evaluate the fluorescence traces.
 
         Attributes:
             Fluorescence (foreign key): Primary key from Fluorescence.
             Fluorescence.Trace (foreign key): Primary key from Fluorescence.Trace.
-            skewness (float): Skewness of the Fluorescence trace.
-            variance (float): Variance of the Fluorescence trace.
+            skewness (float): Skewness of the fluorescence trace.
+            variance (float): Variance of the fluorescence trace.
         """
 
         definition = """
         -> master
         -> Fluorescence.Trace
         ---
-        skewness: float   # Stringer & Pachitariu (2019)
-        variance: float   # Stringer & Pachitariu (2019)
+        skewness: float   # Skewness of the fluorescence trace.
+        variance: float   # Variance of the fluorescence trace.
         """
 
     def make(self, key):
