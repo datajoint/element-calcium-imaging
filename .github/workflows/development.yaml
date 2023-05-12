@@ -1,0 +1,10 @@
+name: Development
+on:
+  push:
+jobs:
+  build-codespaces:
+    uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer/build.yaml@main
+    # with:
+    #   config-path: .github/labeler.yml
+    # secrets:
+    #   envPAT: ${{ secrets.envPAT }}
