@@ -201,7 +201,7 @@ class MaskType(dj.Lookup):
     """Available labels for segmented masks (e.g. 'soma', 'axon', 'dendrite', 'neuropil').
 
     Attributes:
-        masky_type (str): Mask type.
+        mask_type (str): Mask type.
     """
 
     definition = """# Possible types of a segmented mask

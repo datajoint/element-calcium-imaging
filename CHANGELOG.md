@@ -8,6 +8,16 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Quality metrics
 + Update - Docs and readme
 
+## [0.5.7] - 2023-05-11
+
++ Fix - `.ipynb` dark mode output for all notebooks.
++ Fix - Remove `GOOGLE_ANALYTICS_KEY` from `u24_element_release_call.yml`.
+
+## [0.5.6] - 2023-04-28
+
++ Fix - `.ipynb` output in tutorials is not visible in dark mode.
++ Fix - typos in docstrings.
+
 ## [0.5.5] - 2023-04-06
 
 + Update - Bump `element-interface` requirement to `0.5.1`.
@@ -94,6 +104,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
 [0.6.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.0
+[0.5.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.7
+[0.5.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.6
 [0.5.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.5
 [0.5.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.4
 [0.5.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.3
