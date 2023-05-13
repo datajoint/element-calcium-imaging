@@ -1,4 +1,7 @@
-# run tests: pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings
+"""
+run all: python -m pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging --sw -p no:warnings tests/
+run one: python -m pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging --sw -p no:warnings --pdb tests/module_name.py -k function_name
+"""
 
 import os
 import pathlib
@@ -54,28 +57,6 @@ verbose_context = nullcontext() if verbose else QuietStdOut()
 # ------------------- FIXTURES -------------------
 
 
-@pytest.fixture(autouse=True)
-def dj_config():
-    if pathlib.Path("./dj_local_conf.json").exists():
-        dj.config.load("./dj_local_conf.json")
-    dj.config["safemode"] = False
-
-    environ_root = os.environ.get("IMAGING_ROOT_DATA_DIR")
-    if environ_root and not isinstance(environ_root, list):
-        environ_root = list(environ_root)
-    config_root = dj.config["custom"]["imaging_root_data_dir"]
-    if not isinstance(config_root, list):
-        config_root = list(config_root)
-
-    dj.config["custom"] = {
-        "database.prefix": (
-            os.environ.get("DATABASE_PREFIX") or dj.config["custom"]["database.prefix"]
-        ),
-        "imaging_root_data_dir": (environ_root or config_root),
-    }
-    return
-
-
 @pytest.fixture
 def pipeline():
     with verbose_context:
@@ -100,52 +81,6 @@ def pipeline():
     if _tear_down:
         with verbose_context:
             pipeline.subject.Subject.delete()
-
-
-@pytest.fixture(autouse=True)
-def test_data(dj_config, pipeline):
-    root_dirs = pipeline["get_imaging_root_data_dir"]
-    try:
-        _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
-    except FileNotFoundError:
-        test_data_dir = "/main/test_data/"
-        try:
-            dj.config["custom"].update(
-                {
-                    "djarchive.client.endpoint": os.environ[
-                        "DJARCHIVE_CLIENT_ENDPOINT"
-                    ],
-                    "djarchive.client.bucket": os.environ["DJARCHIVE_CLIENT_BUCKET"],
-                    "djarchive.client.access_key": os.environ[
-                        "DJARCHIVE_CLIENT_ACCESSKEY"
-                    ],
-                    "djarchive.client.secret_key": os.environ[
-                        "DJARCHIVE_CLIENT_SECRETKEY"
-                    ],
-                }
-            )
-        except KeyError as e:
-            raise FileNotFoundError(
-                f"Test data not available at {test_data_dir}."
-                f"\nAttempting to download from DJArchive,"
-                f" but no credentials found in environment variables."
-                f"\nError: {str(e)}"
-            )
-
-        import djarchive_client
-
-        from workflow_calcium_imaging import version
-
-        client = djarchive_client.client()
-        workflow_version = version.__version__
-
-        client.download(
-            "workflow-calcium-imaging-test-set",
-            workflow_version.replace(".", "_"),
-            str(test_data_dir),
-            create_target=False,
-        )
-    return
 
 
 @pytest.fixture

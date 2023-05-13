@@ -1,12 +1,11 @@
 import shutil
-
+import datetime
 import pytest
 
 from . import (
     caiman2D_paramset,
     caiman3D_paramset,
     curations,
-    dj_config,
     ingest_sessions,
     ingest_subjects,
     pipeline,
@@ -16,7 +15,6 @@ from . import (
     sessions_csv,
     subjects_csv,
     suite2p_paramset,
-    test_data,
     testdata_paths,
     trigger_processing_suite2p_2D,
     verbose_context,
@@ -414,3 +412,62 @@ def test_segmentation_populate_caiman_2D(curations, pipeline, testdata_paths):
         imaging.Fluorescence.Trace & curation_key & "fluo_channel = 0" & "mask = 1"
     ).fetch1("fluorescence")
     assert len(f) == nframes
+
+
+def test_scan_quality_metrics_populate(pipeline):
+    """
+    Assert correct values for entries in the scan.ScanQualityMetrics table.
+    Run the `demo_prepare.ipynb` notebook, prior to running this test.
+    """
+    scan = pipeline["scan"]
+
+    key = dict(
+        subject="subject1",
+        session_datetime=datetime.datetime(2023, 5, 11, 12, 00, 00),
+        scan_id=0,
+        field_idx=0,
+        channel=0,
+    )
+
+    with verbose_context:
+        scan.ScanQualityMetrics.populate(key)
+
+    scan_metrics = (scan.ScanQualityMetrics.Frames() & key).fetch1()
+
+    assert len(scan_metrics["min_intensity"]) == 3000
+    assert len(scan_metrics["mean_intensity"]) == 3000
+    assert len(scan_metrics["max_intensity"]) == 3000
+    assert len(scan_metrics["contrast"]) == 3000
+
+    assert round(scan_metrics["min_intensity"][0], 2) == -334.00
+    assert round(scan_metrics["mean_intensity"][0], 2) == -194.71
+    assert round(scan_metrics["max_intensity"][0], 2) == 1727.00
+    assert round(scan_metrics["contrast"][0], 2) == 526.00
+
+
+def test_imaging_quality_metrics_populate(pipeline):
+    """
+    Assert correct values for entries in the imaging.ProcessingQualityMetrics table.
+    Run the `demo_prepare.ipynb` notebook, prior to running this test.
+    """
+    imaging = pipeline["imaging"]
+
+    key = dict(
+        subject="subject1",
+        session_datetime=datetime.datetime(2023, 5, 11, 12, 00, 00),
+        scan_id=0,
+        paramset_idx=0,
+        curation_id=0,
+        mask=0,
+    )
+
+    with verbose_context:
+        imaging.ProcessingQualityMetrics.populate(key)
+
+    mask_metrics = (imaging.ProcessingQualityMetrics.Mask() & key).fetch1()
+    trace_metrics = (imaging.ProcessingQualityMetrics.Trace() & key).fetch1()
+
+    assert mask_metrics["mask_area"] == None
+    assert round(mask_metrics["roundness"], 2) == 0.75
+    assert round(trace_metrics["skewness"], 2) == 2.29
+    assert round(trace_metrics["variance"], 2) == 865.22

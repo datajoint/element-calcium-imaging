@@ -121,3 +121,6 @@ Diagram.ipynb
 .env
 
 example_data
+
+# vscode
+*.code-workspace
