@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from typing import Union
 
+import numpy as np
 import datajoint as dj
 from element_interface.utils import find_root_directory
 
@@ -333,15 +334,7 @@ class ScanInfo(dj.Imported):
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero = (
-                scan.motor_position_at_zero[0] if scan.motor_position_at_zero else None
-            )
-            y_zero = (
-                scan.motor_position_at_zero[1] if scan.motor_position_at_zero else None
-            )
-            z_zero = (
-                scan.motor_position_at_zero[2] if scan.motor_position_at_zero else None
-            )
+            x_zero, y_zero, z_zero = scan.motor_position_at_zero or (None, None, None)
 
             self.insert1(
                 dict(
@@ -613,3 +606,96 @@ class ScanInfo(dj.Imported):
             pathlib.Path(f).relative_to(root_dir).as_posix() for f in scan_filepaths
         ]
         self.ScanFile.insert([{**key, "file_path": f} for f in scan_files])
+
+
+@schema
+class ScanQualityMetrics(dj.Computed):
+    """Metrics to assess the quality of the scan.
+
+    Attributes:
+        ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+    """
+
+    definition = """
+    -> ScanInfo.Field
+    """
+
+    class Frames(dj.Part):
+        """Metrics used to evaluate each frame.
+
+        Attributes:
+            ScanInfo.Field (foreign key): Primary key from ScanInfo.Field.
+            Channel (foreign key): Primary key from Channel.
+            min_intensity (longblob): Minimum value of each frame.
+            mean_intensity (longblob): Mean value of each frame.
+            max_intensity (longblob): Maximum value of each frame.
+            contrast (longblob): Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
+        """
+
+        definition = """
+        -> master
+        -> Channel
+        ---
+        min_intensity: longblob   # Minimum value of each frame.
+        mean_intensity: longblob  # Mean value of each frame.
+        max_intensity: longblob   # Maximum value of each frame.
+        contrast: longblob        # Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
+        """
+
+    def make(self, key):
+        acq_software, nchannels = (Scan * ScanInfo & key).fetch1(
+            "acq_software", "nchannels"
+        )
+
+        if acq_software == "ScanImage":
+            import scanreader
+
+            # Switch from FYXCT to TCYX
+            data = scanreader.read_scan(get_scan_image_files(key))[
+                key["field_idx"]
+            ].transpose(3, 2, 0, 1)
+        elif acq_software == "Scanbox":
+            from sbxreader import sbx_memmap
+
+            # Switch from TFCYX to TCYX
+            data = sbx_memmap(get_scan_box_files(key))[:, key["field_idx"]]
+        elif acq_software == "NIS":
+            import nd2
+
+            nd2_file = nd2.ND2File(get_nd2_files(key)[0])
+
+            nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
+
+            valid_dimensions = "TZCYX"
+            assert set(nd2_dims) <= set(
+                valid_dimensions
+            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_nd2_files(key)[0]}."
+
+            # Sort the dimensions in the order of TZCYX, skipping the missing ones.
+            data = nd2_file.asarray().transpose(
+                [nd2_dims[x] for x in valid_dimensions if x in nd2_dims]
+            )
+
+            # Expand array to include the missing dimensions.
+            for i, dim in enumerate("TZC"):
+                if dim not in nd2_dims:
+                    data = np.expand_dims(data, i)
+
+            data = data[:, key["field_idx"]]  # Switch from TFCYX to TCYX
+
+        self.insert1(key)
+
+        for channel in range(nchannels):
+            movie = data[:, channel, :, :]
+
+            self.Frames.insert1(
+                dict(
+                    key,
+                    channel=channel,
+                    min_intensity=movie.min(axis=(1, 2)),
+                    mean_intensity=movie.mean(axis=(1, 2)),
+                    max_intensity=movie.max(axis=(1, 2)),
+                    contrast=np.percentile(movie, 99, axis=(1, 2))
+                    - np.percentile(movie, 1, axis=(1, 2)),
+                )
+            )

@@ -3,6 +3,11 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.6.0] - 2023-05-15
+
++ Add - Quality metrics
++ Update - Docs and readme
+
 ## [0.5.7] - 2023-05-11
 
 + Fix - `.ipynb` dark mode output for all notebooks.
@@ -98,6 +103,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.6.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.0
 [0.5.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.7
 [0.5.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.6
 [0.5.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.5

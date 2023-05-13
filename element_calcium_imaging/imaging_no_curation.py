@@ -23,12 +23,12 @@ _linking_module = None
 
 
 def activate(
-    imaging_schema_name,
-    scan_schema_name=None,
+    imaging_schema_name: str,
+    scan_schema_name: str = None,
     *,
-    create_schema=True,
-    create_tables=True,
-    linking_module=None,
+    create_schema: bool = True,
+    create_tables: bool = True,
+    linking_module: str = None,
 ):
     """Activate this schema.
 
@@ -225,9 +225,9 @@ class ProcessingTask(dj.Manual):
     and the triggering of new analysis for all supported analysis methods.
 
     Attributes:
-        scan.Scan (foreign key):
-        ProcessingParamSet (foreign key):
-        processing_output_dir (str):
+        scan.Scan (foreign key): Primary key from scan.Scan.
+        ProcessingParamSet (foreign key): Primary key from ProcessingParamSet.
+        processing_output_dir (str): Output directory of the processed scan relative to the root data directory.
         task_mode (str): One of 'load' (load computed analysis results) or 'trigger'
             (trigger computation).
     """
@@ -673,6 +673,7 @@ class MotionCorrection(dj.Imported):
 
     def make(self, key):
         """Populate MotionCorrection with results parsed from analysis outputs"""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch(
@@ -1030,17 +1031,17 @@ class Segmentation(dj.Computed):
 
         definition = """ # A mask produced by segmentation.
         -> master
-        mask            : smallint
+        mask               : smallint
         ---
         -> scan.Channel.proj(segmentation_channel='channel')  # channel used for segmentation
-        mask_npix       : int       # number of pixels in ROIs
-        mask_center_x   : int       # center x coordinate in pixel
-        mask_center_y   : int       # center y coordinate in pixel
-        mask_center_z   : int       # center z coordinate in pixel
-        mask_xpix       : longblob  # x coordinates in pixels
-        mask_ypix       : longblob  # y coordinates in pixels
-        mask_zpix       : longblob  # z coordinates in pixels
-        mask_weights    : longblob  # weights of the mask at the indices above
+        mask_npix          : int       # number of pixels in ROIs
+        mask_center_x      : int       # center x coordinate in pixel
+        mask_center_y      : int       # center y coordinate in pixel
+        mask_center_z=null : int       # center z coordinate in pixel
+        mask_xpix          : longblob  # x coordinates in pixels
+        mask_ypix          : longblob  # y coordinates in pixels
+        mask_zpix=null     : longblob  # z coordinates in pixels
+        mask_weights       : longblob  # weights of the mask at the indices above
         """
 
     def make(self, key):
@@ -1413,9 +1414,8 @@ class Activity(dj.Computed):
         return suite2p_key_source.proj() + caiman_key_source.proj()
 
     def make(self, key):
-        """
-        Populate the Activity with the results parsed from analysis outputs.
-        """
+        """Populate the Activity with the results parsed from analysis outputs."""
+
         method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
@@ -1468,6 +1468,120 @@ class Activity(dj.Computed):
                 )
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
+
+
+@schema
+class ProcessingQualityMetrics(dj.Computed):
+    """Quality metrics used to evaluate the results of the calcium imaging analysis pipeline.
+
+    Attributes:
+        Fluorescence (foreign key): Primary key from Fluorescence.
+    """
+
+    definition = """
+    -> Fluorescence
+    """
+
+    class Mask(dj.Part):
+        """Quality metrics used to evaluate the masks.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Segmentation.Mask (foreign key): Primary key from Segmentation.Mask.
+            mask_area (float): Mask area in square micrometer.
+            roundness (float): Roundness between 0 and 1. Values closer to 1 are rounder.
+        """
+
+        definition = """
+        -> master
+        -> Segmentation.Mask
+        ---
+        mask_area=null: float  # Mask area in square micrometer.
+        roundness: float       # Roundness between 0 and 1. Values closer to 1 are rounder.
+        """
+
+    class Trace(dj.Part):
+        """Quality metrics used to evaluate the fluorescence traces.
+
+        Attributes:
+            Fluorescence (foreign key): Primary key from Fluorescence.
+            Fluorescence.Trace (foreign key): Primary key from Fluorescence.Trace.
+            skewness (float): Skewness of the fluorescence trace.
+            variance (float): Variance of the fluorescence trace.
+        """
+
+        definition = """
+        -> master
+        -> Fluorescence.Trace
+        ---
+        skewness: float   # Skewness of the fluorescence trace.
+        variance: float   # Variance of the fluorescence trace.
+        """
+
+    def make(self, key):
+        """Populate the ProcessingQualityMetrics table and its part tables."""
+        from scipy.stats import skew
+
+        (
+            mask_xpixs,
+            mask_ypixs,
+            mask_weights,
+            fluorescence,
+            fluo_channels,
+            mask_ids,
+            mask_npix,
+            px_height,
+            px_width,
+            um_height,
+            um_width,
+        ) = (Segmentation.Mask * scan.ScanInfo.Field * Fluorescence.Trace & key).fetch(
+            "mask_xpix",
+            "mask_ypix",
+            "mask_weights",
+            "fluorescence",
+            "fluo_channel",
+            "mask",
+            "mask_npix",
+            "px_height",
+            "px_width",
+            "um_height",
+            "um_width",
+        )
+
+        norm_mean = lambda x: x.mean() / x.max()
+        roundnesses = [
+            norm_mean(np.linalg.eigvals(np.cov(x, y, aweights=w)))
+            for x, y, w in zip(mask_xpixs, mask_ypixs, mask_weights)
+        ]
+
+        fluorescence = np.stack(fluorescence)
+
+        self.insert1(key)
+
+        self.Mask.insert(
+            dict(key, mask=mask_id, mask_area=mask_area, roundness=roundness)
+            for mask_id, mask_area, roundness in zip(
+                mask_ids,
+                mask_npix * (um_height / px_height) * (um_width / px_width),
+                roundnesses,
+            )
+        )
+
+        self.Trace.insert(
+            dict(
+                key,
+                fluo_channel=fluo_channel,
+                mask=mask_id,
+                skewness=skewness,
+                variance=variance,
+            )
+            for fluo_channel, mask_id, skewness, variance in zip(
+                fluo_channels,
+                mask_ids,
+                skew(fluorescence, axis=1),
+                fluorescence.std(axis=1),
+            )
+        )
 
 
 # ---------------- HELPER FUNCTIONS ----------------
