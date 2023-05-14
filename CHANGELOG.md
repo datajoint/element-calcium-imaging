@@ -3,9 +3,14 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [0.4.0] - 2023-05-15
+## [0.4.1] - 2023-05-15
 
-+ Add - Quality metrics
++ Add - Quality metrics Jupyter notebook
+
+## [0.4.0] - 2023-05-13
+
++ Add - Pytests for quality metrics
++ Update - Dev Containers, and remove previous Docker and Compose files
 + Update - Suite2p version
 
 ## [0.3.1] - 2023-03-09
@@ -59,6 +64,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Containerization for pytests
 + Comment - Phase previously designated 0.1.0 -> 0.0.0
 
+[0.4.1]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.4.1
 [0.4.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.4.0
 [0.3.1]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.1
 [0.3.0]: https://github.com/datajoint/workflow-calcium-imaging/releases/tag/0.3.0
