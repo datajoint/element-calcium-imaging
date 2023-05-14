@@ -2,12 +2,12 @@
 
 Each node in the following diagram represents the analysis code in the workflow and the
 corresponding table in the database.  Within the workflow, Element Calcium Imaging
-connects to upstream Elements including Lab, Animal, and Session. For more detailed
-documentation on each table, see the API docs for the respective schemas.
+connects to upstream Elements including Lab, Animal, Session, and Event. For more 
+detailed documentation on each table, see the API docs for the respective schemas.
 
 The Element is composed of two main schemas, `scan` and `imaging`. To handle
-several use cases of this pipeline, we have designed two alternatives to `imaging` 
-schemas, including `imaging_no_curation` and `imaging_preprocess`.
+several use cases of this pipeline, we have designed two alternatives to the `imaging` 
+schema, including `imaging_no_curation` and `imaging_preprocess`.
 
 - `imaging` module - Multiple scans are acquired during each session and each scan is
 processed independently.
