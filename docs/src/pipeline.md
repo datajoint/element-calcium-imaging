@@ -14,12 +14,14 @@ processed independently.
 
      ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
-- `imaging_no_curation` module - Same as `imaging` module, without the Curation table.
+- `imaging_no_curation` module - Same as the `imaging` module, but without the 
+`Curation` table.
 
      ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_no_curation.svg)
 
-- `imaging_preprocess` module - Same as `imaging` module. Additionally, pre-processing
-steps can be performed on each scan prior to processing with Suite2p or CaImAn.
+- `imaging_preprocess` module - Same as the `imaging` module, and additional 
+pre-processing steps can be performed on each scan prior to processing with Suite2p or 
+CaImAn.
 
      ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_preprocess.svg)
 
