@@ -29,7 +29,7 @@ processing/segmentation on a concatenated set of data from multiple scans. To th
 we have extended the Calcium Imaging Element and provided a design version capable of
 supporting a multi-scan processing scheme.
 
-## `lab` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/workflow_calcium_imaging/pipeline/#workflow_calcium_imaging.pipeline.Equipment))
+## `reference` schema ([API docs](https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/workflow_calcium_imaging/reference/))
 
 | Table | Description |
 | --- | --- |
