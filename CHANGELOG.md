@@ -6,6 +6,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 ## [0.4.1] - 2023-05-15
 
 + Add - Quality metrics Jupyter notebook
++ Remove - `process.py` script
 
 ## [0.4.0] - 2023-05-13
 
