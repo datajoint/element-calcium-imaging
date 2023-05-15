@@ -4,7 +4,6 @@ services:
     extends:
       file: ./local/docker-compose.yaml
       service: app
-    image: datajoint/workflow_calcium_imaging_devcontainer:latest
     environment:
       - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2
     devices:
