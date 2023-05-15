@@ -43,7 +43,7 @@ __all__ = [
 ]
 
 
-# ------------- Activate "lab", "subject", "session" schema -------------
+# Activate "lab", "subject", "session" schema -------------------------
 
 lab.activate(db_prefix + "lab")
 
@@ -58,10 +58,10 @@ session.activate(db_prefix + "session", linking_module=__name__)
 
 trial.activate(db_prefix + "trial", db_prefix + "event", linking_module=__name__)
 
-# ------------- Activate "imaging" schema -------------
+# Activate "imaging" schema -------------------------------------------
 
 imaging.activate(db_prefix + "imaging", db_prefix + "scan", linking_module=__name__)
 
-# ------------- Activate "analysis" schema ------------
+# Activate "analysis" schema ------------------------------------------
 
 analysis.activate(db_prefix + "analysis", linking_module=__name__)

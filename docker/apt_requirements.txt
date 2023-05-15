@@ -1,8 +1,0 @@
-ffmpeg
-g++
-gcc
-git
-libhdf5-dev
-libsm6
-libxext6
-pkg-config
