@@ -5,7 +5,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 ## [0.6.1] - 2023-05-15
 
-+ Fix - Docs
++ Update - Docs
 
 ## [0.6.0] - 2023-05-15
 
