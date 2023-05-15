@@ -325,37 +325,91 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#lab-schema-api-docs" class="md-nav__link">
-    lab schema (API docs)
+  <a href="#diagrams" class="md-nav__link">
+    Diagrams
   </a>
+  
+    <nav class="md-nav" aria-label="Diagrams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imaging-module" class="md-nav__link">
+    imaging module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imaging_no_curation-module" class="md-nav__link">
+    imaging_no_curation module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imaging_preprocess-module" class="md-nav__link">
+    imaging_preprocess module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-scan-processing-branch" class="md-nav__link">
+    multi-scan-processing branch
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#subject-schema-api-docs" class="md-nav__link">
-    subject schema (API docs)
+  <a href="#table-descriptions" class="md-nav__link">
+    Table descriptions
+  </a>
+  
+    <nav class="md-nav" aria-label="Table descriptions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reference-schema" class="md-nav__link">
+    reference schema
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#session-schema-api-docs" class="md-nav__link">
-    session schema (API docs)
+        
+          <li class="md-nav__item">
+  <a href="#subject-schema" class="md-nav__link">
+    subject schema
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#scan-schema-api-docs" class="md-nav__link">
-    scan schema (API docs)
+        
+          <li class="md-nav__item">
+  <a href="#session-schema" class="md-nav__link">
+    session schema
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#imaging-schema-api-docs" class="md-nav__link">
-    imaging schema (API docs)
+        
+          <li class="md-nav__item">
+  <a href="#scan-schema" class="md-nav__link">
+    scan schema
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imaging-schema" class="md-nav__link">
+    imaging schema
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -374,10 +428,64 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../tutorials/">Tutorials</a>
+          
+            <label for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../tutorials/" class="md-nav__link">
-        Tutorials
+      <a href="../tutorials/tutorial/" class="md-nav__link">
+        Tutorial Notebook
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/quality_metrics/" class="md-nav__link">
+        Quality Metrics Notebook
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -630,20 +738,6 @@
 
             
           
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/element_calcium_imaging/version/" class="md-nav__link">
-        version.py
-      </a>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -740,36 +834,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/workflow_calcium_imaging/process/" class="md-nav__link">
-        process.py
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../api/workflow_calcium_imaging/reference/" class="md-nav__link">
         reference.py
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/workflow_calcium_imaging/version/" class="md-nav__link">
-        version.py
       </a>
     </li>
   
@@ -825,33 +891,36 @@
 <h1 id="data-pipeline">Data Pipeline<a class="headerlink" href="#data-pipeline" title="Permanent link">&para;</a></h1>
 <p>Each node in the following diagram represents the analysis code in the workflow and the
 corresponding table in the database.  Within the workflow, Element Calcium Imaging
-connects to upstream Elements including Lab, Animal, and Session. For more detailed
-documentation on each table, see the API docs for the respective schemas.</p>
+connects to upstream Elements including Lab, Animal, Session, and Event. For more 
+detailed documentation on each table, see the API docs for the respective schemas.</p>
 <p>The Element is composed of two main schemas, <code>scan</code> and <code>imaging</code>. To handle
-several use cases of this pipeline, we have designed two alternatives to <code>imaging</code> 
-schemas, including <code>imaging_no_curation</code> and <code>imaging_preprocess</code>.</p>
+several use cases of this pipeline, we have designed two alternatives to the <code>imaging</code> 
+schema, including <code>imaging_no_curation</code> and <code>imaging_preprocess</code>.</p>
+<h2 id="diagrams">Diagrams<a class="headerlink" href="#diagrams" title="Permanent link">&para;</a></h2>
+<h3 id="imaging-module"><code>imaging</code> module<a class="headerlink" href="#imaging-module" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>imaging</code> module - Multiple scans are acquired during each session and each scan is
-processed independently.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg" /></p>
+<li>Multiple scans are acquired during each session and each scan is processed independently.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg" /></p>
 </li>
 </ul>
+<h3 id="imaging_no_curation-module"><code>imaging_no_curation</code> module<a class="headerlink" href="#imaging_no_curation-module" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>imaging_no_curation</code> module - Same as <code>imaging</code> module, without the Curation table.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_no_curation.svg" /></p>
+<li>Same as the <code>imaging</code> module, but without the <code>Curation</code> table.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_no_curation.svg" /></p>
 </li>
 </ul>
+<h3 id="imaging_preprocess-module"><code>imaging_preprocess</code> module<a class="headerlink" href="#imaging_preprocess-module" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>imaging_preprocess</code> module - Same as <code>imaging</code> module. Additionally, pre-processing
-steps can be performed on each scan prior to processing with Suite2p or CaImAn.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_preprocess.svg" /></p>
+<li>Same as the <code>imaging</code> module, and additional pre-processing steps can be performed on each scan prior to processing with Suite2p or CaImAn.<p><img alt="pipeline" src="https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging_preprocess.svg" /></p>
 </li>
 </ul>
+<h3 id="multi-scan-processing-branch"><code>multi-scan-processing</code> branch<a class="headerlink" href="#multi-scan-processing-branch" title="Permanent link">&para;</a></h3>
 <ul>
-<li>The processing workflow is typically performed on a per-scan basis, however, depending
-on the nature of the research questions, different labs may opt to perform
-processing/segmentation on a concatenated set of data from multiple scans. To this end,
-we have extended the Calcium Imaging Element and provided a design version capable of
-supporting a multi-scan processing scheme.</li>
+<li>The processing workflow is typically performed on a per-scan basis, however, depending on the nature of the research questions, different labs may opt to perform processing/segmentation on a concatenated set of data from multiple scans. To this end, we have extended the Calcium Imaging Element and provided a design version capable of supporting a multi-scan processing scheme.</li>
 </ul>
-<h2 id="lab-schema-api-docs"><code>lab</code> schema (<a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/workflow_calcium_imaging/pipeline/#workflow_calcium_imaging.pipeline.Equipment">API docs</a>)<a class="headerlink" href="#lab-schema-api-docs" title="Permanent link">&para;</a></h2>
+<h2 id="table-descriptions">Table descriptions<a class="headerlink" href="#table-descriptions" title="Permanent link">&para;</a></h2>
+<h3 id="reference-schema"><code>reference</code> schema<a class="headerlink" href="#reference-schema" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For further details see the <a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/workflow_calcium_imaging/reference/">reference schema API docs</a></li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -866,9 +935,12 @@ supporting a multi-scan processing scheme.</li>
 </tr>
 </tbody>
 </table>
-<h2 id="subject-schema-api-docs"><code>subject</code> schema (<a href="https://datajoint.com/docs/elements/element-animal/latest/api/element_animal/subject">API docs</a>)<a class="headerlink" href="#subject-schema-api-docs" title="Permanent link">&para;</a></h2>
+<h3 id="subject-schema"><code>subject</code> schema<a class="headerlink" href="#subject-schema" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Although not required, most choose to connect the <code>Session</code> table to a <code>Subject</code> table.</li>
+</ul>
+<ul>
+<li>For further details see the <a href="https://datajoint.com/docs/elements/element-animal/latest/api/element_animal/subject/">subject schema API docs</a></li>
 </ul>
 <table>
 <thead>
@@ -884,7 +956,10 @@ supporting a multi-scan processing scheme.</li>
 </tr>
 </tbody>
 </table>
-<h2 id="session-schema-api-docs"><code>session</code> schema (<a href="https://datajoint.com/docs/elements/element-session/latest/api/element_session/session_with_datetime">API docs</a>)<a class="headerlink" href="#session-schema-api-docs" title="Permanent link">&para;</a></h2>
+<h3 id="session-schema"><code>session</code> schema<a class="headerlink" href="#session-schema" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For further details see the <a href="https://datajoint.com/docs/elements/element-session/latest/api/element_session/session_with_datetime/">session schema API docs</a></li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -899,7 +974,10 @@ supporting a multi-scan processing scheme.</li>
 </tr>
 </tbody>
 </table>
-<h2 id="scan-schema-api-docs"><code>scan</code> schema (<a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/scan">API docs</a>)<a class="headerlink" href="#scan-schema-api-docs" title="Permanent link">&para;</a></h2>
+<h3 id="scan-schema"><code>scan</code> schema<a class="headerlink" href="#scan-schema" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For further details see the <a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/scan/">scan schema API docs</a></li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -946,7 +1024,10 @@ supporting a multi-scan processing scheme.</li>
 </tr>
 </tbody>
 </table>
-<h2 id="imaging-schema-api-docs"><code>imaging</code> schema (<a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/imaging">API docs</a>)<a class="headerlink" href="#imaging-schema-api-docs" title="Permanent link">&para;</a></h2>
+<h3 id="imaging-schema"><code>imaging</code> schema<a class="headerlink" href="#imaging-schema" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For further details see the <a href="https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/imaging/">imaging schema API docs</a></li>
+</ul>
 <table>
 <thead>
 <tr>
