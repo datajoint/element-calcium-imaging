@@ -4,7 +4,9 @@
 
 + Workflow Calcium Imaging includes an [interactive tutorial on GitHub Codespaces](https://github.com/datajoint/workflow-calcium-imaging#interactive-tutorial), which is configured for users to run the pipeline.
 
-+ In the interactive tutorial, the example `tutorial.ipynb` notebook describes the pipeline and provides instructions for adding data to the pipeline.  For convenience, this notebook is also rendered [here](./tutorial.ipynb) on this site.
++ In the interactive tutorial, the example notebooks describe the pipeline and provide instructions for running the pipeline.  For convenience, these notebooks are also rendered on this website:
+   + [Tutorial notebook](./tutorial.ipynb)
+   + [Quality metrics notebook](./quality_metrics.ipynb)
 
 ## Installation Instructions for Active Projects
 
@@ -15,13 +17,15 @@ We recommend users to configure a database specifically for production pipelines
 
 ## Videos
 
-The [YouTube tutorial](https://www.youtube.com/watch?v=gFLn0GB1L30) gives an overview of
-the workflow files and notebooks, as well as core concepts related to calcium imaging
+[![YouTube tutorial](https://img.youtube.com/vi/gFLn0GB1L30/0.jpg)](https://www.youtube.com/watch?v=gFLn0GB1L30)
+
++ The [YouTube tutorial](https://www.youtube.com/watch?v=gFLn0GB1L30) gives an overview 
+of the workflow files and notebooks, as well as core concepts related to calcium imaging
 analysis.
 
 ## EXTRACT
 
-Analysis with the EXTRACT package is currently supported for single channel, single
++ Analysis with the EXTRACT package is currently supported for single channel, single
 plane scans using Suite2p for motion correction. For processing with EXTRACT,
 please set `processing_method="extract"` in the
 ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet

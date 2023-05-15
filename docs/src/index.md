@@ -21,6 +21,8 @@ combined with other Elements to assemble a fully functional pipeline.
 
 ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
++ We have designed three variations of the pipeline to handle different use cases. Displayed above is the default `imaging` schema.  Details on all of the `imaging` schemas can be found in the [Data Pipeline](./pipeline.md) documentation page.
+
 ## Getting Started
 
 + Install from PyPI
