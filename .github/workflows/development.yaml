@@ -4,6 +4,9 @@ on:
 jobs:
   devcontainer-build:
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-build.yaml@main
+  devcontainer-publish:
+    needs: devcontainer-build
+    uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-publish.yaml@main
     # with:
     #   config-path: .github/labeler.yml
     # secrets:
