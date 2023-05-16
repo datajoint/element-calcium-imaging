@@ -1,0 +1,15 @@
+version: "3"
+services:
+  app:
+    cpus: 2
+    mem_limit: 16g
+    environment:
+      - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2
+    build:
+      context: ../..
+      dockerfile: ./.devcontainer/Dockerfile
+    extra_hosts:
+      - fakeservices.datajoint.io:127.0.0.1
+    volumes:
+      - ../../..:/workspaces:cached
+    privileged: true # only because of dind
