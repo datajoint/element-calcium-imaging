@@ -4,4 +4,4 @@ on:
   pull_request:
 jobs:
   devcontainer-build:
-    uses: guzman-raphael/datajoint.github/.github/workflows/devcontainer-build.yaml@main
+    uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
