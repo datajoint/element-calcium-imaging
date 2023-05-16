@@ -1,17 +1,10 @@
-name: Development
+name: Release
 on:
-  push:
   workflow_dispatch:
 jobs:
   devcontainer-build:
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-build.yaml@main
   devcontainer-publish:
-    if: github.event_name == 'workflow_dispatch'
     needs: 
       - devcontainer-build
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-publish.yaml@main
-    # with:
-    #   config-path: .github/labeler.yml
-    # secrets:
-    #   envPAT: ${{ secrets.envPAT }}
-    # 

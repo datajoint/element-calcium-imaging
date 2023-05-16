@@ -1,0 +1,7 @@
+name: Test
+on:
+  push:
+jobs:
+  devcontainer-build:
+    uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-build.yaml@main
+
