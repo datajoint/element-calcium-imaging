@@ -1,5 +1,5 @@
 {
-	"name": "Tutorial environment",
+	"name": "Tutorial (remote data)",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -9,17 +9,14 @@
 	"onCreateCommand": "mkdir -p ${IMAGING_ROOT_DATA_DIR} && pip install -e . && MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait",
 	"postStartCommand": "docker volume prune -f && s3fs ${DJ_PUBLIC_S3_LOCATION} ${IMAGING_ROOT_DATA_DIR} -o nonempty,multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
 	"hostRequirements": {
-		"cpus": 2,
-		"memory": "16gb",
+		"cpus": 4,
+		"memory": "8gb",
 		"storage": "32gb"
 	},
 	"forwardPorts": [
 		3306
 	],
-	"customizations": {	
-		"settings": {
-			"python.pythonPath": "/usr/local/bin/python"
-	 	},
+	"customizations": {
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
