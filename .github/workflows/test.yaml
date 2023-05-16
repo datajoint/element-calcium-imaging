@@ -5,7 +5,3 @@ on:
 jobs:
   devcontainer-build:
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-build.yaml@main
-    secrets:
-      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
-      dockerhub_token: ${{secrets.dockerhub_token}}
-

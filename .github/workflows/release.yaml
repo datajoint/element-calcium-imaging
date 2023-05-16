@@ -8,3 +8,6 @@ jobs:
     needs: 
       - devcontainer-build
     uses: datajoint/dj-gha-workflows/.github/workflows/devcontainer-publish.yaml@main
+    secrets:
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
