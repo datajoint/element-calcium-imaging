@@ -2,7 +2,7 @@ version: "3"
 services:
   app:
     extends:
-      file: ./local-data/docker-compose.yaml
+      file: ./local/docker-compose.yaml
       service: app
     environment:
       - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2
