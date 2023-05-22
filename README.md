@@ -11,10 +11,7 @@ and `Bruker Prairie View` acquisition software; and
 software. DataJoint Elements collectively standardize and automate
 data collection and analysis for neuroscience experiments. Each Element is a modular
 pipeline for data storage and processing with corresponding database tables that can be
-combined with other Elements to assemble a fully functional pipeline.
-
-DataJoint Workflow for functional calcium imaging combines multiple DataJoint Elements to process data acquired with [ScanImage](http://scanimage.vidriotechnologies.com), [Scanbox](https://scanbox.org), `Nikon
-NIS`, or `PrairieView` acquisition software, using [Suite2p](https://github.com/MouseLand/suite2p) or [CaImAn](https://github.com/flatironinstitute/CaImAn) analysis software. DataJoint Elements collectively standardize and automate data collection and analysis for neuroscience experiments. Each Element is a modular pipeline for data storage and processing with corresponding database tables that can be combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebook to learn the pipeline.
+combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebook to learn the pipeline.
 
 ## Experiment Flowchart
 
@@ -28,18 +25,14 @@ NIS`, or `PrairieView` acquisition software, using [Suite2p](https://github.com/
 
 ## Getting Started
 
+
 + Install from PyPI
-## Getting Started
-
-+ [Interactive tutorial on GitHub Codespaces](#interactive-tutorial)
-
-+ Install Element Calcium Imaging from PyPI
 
      ```bash
      pip install element-calcium-imaging
      ```
 
-+ [Interactive tutorial on GitHub Codespaces](https://github.com/datajoint/workflow-calcium-imaging#interactive-tutorial)
++ [Interactive tutorial on GitHub Codespaces](#interactive-tutorial)
 
 + [Documentation](https://datajoint.com/docs/elements/element-calcium-imaging)
 
