@@ -108,7 +108,6 @@ ENV/
 # datajoint
 dj_local_conf*.json
 dj_local_conf_old.json
-workflow_calcium_imaging/
 temp*
 
 # docs
