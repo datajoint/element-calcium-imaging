@@ -1,5 +1,0 @@
-subject,session_datetime,block_id,block_start_time,block_stop_time,attribute_name,attribute_value
-subject3,2021-04-30 12:22:15,1,0,241,type,light
-subject3,2021-04-30 12:22:15,2,241,482,type,dark
-subject3,2021-04-30 12:22:15,3,482,723,type,light
-subject3,2021-04-30 12:22:15,4,723,964,type,dark

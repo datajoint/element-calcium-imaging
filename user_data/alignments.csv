@@ -1,4 +1,0 @@
-alignment_name,alignment_event_type,alignment_time_shift,start_event_type,start_time_shift,end_event_type,end_time_shift
-left_button,left,0,left,-5,left,5
-center_button,center,0,center,-5,center,5
-right_button,right,0,right,-5,right,5
