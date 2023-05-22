@@ -1,4 +1,14 @@
 datajoint>=0.13.0
-element-interface>=0.5.1
 plotly
 ipywidgets
+element-animal>=0.1.2
+element-calcium-imaging>=0.6.0
+element-event>=0.1.2
+element-interface>=0.5.1
+element-lab>=0.1.1
+element-session>=0.1.2
+ipykernel>=6.0.1
+nd2
+sbxreader @ git+https://github.com/datajoint/sbxreader
+scanreader @ git+https://github.com/atlab/scanreader.git
+suite2p>=0.12.1

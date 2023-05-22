@@ -1,5 +1,6 @@
 default_stages: [commit, push]
-exclude: (^.github/|^docs/|^images/)
+exclude: (^.github/|^docs/|^images/|^notebooks/py_scripts/|^tests/)
+# Current tests/__init__ violates many flake8. Excluding pending change to conftest
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -25,7 +26,7 @@ repos:
 
   # isort
   - repo: https://github.com/pycqa/isort
-    rev: 5.11.2
+    rev: 5.12.0
     hooks:
       - id: isort
         args: ["--profile", "black"]
