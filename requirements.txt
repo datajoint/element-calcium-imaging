@@ -1,9 +1,4 @@
 datajoint>=0.13.0
-element-animal>=0.1.2
-element-event>=0.1.2
-element-interface>=0.5.1
-element-lab>=0.1.1
-element-session>=0.1.2
 ipykernel>=6.0.1
 ipywidgets
 nd2

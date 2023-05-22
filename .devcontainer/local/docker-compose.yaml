@@ -3,14 +3,11 @@ services:
   app:
     cpus: 4
     mem_limit: 16g
-    # build:
-    #   context: ../..
-    #   dockerfile: ./.devcontainer/Dockerfile
-    image: datajoint/workflow_calcium_imaging_devcontainer:latest
+    image: datajoint/element_calcium_imaging_devcontainer:latest
     extra_hosts:
       - fakeservices.datajoint.io:127.0.0.1
     volumes:
-      - ../..:/workspaces/workflow-calcium-imaging:cached
+      - ../..:/workspaces/element-calcium-imaging:cached
       - docker_data:/var/lib/docker  # persist docker images
     privileged: true # only because of dind
 volumes:

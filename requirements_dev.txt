@@ -1,3 +1,8 @@
+element-animal>=0.1.2
+element-event>=0.1.2
+element-interface>=0.5.1
+element-lab>=0.1.1
+element-session>=0.1.2
 pytest
 pytest-cov
 shutils

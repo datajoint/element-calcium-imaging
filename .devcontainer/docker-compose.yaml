@@ -5,7 +5,7 @@ services:
       file: ./local/docker-compose.yaml
       service: app
     environment:
-      - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/workflow-calcium-imaging-data-v2
+      - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/calcium-imaging-v2
     devices:
       - /dev/fuse
     cap_add:
