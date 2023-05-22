@@ -83,6 +83,14 @@ def pipeline():
             pipeline.subject.Subject.delete()
 
 
+@pytest.fixture(autouse=True)
+def test_data(dj_config, pipeline):
+    root_dirs = pipeline["get_imaging_root_data_dir"]
+    try:
+        _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
+    except FileNotFoundError:
+
+
 @pytest.fixture
 def subjects_csv():
     """Create a 'subjects.csv' file"""
