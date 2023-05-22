@@ -1,6 +1,6 @@
 """
-run all: python -m pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging --sw -p no:warnings tests/
-run one: python -m pytest -sv --cov-report term-missing --cov=workflow_calcium_imaging --sw -p no:warnings --pdb tests/module_name.py -k function_name
+run all: python -m pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings tests/
+run one: python -m pytest -sv --cov-report term-missing --cov=element_calcium_imaging --sw -p no:warnings --pdb tests/module_name.py -k function_name
 """
 
 import os
@@ -61,7 +61,7 @@ verbose_context = nullcontext() if verbose else QuietStdOut()
 def pipeline():
     with verbose_context:
         print("\n")
-        from workflow_calcium_imaging import paths, pipeline
+        from element_calcium_imaging import paths, pipeline
 
     global is_multi_scan_processing
     is_multi_scan_processing = (
@@ -120,7 +120,7 @@ def subjects_csv():
 
 @pytest.fixture
 def ingest_subjects(pipeline, subjects_csv):
-    from workflow_calcium_imaging.ingest import ingest_subjects
+    from element_calcium_imaging.ingest import ingest_subjects
 
     _, subjects_csv_path = subjects_csv
     with verbose_context:
@@ -158,7 +158,7 @@ def sessions_csv(test_data, pipeline):
 
 @pytest.fixture
 def ingest_sessions(ingest_subjects, sessions_csv):
-    from workflow_calcium_imaging.ingest import ingest_sessions
+    from element_calcium_imaging.ingest import ingest_sessions
 
     _, sessions_csv_path = sessions_csv
     with verbose_context:
