@@ -35,13 +35,13 @@ schema, including `imaging_no_curation` and `imaging_preprocess`.
 
 ## Table descriptions
 
-### `reference` schema
+### `lab` schema
 
-- For further details see the [reference schema API docs](https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/workflow_calcium_imaging/reference/)
+- For further details see the [lab schema API docs](https://datajoint.com/docs/elements/element-lab/latest/api/element_lab/lab/)
 
 | Table | Description |
 | --- | --- |
-| Equipment | Scanner metadata |
+| Device | Scanner metadata |
 
 ### `subject` schema
 
