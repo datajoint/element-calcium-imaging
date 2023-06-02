@@ -42,7 +42,7 @@ combined with other Elements to assemble a fully functional pipeline. This repos
 
 ## Interactive Tutorial
 
-+ The easiest way to learn about DataJoint Elements is to use the tutorial notebooks within the included interactive environment configured using [DevContainer](https://containers.dev/).
++ The easiest way to learn about DataJoint Elements is to use the tutorial notebooks within the included interactive environment configured using [Dev Container](https://containers.dev/).
 
 ### Launch Environment
 

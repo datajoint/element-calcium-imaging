@@ -1,7 +1,7 @@
 # Data Pipeline
 
-Each node in the following diagram represents the analysis code in the workflow and the
-corresponding table in the database.  Within the workflow, Element Calcium Imaging
+Each node in the following diagram represents the analysis code in the pipeline and the
+corresponding table in the database.  Within the pipeline, Element Calcium Imaging
 connects to upstream Elements including Lab, Animal, Session, and Event. For more 
 detailed documentation on each table, see the API docs for the respective schemas.
 
@@ -31,7 +31,7 @@ schema, including `imaging_no_curation` and `imaging_preprocess`.
 
 ### `multi-scan-processing` branch
 
-- The processing workflow is typically performed on a per-scan basis, however, depending on the nature of the research questions, different labs may opt to perform processing/segmentation on a concatenated set of data from multiple scans. To this end, we have extended the Calcium Imaging Element and provided a design version capable of supporting a multi-scan processing scheme.
+- The processing pipeline is typically performed on a per-scan basis, however, depending on the nature of the research questions, different labs may opt to perform processing/segmentation on a concatenated set of data from multiple scans. To this end, we have extended the Calcium Imaging Element and provided a design version capable of supporting a multi-scan processing scheme.
 
 ## Table descriptions
 

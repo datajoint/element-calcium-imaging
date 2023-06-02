@@ -8,7 +8,7 @@ population activity in intact neural circuits. The tools for signal acquisition 
 analysis continue to evolve but common patterns and elements of standardization have
 emerged.
 
-The preprocessing workflow for two-photon laser-scanning microscopy includes motion
+The preprocessing pipeline for two-photon laser-scanning microscopy includes motion
 correction (rigid or non-rigid), cell segmentation, and calcium event extraction
 (sometimes described as "deconvolution" or "spike inference"). Some include raster
 artifact correction, cropping and stitching operations.

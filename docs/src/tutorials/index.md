@@ -10,7 +10,7 @@
 
 ## Installation Instructions for Active Projects
 
-+ The Workflow Calcium Imaging described above can be modified for a user's specific experimental requirements and thereby used in active projects.  
++ The Element Calcium Imaging described above can be modified for a user's specific experimental requirements and thereby used in active projects.  
 
 + The GitHub Codespace and Dev Container is configured for tutorials and prototyping.  
 We recommend users to configure a database specifically for production pipelines.  Instructions for a local installation of the integrated development environment with a database can be found on the [User Guide](https://datajoint.com/docs/elements/user-guide/) page.
