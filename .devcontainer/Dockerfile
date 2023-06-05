@@ -13,7 +13,6 @@ RUN \
     usermod -aG docker vscode && \
     apt-get clean
 
-COPY ./requirements_dev.txt /tmp/
 RUN \
     # dev setup
     apt update && \
@@ -23,22 +22,22 @@ RUN \
     pip install --no-cache-dir --upgrade black pip && \
     echo '. /etc/bash_completion' >> /home/vscode/.bashrc && \
     echo 'export PS1="\[\e[32;1m\]\u\[\e[m\]@\[\e[34;1m\]\H\[\e[m\]:\[\e[33;1m\]\w\[\e[m\]$ "' >> /home/vscode/.bashrc && \
-    pip install --no-cache-dir -r /tmp/requirements_dev.txt && \
-    rm /tmp/requirements_dev.txt && \
     # dircolors -b >> /home/vscode/.bashrc && \  # somehow fix colors
     apt-get clean
-COPY ./requirements.txt /tmp/
+
+COPY ./ /tmp/element-calcium-imaging/
+
 RUN \
     # workflow dependencies
-    apt-get install gcc ffmpeg libsm6 libxext6 -y && \
+    # apt-get install gcc ffmpeg libsm6 libxext6 -y && \
     # pip install --no-cache-dir Pygments==2.14.0  && \
     # git clone https://github.com/datajoint/CaImAn.git  && \
     # pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
     # pip install --no-cache-dir ./CaImAn && \
-    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[elements,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
     # rm -rf /tmp/CaImAn && \
-    rm /tmp/requirements.txt && \
+    rm /tmp/element-calcium-imaging && \
     apt-get clean
 
 ENV DJ_HOST fakeservices.datajoint.io

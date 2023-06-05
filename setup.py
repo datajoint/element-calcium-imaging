@@ -3,7 +3,7 @@ from os import path
 
 from setuptools import find_packages, setup
 
-pkg_name = next(p for p in find_packages() if "." not in p)
+pkg_name = "element_calcium_imaging"
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, "README.md"), "r") as f:
@@ -28,5 +28,13 @@ setup(
     keywords="neuroscience calcium-imaging science datajoint",
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
     scripts=[],
-    install_requires=requirements,
+    install_requires=["datajoint>=0.13.0", "ipykernel>=6.0.1", "ipywidgets", "plotly"],
+    extras_require={
+        "elements": ["element-animal>=0.1.5", "element-event>=0.2.0", "element-interface>=0.5.4", "element-lab>=0.2.0", "element-session>=0.1.2"],
+        "nd2": ["nd2"],
+        "sbxreader": ["sbxreader @ git+https://github.com/datajoint/sbxreader"],
+        "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
+        "suite2p": ["suite2p[io]>=0.12.1"],
+        "tests": ["pytest","pytest-cov","shutils"]
+    },
 )
