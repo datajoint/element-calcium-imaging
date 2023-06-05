@@ -104,52 +104,16 @@ def get_processed_root_data_dir() -> Union[str, pathlib.Path]:
         return get_imaging_root_data_dir()[0]
 
 
-def get_scan_image_files(scan_key: dict) -> list:
-    """Retrieve the list of ScanImage files associated with a given Scan.
+def get_image_files(scan_key: dict, file_type: str) -> list:
+    """Retrieve the list of image files associated with a given Scan.
 
     Args:
         scan_key: Primary key of a Scan entry.
 
     Returns:
-        A list of ScanImage files' full file-paths.
+        A list of full file paths.
     """
-    return _linking_module.get_scan_image_files(scan_key)
-
-
-def get_scan_box_files(scan_key: dict) -> list:
-    """Retrieve the list of Scanbox files (*.sbx) associated with a given Scan.
-
-    Args:
-        scan_key: Primary key of a Scan entry.
-
-    Returns:
-        A list of Scanbox files' full file-paths.
-    """
-    return _linking_module.get_scan_box_files(scan_key)
-
-
-def get_nd2_files(scan_key: dict) -> list:
-    """Retrieve the list of Nikon files (*.nd2) associated with a given Scan.
-
-    Args:
-        scan_key: Primary key of a Scan entry.
-
-    Returns:
-        A list of Nikon files' full file-paths.
-    """
-    return _linking_module.get_nd2_files(scan_key)
-
-
-def get_prairieview_files(scan_key: dict) -> list:
-    """Retrieve the list of Bruker PrairieView tif files (*.tif) with a given Scan.
-
-    Args:
-        scan_key: Primary key of a Scan entry.
-
-    Returns:
-        A list of Bruker PrairieView files' full file-paths.
-    """
-    return _linking_module.get_prairieview_files(scan_key)
+    return _linking_module.get_image_files(scan_key, file_type)
 
 
 # ----------------------------- Table declarations ----------------------
@@ -330,7 +294,7 @@ class ScanInfo(dj.Imported):
             import scanreader
 
             # Read the scan
-            scan_filepaths = get_scan_image_files(key)
+            scan_filepaths = get_image_files(key, "*.tif")
             scan = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
@@ -406,7 +370,7 @@ class ScanInfo(dj.Imported):
             import sbxreader
 
             # Read the scan
-            scan_filepaths = get_scan_box_files(key)
+            scan_filepaths = get_image_files(key, ".sbx")
             sbx_meta = sbxreader.sbx_get_metadata(scan_filepaths[0])
             sbx_matinfo = sbxreader.sbx_get_info(scan_filepaths[0])
             is_multiROI = bool(
@@ -465,7 +429,7 @@ class ScanInfo(dj.Imported):
             import nd2
 
             # Read the scan
-            scan_filepaths = get_nd2_files(key)
+            scan_filepaths = get_image_files(key, ".nd2")
             nd2_file = nd2.ND2File(scan_filepaths[0])
             is_multiROI = False  # MultiROI to be implemented later
 
@@ -555,7 +519,7 @@ class ScanInfo(dj.Imported):
         elif acq_software == "PrairieView":
             from element_interface import prairieviewreader
 
-            scan_filepaths = get_prairieview_files(key)
+            scan_filepaths = get_image_files(key, ".tif")
             PVScan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
             self.insert1(
                 dict(
@@ -651,25 +615,25 @@ class ScanQualityMetrics(dj.Computed):
             import scanreader
 
             # Switch from FYXCT to TCYX
-            data = scanreader.read_scan(get_scan_image_files(key))[
+            data = scanreader.read_scan(get_image_files(key, ".tif"))[
                 key["field_idx"]
             ].transpose(3, 2, 0, 1)
         elif acq_software == "Scanbox":
             from sbxreader import sbx_memmap
 
             # Switch from TFCYX to TCYX
-            data = sbx_memmap(get_scan_box_files(key))[:, key["field_idx"]]
+            data = sbx_memmap(get_image_files(key, ".sbx"))[:, key["field_idx"]]
         elif acq_software == "NIS":
             import nd2
 
-            nd2_file = nd2.ND2File(get_nd2_files(key)[0])
+            nd2_file = nd2.ND2File(get_image_files(key, ".nd2")[0])
 
             nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
             valid_dimensions = "TZCYX"
             assert set(nd2_dims) <= set(
                 valid_dimensions
-            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_nd2_files(key)[0]}."
+            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_image_files(key, '.nd2')[0]}."
 
             # Sort the dimensions in the order of TZCYX, skipping the missing ones.
             data = nd2_file.asarray().transpose(
