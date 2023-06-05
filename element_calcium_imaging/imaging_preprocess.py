@@ -445,7 +445,7 @@ class ProcessingTask(dj.Manual):
         """
         acq_software = (scan.Scan & key).fetch1("acq_software")
         filetypes = dict(
-            ScanImage=".tif", Scanbox=".sbx", NIS=".nd2", PrairieView=".tif"
+            ScanImage="*.tif", Scanbox="*.sbx", NIS="*.nd2", PrairieView="*.tif"
         )
 
         scan_dir = find_full_path(

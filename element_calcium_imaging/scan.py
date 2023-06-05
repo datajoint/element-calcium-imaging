@@ -370,7 +370,7 @@ class ScanInfo(dj.Imported):
             import sbxreader
 
             # Read the scan
-            scan_filepaths = get_image_files(key, ".sbx")
+            scan_filepaths = get_image_files(key, "*.sbx")
             sbx_meta = sbxreader.sbx_get_metadata(scan_filepaths[0])
             sbx_matinfo = sbxreader.sbx_get_info(scan_filepaths[0])
             is_multiROI = bool(
@@ -429,7 +429,7 @@ class ScanInfo(dj.Imported):
             import nd2
 
             # Read the scan
-            scan_filepaths = get_image_files(key, ".nd2")
+            scan_filepaths = get_image_files(key, "*.nd2")
             nd2_file = nd2.ND2File(scan_filepaths[0])
             is_multiROI = False  # MultiROI to be implemented later
 
@@ -519,7 +519,7 @@ class ScanInfo(dj.Imported):
         elif acq_software == "PrairieView":
             from element_interface import prairieviewreader
 
-            scan_filepaths = get_image_files(key, ".tif")
+            scan_filepaths = get_image_files(key, "*.tif")
             PVScan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
             self.insert1(
                 dict(
@@ -615,25 +615,25 @@ class ScanQualityMetrics(dj.Computed):
             import scanreader
 
             # Switch from FYXCT to TCYX
-            data = scanreader.read_scan(get_image_files(key, ".tif"))[
+            data = scanreader.read_scan(get_image_files(key, "*.tif"))[
                 key["field_idx"]
             ].transpose(3, 2, 0, 1)
         elif acq_software == "Scanbox":
             from sbxreader import sbx_memmap
 
             # Switch from TFCYX to TCYX
-            data = sbx_memmap(get_image_files(key, ".sbx"))[:, key["field_idx"]]
+            data = sbx_memmap(get_image_files(key, "*.sbx"))[:, key["field_idx"]]
         elif acq_software == "NIS":
             import nd2
 
-            nd2_file = nd2.ND2File(get_image_files(key, ".nd2")[0])
+            nd2_file = nd2.ND2File(get_image_files(key, "*.nd2")[0])
 
             nd2_dims = {k: i for i, k in enumerate(nd2_file.sizes)}
 
             valid_dimensions = "TZCYX"
             assert set(nd2_dims) <= set(
                 valid_dimensions
-            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_image_files(key, '.nd2')[0]}."
+            ), f"Unknown dimensions {set(nd2_dims)-set(valid_dimensions)} in file {get_image_files(key, '*.nd2')[0]}."
 
             # Sort the dimensions in the order of TZCYX, skipping the missing ones.
             data = nd2_file.asarray().transpose(
