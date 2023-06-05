@@ -37,7 +37,7 @@ RUN \
     pip install --no-cache-dir -e /tmp/element-calcium-imaging[elements,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
     # rm -rf /tmp/CaImAn && \
-    rm /tmp/element-calcium-imaging && \
+    rm -rf /tmp/element-calcium-imaging && \
     apt-get clean
 
 ENV DJ_HOST fakeservices.datajoint.io
