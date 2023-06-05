@@ -9,12 +9,9 @@ from element_interface.utils import dict_to_uuid, find_full_path, find_root_dire
 
 from . import imaging_report, scan
 from .scan import (
+    get_image_files,
     get_imaging_root_data_dir,
-    get_nd2_files,
-    get_prairieview_files,
     get_processed_root_data_dir,
-    get_scan_box_files,
-    get_scan_image_files,
 )
 
 schema = dj.Schema()
@@ -270,9 +267,14 @@ class Preprocess(dj.Imported):
 
 @schema
 class ProcessingMethod(dj.Lookup):
-    definition = """
-    # Method, package, analysis suite used for processing of calcium imaging
-    # data (e.g. Suite2p, CaImAn, etc.)
+    """Package used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.).
+
+    Attributes:
+        processing_method (str): Processing method.
+        processing_method_desc (str): Processing method description.
+    """
+
+    definition = """# Package used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.).
     processing_method: char(8)
     ---
     processing_method_desc: varchar(1000)  # Processing method description
@@ -405,8 +407,8 @@ class ProcessingTask(dj.Manual):
     This table defines a calcium imaging processing task for a combination of a
     `Scan` and a `ProcessingParamSet` entries, including all the inputs (scan, method,
     method's parameters). The task defined here is then run in the downstream table
-    Processing. This table supports definitions of both loading of pre-generated results
-    and the triggering of new analysis for all supported analysis methods
+    `Processing`. This table supports definitions of both loading of pre-generated results
+    and the triggering of new analysis for all supported analysis methods.
 
     Attributes:
         Preprocess (foreign key): Primary key from Preprocess.
@@ -441,16 +443,14 @@ class ProcessingTask(dj.Manual):
                 processed_dir / scan_dir / {processing_method}_{paramset_idx}
                 e.g.: sub4/sess1/scan0/suite2p_0
         """
-        image_locators = {
-            "NIS": get_nd2_files,
-            "ScanImage": get_scan_image_files,
-            "Scanbox": get_scan_box_files,
-            "PrairieView": get_prairieview_files,
-        }
-        image_locator = image_locators[(scan.Scan & key).fetch1("acq_software")]
+        acq_software = (scan.Scan & key).fetch1("acq_software")
+        filetypes = dict(
+            ScanImage=".tif", Scanbox=".sbx", NIS=".nd2", PrairieView=".tif"
+        )
 
         scan_dir = find_full_path(
-            get_imaging_root_data_dir(), image_locator(key)[0]
+            get_imaging_root_data_dir(),
+            get_image_files(key, filetypes[acq_software])[0],
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
@@ -588,7 +588,6 @@ class Processing(dj.Computed):
             else:
                 raise NotImplementedError("Unknown method: {}".format(method))
         elif task_mode == "trigger":
-
             method = (ProcessingParamSet * ProcessingTask & key).fetch1(
                 "processing_method"
             )
