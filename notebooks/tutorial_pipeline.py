@@ -12,6 +12,7 @@ import element_interface
 
 from collections import abc
 
+# Declare functions for retrieving data
 def get_imaging_root_data_dir():
     """Retrieve imaging root data directory."""
     imaging_root_dirs = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
@@ -37,7 +38,7 @@ def get_image_files(scan_key, file_type: str):
     else:
         raise FileNotFoundError(f"No {file_type} file found in {session_dir}")
 
-
+# Activate schemas
 lab.activate(db_prefix + "lab")
 subject.activate(db_prefix + "subject", linking_module=__name__)
 session.activate(db_prefix + "session", linking_module=__name__)
