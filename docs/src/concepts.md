@@ -14,10 +14,10 @@ correction (rigid or non-rigid), cell segmentation, and calcium event extraction
 artifact correction, cropping and stitching operations.
 
 <figure markdown>
-  ![Raw Scans](./images/rawscans.gif){: style="height:250px"}
-  ![Motion Corrected Scans](./images/motioncorrectedscans.gif){: style="height:250px"}
-  ![Cell Segmentation](./images/cellsegmentation.png){: style="height:250px"}
-  ![Calcium Events](./images/calciumtraces.png){: style="height:250px"}
+  ![Raw Scans](./images/docs_rawscans.gif){: style="height:250px"}
+  ![Motion Corrected Scans](./images/docs_motioncorrectedscans.gif){: style="height:250px"}
+  ![Cell Segmentation](./images/docs_cellsegmentation.png){: style="height:250px"}
+  ![Calcium Events](./images/docs_calciumtraces.png){: style="height:250px"}
   <figcaption>
     Left to right: Raw scans, Motion corrected scans, Cell segmentation, Calcium events
   </figcaption>
