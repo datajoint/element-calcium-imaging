@@ -2,6 +2,7 @@ name: Test
 on:
   push:
   pull_request:
+  workflow_dispatch:
 jobs:
   run_tests:
     uses: yambottle/datajoint.github/.github/workflows/run_pytest.yaml@main
