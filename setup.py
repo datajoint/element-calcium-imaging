@@ -30,8 +30,8 @@ setup(
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",
-        "sbxreader @ git+https://github.com/datajoint/sbxreader",
-        "scanreader @ git+https://github.com/atlab/scanreader",
+        "sbxreader @ git+ssh://git@github.com:datajoint/sbxreader.git#egg=sbxreader",
+        "scanreader @ git+ssh://git@github.com:atlab/scanreader.get#egg=scanreader",
     ],
     extras_require={
         "elements": [
