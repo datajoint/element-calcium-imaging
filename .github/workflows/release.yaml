@@ -2,6 +2,8 @@ name: Release
 on:
   workflow_dispatch:
 jobs:
+  # make_github_release:
+  #   uses: datajoint/.github/.github/workflows/make_github_release.yaml@main
   devcontainer-build:
     uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
   devcontainer-publish:
@@ -11,3 +13,12 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
       DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
+  pypi_release:
+    uses: yambottle/datajoint.github/.github/workflows/pypi_release.yaml@main
+    secrets:
+      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
+      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
+  # mkdocs_release:
+  #   uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
+  #   permissions: 
+  #     contents: write
