@@ -3,7 +3,7 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [0.7.0] - 2023-05-30
+## [0.7.0] - 2023-06-06
 
 + Update - Merge `workflow-calcium-imaging` into `element-calcium-imaging` PR [#135](https://github.com/datajoint/element-calcium-imaging/pull/135)
 + Add - `extras_require` feature to `setup.py`
