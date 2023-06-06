@@ -25,7 +25,12 @@ setup(
     keywords="neuroscience calcium-imaging science datajoint",
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
     scripts=[],
-    install_requires=["datajoint>=0.13.0", "ipykernel>=6.0.1", "ipywidgets", "plotly"],
+    install_requires=[
+        "datajoint>=0.13.0",
+        "ipykernel>=6.0.1",
+        "ipywidgets",
+        "plotly",
+    ],
     extras_require={
         "elements": [
             "element-animal>=0.1.5",
@@ -36,9 +41,11 @@ setup(
         ],
         "extract": ["matlabengine", "scipy"]
         "nd2": ["nd2"],
-        "sbxreader": ["sbxreader @ git+https://github.com/datajoint/sbxreader"],
-        "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
+    dependency_links=[
+        "sbxreader @ git+https://github.com/datajoint/sbxreader#egg=sbxreader-0.2.2",
+        "scanreader @ git+https://github.com/atlab/scanreader#egg=scanreader-0.4.12",
+    ],
 )

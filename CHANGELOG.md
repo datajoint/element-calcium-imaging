@@ -108,6 +108,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Citation section to README
 + Update - Move background file to elements.datajoint.org
 + Add - Adopt black formatting into code base
++ Add - Calling reusable CICD 
 
 ## [0.1.0b0] - 2021-05-07
 

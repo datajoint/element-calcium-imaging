@@ -105,6 +105,8 @@ ENV/
 # mypy
 .mypy_cache/
 
+.vscode
+
 # datajoint
 dj_local_conf*.json
 temp*
