@@ -4,6 +4,6 @@ on:
   pull_request:
 jobs:
   run_tests:
-    uses: yambottle/datajoint.github/.github/workflows/run_tests.yaml@main
+    uses: yambottle/datajoint.github/.github/workflows/run_pytest.yaml@main
   devcontainer-build:
     uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
