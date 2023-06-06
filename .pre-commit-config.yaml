@@ -1,5 +1,5 @@
 default_stages: [commit, push]
-exclude: (^.github/|^docs/|^images/|^notebooks/py_scripts/|^tests/)
+exclude: (^.github/|^docs/|^images/|^notebooks/|^tests/)
 # Current tests/__init__ violates many flake8. Excluding pending change to conftest
 
 repos:
