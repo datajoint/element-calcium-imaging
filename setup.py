@@ -39,7 +39,7 @@ setup(
             "element-lab>=0.3.0",
             "element-session>=0.1.2",
         ],
-        "extract": ["matlabengine", "scipy"]
+        "extract": ["matlabengine", "scipy"],
         "nd2": ["nd2"],
         "sbxreader": ["sbxreader"],
         "scanreader": ["scanreader"],
