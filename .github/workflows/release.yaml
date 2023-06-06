@@ -12,13 +12,13 @@ jobs:
   #   uses: datajoint/.github/.github/workflows/devcontainer-publish.yaml@main
   #   secrets:
   #     DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
-  #     DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
-  # pypi_release:
-  #   uses: yambottle/datajoint.github/.github/workflows/pypi_release.yaml@main
-  #   secrets:
-  #     TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
-  #     TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-  mkdocs_release:
-    uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
-    permissions: 
-      contents: write
+  #     DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN_FOR_ELEMENTS}}
+  pypi_release:
+    uses: yambottle/datajoint.github/.github/workflows/pypi_release.yaml@main
+    secrets:
+      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
+      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
+  # mkdocs_release:
+  #   uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
+  #   permissions: 
+  #     contents: write
