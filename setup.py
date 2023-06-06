@@ -30,8 +30,6 @@ setup(
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",
-        # "sbxreader @ git+https://github.com/datajoint/sbxreader",
-        # "scanreader @ git+https://github.com/atlab/scanreader",
     ],
     extras_require={
         "elements": [
@@ -42,8 +40,6 @@ setup(
             "element-session>=0.1.2",
         ],
         "nd2": ["nd2"],
-        # "sbxreader": ["sbxreader @ git+https://github.com/datajoint/sbxreader"],
-        # "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
