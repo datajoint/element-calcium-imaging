@@ -117,11 +117,6 @@ temp*
 **/*~
 **/#*#
 **/.#*
-docker-compose.yml
-Diagram.ipynb
-
-# docker
-.env
 
 example_data
 
