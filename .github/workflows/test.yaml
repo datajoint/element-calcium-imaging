@@ -28,6 +28,7 @@ jobs:
           pip install flake8 "black[jupyter]"
       - name: Run style tests
         run: |
-          black element_calcium_imaging --check --verbose
-          black notebooks --check --verbose
-          black tests --check --verbose
+          echo ${matrix.py_ver//.}
+          black element_calcium_imaging --check --verbose --target-version py${matrix.py_ver//.}
+          black notebooks --check --verbose --target-version py${matrix.py_ver//.}
+          black tests --check --verbose --target-version py${matrix.py_ver//.}
