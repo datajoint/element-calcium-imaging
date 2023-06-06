@@ -7,7 +7,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 + Update - Merge `workflow-calcium-imaging` into `element-calcium-imaging` PR [#135](https://github.com/datajoint/element-calcium-imaging/pull/135)
 + Add - `extras_require` feature to `setup.py`
-+ Add - GitHub Actions workflow to build Dev Container image
++ Add - GitHub Actions that call reusable workflows in the `datajoint/.github` repository
 + Update - Replace `get_nd2_files`, etc. functions with `get_image_files` function
 + Add - `tutorial_pipeline.py` script for notebooks to import and activate schemas
 + Update - Replace `reference.Equipment` with `lab.Device` table
@@ -108,7 +108,6 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - Citation section to README
 + Update - Move background file to elements.datajoint.org
 + Add - Adopt black formatting into code base
-+ Add - Calling reusable CICD 
 
 ## [0.1.0b0] - 2021-05-07
 
