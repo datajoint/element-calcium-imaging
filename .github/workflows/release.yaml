@@ -11,7 +11,7 @@ jobs:
     secrets:
       TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
       TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-    inputs:
+    with:
       UPLOAD_URL: ${{needs.make_github_release.outputs.release_upload_url}}
   # mkdocs_release:
   #   uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
