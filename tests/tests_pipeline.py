@@ -17,3 +17,4 @@ def test_pipeline(pipeline):
 
     assert "mask_npix" in imaging.Segmentation.Mask.heading.secondary_attributes
     assert "activity_trace" in imaging.Activity.Trace.heading.secondary_attributes
+
