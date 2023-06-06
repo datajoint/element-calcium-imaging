@@ -29,7 +29,5 @@ jobs:
       - name: Run style tests
         run: |
           python_version=${{matrix.py_ver}}
-          echo ${python_version//.}
           black element_calcium_imaging --check --verbose --target-version py${python_version//.}
           black notebooks --check --verbose --target-version py${python_version//.}
-          black tests --check --verbose --target-version py${python_version//.}
