@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  # run_tests:
-  #   uses: datajoint/.github/.github/workflows/run_tests.yaml@main
+  run_tests:
+    uses: datajoint/.github/.github/workflows/run_tests.yaml@main
   devcontainer-build:
     uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
