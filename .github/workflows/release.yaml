@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
 jobs:
   make_github_release:
-    uses: datajoint/.github/.github/workflows/make_github_release.yaml@main
+    uses: yambottle/datajoint.github/.github/workflows/make_github_release.yaml@main
   pypi_release:
     needs: 
       - make_github_release
-    uses: datajoint/.github/.github/workflows/pypi_release.yaml@main
+    uses: yambottle/datajoint.github/.github/workflows/pypi_release.yaml@main
     secrets:
       TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
       TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
