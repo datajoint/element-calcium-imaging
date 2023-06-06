@@ -2,8 +2,8 @@ name: Release
 on:
   workflow_dispatch:
 jobs:
-  make_github_release:
-    uses: yambottle/datajoint.github/.github/workflows/make_github_release.yaml@main
+  # make_github_release:
+  #   uses: datajoint/.github/.github/workflows/make_github_release.yaml@main
   # devcontainer-build:
   #   uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
   # devcontainer-publish:
@@ -18,7 +18,7 @@ jobs:
   #   secrets:
   #     TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
   #     TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-  # mkdocs_release:
-  #   uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
-  #   permissions: 
-  #     contents: write
+  mkdocs_release:
+    uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
+    permissions: 
+      contents: write
