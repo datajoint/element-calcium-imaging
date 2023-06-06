@@ -1,0 +1,179 @@
+# ---------------------- PROJECT SPECIFIC ---------------------------
+
+site_name: DataJoint Documentation
+site_url: http://localhost/docs/elements/element-calcium-imaging
+repo_url: https://github.com/datajoint/element-calcium-imaging
+repo_name: datajoint/element-calcium-imaging
+nav:
+  - Element Calcium Imaging: index.md
+  - Data Pipeline: pipeline.md
+  - Tutorials:
+      - tutorials/index.md
+      - Tutorial Notebook: tutorials/tutorial.ipynb
+      - Quality Metrics Notebook: tutorials/quality_metrics.ipynb
+  - Concepts: concepts.md
+  - Key Partnerships: partnerships.md
+  - Roadmap: roadmap.md
+  - Citation: citation.md
+  - API: api/ # defer to gen-files + literate-nav
+  - Changelog: changelog.md
+
+# --------------------- NOTES TO CONTRIBUTORS -----------------------
+# Markdown in mkdocs
+# 01. Redering concatenates across single line breaks. This means...
+#     A. We have to be careful to add extra line breaks around paragraphs,
+#        including between the end of a pgf and the beginnign of bullets.
+#     B. We can use hard wrapping to make github reviews easier to read.
+#        VSCode Rewrap extension offers a keyboard shortcut for hard wrap
+#        at the ruler, but don't add breaks in [multiword links](example.com)
+# 02. Instead of designating codeblocks with bash, use console. For example..
+#     ```console
+#     cd ../my_dir
+#     ``` 
+# 03. Links across docs should ...
+#     A. Not involve line breaks.
+#     B. Use relative paths to docs in the same repo
+#     C. Use lowercase and hyphens not spaces: [sub headings](./doc#sub-heading)
+#
+# Files
+# 01. Add a soft link to your changelog with the following
+#     ```console
+#     ln -s ../../CHANGELOG.md ./docs/src/changelog.md
+#     ```
+#
+# Site rendering
+# 01. Deploy locally to localhost with the command
+#     ```console
+#     MODE="LIVE" PACKAGE=element_{ELEMENT} \
+#     UPSTREAM_REPO=https://github.com/datajoint/element-{ELEMENT}.git \
+#     HOST_UID=$(id -u) docker compose -f docs/docker-compose.yaml up --build
+#     ```
+# 02. The API section will pull docstrings.
+#     A. Follow google styleguide e.g., 
+#        https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+#        With typing suggestions: https://docs.python.org/3/library/typing.html
+#     B. To pull a specific workflow fork, change ./docs/src/api/make_pages.py#L19
+# 03. To see your fork of the workflow-{element} in this render, change the
+#     URL in ./docs/src/api/make_pages.py#L19 to your fork.
+# 04. To deploy this site on your fork, 
+#     A. declare a branch called gh-pages
+#     B. go to the your fork > settings > pages 
+#     C. direct pages to render from the gh-pages branch at root
+#     D. push a tag to your fork with the format test*.*.*
+#
+# ---------------------------- STANDARD -----------------------------
+edit_uri: ./edit/main/docs/src
+docs_dir: ./src
+theme:
+  font:
+    text: Roboto Slab
+    code: Source Code Pro
+  name: material
+  custom_dir: src/.overrides
+  icon:
+    logo: main/company-logo
+  favicon: assets/images/company-logo-blue.png
+  features:
+    - toc.integrate
+    - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: datajoint
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+plugins:
+  - markdownextradata: {}
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            members_order: source
+            group_by_category: false
+            line_length: 88
+  - gen-files:
+      scripts:
+      - ./src/api/make_pages.py
+  - literate-nav:
+      nav_file: navigation.md
+  - exclude-search:
+      exclude:
+        - "*/navigation.md"
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
+      include: ["*.ipynb"]
+  - section-index
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      options:
+        custom_icons:
+          - .overrides/.icons
+  - mdx_truly_sane_lists
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.magiclink # Displays bare URLs as links
+  - pymdownx.tasklist: # Renders check boxes in tasks lists
+      custom_checkbox: true
+extra:
+  PATCH_VERSION: !ENV PATCH_VERSION
+  generator: false # Disable watermark
+  version:
+    provider: mike
+  social:
+    - icon: main/company-logo
+      link: https://www.datajoint.com
+      name: DataJoint
+    - icon: fontawesome/brands/slack
+      link: https://datajoint.slack.com
+      name: Slack
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/datajoint
+      name: LinkedIn
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/datajoint
+      name: Twitter
+    - icon: fontawesome/brands/github
+      link: https://github.com/datajoint
+      name: GitHub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/datajoint
+      name: DockerHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/user/datajointbot
+      name: PyPI
+    - icon: fontawesome/brands/stack-overflow
+      link: https://stackoverflow.com/questions/tagged/datajoint
+      name: StackOverflow
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/channel/UCdeCuFOTCXlVMRzh6Wk-lGg
+      name: YouTube
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - https://js-na1.hs-scripts.com/23133402.js  # HubSpot chatbot
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

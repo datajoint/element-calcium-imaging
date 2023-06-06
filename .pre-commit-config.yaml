@@ -1,0 +1,59 @@
+default_stages: [commit, push]
+exclude: (^.github/|^docs/|^images/|^notebooks/|^tests/)
+# Current tests/__init__ violates many flake8. Excluding pending change to conftest
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files # prevent giant files from being committed
+      - id: requirements-txt-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+        description: Forces to replace line ending by the UNIX 'lf' character.
+
+  # black
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+      - id: black-jupyter
+        args:
+          - --line-length=88
+
+  # isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+        description: Sorts imports in an alphabetical order
+
+  # flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        args: # arguments to configure flake8
+          # making isort line length compatible with black
+          - "--max-line-length=88"
+          - "--max-complexity=18"
+          - "--select=B,C,E,F,W,T4,B9"
+
+          # these are errors that will be ignored by flake8
+          # https://www.flake8rules.com/rules/{code}.html
+          - "--ignore=E203,E501,W503,W605,E402"
+          # E203 - Colons should not have any space before them.
+          #        Needed for list indexing
+          # E501 - Line lengths are recommended to be no greater than 79 characters.
+          #        Needed as we conform to 88
+          # W503 - Line breaks should occur after the binary operator.
+          #        Needed because not compatible with black
+          # W605 - a backslash-character pair that is not a valid escape sequence now
+          #        generates a DeprecationWarning. This will eventually become a SyntaxError.
+          #        Needed because we use \d as an escape sequence
+          # E402 - Place module level import at the top.
+          #        Needed to prevent circular import error

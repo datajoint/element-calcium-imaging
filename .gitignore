@@ -108,11 +108,19 @@ ENV/
 .vscode
 
 # datajoint
-dj_local_conf.json
-dj_local_conf_old.json
+dj_local_conf*.json
+temp*
+
+# docs
+/docs/site
+/docs/src/tutorials/*ipynb
 
 # emacs
 **/*~
 **/#*#
 **/.#*
-docker-compose.y*ml
+
+example_data
+
+# vscode
+*.code-workspace

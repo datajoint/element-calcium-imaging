@@ -1,168 +1,73 @@
 # DataJoint Element - Functional Calcium Imaging
 
-+ This repository features DataJoint pipeline design for functional Calcium imaging 
-with `ScanImage`, `Scanbox`, or `Nikon NIS` acquisition system and `Suite2p` or `CaImAn` suites for analysis.
+DataJoint Element for functional calcium imaging with 
+[ScanImage](https://docs.scanimage.org/), 
+[Scanbox](https://scanbox.org/),
+[Nikon NIS-Elements](https://www.microscope.healthcare.nikon.com/products/software/nis-elements), 
+and `Bruker Prairie View` acquisition software; and 
+[Suite2p](https://github.com/MouseLand/suite2p), 
+[CaImAn](https://github.com/flatironinstitute/CaImAn), and
+[EXTRACT](https://github.com/schnitzer-lab/EXTRACT-public) analysis 
+software. DataJoint Elements collectively standardize and automate
+data collection and analysis for neuroscience experiments. Each Element is a modular
+pipeline for data storage and processing with corresponding database tables that can be
+combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebooks to learn the pipeline.
 
-+ The element presented here is not a complete workflow by itself,
- but rather a modular design of tables and dependencies specific to the functional Calcium imaging workflow.
+## Experiment Flowchart
 
-+ This modular element can be flexibly attached downstream to 
-any particular design of experiment session, thus assembling 
-a fully functional calcium imaging workflow.
+![flowchart](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/flowchart.svg)
 
-+ See the [Element Calcium Imaging documentation](https://elements.datajoint.org/description/calcium_imaging/) for the background information and development timeline.
+## Data Pipeline Diagram
 
-+ For more information on the DataJoint Elements project, please visit https://elements.datajoint.org.  This work is supported by the National Institutes of Health.
+![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
-## Element architecture
++ We have designed three variations of the pipeline to handle different use cases. Displayed above is the default `imaging` schema.  Details on all of the `imaging` schemas can be found in the [Data Pipeline](https://datajoint.com/docs/elements/element-calcium-imaging/latest/pipeline/) documentation page.
 
-![element-calcium-imaging diagram](images/attached_calcium_imaging_element.svg)
+## Getting Started
 
-+ As the diagram depicts, the imaging element starts immediately downstream from `Session`, and also requires some notion of:
 
-     + `Scanner` for equipment/device
++ Install from PyPI
 
-     + `Location` as a dependency for `ScanLocation`
-
-## Table definitions
-
-### Scan
-The `scan` schema contains information regarding the raw data acquired with ScanImage 
-or Scanbox.
-
-<details>
-<summary>Click to expand details</summary>
-
-+ A `Session` (more specifically an experimental session) may have multiple scans, where each scan describes a complete 4D dataset (i.e. 3D volume over time) from one scanning session, typically from the moment of pressing the *start* button to pressing the *stop* button.
-
-+ `Scan` - table containing information about the equipment used (e.g. the Scanner information)
-
-+ `ScanInfo` - meta information about this scan, from ScanImage header (e.g. frame rate, number of channels, scanning depths, frames, etc.)
-
-+ `ScanInfo.Field` - a field is a 2D image at a particular xy-coordinate and plane (scanning depth) within the field-of-view (FOV) of the scan.
-
-     + For resonant scanner, a field is usually the 2D image occupying the entire FOV from a certain plane (at some depth).
-
-     + For mesoscope scanner, with much wider FOV, there may be multiple fields on one plane. 
-
-</details>
-
-### Preprocessing - Motion Correction
-The `imaging` schema stores information regarding the motion corrected images.
-
-<details>
-<summary>Click to expand details</summary>
-
-+ `MotionCorrection` - motion correction information performed on a scan
-
-+ `MotionCorrection.RigidMotionCorrection` - details of the rigid motion correction (e.g. shifting in x, y) at a per `ScanInfo.Field` level
-
-+ `MotionCorrection.NonRigidMotionCorrection` and `MotionCorrection.Block` tables are used to describe the non-rigid motion correction performed on each `ScanInfo.Field`
-
-+ `MotionCorrection.Summary` - summary images for each `ScanInfo.Field` after motion correction (e.g. average image, correlation image)
-
-</details>
-
-### Preprocessing - Segmentation
-The `imaging` schema stores information regarding the segmented masks for each field.
-
-<details>
-<summary>Click to expand details</summary>
-
-+ `Segmentation` - table specifies the segmentation step and its outputs, following the motion correction step.
- 
-+ `Segmentation.Mask` - image mask for the segmented region of interest from a particular `ScanInfo.Field`
-
-+ `MaskClassification` - classification of `Segmentation.Mask` into different type (e.g. soma, axon, dendrite, artifact, etc.)
-</details>
-
-### Neural activity extraction
-The `imaging` schema stores information regarding the calcium traces for each mask.
-
-<details>
-<summary>Click to expand details</summary>
-
-+ `Fluorescence` - fluorescence traces extracted from each `Segmentation.Mask`
-
-+ `ActivityExtractionMethod` - activity extraction method (e.g. deconvolution) to be applied on fluorescence trace
-
-+ `Activity` - computed neuronal activity trace from fluorescence trace (e.g. spikes)
-
-</details>
-
-## Installation
-
-+ The installation instructions can be found at the
-[DataJoint Elements documentation](https://elements.datajoint.org/usage/install/).
-
-+ Install `element-calcium-imaging`
-     ```
+     ```bash
      pip install element-calcium-imaging
      ```
 
-+ Upgrade `element-calcium-imaging` previously installed with `pip`
-     ```
-     pip install --upgrade element-calcium-imaging
-     ```
++ [Interactive tutorial on GitHub Codespaces](#interactive-tutorial)
 
-+ Install `element-interface`
++ [Documentation](https://datajoint.com/docs/elements/element-calcium-imaging)
 
-     + `element-interface` contains data loading utilities for `element-calcium-imaging`.
+## Support
 
-     + `element-interface` is a dependency of `element-calcium-imaging`, however it is not contained within `requirements.txt`, therefore, must be installed in addition to the installation of the `element-calcium-imaging`. 
++ If you need help getting started or run into any errors, please contact our team by email at support@datajoint.com.
 
-     + `element-interface` can also be used to install packages used for reading acquired data (e.g. `scanreader`) and running analysis (e.g. `CaImAn`).
+## Interactive Tutorial
 
-     + If your workflow uses these packages, you should install them when you install `element-interface`.
++ The easiest way to learn about DataJoint Elements is to use the tutorial notebooks within the included interactive environment configured using [Dev Container](https://containers.dev/).
 
-     <details>
-     <summary>Click to expand details</summary>
+### Launch Environment
 
-     + Install `element-interface` with `scanreader`
-          ```
-          pip install "element-interface[scanreader] @ git+https://github.com/datajoint/element-interface"
-          ```
+Here are some options that provide a great experience:
 
-     + Install `element-interface` with `sbxreader`
-          ```
-          pip install "element-interface[sbxreader] @ git+https://github.com/datajoint/element-interface"
-          ```
+- (*recommended*) Cloud-based Environment
+  - Launch using [GitHub Codespaces](https://github.com/features/codespaces) using the `+` option which will `Create codespace on main` in the codebase repository on your fork with default options. For more control, see the `...` where you may create `New with options...`.
+  - Build time for a codespace is a few minutes. This is done infrequently and cached for convenience.
+  - Start time for a codespace is less than 1 minute. This will pull the built codespace from cache when you need it.
+  - *Tip*: Each month, GitHub renews a [free-tier](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces#monthly-included-storage-and-core-hours-for-personal-accounts) quota of compute and storage. Typically we run into the storage limits before anything else since Codespaces consume storage while stopped. It is best to delete Codespaces when not actively in use and recreate when needed. We'll soon be creating prebuilds to avoid larger build times. Once any portion of your quota is reached, you will need to wait for it to be reset at the end of your cycle or add billing info to your GitHub account to handle overages.
+  - *Tip*: GitHub auto names the codespace but you can rename the codespace so that it is easier to identify later.
 
-     + Install `element-interface` with `Suite2p`
-          ```
-          pip install "element-interface[suite2p] @ git+https://github.com/datajoint/element-interface"
-          ```
+- Local Environment
+  > *Note: Access to example data is currently limited to MacOS and Linux due to the s3fs utility. Windows users are recommended to use the above environment.*
+  - Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+  - Install [Docker](https://docs.docker.com/get-docker/)
+  - Install [VSCode](https://code.visualstudio.com/)
+  - Install the VSCode [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+  - `git clone` the codebase repository and open it in VSCode
+  - Use the `Dev Containers extension` to `Reopen in Container` (More info is in the `Getting started` included with the extension.)
 
-     + Install `element-interface` with `CaImAn` requires two separate commands
-          ```
-          pip install "element-interface[caiman_requirements] @ git+https://github.com/datajoint/element-interface"
-          pip install "element-interface[caiman] @ git+https://github.com/datajoint/element-interface"
-          ```
+You will know your environment has finished loading once you either see a terminal open related to `Running postStartCommand` with a final message of `Done` or the `README.md` is opened in `Preview`.
 
-     + Install `element-interface` with multiple packages
-          ```
-          pip install "element-interface[caiman_requirements] @ git+https://github.com/datajoint/element-interface"
-          pip install "element-interface[scanreader,sbxreader,suite2p,caiman] @ git+https://github.com/datajoint/element-interface"
-          ```
+### Instructions
 
-     </details>
+1. We recommend you start by navigating to the `notebooks` directory on the left panel and go through the `tutorial.ipynb` Jupyter notebook. Execute the cells in the notebook to begin your walk through of the tutorial.
 
-## Element usage
-
-+ See [workflow-calcium-imaging](https://github.com/datajoint/workflow-calcium-imaging) 
-repository for an example usage of `element-calcium-imaging`.
-
-## Citation
-
-+ If your work uses DataJoint and DataJoint Elements, please cite the respective Research Resource Identifiers (RRIDs) and manuscripts.
-
-+ DataJoint for Python or MATLAB
-    + Yatsenko D, Reimer J, Ecker AS, Walker EY, Sinz F, Berens P, Hoenselaar A, Cotton RJ, Siapas AS, Tolias AS. DataJoint: managing big scientific data using MATLAB or Python. bioRxiv. 2015 Jan 1:031658. doi: https://doi.org/10.1101/031658
-
-    + DataJoint ([RRID:SCR_014543](https://scicrunch.org/resolver/SCR_014543)) - DataJoint for `<Select Python or MATLAB>` (version `<Enter version number>`)
-
-+ DataJoint Elements
-    + Yatsenko D, Nguyen T, Shen S, Gunalan K, Turner CA, Guzman R, Sasaki M, Sitonic D, Reimer J, Walker EY, Tolias AS. DataJoint Elements: Data Workflows for Neurophysiology. bioRxiv. 2021 Jan 1. doi: https://doi.org/10.1101/2021.03.30.437358
-
-    + DataJoint Elements ([RRID:SCR_021894](https://scicrunch.org/resolver/SCR_021894)) - Element Calcium Imaging (version `<Enter version number>`)
-    
+1. Once you are done, see the options available to you in the menu in the bottom-left corner. For example, in Codespace you will have an option to `Stop Current Codespace` but when running Dev Container on your own machine the equivalent option is `Reopen folder locally`. By default, GitHub will also automatically stop the Codespace after 30 minutes of inactivity.  Once the Codespace is no longer being used, we recommend deleting the Codespace.
