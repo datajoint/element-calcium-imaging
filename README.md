@@ -11,7 +11,7 @@ and `Bruker Prairie View` acquisition software; and
 software. DataJoint Elements collectively standardize and automate
 data collection and analysis for neuroscience experiments. Each Element is a modular
 pipeline for data storage and processing with corresponding database tables that can be
-combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebook to learn the pipeline.
+combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebooks to learn the pipeline.
 
 ## Experiment Flowchart
 
@@ -68,6 +68,6 @@ You will know your environment has finished loading once you either see a termin
 
 ### Instructions
 
-1. We recommend you start by navigating to the `notebooks` directory on the left panel and go through the `demo_prepare.ipynb` and `demo_run.ipynb` Jupyter notebooks. Execute the cells in the notebooks to begin your walk through of the tutorial.
+1. We recommend you start by navigating to the `notebooks` directory on the left panel and go through the `tutorial.ipynb` Jupyter notebook. Execute the cells in the notebook to begin your walk through of the tutorial.
 
 1. Once you are done, see the options available to you in the menu in the bottom-left corner. For example, in Codespace you will have an option to `Stop Current Codespace` but when running Dev Container on your own machine the equivalent option is `Reopen folder locally`. By default, GitHub will also automatically stop the Codespace after 30 minutes of inactivity.  Once the Codespace is no longer being used, we recommend deleting the Codespace.
