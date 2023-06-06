@@ -36,9 +36,10 @@ setup(
             "element-animal>=0.1.5",
             "element-event>=0.2.0",
             "element-interface>=0.5.4",
-            "element-lab>=0.2.0",
+            "element-lab>=0.3.0",
             "element-session>=0.1.2",
         ],
+        "extract": ["matlabengine", "scipy"]
         "nd2": ["nd2"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],

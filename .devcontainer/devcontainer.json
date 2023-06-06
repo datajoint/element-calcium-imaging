@@ -6,7 +6,7 @@
 	"remoteEnv": {
 		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
 	},
-	"onCreateCommand": "mkdir -p ${IMAGING_ROOT_DATA_DIR} && pip install -e . && MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait",
+	"onCreateCommand": "mkdir -p ${IMAGING_ROOT_DATA_DIR} && pip install -e . && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml down && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build --wait",
 	"postStartCommand": "docker volume prune -f && s3fs ${DJ_PUBLIC_S3_LOCATION} ${IMAGING_ROOT_DATA_DIR} -o nonempty,multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
 	"hostRequirements": {
 		"cpus": 4,

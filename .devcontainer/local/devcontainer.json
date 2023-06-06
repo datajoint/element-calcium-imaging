@@ -6,7 +6,7 @@
 	"remoteEnv": {
 		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
 	},
-	"onCreateCommand": "pip install -e . && MYSQL_VER=8.0 docker compose down && MYSQL_VER=8.0 docker compose up --build --wait",
+	"onCreateCommand": "pip install -e . && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml down && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build --wait",
 	"postStartCommand": "docker volume prune -f",
 	"hostRequirements": {
 		"cpus": 4,
