@@ -18,18 +18,9 @@ from element_interface.utils import find_full_path, find_root_directory
 
 _tear_down = False
 
-test_user_data_dir = pathlib.Path("./tests/user_data")
-test_user_data_dir.mkdir(exist_ok=True)
-
 sessions_dirs = [
-    "subject0/session1",
-    "subject1/20200609_170519",
-    "subject1/20200609_171646",
-    "subject2/20200420_1843959",
-    "subject3/210107_run00_orientation_8dir",
+    "subject1/session1",
 ]
-
-is_multi_scan_processing = False
 
 verbose = False
 
@@ -61,18 +52,16 @@ verbose_context = nullcontext() if verbose else QuietStdOut()
 def pipeline():
     with verbose_context:
         print("\n")
-        from element_calcium_imaging import pipeline
-
-
+        from notebooks import tutorial_pipeline
 
     yield {
-        "subject": pipeline.subject,
-        "lab": pipeline.lab,
-        "imaging": pipeline.imaging,
-        "scan": pipeline.scan,
-        "session": pipeline.session,
-        "Equipment": pipeline.Equipment,
-        "get_imaging_root_data_dir": paths.get_imaging_root_data_dir,
+        "subject": tutorial_pipeline.subject,
+        "lab": tutorial_pipeline.lab,
+        "imaging": tutorial_pipeline.imaging,
+        "scan": tutorial_pipeline.scan,
+        "session": tutorial_pipeline.session,
+        "Equipment": tutorial_pipeline.Equipment,
+        "get_imaging_root_data_dir": tutorial_pipeline.get_imaging_root_data_dir,
     }
 
     if _tear_down:
@@ -81,7 +70,7 @@ def pipeline():
 
 
 @pytest.fixture(autouse=True)
-def test_data(dj_config, pipeline):
+def test_data(pipeline):
     root_dirs = pipeline["get_imaging_root_data_dir"]
     try:
         _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
