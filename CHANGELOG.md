@@ -5,11 +5,15 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 ## [0.7.0] - 2023-05-30
 
-+ Update - Merge `workflow-calcium-imaging` into `element-calcium-imaging`
-
-## [0.6.3] - 2023-05-23
-
-+ Fix - Docs formatting
++ Update - Merge `workflow-calcium-imaging` into `element-calcium-imaging` PR [#135](https://github.com/datajoint/element-calcium-imaging/pull/135)
++ Add - `extras_require` feature to `setup.py`
++ Add - GitHub Actions workflow to build Dev Container image
++ Update - Replace `get_nd2_files`, etc. functions with `get_image_files` function
++ Add - `tutorial_pipeline.py` script for notebooks to import and activate schemas
++ Update - Replace `reference.Equipment` with `lab.Device` table
++ Update - Remove `demo_prepare.ipynb`
++ Update - Rename `demo_run.ipynb` to `demo.ipynb`
++ Update - `__init__.py` to use environment variables (if available) in place of `dj.config['custom']` values
 
 ## [0.6.2] - 2023-05-22
 
@@ -119,6 +123,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.7.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.0
 [0.6.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.2
 [0.6.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.1
 [0.6.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.0
