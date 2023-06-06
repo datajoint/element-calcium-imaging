@@ -23,20 +23,22 @@ def get_imaging_root_data_dir():
     else:
         return imaging_root_dirs
 
+
 def get_image_files(scan_key, file_type: str):
     """Retrieve the list of absolute paths associated with a given Scan."""
     # Folder structure: root / subject / session / .tif or .sbx or .nd2
     session_dir = element_interface.utils.find_full_path(
         get_imaging_root_data_dir(),
         (session.SessionDirectory & scan_key).fetch1("session_dir"),
-     )
+    )
 
     filepaths = [fp.as_posix() for fp in session_dir.glob(file_type)]
-    
+
     if filepaths:
         return filepaths
     else:
         raise FileNotFoundError(f"No {file_type} file found in {session_dir}")
+
 
 # Activate schemas
 lab.activate(db_prefix + "lab")
