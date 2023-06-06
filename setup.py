@@ -27,11 +27,18 @@ setup(
     scripts=[],
     install_requires=["datajoint>=0.13.0", "ipykernel>=6.0.1", "ipywidgets", "plotly"],
     extras_require={
-        "elements": ["element-animal>=0.1.5", "element-event>=0.2.0", "element-interface>=0.5.4", "element-lab>=0.2.0", "element-session>=0.1.2"],
+        "elements": [
+            "element-animal>=0.1.5",
+            "element-event>=0.2.0",
+            "element-interface>=0.5.4",
+            "element-lab>=0.3.0",
+            "element-session>=0.1.2",
+        ],
+        "extract": ["matlabengine", "scipy"]
         "nd2": ["nd2"],
         "sbxreader": ["sbxreader @ git+https://github.com/datajoint/sbxreader"],
         "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
-        "tests": ["pytest","pytest-cov","shutils"]
+        "tests": ["pytest", "pytest-cov", "shutils"],
     },
 )
