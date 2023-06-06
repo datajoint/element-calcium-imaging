@@ -5,7 +5,7 @@ jobs:
   # make_github_release:
   #   uses: datajoint/.github/.github/workflows/make_github_release.yaml@main
   devcontainer-build:
-    uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
+    uses: yambottle/datajoint.github/.github/workflows/devcontainer-build.yaml@main
   devcontainer-publish:
     needs: 
       - devcontainer-build
