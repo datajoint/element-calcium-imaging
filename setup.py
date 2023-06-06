@@ -41,6 +41,8 @@ setup(
         ],
         "extract": ["matlabengine", "scipy"]
         "nd2": ["nd2"],
+        "sbxreader": ["sbxreader"],
+        "scanreader": ["scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
