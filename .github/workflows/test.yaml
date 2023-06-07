@@ -4,8 +4,6 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-  run_tests:
-    uses: datajoint/.github/.github/workflows/run_pytest.yaml@main
   devcontainer-build:
     uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
   tests:
