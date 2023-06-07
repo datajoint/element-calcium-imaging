@@ -9,6 +9,7 @@ from element_lab.lab import User as Experimenter
 from element_session import session_with_datetime as session
 from element_session.session_with_datetime import Session
 import element_interface
+import pathlib
 
 
 # Declare functions for retrieving data
@@ -22,7 +23,7 @@ def get_imaging_root_data_dir():
     elif isinstance(imaging_root_dirs, list):
         return imaging_root_dirs
     else:
-        raise TypeError('`imaging_root_data_dir` must be a string, Path, or list')
+        raise TypeError("`imaging_root_data_dir` must be a string, Path, or list")
 
 
 def get_image_files(scan_key, file_type: str):
