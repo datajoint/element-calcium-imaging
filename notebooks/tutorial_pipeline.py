@@ -32,10 +32,9 @@ def get_image_files(scan_key, file_type: str):
 
     filepaths = [fp.as_posix() for fp in session_dir.glob(file_type)]
 
-    if filepaths:
-        return filepaths
-    else:
+    if not filepaths:
         raise FileNotFoundError(f"No {file_type} file found in {session_dir}")
+    return filepaths
 
 
 # Activate schemas
