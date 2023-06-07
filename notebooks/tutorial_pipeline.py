@@ -11,7 +11,6 @@ from element_session.session_with_datetime import Session
 import element_interface
 
 
-
 # Declare functions for retrieving data
 def get_imaging_root_data_dir():
     """Retrieve imaging root data directory."""
