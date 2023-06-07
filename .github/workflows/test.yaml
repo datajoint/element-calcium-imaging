@@ -32,3 +32,14 @@ jobs:
           python_version=${{matrix.py_ver}}
           black element_calcium_imaging --check --verbose --target-version py${python_version//.}
           black notebooks --check --verbose --target-version py${python_version//.}
+      - name: Run pytests
+        env:
+          PY_VER: ${{matrix.py_ver}}
+          DJ_PASS: simple
+          MYSQL_VER: ${{matrix.mysql_ver}}
+          DISTRO: alpine
+          DOCKER_CLIENT_TIMEOUT: "120"
+          COMPOSE_HTTP_TIMEOUT: "120"
+        run: |
+          export HOST_UID=$(id -u)
+          docker-compose -f docker-compose-tests.yaml up --build --exit-code-from app

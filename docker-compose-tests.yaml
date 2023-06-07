@@ -1,0 +1,45 @@
+# PY_VER=3.9 MYSQL_VER=8.0 DISTRO=alpine HOST_UID=$(id -u) docker compose -f docker-compose-tests.yml up --exit-code-from app --build
+version: "2.4"
+x-net:
+  &net
+  networks:
+    - main
+services:
+  db:
+    <<: *net
+    restart: always
+    image: datajoint/mysql:${MYSQL_VER}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DJ_PASS}
+    ports:
+      - "3306:3306"
+    # volumes:
+    #   - ./mysql/data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 30s
+      retries: 10
+      interval: 15s
+  app:
+    <<: *net
+    image: datajoint/element_calcium_imaging_devcontainer:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DJ_HOST=fakeservices.datajoint.io
+      - DJ_USER=root
+      - DJ_PASS
+    working_dir: /src
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        pip install -e .
+        pytest -sv --cov-report term-missing --cov=element_calcium_imaging tests/
+    user: ${HOST_UID}:anaconda
+    volumes:
+      - .:/src
+networks:
+  main:
