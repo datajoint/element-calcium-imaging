@@ -19,10 +19,7 @@ def get_imaging_root_data_dir():
     imaging_root_dirs = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
     if not imaging_root_dirs:
         return None
-    elif not isinstance(imaging_root_dirs, abc.Sequence):
-        return list(imaging_root_dirs)
-    else:
-        return imaging_root_dirs
+    return list(imaging_root_dirs)
 
 
 def get_image_files(scan_key, file_type: str):
