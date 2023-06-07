@@ -41,13 +41,7 @@ setup(
         ],
         "extract": ["matlabengine", "scipy"],
         "nd2": ["nd2"],
-        "sbxreader": ["sbxreader"],
-        "scanreader": ["scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
-    dependency_links=[
-        "sbxreader @ git+https://github.com/datajoint/sbxreader#egg=sbxreader-0.2.2",
-        "scanreader @ git+https://github.com/atlab/scanreader#egg=scanreader-0.4.12",
-    ],
 )
