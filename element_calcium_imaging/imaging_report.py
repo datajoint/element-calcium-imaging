@@ -12,7 +12,7 @@ def activate(
     imaging_schema_name: str,
     *,
     create_schema: bool = True,
-    create_tables: bool = True
+    create_tables: bool = True,
 ):
     """Activate this schema.
 
