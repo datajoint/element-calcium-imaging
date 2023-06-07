@@ -23,7 +23,7 @@ def get_imaging_root_data_dir():
     elif isinstance(imaging_root_dirs, list):
         return imaging_root_dirs
     else:
-        raise TypeError("`imaging_root_data_dir` must be a string, Path, or list")
+        raise TypeError("`imaging_root_data_dir` must be a string, pathlib, or list")
 
 
 def get_image_files(scan_key, file_type: str):
