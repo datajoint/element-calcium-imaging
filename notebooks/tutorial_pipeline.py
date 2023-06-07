@@ -10,7 +10,6 @@ from element_session import session_with_datetime as session
 from element_session.session_with_datetime import Session
 import element_interface
 
-from collections import abc
 
 
 # Declare functions for retrieving data
