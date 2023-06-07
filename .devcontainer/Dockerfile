@@ -34,8 +34,8 @@ RUN \
     # git clone https://github.com/datajoint/CaImAn.git  && \
     # pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
     # pip install --no-cache-dir ./CaImAn && \
-    pip install sbxreader @ git+https://github.com/datajoint/sbxreader && \
-    pip install scanreader @ git+https://github.com/atlab/scanreader && \
+    pip install git+https://github.com/datajoint/sbxreader && \
+    pip install git+https://github.com/atlab/scanreader && \
     pip install --no-cache-dir -e /tmp/element-calcium-imaging[elements,nd2,suite2p,tests] && \
     # clean up
     # rm -rf /tmp/CaImAn && \
