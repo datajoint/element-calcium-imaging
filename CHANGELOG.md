@@ -3,6 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.7.2] - 2023-06-08
+
++ Update - `tutorial` notebook
+
 ## [0.7.1] - 2023-06-07
 
 + Fix - Docs to render notebooks
@@ -128,6 +132,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.7.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.2
 [0.7.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.1
 [0.7.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.0
 [0.6.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.2
