@@ -1,8 +1,6 @@
 version: "3"
 services:
   app:
-    cpus: 4
-    mem_limit: 16g
     # build:
     #   context: ../..
     #   dockerfile: ./.devcontainer/Dockerfile
