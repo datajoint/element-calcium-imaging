@@ -3,8 +3,8 @@
 + Element Calcium Imaging includes an [interactive tutorial on GitHub Codespaces](https://github.com/datajoint/element-calcium-imaging#interactive-tutorial), which is configured for users to run the pipeline.
 
 + DataJoint Elements are modular and can be connected into a complete pipeline.  In the interactive tutorial are example Jupyter notebooks that combine five DataJoint Elements - Lab, Animal, Session, Event, and Calcium Imaging.  The notebooks describe the pipeline and provide instructions for running the pipeline.  For convenience, these notebooks are also rendered on this website:
-   + [Tutorial notebook](../../../notebooks/tutorial.ipynb)
-   + [Quality metrics notebook](../../../notebooks/quality_metrics.ipynb)
+   + [Tutorial notebook](tutorial.ipynb)
+   + [Quality metrics notebook](quality_metrics.ipynb)
 
 ## Installation Instructions for Active Projects
 

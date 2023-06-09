@@ -9,6 +9,7 @@ from element_lab.lab import User as Experimenter
 from element_session import session_with_datetime as session
 from element_session.session_with_datetime import Session
 import element_interface
+import pathlib
 
 
 # Declare functions for retrieving data
@@ -17,7 +18,12 @@ def get_imaging_root_data_dir():
     imaging_root_dirs = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
     if not imaging_root_dirs:
         return None
-    return list(imaging_root_dirs)
+    elif isinstance(imaging_root_dirs, (str, pathlib.Path)):
+        return [imaging_root_dirs]
+    elif isinstance(imaging_root_dirs, list):
+        return imaging_root_dirs
+    else:
+        raise TypeError("`imaging_root_data_dir` must be a string, pathlib, or list")
 
 
 def get_image_files(scan_key, file_type: str):
