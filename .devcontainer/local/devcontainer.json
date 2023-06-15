@@ -8,6 +8,11 @@
 	},
 	"onCreateCommand": "pip install -e . && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml down && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build --wait",
 	"postStartCommand": "docker volume prune -f",
+	"hostRequirements": {
+		"cpus": 4,
+		"memory": "8gb",
+		"storage": "32gb"
+	},
 	"forwardPorts": [
 		3306
 	],
