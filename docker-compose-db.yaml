@@ -2,7 +2,7 @@
 version: "2.4"
 services:
   db:
-    mem_limit: 8g
+    mem_limit: 12g
     restart: always
     image: datajoint/mysql:${MYSQL_VER}
     environment:
