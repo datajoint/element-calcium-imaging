@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.9-slim@sha256:10055454792f712b0f5a0ed15779cff1a7bc5f79be7a3330411ed2442cf57376
 
 RUN \
     adduser --system --disabled-password --shell /bin/bash vscode && \
