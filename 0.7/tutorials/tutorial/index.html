@@ -17,7 +17,7 @@
         <link rel="next" href="../quality_metrics/">
       
       <link rel="icon" href="../../assets/images/company-logo-blue.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.15">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
     
     
       
@@ -2218,7 +2218,7 @@ import numpy as np</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="diagram">Diagram<a class="anchor-link" href="#diagram">&#182;</a></h2><p>Let's plot the diagram of tables within multiple schemas and their dependencies using <code>dj.Diagram()</code> (see <a href="https://datajoint.com/docs/core/concepts/getting-started/diagrams/">Diagram docs</a>).</p>
+<h2 id="diagram">Diagram<a class="anchor-link" href="#diagram">&#182;</a></h2><p>Let's plot the diagram of tables within multiple schemas and their dependencies using <code>dj.Diagram()</code>.</p>
 
 </div>
 </div>
@@ -2913,8 +2913,8 @@ import numpy as np</div>
 <p>Data is manually entered into the green rectangular tables with the <code>insert1()</code> method.</p>
 <p>Tables connected by a line depend on entries from the table above it.</p>
 <p>Tables with a purple oval or red circle will be automatically filled with relevant data
-  by calling <code>populate()</code>. For example <code>scan.ScanInfo</code> and its part-table
-  <code>scan.ScanInfo.Field</code> are both populated with <code>scan.ScanInfo.populate()</code>.</p>
+by calling <code>populate()</code>. For example <code>scan.ScanInfo</code> and its part-table
+<code>scan.ScanInfo.Field</code> are both populated with <code>scan.ScanInfo.populate()</code>.</p>
 <h2 id="datajoint-basics">DataJoint Basics<a class="anchor-link" href="#datajoint-basics">&#182;</a></h2><p>DataJoint pipelines can be run with four commands:</p>
 <ul>
 <li><code>Insert</code></li>
@@ -2924,7 +2924,7 @@ import numpy as np</div>
 </ul>
 <p>In this demo we will:</p>
 <ul>
-<li><p><code>Insert</code> metadata about a subject, recording session, and 
+<li><p><code>Insert</code> metadata about a subject, recording session, and
 parameters related to processing calcium imaging data through Suite2p.</p>
 </li>
 <li><p><code>Populate</code> tables with outputs of image processing including motion correction,
@@ -5041,17 +5041,15 @@ task_mode=&#34;load&#34;     : enum(&#39;load&#39;,&#39;trigger&#39;)       # &#
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The <code>ProcessingParamSet</code> table contains two important attributes:</p>
+<p>The <code>ProcessingTask</code> table contains two important attributes:
+processing algorithm defined in <code>ProcessingParamSet</code>. When set to <code>trigger</code>, the</p>
 <ul>
-<li><code>paramset_idx</code> - Allows the user to choose the parameter set with which</li>
+<li><code>paramset_idx</code> - Allows the user to choose the parameter set with which
+you want to run image processing.</li>
+<li><code>task_mode</code> - Can be set to <code>load</code> or <code>trigger</code>. When set to <code>load</code>,
+running the processing step initiates a search for existing output files of the image</li>
 </ul>
-<p>you want to run image processing.</p>
-<ul>
-<li><code>task_mode</code> - Can be set to <code>load</code> or <code>trigger</code>. When set to <code>load</code>,</li>
-</ul>
-<p>running the processing step initiates a search for existing output files of the image
-processing algorithm defined in <code>ProcessingParamSet</code>. When set to <code>trigger</code>, the
-processing step will run image processing on the raw data.</p>
+<p>processing step will run image processing on the raw data.</p>
 
 </div>
 </div>
@@ -7916,15 +7914,23 @@ class="
     <script id="__config" type="application/json">{"base": "../..", "features": ["toc.integrate", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.b4d07000.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a51614de.min.js"></script>
       
-        <script src="https://js-na1.hs-scripts.com/23133402.js"></script>
+        
+          <script src="https://js-na1.hs-scripts.com/23133402.js"></script>
+        
       
-        <script src="../../javascripts/mathjax.js"></script>
+        
+          <script src="../../javascripts/mathjax.js"></script>
+        
       
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        
+          <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        
       
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+          <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
       
     
   </body>
