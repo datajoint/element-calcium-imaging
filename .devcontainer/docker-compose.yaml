@@ -1,9 +1,14 @@
 version: "3"
 services:
   app:
-    extends:
-      file: ./local/docker-compose.yaml
-      service: app
+    cpus: 4
+    mem_limit: 8g
+    # build:
+    #   context: ../..
+    #   dockerfile: ./.devcontainer/Dockerfile
+    image: datajoint/element_calcium_imaging_devcontainer:latest
+    extra_hosts:
+      - fakeservices.datajoint.io:127.0.0.1
     environment:
       - DJ_PUBLIC_S3_LOCATION=djhub.vathes.datapub.elements:/calcium-imaging-v2
     devices:
@@ -12,5 +17,9 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
+    volumes:
+      - ..:/workspaces/element-calcium-imaging:cached
+      - docker_data:/var/lib/docker # persist docker images
+    privileged: true # only because of dind
 volumes:
   docker_data:

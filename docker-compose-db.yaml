@@ -1,5 +1,5 @@
-# MYSQL_VER=8.0 docker compose up -f docker-compose-db.yaml --build
-version: "2.4"
+# MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build
+version: "3"
 services:
   db:
     restart: always
