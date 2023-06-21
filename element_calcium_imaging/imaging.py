@@ -387,10 +387,18 @@ class Processing(dj.Computed):
                         + " ScanImage multi-ROI scanning mode yet"
                     )
                 suite2p_dataset = imaging_dataset
-                key = {**key, "processing_time": suite2p_dataset.creation_time}
+                key = {
+                    **key,
+                    "processing_time": suite2p_dataset.creation_time,
+                    "package_version": "",
+                }
             elif method == "caiman":
                 caiman_dataset = imaging_dataset
-                key = {**key, "processing_time": caiman_dataset.creation_time}
+                key = {
+                    **key,
+                    "processing_time": caiman_dataset.creation_time,
+                    "package_version": "",
+                }
             elif method == "extract":
                 raise NotImplementedError(
                     "To use EXTRACT with this DataJoint Element please set `task_mode=trigger`"
@@ -433,7 +441,11 @@ class Processing(dj.Computed):
 
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 suite2p_dataset = imaging_dataset
-                key = {**key, "processing_time": suite2p_dataset.creation_time}
+                key = {
+                    **key,
+                    "processing_time": suite2p_dataset.creation_time,
+                    "package_version": "",
+                }
 
             elif method == "caiman":
                 from element_interface.caiman_loader import _process_scanimage_tiff
@@ -473,6 +485,7 @@ class Processing(dj.Computed):
                 _, imaging_dataset = get_loader_result(key, ProcessingTask)
                 caiman_dataset = imaging_dataset
                 key["processing_time"] = caiman_dataset.creation_time
+                key["package_version"] = ""
 
             elif method == "extract":
                 import suite2p
@@ -524,6 +537,7 @@ class Processing(dj.Computed):
 
                 _, extract_dataset = get_loader_result(key, ProcessingTask)
                 key["processing_time"] = extract_dataset.creation_time
+                key["package_version"] = ""
 
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
