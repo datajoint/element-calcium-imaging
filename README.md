@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/element-calcium-imaging.svg)](http://badge.fury.io/py/element-calcium-imaging)
+
 # DataJoint Element - Functional Calcium Imaging
 
 DataJoint Element for functional calcium imaging with 
