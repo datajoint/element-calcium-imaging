@@ -33,11 +33,11 @@ setup(
     ],
     extras_require={
         "elements": [
-            "element-animal>=0.1.5",
-            "element-event>=0.2.0",
+            "element-animal>=0.1.8",
+            "element-event>=0.2.3",
             "element-interface>=0.5.4",
             "element-lab>=0.3.0",
-            "element-session>=0.1.2",
+            "element-session>=0.1.5",
         ],
         "extract": ["matlabengine", "scipy"],
         "nd2": ["nd2"],
