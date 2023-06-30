@@ -528,7 +528,7 @@ class Processing(dj.Computed):
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
 
-        self.insert1(key)
+        self.insert1({**key, "package_version": ""})
 
 
 # -------------- Motion Correction --------------
