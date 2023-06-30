@@ -7,7 +7,7 @@
 		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
 	},
 	"onCreateCommand": "mkdir -p ${IMAGING_ROOT_DATA_DIR} && pip install -e .",
-	"postStartCommand": "docker volume prune -f && s3fs ${DJ_PUBLIC_S3_LOCATION} ${IMAGING_ROOT_DATA_DIR} -o nonempty,multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1",
+	"postStartCommand": "docker volume prune -f && s3fs ${DJ_PUBLIC_S3_LOCATION} ${IMAGING_ROOT_DATA_DIR} -o nonempty,multipart_size=530,endpoint=us-east-1,url=http://s3.amazonaws.com,public_bucket=1 && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml down && MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build -d",
 	"hostRequirements": {
 		"cpus": 4,
 		"memory": "8gb",
