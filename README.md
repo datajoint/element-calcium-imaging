@@ -1,6 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/element-calcium-imaging.svg)](http://badge.fury.io/py/element-calcium-imaging)
 
-# DataJoint Element - Functional Calcium Imaging
+# DataJoint Element for Functional Calcium Imaging
 
 DataJoint Element for functional calcium imaging with 
 [ScanImage](https://docs.scanimage.org/), 
@@ -13,7 +13,8 @@ and `Bruker Prairie View` acquisition software; and
 software. DataJoint Elements collectively standardize and automate
 data collection and analysis for neuroscience experiments. Each Element is a modular
 pipeline for data storage and processing with corresponding database tables that can be
-combined with other Elements to assemble a fully functional pipeline. This repository also provides a tutorial environment and notebooks to learn the pipeline.
+combined with other Elements to assemble a fully functional pipeline. This repository 
+also provides a tutorial environment and notebooks to learn the pipeline.
 
 ## Experiment Flowchart
 
@@ -23,10 +24,12 @@ combined with other Elements to assemble a fully functional pipeline. This repos
 
 ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
-+ We have designed three variations of the pipeline to handle different use cases. Displayed above is the default `imaging` schema.  Details on all of the `imaging` schemas can be found in the [Data Pipeline](https://datajoint.com/docs/elements/element-calcium-imaging/latest/pipeline/) documentation page.
++ We have designed three variations of the pipeline to handle different use cases. 
+Displayed above is the default `imaging` schema.  Details on all of the `imaging` 
+schemas can be found in the [Data Pipeline](https://datajoint.com/docs/elements/
+element-calcium-imaging/latest/pipeline/) documentation page.
 
 ## Getting Started
-
 
 + Install from PyPI
 
@@ -40,7 +43,8 @@ combined with other Elements to assemble a fully functional pipeline. This repos
 
 ## Support
 
-+ If you need help getting started or run into any errors, please contact our team by email at support@datajoint.com.
++ If you need help getting started or run into any errors, please open a GitHub Issue 
+or contact our team by email at support@datajoint.com.
 
 ## Interactive Tutorial
 
