@@ -22,7 +22,6 @@ RUN \
     pip install --no-cache-dir --upgrade black pip && \
     echo '. /etc/bash_completion' >> /home/vscode/.bashrc && \
     echo 'export PS1="\[\e[32;1m\]\u\[\e[m\]@\[\e[34;1m\]\H\[\e[m\]:\[\e[33;1m\]\w\[\e[m\]$ "' >> /home/vscode/.bashrc && \
-    # dircolors -b >> /home/vscode/.bashrc && \  # somehow fix colors
     apt-get clean
 
 COPY ./ /tmp/element-calcium-imaging/
