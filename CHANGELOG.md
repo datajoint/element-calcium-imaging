@@ -3,6 +3,11 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.7.7] - 2023-07-13
+
++ Add - Environment variables for the Python version in the Dev Container
++ Add - Versions for the VS Code extensions in the Dev Container
+
 ## [0.7.6] - 2023-06-30
 
 + Add - Null value for `package_version` in `imaging*` modules to patch bug
@@ -151,6 +156,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.7.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.7
 [0.7.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.6
 [0.7.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.5
 [0.7.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.4
