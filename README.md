@@ -19,6 +19,7 @@ also provides a tutorial environment and notebooks to learn the pipeline.
 ## Experiment Flowchart
 
 ![flowchart](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/flowchart.svg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdatajoint%2Felement-calcium-imaging.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdatajoint%2Felement-calcium-imaging?ref=badge_shield)
 
 ## Data Pipeline Diagram
 
@@ -82,3 +83,7 @@ MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build -d
 1. We recommend you start by navigating to the `notebooks` directory on the left panel and go through the `tutorial.ipynb` Jupyter notebook. Execute the cells in the notebook to begin your walk through of the tutorial.
 
 1. Once you are done, see the options available to you in the menu in the bottom-left corner. For example, in Codespace you will have an option to `Stop Current Codespace` but when running Dev Container on your own machine the equivalent option is `Reopen folder locally`. By default, GitHub will also automatically stop the Codespace after 30 minutes of inactivity.  Once the Codespace is no longer being used, we recommend deleting the Codespace.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdatajoint%2Felement-calcium-imaging.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdatajoint%2Felement-calcium-imaging?ref=badge_large)
