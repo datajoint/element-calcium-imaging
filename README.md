@@ -26,8 +26,9 @@ also provides a tutorial environment and notebooks to learn the pipeline.
 
 + We have designed three variations of the pipeline to handle different use cases. 
 Displayed above is the default `imaging` schema.  Details on all of the `imaging` 
-schemas can be found in the [Data Pipeline](https://datajoint.com/docs/elements/
-element-calcium-imaging/latest/pipeline/) documentation page.
+schemas can be found in the [Data 
+Pipeline](https://datajoint.com/docs/elements/element-calcium-imaging/latest/pipeline/) 
+documentation page.
 
 ## Getting Started
 
