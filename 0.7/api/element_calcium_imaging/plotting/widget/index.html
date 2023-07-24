@@ -17,7 +17,7 @@
         <link rel="next" href="../../scan/">
       
       <link rel="icon" href="../../../../assets/images/company-logo-blue.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.19">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ecc896b0.min.css">
@@ -649,53 +649,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#element_calcium_imaging.plotting.widget.ScanLevelReport" class="md-nav__link">
-    ScanLevelReport
-  </a>
-  
-    <nav class="md-nav" aria-label="ScanLevelReport">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_report.ScanLevelReport.make" class="md-nav__link">
-    make()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#element_calcium_imaging.plotting.widget.TraceReport" class="md-nav__link">
-    TraceReport
-  </a>
-  
-    <nav class="md-nav" aria-label="TraceReport">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_report.TraceReport.key_source" class="md-nav__link">
-    key_source
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_report.TraceReport.make" class="md-nav__link">
-    make()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -787,6 +740,7 @@
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -800,6 +754,8 @@
   <div class="doc doc-contents ">
   
       <p>Display the widget.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -844,6 +800,8 @@ the figures on the fly.</p>
     </tbody>
   </table>
 
+
+
   <p><strong>Returns:</strong></p>
   <table>
     <thead>
@@ -866,9 +824,9 @@ the figures on the fly.</p>
     </tbody>
   </table>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/plotting/widget.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/plotting/widget.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -1238,7 +1196,7 @@ the figures on the fly.</p>
         <span class="p">]</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -1248,353 +1206,8 @@ the figures on the fly.</p>
 
 
 
-<div class="doc doc-object doc-class">
 
 
-
-<h2 id="element_calcium_imaging.plotting.widget.ScanLevelReport" class="doc doc-heading">
-        <code>ScanLevelReport</code>
-
-
-<a href="#element_calcium_imaging.plotting.widget.ScanLevelReport" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
-
-  
-      <p>Scan level report with figures.</p>
-
-  <p><strong>Attributes:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>imaging.Segmentation</code></td>
-          <td>
-                <code>foreign key</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Primary key from imaging.Segmentation.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>cell_overlayed_image</code></td>
-          <td>
-                <code>longblob</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Plotly figure object showing the segmented
-cells on the average image.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_report.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
-<span class="k">class</span> <span class="nc">ScanLevelReport</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Computed</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan level report with figures.</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        imaging.Segmentation (foreign key): Primary key from imaging.Segmentation.</span>
-<span class="sd">        cell_overlayed_image (longblob): Plotly figure object showing the segmented</span>
-<span class="sd">            cells on the average image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    -&gt; imaging.Segmentation</span>
-<span class="s2">    ---</span>
-<span class="s2">    cell_overlayed_image: longblob</span>
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute and ingest the plotly figure objects.&quot;&quot;&quot;</span>
-
-        <span class="n">image_fig</span> <span class="o">=</span> <span class="n">cell_plot</span><span class="o">.</span><span class="n">plot_cell_overlayed_image</span><span class="p">(</span><span class="n">imaging</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;cell_overlayed_image&quot;</span><span class="p">:</span> <span class="n">image_fig</span><span class="o">.</span><span class="n">to_json</span><span class="p">()})</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="element_calcium_imaging.imaging_report.ScanLevelReport.make" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">make</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></code>
-
-<a href="#element_calcium_imaging.imaging_report.ScanLevelReport.make" class="headerlink" title="Permanent link">&para;</a></h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute and ingest the plotly figure objects.</p>
-
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_report.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute and ingest the plotly figure objects.&quot;&quot;&quot;</span>
-
-    <span class="n">image_fig</span> <span class="o">=</span> <span class="n">cell_plot</span><span class="o">.</span><span class="n">plot_cell_overlayed_image</span><span class="p">(</span><span class="n">imaging</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;cell_overlayed_image&quot;</span><span class="p">:</span> <span class="n">image_fig</span><span class="o">.</span><span class="n">to_json</span><span class="p">()})</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-
-
-
-  </div>
-
-  </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="element_calcium_imaging.plotting.widget.TraceReport" class="doc doc-heading">
-        <code>TraceReport</code>
-
-
-<a href="#element_calcium_imaging.plotting.widget.TraceReport" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
-
-  
-      <p>Figures of traces.</p>
-
-  <p><strong>Attributes:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>imaging.Segmentation.Mask</code></td>
-          <td>
-                <code>foreign key</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Primary key from
-imaging.Segmentation.Mask.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>cell_traces</code></td>
-          <td>
-                <code>longblob</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Plotly figure object showing the cell traces.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_report.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
-<span class="k">class</span> <span class="nc">TraceReport</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Computed</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Figures of traces.</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        imaging.Segmentation.Mask (foreign key): Primary key from</span>
-<span class="sd">            imaging.Segmentation.Mask.</span>
-<span class="sd">        cell_traces (longblob): Plotly figure object showing the cell traces.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    -&gt; imaging.Segmentation.Mask</span>
-<span class="s2">    ---</span>
-<span class="s2">    cell_traces: longblob</span>
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">key_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Limit the TraceReport to Masks that have Activity table populated.</span>
-<span class="sd">        database.&quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="n">imaging</span><span class="o">.</span><span class="n">Segmentation</span><span class="o">.</span><span class="n">Mask</span> <span class="o">&amp;</span> <span class="n">imaging</span><span class="o">.</span><span class="n">Activity</span>
-
-    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute and ingest the plotly figure objects.&quot;&quot;&quot;</span>
-
-        <span class="n">trace_fig</span> <span class="o">=</span> <span class="n">cell_plot</span><span class="o">.</span><span class="n">plot_cell_traces</span><span class="p">(</span><span class="n">imaging</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;cell_traces&quot;</span><span class="p">:</span> <span class="n">trace_fig</span><span class="o">.</span><span class="n">to_json</span><span class="p">()})</span>
-</code></pre></div></td></tr></table></div>
-        </details>
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="element_calcium_imaging.imaging_report.TraceReport.key_source" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">key_source</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-<a href="#element_calcium_imaging.imaging_report.TraceReport.key_source" class="headerlink" title="Permanent link">&para;</a></h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Limit the TraceReport to Masks that have Activity table populated.
-database.</p>
-  </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="element_calcium_imaging.imaging_report.TraceReport.make" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">make</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></code>
-
-<a href="#element_calcium_imaging.imaging_report.TraceReport.make" class="headerlink" title="Permanent link">&para;</a></h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute and ingest the plotly figure objects.</p>
-
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_report.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute and ingest the plotly figure objects.&quot;&quot;&quot;</span>
-
-    <span class="n">trace_fig</span> <span class="o">=</span> <span class="n">cell_plot</span><span class="o">.</span><span class="n">plot_cell_traces</span><span class="p">(</span><span class="n">imaging</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;cell_traces&quot;</span><span class="p">:</span> <span class="n">trace_fig</span><span class="o">.</span><span class="n">to_json</span><span class="p">()})</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-
-
-
-  </div>
-
-  </div>
-
-</div>
 
 
 
@@ -1722,10 +1335,10 @@ database.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["toc.integrate", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["toc.integrate", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.b425cdc4.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
           <script src="https://js-na1.hs-scripts.com/23133402.js"></script>

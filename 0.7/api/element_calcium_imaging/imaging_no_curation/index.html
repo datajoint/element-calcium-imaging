@@ -17,7 +17,7 @@
         <link rel="next" href="../imaging_preprocess/">
       
       <link rel="icon" href="../../../assets/images/company-logo-blue.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.19">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.ecc896b0.min.css">
@@ -565,22 +565,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_no_curation.get_imaging_root_data_dir" class="md-nav__link">
-    get_imaging_root_data_dir()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#element_calcium_imaging.imaging_no_curation.ProcessingMethod" class="md-nav__link">
     ProcessingMethod
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_no_curation.get_processed_root_data_dir" class="md-nav__link">
-    get_processed_root_data_dir()
   </a>
   
 </li>
@@ -602,13 +588,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#element_calcium_imaging.imaging_no_curation.get_image_files" class="md-nav__link">
-    get_image_files()
-  </a>
   
 </li>
       
@@ -1058,6 +1037,7 @@
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -1071,6 +1051,8 @@
   <div class="doc doc-contents ">
   
       <p>Activate this schema.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1170,9 +1152,9 @@ the <code>scan</code> module.</p>
 <li>Equipment: A parent table to Scan, identifying a scanning device.</li>
 </ul>
 </details>
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -1274,7 +1256,7 @@ the <code>scan</code> module.</p>
     <span class="p">)</span>
     <span class="n">imaging_report</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">imaging_schema_name</span><span class="si">}</span><span class="s2">_report&quot;</span><span class="p">,</span> <span class="n">imaging_schema_name</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -1282,103 +1264,6 @@ the <code>scan</code> module.</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h2 id="element_calcium_imaging.imaging_no_curation.get_imaging_root_data_dir" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_imaging_root_data_dir</span><span class="p">()</span></code>
-
-<a href="#element_calcium_imaging.imaging_no_curation.get_imaging_root_data_dir" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Return imaging root data director(y/ies)</p>
-<p>Retrieve the root data director(y/ies) containing the imaging data
-for all subjects/sessions (e.g. acquired ScanImage raw files, output files from
-processing routines, etc.). All data paths and directories in DataJoint Elements are
-recommended to be stored as relative paths (posix format), with respect to some
-user-configured "root" directory, which varies from machine to machine
-(e.g. different mounted drive locations).</p>
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>dirs</code></td>          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A list of string(s) or Path(s) for the absolute paths of the imaging root data
-director(y/ies).</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/scan.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_imaging_root_data_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return imaging root data director(y/ies)</span>
-
-<span class="sd">    Retrieve the root data director(y/ies) containing the imaging data</span>
-<span class="sd">    for all subjects/sessions (e.g. acquired ScanImage raw files, output files from</span>
-<span class="sd">    processing routines, etc.). All data paths and directories in DataJoint Elements are</span>
-<span class="sd">    recommended to be stored as relative paths (posix format), with respect to some</span>
-<span class="sd">    user-configured &quot;root&quot; directory, which varies from machine to machine</span>
-<span class="sd">    (e.g. different mounted drive locations).</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dirs (list): A list of string(s) or Path(s) for the absolute paths of the imaging root data</span>
-<span class="sd">            director(y/ies).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">root_directories</span> <span class="o">=</span> <span class="n">_linking_module</span><span class="o">.</span><span class="n">get_imaging_root_data_dir</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_directories</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)):</span>
-        <span class="n">root_directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">root_directories</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_linking_module</span><span class="p">,</span> <span class="s2">&quot;get_processed_root_data_dir&quot;</span><span class="p">):</span>
-        <span class="n">root_directories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_linking_module</span><span class="o">.</span><span class="n">get_processed_root_data_dir</span><span class="p">())</span>
-
-    <span class="k">return</span> <span class="n">root_directories</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
 
 
 
@@ -1390,18 +1275,20 @@ director(y/ies).</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.ProcessingMethod" class="doc doc-heading">
-        <code>ProcessingMethod</code>
+          <code>ProcessingMethod</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingMethod" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Package used for processing of calcium imaging data (e.g. Suite2p, CaImAn, etc.).</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -1438,10 +1325,9 @@ director(y/ies).</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">78</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
@@ -1481,7 +1367,7 @@ director(y/ies).</p>
         <span class="p">(</span><span class="s2">&quot;extract&quot;</span><span class="p">,</span> <span class="s2">&quot;extract analysis suite&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -1502,89 +1388,6 @@ director(y/ies).</p>
 
 
 
-<div class="doc doc-object doc-function">
-
-
-
-<h2 id="element_calcium_imaging.imaging_no_curation.get_processed_root_data_dir" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_processed_root_data_dir</span><span class="p">()</span></code>
-
-<a href="#element_calcium_imaging.imaging_no_curation.get_processed_root_data_dir" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Retrieve the root directory for all processed data.</p>
-<p>All data paths and directories in DataJoint Elements are recommended to be stored as
-relative paths (posix format), with respect to some user-configured "root"
-directory, which varies from machine to machine (e.g. different mounted drive
-locations).</p>
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>dir</code></td>          <td>
-                <code>str | pathlib.<span title="pathlib.Path">Path</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Absolute path of the processed imaging root data
-directory.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/scan.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_processed_root_data_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the root directory for all processed data.</span>
-
-<span class="sd">    All data paths and directories in DataJoint Elements are recommended to be stored as</span>
-<span class="sd">    relative paths (posix format), with respect to some user-configured &quot;root&quot;</span>
-<span class="sd">    directory, which varies from machine to machine (e.g. different mounted drive</span>
-<span class="sd">    locations).</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dir (str| pathlib.Path): Absolute path of the processed imaging root data</span>
-<span class="sd">            directory.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_linking_module</span><span class="p">,</span> <span class="s2">&quot;get_processed_root_data_dir&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_linking_module</span><span class="o">.</span><span class="n">get_processed_root_data_dir</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">get_imaging_root_data_dir</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-
 
 
 
@@ -1594,21 +1397,23 @@ directory.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.ProcessingParamSet" class="doc doc-heading">
-        <code>ProcessingParamSet</code>
+          <code>ProcessingParamSet</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingParamSet" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Parameter set used for the processing of the calcium imaging scans,
 including both the analysis suite and its respective input parameters.</p>
 <p>A hash of the parameters of the analysis suite is also stored in order
 to avoid duplicated entries.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -1679,10 +1484,9 @@ the analysis suite.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
@@ -1838,11 +1642,12 @@ the analysis suite.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
   <div class="doc doc-children">
+
 
 
 
@@ -1869,6 +1674,8 @@ the analysis suite.</p>
       <p>Insert a parameter set into ProcessingParamSet table.</p>
 <p>This function automates the parameter set hashing and avoids insertion of an
     existing parameter set.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -1929,9 +1736,9 @@ suite.</p>
     </tbody>
   </table>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
@@ -2033,7 +1840,7 @@ suite.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -2050,98 +1857,6 @@ suite.</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h2 id="element_calcium_imaging.imaging_no_curation.get_image_files" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_image_files</span><span class="p">(</span><span class="n">scan_key</span><span class="p">,</span> <span class="n">file_type</span><span class="p">)</span></code>
-
-<a href="#element_calcium_imaging.imaging_no_curation.get_image_files" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Retrieve the list of image files associated with a given Scan.</p>
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>scan_key</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Primary key of a Scan entry.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A list of full file paths.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/scan.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_image_files</span><span class="p">(</span><span class="n">scan_key</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the list of image files associated with a given Scan.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        scan_key: Primary key of a Scan entry.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A list of full file paths.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_linking_module</span><span class="o">.</span><span class="n">get_image_files</span><span class="p">(</span><span class="n">scan_key</span><span class="p">,</span> <span class="n">file_type</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
 
 
 
@@ -2153,18 +1868,20 @@ suite.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.CellCompartment" class="doc doc-heading">
-        <code>CellCompartment</code>
+          <code>CellCompartment</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.CellCompartment" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Cell compartments that can be imaged (e.g. 'axon', 'soma', etc.)</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -2190,10 +1907,9 @@ suite.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">180</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
@@ -2219,7 +1935,7 @@ suite.</p>
 
     <span class="n">contents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;axon&quot;</span><span class="p">,</span> <span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="s2">&quot;bouton&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -2245,18 +1961,20 @@ suite.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.MaskType" class="doc doc-heading">
-        <code>MaskType</code>
+          <code>MaskType</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MaskType" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Available labels for segmented masks (e.g. 'soma', 'axon', 'dendrite', 'neuropil').</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -2282,10 +2000,9 @@ suite.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
@@ -2311,7 +2028,7 @@ suite.</p>
 
     <span class="n">contents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="s2">&quot;axon&quot;</span><span class="p">,</span> <span class="s2">&quot;dendrite&quot;</span><span class="p">,</span> <span class="s2">&quot;neuropil&quot;</span><span class="p">,</span> <span class="s2">&quot;artefact&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -2337,15 +2054,15 @@ suite.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.ProcessingTask" class="doc doc-heading">
-        <code>ProcessingTask</code>
+          <code>ProcessingTask</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingTask" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Manual">Manual</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Manual">Manual</span></code></p>
 
   
       <p>A pairing of processing params and scans to be loaded or triggered</p>
@@ -2354,6 +2071,8 @@ suite.</p>
 method's parameters). The task defined here is then run in the downstream table
 <code>Processing</code>. This table supports definitions of both loading of pre-generated results
 and the triggering of new analysis for all supported analysis methods.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -2413,10 +2132,9 @@ and the triggering of new analysis for all supported analysis methods.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
@@ -2664,11 +2382,12 @@ and the triggering of new analysis for all supported analysis methods.</p>
 
     <span class="n">auto_generate_entries</span> <span class="o">=</span> <span class="n">generate</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
   <div class="doc doc-children">
+
 
 
 
@@ -2693,6 +2412,8 @@ and the triggering of new analysis for all supported analysis methods.</p>
   <div class="doc doc-contents ">
   
       <p>Infer an output directory for an entry in ProcessingTask table.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2752,6 +2473,8 @@ Default True.</p>
     </tbody>
   </table>
 
+
+
   <p><strong>Returns:</strong></p>
   <table>
     <thead>
@@ -2777,9 +2500,9 @@ e.g.: sub4/sess1/scan0/suite2p_0</p>
     </tbody>
   </table>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
@@ -2865,10 +2588,11 @@ e.g.: sub4/sess1/scan0/suite2p_0</p>
 
     <span class="k">return</span> <span class="n">output_dir</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">processed_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">relative</span> <span class="k">else</span> <span class="n">output_dir</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
+
 
 
 
@@ -2894,6 +2618,8 @@ e.g.: sub4/sess1/scan0/suite2p_0</p>
       <p>Generate a ProcessingTask for a Scan using an parameter ProcessingParamSet</p>
 <p>Generate an entry in the ProcessingTask table for a particular scan using an
 existing parameter set from the ProcessingParamSet table.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2937,9 +2663,9 @@ existing parameter set from the ProcessingParamSet table.</p>
     </tbody>
   </table>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">283</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">283</span>
 <span class="normal">284</span>
 <span class="normal">285</span>
 <span class="normal">286</span>
@@ -3043,7 +2769,7 @@ existing parameter set from the ProcessingParamSet table.</p>
         <span class="p">}</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -3067,19 +2793,21 @@ existing parameter set from the ProcessingParamSet table.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.Processing" class="doc doc-heading">
-        <code>Processing</code>
+          <code>Processing</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Processing" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Perform the computation of an entry (task) defined in the ProcessingTask table.
 The computation is performed only on the scans with ScanInfo inserted.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -3128,10 +2856,9 @@ processing the data.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
 <span class="normal">340</span>
 <span class="normal">341</span>
 <span class="normal">342</span>
@@ -3517,7 +3244,7 @@ processing the data.</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;package_version&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -3556,6 +3283,7 @@ database.</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -3570,9 +3298,9 @@ database.</p>
   
       <p>Execute the calcium imaging analysis defined by the ProcessingTask.</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">366</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
 <span class="normal">369</span>
@@ -3904,7 +3632,7 @@ database.</p>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">({</span><span class="o">**</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;package_version&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -3928,18 +3656,20 @@ database.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.MotionCorrection" class="doc doc-heading">
-        <code>MotionCorrection</code>
+          <code>MotionCorrection</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MotionCorrection" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Imported">Imported</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Imported">Imported</span></code></p>
 
   
       <p>Results of motion correction shifts performed on the imaging data.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -3977,10 +3707,9 @@ motion correction in this processing task.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">537</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">537</span>
 <span class="normal">538</span>
 <span class="normal">539</span>
 <span class="normal">540</span>
@@ -4886,7 +4615,7 @@ motion correction in this processing task.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -4903,18 +4632,20 @@ motion correction in this processing task.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.MotionCorrection.RigidMotionCorrection" class="doc doc-heading">
-        <code>RigidMotionCorrection</code>
+          <code>RigidMotionCorrection</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MotionCorrection.RigidMotionCorrection" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Details of rigid motion correction performed on the imaging data.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -5019,10 +4750,9 @@ motion correction in this processing task.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">553</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">553</span>
 <span class="normal">554</span>
 <span class="normal">555</span>
 <span class="normal">556</span>
@@ -5076,7 +4806,7 @@ motion correction in this processing task.</p>
 <span class="s2">    z_std=null          : float     # (pixels) standard deviation of z shifts across all frames</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -5102,19 +4832,21 @@ motion correction in this processing task.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.MotionCorrection.NonRigidMotionCorrection" class="doc doc-heading">
-        <code>NonRigidMotionCorrection</code>
+          <code>NonRigidMotionCorrection</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MotionCorrection.NonRigidMotionCorrection" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Piece-wise rigid motion correction - tile the FOV into multiple 3D
 blocks/patches.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -5140,7 +4872,7 @@ blocks/patches.</p>
         <tr>
           <td><code>outlier_frames</code></td>
           <td>
-                <code>longblob, null</code>
+                <code>(longblob, null)</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -5218,10 +4950,9 @@ shifts (already corrected).</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">581</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">581</span>
 <span class="normal">582</span>
 <span class="normal">583</span>
 <span class="normal">584</span>
@@ -5275,7 +5006,7 @@ shifts (already corrected).</p>
 <span class="s2">    block_count_z       : int      # number of blocks tiled in the z direction</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -5301,18 +5032,20 @@ shifts (already corrected).</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.MotionCorrection.Block" class="doc doc-heading">
-        <code>Block</code>
+          <code>Block</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MotionCorrection.Block" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>FOV-tiled blocks used for non-rigid motion correction.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -5451,10 +5184,9 @@ in pixels</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">609</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">609</span>
 <span class="normal">610</span>
 <span class="normal">611</span>
 <span class="normal">612</span>
@@ -5522,7 +5254,7 @@ in pixels</p>
 <span class="s2">    z_std=null      : float     # (pixels) standard deviation of z shifts across all frames</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -5548,18 +5280,20 @@ in pixels</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.MotionCorrection.Summary" class="doc doc-heading">
-        <code>Summary</code>
+          <code>Summary</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MotionCorrection.Summary" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Summary images for each field and channel after corrections.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -5641,10 +5375,9 @@ cell detection).</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">644</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">644</span>
 <span class="normal">645</span>
 <span class="normal">646</span>
 <span class="normal">647</span>
@@ -5688,7 +5421,7 @@ cell detection).</p>
 <span class="s2">    max_proj_image=null     : longblob  # max of registered frames</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -5709,6 +5442,7 @@ cell detection).</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -5723,9 +5457,9 @@ cell detection).</p>
   
       <p>Populate MotionCorrection with results parsed from analysis outputs</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">667</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">667</span>
 <span class="normal">668</span>
 <span class="normal">669</span>
 <span class="normal">670</span>
@@ -6371,7 +6105,7 @@ cell detection).</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -6395,18 +6129,20 @@ cell detection).</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.Segmentation" class="doc doc-heading">
-        <code>Segmentation</code>
+          <code>Segmentation</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Segmentation" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Result of the Segmentation process.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -6432,10 +6168,9 @@ cell detection).</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 995</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 995</span>
 <span class="normal"> 996</span>
 <span class="normal"> 997</span>
 <span class="normal"> 998</span>
@@ -6789,7 +6524,7 @@ cell detection).</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -6806,18 +6541,20 @@ cell detection).</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.Segmentation.Mask" class="doc doc-heading">
-        <code>Mask</code>
+          <code>Mask</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Segmentation.Mask" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Details of the masks identified from the Segmentation procedure.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -6954,10 +6691,9 @@ used for segmentation.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1007</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1007</span>
 <span class="normal">1008</span>
 <span class="normal">1009</span>
 <span class="normal">1010</span>
@@ -7021,7 +6757,7 @@ used for segmentation.</p>
 <span class="s2">    mask_weights       : longblob  # weights of the mask at the indices above</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -7042,6 +6778,7 @@ used for segmentation.</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -7056,9 +6793,9 @@ used for segmentation.</p>
   
       <p>Populate the Segmentation with the results parsed from analysis outputs.</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1040</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1040</span>
 <span class="normal">1041</span>
 <span class="normal">1042</span>
 <span class="normal">1043</span>
@@ -7322,7 +7059,7 @@ used for segmentation.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -7346,18 +7083,20 @@ used for segmentation.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.MaskClassificationMethod" class="doc doc-heading">
-        <code>MaskClassificationMethod</code>
+          <code>MaskClassificationMethod</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MaskClassificationMethod" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Available mask classification methods.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -7383,10 +7122,9 @@ used for segmentation.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1174</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1174</span>
 <span class="normal">1175</span>
 <span class="normal">1176</span>
 <span class="normal">1177</span>
@@ -7412,7 +7150,7 @@ used for segmentation.</p>
 
     <span class="n">contents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;suite2p_default_classifier&quot;</span><span class="p">,</span> <span class="s2">&quot;caiman_default_classifier&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -7438,18 +7176,20 @@ used for segmentation.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.MaskClassification" class="doc doc-heading">
-        <code>MaskClassification</code>
+          <code>MaskClassification</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MaskClassification" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Classes assigned to each mask.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -7487,10 +7227,9 @@ MaskClassificationMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1189</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1189</span>
 <span class="normal">1190</span>
 <span class="normal">1191</span>
 <span class="normal">1192</span>
@@ -7560,7 +7299,7 @@ MaskClassificationMethod.</p>
     <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">pass</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -7577,18 +7316,20 @@ MaskClassificationMethod.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.MaskClassification.MaskType" class="doc doc-heading">
-        <code>MaskType</code>
+          <code>MaskType</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.MaskClassification.MaskType" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Type assigned to each mask.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -7647,10 +7388,9 @@ MaskClassificationMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1204</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1204</span>
 <span class="normal">1205</span>
 <span class="normal">1206</span>
 <span class="normal">1207</span>
@@ -7684,7 +7424,7 @@ MaskClassificationMethod.</p>
 <span class="s2">    confidence=null: float</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -7719,18 +7459,20 @@ MaskClassificationMethod.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.Fluorescence" class="doc doc-heading">
-        <code>Fluorescence</code>
+          <code>Fluorescence</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Fluorescence" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Fluorescence traces.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -7756,10 +7498,9 @@ MaskClassificationMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1229</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1229</span>
 <span class="normal">1230</span>
 <span class="normal">1231</span>
 <span class="normal">1232</span>
@@ -7987,7 +7728,7 @@ MaskClassificationMethod.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -8004,18 +7745,20 @@ MaskClassificationMethod.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.Fluorescence.Trace" class="doc doc-heading">
-        <code>Trace</code>
+          <code>Trace</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Fluorescence.Trace" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Traces obtained from segmented region of interests.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -8086,10 +7829,9 @@ comes from.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1241</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1241</span>
 <span class="normal">1242</span>
 <span class="normal">1243</span>
 <span class="normal">1244</span>
@@ -8129,7 +7871,7 @@ comes from.</p>
 <span class="s2">    neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -8150,6 +7892,7 @@ comes from.</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -8164,9 +7907,9 @@ comes from.</p>
   
       <p>Populate the Fluorescence with the results parsed from analysis outputs.</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1262</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1262</span>
 <span class="normal">1263</span>
 <span class="normal">1264</span>
 <span class="normal">1265</span>
@@ -8328,7 +8071,7 @@ comes from.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -8352,18 +8095,20 @@ comes from.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.ActivityExtractionMethod" class="doc doc-heading">
-        <code>ActivityExtractionMethod</code>
+          <code>ActivityExtractionMethod</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ActivityExtractionMethod" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Lookup">Lookup</span></code></p>
 
   
       <p>Available activity extraction methods.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -8389,10 +8134,9 @@ comes from.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1345</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1345</span>
 <span class="normal">1346</span>
 <span class="normal">1347</span>
 <span class="normal">1348</span>
@@ -8418,7 +8162,7 @@ comes from.</p>
 
     <span class="n">contents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;suite2p_deconvolution&quot;</span><span class="p">,</span> <span class="s2">&quot;caiman_deconvolution&quot;</span><span class="p">,</span> <span class="s2">&quot;caiman_dff&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -8444,18 +8188,20 @@ comes from.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.Activity" class="doc doc-heading">
-        <code>Activity</code>
+          <code>Activity</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Activity" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Inferred neural activity from fluorescence trace (e.g. dff, spikes, etc.).</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -8493,10 +8239,9 @@ ActivityExtractionMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1360</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1360</span>
 <span class="normal">1361</span>
 <span class="normal">1362</span>
 <span class="normal">1363</span>
@@ -8704,7 +8449,7 @@ ActivityExtractionMethod.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -8721,18 +8466,20 @@ ActivityExtractionMethod.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.Activity.Trace" class="doc doc-heading">
-        <code>Trace</code>
+          <code>Trace</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.Activity.Trace" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Trace(s) for each mask.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -8780,10 +8527,9 @@ ActivityExtractionMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1375</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1375</span>
 <span class="normal">1376</span>
 <span class="normal">1377</span>
 <span class="normal">1378</span>
@@ -8813,7 +8559,7 @@ ActivityExtractionMethod.</p>
 <span class="s2">    activity_trace: longblob</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -8834,6 +8580,7 @@ ActivityExtractionMethod.</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -8848,9 +8595,9 @@ ActivityExtractionMethod.</p>
   
       <p>Populate the Activity with the results parsed from analysis outputs.</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1409</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1409</span>
 <span class="normal">1410</span>
 <span class="normal">1411</span>
 <span class="normal">1412</span>
@@ -8960,7 +8707,7 @@ ActivityExtractionMethod.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown/unimplemented method: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -8984,18 +8731,20 @@ ActivityExtractionMethod.</p>
 
 
 <h2 id="element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics" class="doc doc-heading">
-        <code>ProcessingQualityMetrics</code>
+          <code>ProcessingQualityMetrics</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics" class="headerlink" title="Permanent link">&para;</a></h2>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Computed">Computed</span></code></p>
 
   
       <p>Quality metrics used to evaluate the results of the calcium imaging analysis pipeline.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -9021,10 +8770,9 @@ ActivityExtractionMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1466</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1466</span>
 <span class="normal">1467</span>
 <span class="normal">1468</span>
 <span class="normal">1469</span>
@@ -9248,7 +8996,7 @@ ActivityExtractionMethod.</p>
             <span class="p">)</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -9265,18 +9013,20 @@ ActivityExtractionMethod.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics.Mask" class="doc doc-heading">
-        <code>Mask</code>
+          <code>Mask</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics.Mask" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Quality metrics used to evaluate the masks.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -9335,10 +9085,9 @@ ActivityExtractionMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1478</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1478</span>
 <span class="normal">1479</span>
 <span class="normal">1480</span>
 <span class="normal">1481</span>
@@ -9372,7 +9121,7 @@ ActivityExtractionMethod.</p>
 <span class="s2">    roundness: float       # Roundness between 0 and 1. Values closer to 1 are rounder.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -9398,18 +9147,20 @@ ActivityExtractionMethod.</p>
 
 
 <h3 id="element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics.Trace" class="doc doc-heading">
-        <code>Trace</code>
+          <code>Trace</code>
 
 
 <a href="#element_calcium_imaging.imaging_no_curation.ProcessingQualityMetrics.Trace" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="datajoint">dj</span>.<span title="datajoint.Part">Part</span></code></p>
 
   
       <p>Quality metrics used to evaluate the fluorescence traces.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -9468,10 +9219,9 @@ ActivityExtractionMethod.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1496</span>
+            <details class="quote">
+              <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1496</span>
 <span class="normal">1497</span>
 <span class="normal">1498</span>
 <span class="normal">1499</span>
@@ -9505,7 +9255,7 @@ ActivityExtractionMethod.</p>
 <span class="s2">    variance: float   # Variance of the fluorescence trace.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -9526,6 +9276,7 @@ ActivityExtractionMethod.</p>
 
 
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -9540,9 +9291,9 @@ ActivityExtractionMethod.</p>
   
       <p>Populate the ProcessingQualityMetrics table and its part tables.</p>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1514</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1514</span>
 <span class="normal">1515</span>
 <span class="normal">1516</span>
 <span class="normal">1517</span>
@@ -9670,7 +9421,7 @@ ActivityExtractionMethod.</p>
         <span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -9683,6 +9434,7 @@ ActivityExtractionMethod.</p>
   </div>
 
 </div>
+
 
 
 
@@ -9702,6 +9454,8 @@ ActivityExtractionMethod.</p>
   <div class="doc doc-contents ">
   
       <p>Retrieve the processed imaging results from a suite2p or caiman loader.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -9746,6 +9500,8 @@ ProcessingTask, Curation)</p>
     </tbody>
   </table>
 
+
+
   <p><strong>Raises:</strong></p>
   <table>
     <thead>
@@ -9768,6 +9524,8 @@ ProcessingTask, Curation)</p>
         </tr>
     </tbody>
   </table>
+
+
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -9801,9 +9559,9 @@ ProcessingTask, Curation)</p>
     </tbody>
   </table>
 
-      <details class="quote">
-        <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1589</span>
+          <details class="quote">
+            <summary>Source code in <code>element_calcium_imaging/imaging_no_curation.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1589</span>
 <span class="normal">1590</span>
 <span class="normal">1591</span>
 <span class="normal">1592</span>
@@ -9883,7 +9641,7 @@ ProcessingTask, Curation)</p>
 
     <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">loaded_dataset</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -10014,10 +9772,10 @@ ProcessingTask, Curation)</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["toc.integrate", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["toc.integrate", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.b425cdc4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
           <script src="https://js-na1.hs-scripts.com/23133402.js"></script>
