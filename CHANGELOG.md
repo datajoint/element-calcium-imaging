@@ -6,6 +6,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 ## [0.7.8] - 2023-07-25
 
 + Update - GitHub Actions to run every Monday at 8am
++ Update - `extras_require` to include `caiman`, `sbxreader`, and `scanreader`
 
 ## [0.7.7] - 2023-07-13
 
