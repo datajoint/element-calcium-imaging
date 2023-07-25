@@ -3,6 +3,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "14 25 * * *"
 jobs:
   devcontainer-build:
     uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
