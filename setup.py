@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from os import path
-
 from setuptools import find_packages, setup
+import urllib.request
 
 pkg_name = "element_calcium_imaging"
 here = path.abspath(path.dirname(__file__))
@@ -11,6 +11,15 @@ with open(path.join(here, "README.md"), "r") as f:
 
 with open(path.join(here, pkg_name, "version.py")) as f:
     exec(f.read())
+
+with urllib.request.urlopen(
+    "https://raw.githubusercontent.com/flatironinstitute/CaImAn/master/requirements.txt"
+) as f:
+    caiman_requirements = f.read().decode("UTF-8").split("\n")
+
+caiman_requirements.remove("")
+caiman_requirements.append("future")
+caiman_requirements.append("caiman @ git+https://github.com/datajoint/CaImAn")
 
 setup(
     name=pkg_name.replace("_", "-"),
@@ -32,6 +41,7 @@ setup(
         "plotly",
     ],
     extras_require={
+        "caiman": caiman_requirements,
         "elements": [
             "element-animal>=0.1.8",
             "element-event>=0.2.3",
@@ -41,6 +51,8 @@ setup(
         ],
         "extract": ["matlabengine", "scipy"],
         "nd2": ["nd2"],
+        "sbxreader": ["sbxreader @ git+https://github.com/jcouto/sbxreader@0.2.3"],
+        "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
