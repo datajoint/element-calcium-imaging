@@ -18,8 +18,6 @@ with urllib.request.urlopen(
     caiman_requirements = f.read().decode("UTF-8").split("\n")
 
 caiman_requirements.remove("")
-caiman_requirements.append("future")
-caiman_requirements.append("caiman @ git+https://github.com/datajoint/CaImAn")
 
 setup(
     name=pkg_name.replace("_", "-"),
@@ -42,7 +40,9 @@ setup(
         "plotly",
     ],
     extras_require={
-        "caiman": caiman_requirements,
+        "caiman": [caiman_requirements,
+                   "future",
+                   "caiman @ git+https://github.com/datajoint/CaImAn"],
         "elements": [
             "element-animal>=0.1.8",
             "element-event>=0.2.3",
