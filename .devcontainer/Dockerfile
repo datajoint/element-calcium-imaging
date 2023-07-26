@@ -30,7 +30,8 @@ RUN \
 COPY ./ /tmp/element-calcium-imaging/
 
 RUN \
-    # workflow dependencies
+    # pipeline dependencies
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman_requirements] && \
     pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman,elements,extract,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
     rm -rf /tmp/element-calcium-imaging && \

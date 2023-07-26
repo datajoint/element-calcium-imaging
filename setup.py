@@ -16,7 +16,9 @@ with urllib.request.urlopen(
     "https://raw.githubusercontent.com/flatironinstitute/CaImAn/master/requirements.txt"
 ) as f:
     caiman_requirements = f.read().decode("UTF-8").split("\n")
+
 caiman_requirements.remove("")
+caiman_requirements.append("future")
 
 setup(
     name=pkg_name.replace("_", "-"),
@@ -31,7 +33,6 @@ setup(
     keywords="neuroscience calcium-imaging science datajoint",
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
     scripts=[],
-    setup_requires=["numpy"],
     install_requires=[
         "datajoint>=0.13.0",
         "ipykernel>=6.0.1",
@@ -39,9 +40,8 @@ setup(
         "plotly",
     ],
     extras_require={
-        "caiman": [caiman_requirements,
-                   "future",
-                   "caiman @ git+https://github.com/datajoint/CaImAn"],
+        "caiman_requirements": [caiman_requirements],
+        "caiman": ["caiman @ git+https://github.com/datajoint/CaImAn"],
         "elements": [
             "element-animal>=0.1.8",
             "element-event>=0.2.3",
