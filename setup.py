@@ -38,6 +38,7 @@ setup(
         "datajoint>=0.13.0",
         "ipykernel>=6.0.1",
         "ipywidgets",
+        "numpy",
         "plotly",
     ],
     extras_require={
