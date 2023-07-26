@@ -31,8 +31,9 @@ COPY ./ /tmp/element-calcium-imaging/
 
 RUN \
     # pipeline dependencies
+    apt-get install gcc && \
     pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman_requirements] && \
-    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman,elements,extract,nd2,sbxreader,scanreader,suite2p,tests] && \
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman,elements,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
     rm -rf /tmp/element-calcium-imaging && \
     apt-get clean
