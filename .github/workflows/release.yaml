@@ -1,0 +1,27 @@
+name: Release
+on:
+  workflow_dispatch:
+jobs:
+  make_github_release:
+    uses: datajoint/.github/.github/workflows/make_github_release.yaml@main
+  pypi_release:
+    needs: make_github_release
+    uses: datajoint/.github/.github/workflows/pypi_release.yaml@main
+    secrets:
+      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
+      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
+    with:
+      UPLOAD_URL: ${{needs.make_github_release.outputs.release_upload_url}}
+  mkdocs_release:
+    uses: datajoint/.github/.github/workflows/mkdocs_release.yaml@main
+    permissions: 
+      contents: write
+  devcontainer-build:
+    uses: datajoint/.github/.github/workflows/devcontainer-build.yaml@main
+  devcontainer-publish:
+    needs: 
+      - devcontainer-build
+    uses: datajoint/.github/.github/workflows/devcontainer-publish.yaml@main
+    secrets:
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN_FOR_ELEMENTS}}

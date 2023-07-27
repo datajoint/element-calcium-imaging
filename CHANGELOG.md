@@ -3,6 +3,78 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.7.8] - 2023-07-23
+
++ Update - import statement for `prairie_view_loader` in `scan.py`
+
+## [0.7.7] - 2023-07-13
+
++ Add - Environment variables for the Python version in the Dev Container
++ Add - Versions for the VS Code extensions in the Dev Container
+
+## [0.7.6] - 2023-06-30
+
++ Add - Null value for `package_version` in `imaging*` modules to patch bug
++ Update - `tutorial.ipynb` notebook to insert values for nullable attributes
+
+## [0.7.5] - 2023-06-20
+
++ Update - Requirements
+
+## [0.7.4] - 2023-06-19
+
++ Add - Dev Container Docker image ID
++ Update - Remove `.devcontainer/local/`
++ Update - Move `docker compose up` command from `devcontainer.json` to README
+
+## [0.7.3] - 2023-06-09
+
++ Fix - Output of cells within the `tutorial` notebook
+
+## [0.7.2] - 2023-06-08
+
++ Update - `tutorial` notebook
+
+## [0.7.1] - 2023-06-07
+
++ Fix - Docs to render notebooks
++ Fix - `get_imaging_root_data_dir` function
+
+## [0.7.0] - 2023-06-06
+
++ Update - Merge `workflow-calcium-imaging` into `element-calcium-imaging` PR [#135](https://github.com/datajoint/element-calcium-imaging/pull/135)
++ Add - `extras_require` feature to `setup.py`
++ Add - GitHub Actions that call reusable workflows in the `datajoint/.github` repository
++ Update - Replace `get_nd2_files`, etc. functions with `get_image_files` function
++ Add - `tutorial_pipeline.py` script for notebooks to import and activate schemas
++ Update - Replace `reference.Equipment` with `lab.Device` table
++ Update - Remove `demo_prepare.ipynb`
++ Update - Rename `demo_run.ipynb` to `demo.ipynb`
++ Update - `__init__.py` to use environment variables (if available) in place of `dj.config['custom']` values
+
+## [0.6.2] - 2023-05-22
+
++ Add - CaImAn, Suite2p, and EXTRACT citations
+
+## [0.6.1] - 2023-05-15
+
++ Update - Docs
+
+## [0.6.0] - 2023-05-15
+
++ Add - Quality metrics
++ Update - Docs and readme
+
+## [0.5.7] - 2023-05-11
+
++ Fix - `.ipynb` dark mode output for all notebooks.
++ Fix - Remove `GOOGLE_ANALYTICS_KEY` from `u24_element_release_call.yml`.
+
+## [0.5.6] - 2023-04-28
+
++ Fix - `.ipynb` output in tutorials is not visible in dark mode.
++ Fix - typos in docstrings.
+
 ## [0.5.5] - 2023-04-06
 
 + Update - Bump `element-interface` requirement to `0.5.1`.
@@ -88,6 +160,20 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.7.8]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.8
+[0.7.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.7
+[0.7.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.6
+[0.7.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.5
+[0.7.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.4
+[0.7.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.3
+[0.7.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.2
+[0.7.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.1
+[0.7.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.0
+[0.6.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.2
+[0.6.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.1
+[0.6.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.6.0
+[0.5.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.7
+[0.5.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.6
 [0.5.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.5
 [0.5.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.4
 [0.5.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.5.3
