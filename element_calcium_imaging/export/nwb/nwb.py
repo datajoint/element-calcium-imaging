@@ -1,8 +1,7 @@
+import datajoint as dj
 from datetime import datetime
 from uuid import uuid4
 
-import datajoint as dj
-import matplotlib.pyplot as plt
 import numpy as np
 from dateutil.tz import tzlocal
 
@@ -22,77 +21,137 @@ from pynwb.ophys import (
 from ... import imaging, scan
 
 
-def add_scan_to_nwb(session_key, nwbfile, nwbfile_kwargs=None):
+def add_scan_to_nwb(session_key, nwbfile):
     from math import nan
 
-    scan_keys = (scan.Scan & session_key).fetch("KEY")
-
-    for scan_key in scan_keys:
-        scan_data = (scan.Scan & scan_key).fetch1("scanner", "scan_notes")
-        device = nwbfile.create_device(
-            name=scan_data["scanner"]
-            if scan_data["scanner"] is not None
-            else "TwoPhotonMicroscope",
-            description="Two photon microscope",
-            manufacturer="Microscope manufacturer",
+    try:
+        scan_key = (scan.Scan & session_key).fetch1("KEY")
+    except DataJointError:
+        raise NotImplementedError(
+            "Exporting more than one scan per session to NWB is not supported yet."
         )
 
-        no_channels, frame_rate = (scan.ScanInfo & scan_key).fetch1("nchannels", "fps")
+    scanner_name, scan_notes = (scan.Scan & scan_key).fetch1("scanner", "scan_notes")
+    device = nwbfile.create_device(
+        name=scanner_name if scanner_name is not None else "TwoPhotonMicroscope",
+        description="Two photon microscope",
+        manufacturer="Microscope manufacturer",
+    )
 
-        field_keys = (scan.ScanInfo.Field & scan_key).fetch("KEY")
+    no_channels, frame_rate = (scan.ScanInfo & scan_key).fetch1("nchannels", "fps")
 
-        for channel in range(no_channels):
-            optical_channel = OpticalChannel(
-                name=f"OpticalChannel{channel+1}",
-                description=f"Optical channel number {channel+1}",
-                emission_lambda=nan,
+    field_keys = (scan.ScanInfo.Field & scan_key).fetch("KEY")
+
+    for channel in range(no_channels):
+        optical_channel = OpticalChannel(
+            name=f"OpticalChannel{channel+1}",
+            description=f"Optical channel number {channel+1}",
+            emission_lambda=nan,
+        )
+
+        for field_key in field_keys:
+            field_no = (scan.ScanInfo.Field & field_key).fetch1("field_idx")
+            imaging_plane = nwbfile.create_imaging_plane(
+                name=f"ImagingPlane{field_no+1}",
+                optical_channel=optical_channel,
+                imaging_rate=frame_rate,
+                description=scan_data["scan_notes"]
+                if scan_notes != ""
+                else f"Imaging plane for channel {channel+1}",
+                device=device,
+                excitation_lambda=nan,
+                indicator="unknown",
+                location="unknown",
+                grid_spacing=(0.01, 0.01),
+                grid_spacing_unit="meters",
+                origin_coords=[1.0, 2.0, 3.0],
+                origin_coords_unit="meters",
             )
-
-            for field_key in field_keys:
-                field_no = (scan.ScanInfo.Field & field_key).fetch1("field_idx")
-                imaging_plane = nwbfile.create_imaging_plane(
-                    name=f"ImagingPlane{field_no+1}",
-                    optical_channel=optical_channel,
-                    imaging_rate=frame_rate,
-                    description=scan_data["scan_notes"]
-                    if session_info["scan_notes"] != ""
-                    else f"Imaging plane for channel {channel+1}",
-                    device=device,
-                    excitation_lambda=nan,
-                    indicator="unknown",
-                    location="unknown",
-                    grid_spacing=(0.01, 0.01),
-                    grid_spacing_unit="meters",
-                    origin_coords=[1.0, 2.0, 3.0],
-                    origin_coords_units="meters",
-                )
+    return imaging_plane
 
 
-def add_data_to_nwb(session_key, nwbfile, raw_data):
+def add_data_to_nwb(session_key, nwbfile, raw_data, plane):
     if raw_data:
         imaging_data = get_image_files(session_key)
         frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
         two_p_series = TwoPhotonSeries(
             name="TwoPhotonSeries",
             data=imaging_data,
-            imaging_plane=imaging_plane,
+            imaging_plane=plane,
             rate=frame_rate,
             unit="raw fluorescence",
         )
     else:
         imaging_files = (scan.ScanInfo.ScanFile & session_key).fetch("file_path")
+        two_p_series = TwoPhotonSeries(
+            name="TwoPhotonSeries",
+            dimension=(scan.ScanInfo.Field & session_key).fetch1(
+                "px_height", "px_width"
+            ),
+            external_file=imaging_files,
+            imaging_plane=plane,
+            starting_frame=[0],
+            format="external",
+            starting_time=0.0,
+            rate=(scan.ScanInfo & session_key).fetch1("fps"),
+        )
 
 
 def add_motion_correction_to_nwb(session_key, nwbfile):
-    pass
+    raise NotImplementedError(
+        "Motion Correction data cannot be packaged into NWB at this time."
+    )
+
+
+def add_segmentation_data_to_nwb(session_key, nwbfile, plane):
+    ophys_module = nwbfile.create_processing_module(
+        name="ophys", description="optical physiology processed data"
+    )
+    img_seg = ImageSegmentation()
+    ps = img_seg.create_plane_segmentation(
+        name="PlaneSegmentation",
+        description="output from segmenting",
+        imaging_plane=plane,
+    )
+    ophys_module.add(img_seg)
+
+    mask_keys = (imaging.Segmentation.Mask & session_key).fetch("KEY")
+    for mask_key in mask_keys:
+        ps.add_roi(
+            image_mask=np.asarray(
+                (imaging.Segmentation.Mask() & mask_key).fetch1(
+                    "mask_xpix", "mask_ypix", "mask_weights"
+                )
+            )
+        )
+
+    rt_region = ps.create_roi_table_region(
+        region=((imaging.Segmentation.Mask & session_key).fetch("mask")).tolist(),
+        description="All ROIs from database.",
+    )
+
+    channels = (scan.ScanInfo & session_key).fetch1("nchannels")
+    for channel in range(channels):
+        roi_resp_series = RoiResponseSeries(
+            name=f"RoiResponseSeries{channel}",
+            data=np.stack(
+                (
+                    imaging.Fluorescence.Trace
+                    & session_key
+                    & f"fluo_channel='{channel}'"
+                ).fetch("fluorescence")
+            ).T,
+            rois=rt_region,
+            unit="a.u.",
+            rate=(scan.ScanInfo & session_key).fetch1("fps"),
+        )
+    fl = Fluorescence(roi_response_series=roi_resp_series)
+    ophys_module.add(fl)
 
 
 def imaging_session_to_nwb(
     session_key,
-    raw=True,
-    spikes=True,
-    lfp="source",
-    end_frame=None,
+    raw=False,
     lab_key=None,
     project_key=None,
     protocol_key=None,
@@ -111,13 +170,8 @@ def imaging_session_to_nwb(
     else:
         nwbfile = NWBFile(**nwbfile_kwargs)
 
-    add_scan_to_nwb(session_key, nwbfile, **nwbfile_kwargs)
-    add_data_to_nwb(session_key, nwbfile, raw_data=raw)
-
-    try:
-        (imaging.MotionCorrection & "scan_id='1'").fetch1("KEY")
-        add_motion_correction_to_nwb(session_key)
-    except DataJointError:
-        raise DataJointError(f"No motion correction data found for key {session_key}")
+    imaging_plane = add_scan_to_nwb(session_key, nwbfile)
+    add_data_to_nwb(session_key, nwbfile, raw_data=raw, plane=imaging_plane)
+    add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane)
 
     return nwbfile
