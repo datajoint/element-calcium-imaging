@@ -1,10 +1,7 @@
 import datajoint as dj
-from datetime import datetime
-from uuid import uuid4
-
 import numpy as np
-from dateutil.tz import tzlocal
 
+from datajoint import DataJointError
 from pynwb import NWBHDF5IO, NWBFile, TimeSeries
 from pynwb.image import ImageSeries
 from pynwb.ophys import (
@@ -19,6 +16,7 @@ from pynwb.ophys import (
 )
 
 from ... import imaging, scan
+from ...scan import get_image_files
 
 
 def add_scan_to_nwb(session_key, nwbfile):
@@ -55,7 +53,7 @@ def add_scan_to_nwb(session_key, nwbfile):
                 name=f"ImagingPlane{field_no+1}",
                 optical_channel=optical_channel,
                 imaging_rate=frame_rate,
-                description=scan_data["scan_notes"]
+                description=scan_notes
                 if scan_notes != ""
                 else f"Imaging plane for channel {channel+1}",
                 device=device,
