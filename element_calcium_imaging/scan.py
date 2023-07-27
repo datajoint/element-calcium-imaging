@@ -517,10 +517,10 @@ class ScanInfo(dj.Imported):
                     ]
                 )
         elif acq_software == "PrairieView":
-            from element_interface import prairieviewreader
+            from element_interface import prairie_view_loader
 
             scan_filepaths = get_image_files(key, "*.tif")
-            PVScan_info = prairieviewreader.get_pv_metadata(scan_filepaths[0])
+            PVScan_info = prairie_view_loader.get_prairieview_metadata(scan_filepaths[0])
             self.insert1(
                 dict(
                     key,
