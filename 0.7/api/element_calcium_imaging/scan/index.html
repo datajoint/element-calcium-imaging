@@ -17,7 +17,7 @@
         <link rel="next" href="../../../changelog/">
       
       <link rel="icon" href="../../../assets/images/company-logo-blue.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.19">
+      <meta name="generator" content="mkdocs-1.5.0, mkdocs-material-9.1.20">
     
     
       
@@ -2379,7 +2379,9 @@ scanimage)</p>
 <span class="normal">569</span>
 <span class="normal">570</span>
 <span class="normal">571</span>
-<span class="normal">572</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
 <span class="k">class</span> <span class="nc">ScanInfo</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Imported</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Information about the scan extracted from the recorded files.</span>
@@ -2706,10 +2708,12 @@ scanimage)</p>
                     <span class="p">]</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="n">acq_software</span> <span class="o">==</span> <span class="s2">&quot;PrairieView&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">element_interface</span> <span class="kn">import</span> <span class="n">prairieviewreader</span>
+            <span class="kn">from</span> <span class="nn">element_interface</span> <span class="kn">import</span> <span class="n">prairie_view_loader</span>
 
             <span class="n">scan_filepaths</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;*.tif&quot;</span><span class="p">)</span>
-            <span class="n">PVScan_info</span> <span class="o">=</span> <span class="n">prairieviewreader</span><span class="o">.</span><span class="n">get_pv_metadata</span><span class="p">(</span><span class="n">scan_filepaths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">PVScan_info</span> <span class="o">=</span> <span class="n">prairie_view_loader</span><span class="o">.</span><span class="n">get_prairieview_metadata</span><span class="p">(</span>
+                <span class="n">scan_filepaths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
                 <span class="nb">dict</span><span class="p">(</span>
                     <span class="n">key</span><span class="p">,</span>
@@ -3429,7 +3433,9 @@ software) containing this field - only relevant to mesoscale scans.</p>
 <span class="normal">569</span>
 <span class="normal">570</span>
 <span class="normal">571</span>
-<span class="normal">572</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Populate the ScanInfo with the information parsed from image files.&quot;&quot;&quot;</span>
 
     <span class="n">acq_software</span> <span class="o">=</span> <span class="p">(</span><span class="n">Scan</span> <span class="o">&amp;</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">fetch1</span><span class="p">(</span><span class="s2">&quot;acq_software&quot;</span><span class="p">)</span>
@@ -3661,10 +3667,12 @@ software) containing this field - only relevant to mesoscale scans.</p>
                 <span class="p">]</span>
             <span class="p">)</span>
     <span class="k">elif</span> <span class="n">acq_software</span> <span class="o">==</span> <span class="s2">&quot;PrairieView&quot;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">element_interface</span> <span class="kn">import</span> <span class="n">prairieviewreader</span>
+        <span class="kn">from</span> <span class="nn">element_interface</span> <span class="kn">import</span> <span class="n">prairie_view_loader</span>
 
         <span class="n">scan_filepaths</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;*.tif&quot;</span><span class="p">)</span>
-        <span class="n">PVScan_info</span> <span class="o">=</span> <span class="n">prairieviewreader</span><span class="o">.</span><span class="n">get_pv_metadata</span><span class="p">(</span><span class="n">scan_filepaths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">PVScan_info</span> <span class="o">=</span> <span class="n">prairie_view_loader</span><span class="o">.</span><span class="n">get_prairieview_metadata</span><span class="p">(</span>
+            <span class="n">scan_filepaths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">insert1</span><span class="p">(</span>
             <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">key</span><span class="p">,</span>
@@ -3780,9 +3788,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
             <details class="quote">
               <summary>Source code in <code>element_calcium_imaging/scan.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">577</span>
 <span class="normal">578</span>
 <span class="normal">579</span>
 <span class="normal">580</span>
@@ -3870,7 +3876,9 @@ software) containing this field - only relevant to mesoscale scans.</p>
 <span class="normal">662</span>
 <span class="normal">663</span>
 <span class="normal">664</span>
-<span class="normal">665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@schema</span>
 <span class="k">class</span> <span class="nc">ScanQualityMetrics</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Computed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metrics to assess the quality of the scan.</span>
 
@@ -4075,9 +4083,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
             <details class="quote">
               <summary>Source code in <code>element_calcium_imaging/scan.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">589</span>
 <span class="normal">590</span>
 <span class="normal">591</span>
 <span class="normal">592</span>
@@ -4095,7 +4101,9 @@ software) containing this field - only relevant to mesoscale scans.</p>
 <span class="normal">604</span>
 <span class="normal">605</span>
 <span class="normal">606</span>
-<span class="normal">607</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Frames</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Part</span><span class="p">):</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Frames</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">Part</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metrics used to evaluate each frame.</span>
 
 <span class="sd">    Attributes:</span>
