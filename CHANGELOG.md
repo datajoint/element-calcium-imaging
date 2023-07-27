@@ -7,8 +7,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 
 + Update - GitHub Actions to run every Monday at 8am
 + Update - Dev Container to install CaImAn and rename Docker image
-+ Update - Update `extras_require` to increment `element-interface` version
-+ Update - Update `extras_require` to include `caiman`, `sbxreader`, and `scanreader`
++ Update - `extras_require` to increment `element-interface` version
++ Update - `extras_require` to include `caiman`, `sbxreader`, and `scanreader`
 
 ## [0.7.8] - 2023-07-27
 
