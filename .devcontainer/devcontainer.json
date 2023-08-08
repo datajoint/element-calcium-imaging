@@ -23,7 +23,7 @@
 		"vscode": {
 			"extensions": [
 				"ms-python.python@2023.8.0",
-				"ms-toolsai.jupyter@2023.3.1201040234",
+				"ms-toolsai.jupyter@2023.3.1201040234"
 			]
 		}
 	}

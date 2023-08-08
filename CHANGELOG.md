@@ -3,7 +3,14 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [0.7.8] - 2023-07-23
+## [0.7.9] - 2023-07-27
+
++ Update - GitHub Actions to run every Monday at 8am
++ Update - Dev Container to install CaImAn and rename Docker image
++ Update - `extras_require` to increment `element-interface` version
++ Update - `extras_require` to include `caiman`, `sbxreader`, and `scanreader`
+
+## [0.7.8] - 2023-07-27
 
 + Update - import statement for `prairie_view_loader` in `scan.py`
 
@@ -160,6 +167,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.7.9]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.9
 [0.7.8]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.8
 [0.7.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.7
 [0.7.6]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.6

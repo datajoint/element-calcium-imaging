@@ -30,17 +30,11 @@ RUN \
 COPY ./ /tmp/element-calcium-imaging/
 
 RUN \
-    # workflow dependencies
-    # apt-get install gcc ffmpeg libsm6 libxext6 -y && \
-    # pip install --no-cache-dir Pygments==2.14.0  && \
-    # git clone https://github.com/datajoint/CaImAn.git  && \
-    # pip install --no-cache-dir -r ./CaImAn/requirements.txt  && \
-    # pip install --no-cache-dir ./CaImAn && \
-    pip install git+https://github.com/datajoint/sbxreader && \
-    pip install git+https://github.com/atlab/scanreader && \
-    pip install --no-cache-dir -e /tmp/element-calcium-imaging[elements,nd2,suite2p,tests] && \
+    # pipeline dependencies
+    apt-get install gcc g++ ffmpeg libsm6 libxext6 -y && \
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman_requirements] && \
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman,elements,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
-    # rm -rf /tmp/CaImAn && \
     rm -rf /tmp/element-calcium-imaging && \
     apt-get clean
 
