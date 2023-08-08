@@ -22,7 +22,7 @@ RUN \
     apt-get install sudo git bash-completion graphviz default-mysql-client s3fs procps -y && \
     usermod -aG sudo vscode && \
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    pip install --no-cache-dir --upgrade black pip && \
+    pip install --no-cache-dir --upgrade black pip nbconvert && \
     echo '. /etc/bash_completion' >> /home/vscode/.bashrc && \
     echo 'export PS1="\[\e[32;1m\]\u\[\e[m\]@\[\e[34;1m\]\H\[\e[m\]:\[\e[33;1m\]\w\[\e[m\]$ "' >> /home/vscode/.bashrc && \
     apt-get clean
@@ -32,8 +32,9 @@ COPY ./ /tmp/element-calcium-imaging/
 RUN \
     # pipeline dependencies
     apt-get install gcc g++ ffmpeg libsm6 libxext6 -y && \
-    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman_requirements] && \
-    pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman,elements,nd2,sbxreader,scanreader,suite2p,tests] && \
+    # pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman_requirements] && \
+    # pip install --no-cache-dir -e /tmp/element-calcium-imaging[caiman] && \
+    pip install --no-cache-dir -e /tmp/element-calcium-imaging[elements,nd2,sbxreader,scanreader,suite2p,tests] && \
     # clean up
     rm -rf /tmp/element-calcium-imaging && \
     apt-get clean
