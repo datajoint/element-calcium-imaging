@@ -616,9 +616,9 @@ class ScanQualityMetrics(dj.Computed):
             import scanreader
 
             # Switch from FYXCT to TCYX
-            data = scanreader.read_scan(scan_filepaths)[
-                key["field_idx"]
-            ].transpose(3, 2, 0, 1)
+            data = scanreader.read_scan(scan_filepaths)[key["field_idx"]].transpose(
+                3, 2, 0, 1
+            )
         elif acq_software == "Scanbox":
             from sbxreader import sbx_memmap
 
