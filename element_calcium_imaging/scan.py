@@ -109,7 +109,7 @@ def get_calcium_imaging_files(scan_key: dict, acq_software: str) -> list:
 
     Args:
         scan_key: Primary key of a Scan entry.
-        acq_software: Primary key of a AcquisitionSoftware entry (i.e. "ScanImage" "Scanbox", "NIS", or "PrairieView")
+        acq_software: name of the acquisition software, matching AcquisitionSoftware entry (i.e. "ScanImage" "Scanbox", "NIS", or "PrairieView")
 
     Returns:
         A list of full file paths.
