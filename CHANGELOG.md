@@ -3,6 +3,12 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.8.0] - 2023-08-08
+
++ Update - Rename `get_image_files` to `get_calcium_imaging_files`, and update arguments
++ Update - Remove CaImAn installation from the Dev Container due to memory limits of a free GitHub Codespace account
++ Update - Installation instructions
+
 ## [0.7.9] - 2023-07-27
 
 + Update - GitHub Actions to run every Monday at 8am
@@ -167,6 +173,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.8.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.8.0
 [0.7.9]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.9
 [0.7.8]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.8
 [0.7.7]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.7

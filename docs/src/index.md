@@ -27,11 +27,19 @@ schemas can be found in the [Data Pipeline](./pipeline.md) documentation page.
 
 ## Getting Started
 
-+ Install from PyPI
++ Please fork the [repository](https://github.com/datajoint/element-calcium-imaging){:target="_blank"}
 
-     ```bash
-     pip install element-calcium-imaging
-     ```
++ Clone the repository to your computer
+
+  ```bash
+  git clone https://github.com/<enter_github_username>/element-calcium-imaging
+  ```
+
++ Install with `pip`
+
+  ```bash
+  pip install -e .
+  ```
 
 + [Data Pipeline](./pipeline.md) - Pipeline and table descriptions
 
