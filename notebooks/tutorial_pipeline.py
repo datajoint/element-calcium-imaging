@@ -27,7 +27,7 @@ def get_imaging_root_data_dir():
 
 
 def get_calcium_imaging_files(scan_key, acq_software: str):
-    """Retrieve the list of absolute paths of the calcium imaging files associated with a given Scan and a given acquisition software (e.g. .tif, .sbx, etc.)."""
+    """Retrieve the list of absolute paths of the calcium imaging files associated with a given Scan and a given acquisition software (e.g. "ScanImage", "PrairieView", etc.)."""
     # Folder structure: root / subject / session / .tif or .sbx or .nd2
     session_dir = element_interface.utils.find_full_path(
         get_imaging_root_data_dir(),
