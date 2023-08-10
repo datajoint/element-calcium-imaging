@@ -6,6 +6,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 ## [0.8.0] - 2023-08-08
 
 + Update - Rename `get_image_files` to `get_calcium_imaging_files`, and update arguments
++ Update - Remove CaImAn installation from the Dev Container due to memory limits of a free GitHub Codespace account
++ Update - Installation instructions
 
 ## [0.7.9] - 2023-07-27
 
