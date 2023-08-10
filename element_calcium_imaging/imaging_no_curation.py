@@ -369,6 +369,7 @@ class Processing(dj.Computed):
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
+        acq_software = (scan.Scan & key).fetch1("acq_software")
 
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
@@ -452,8 +453,8 @@ class Processing(dj.Computed):
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
 
-                # handle multi-channel tiff image before running CaImAn
-                if nchannels > 1:
+                if acq_software == "ScanImage" and nchannels > 1:
+                    # handle multi-channel tiff image before running CaImAn
                     channel_idx = caiman_params.get("channel_to_process", 0)
                     tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
                     tmp_dir.mkdir(exist_ok=True)
