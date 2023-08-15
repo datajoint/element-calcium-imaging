@@ -1,8 +1,9 @@
+import pathlib
 import datajoint as dj
 import numpy as np
 
 from datajoint import DataJointError
-from pynwb import NWBHDF5IO, NWBFile, TimeSeries
+from pynwb import NWBHDF5IO, NWBFile
 from pynwb.image import ImageSeries
 from pynwb.ophys import (
     CorrectedImageStack,
@@ -16,7 +17,7 @@ from pynwb.ophys import (
 )
 
 from ... import imaging, scan
-from ...scan import get_image_files
+from ...scan import get_imaging_root_data_dir, get_image_files
 
 
 def add_scan_to_nwb(session_key, nwbfile):
@@ -70,15 +71,63 @@ def add_scan_to_nwb(session_key, nwbfile):
 
 def add_data_to_nwb(session_key, nwbfile, raw_data, plane):
     if raw_data:
-        imaging_data = get_image_files(session_key)
-        frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
-        two_p_series = TwoPhotonSeries(
-            name="TwoPhotonSeries",
-            data=imaging_data,
-            imaging_plane=plane,
-            rate=frame_rate,
-            unit="raw fluorescence",
+        from element_interface.utils import find_full_path
+
+        acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
+        output_dir = (imaging.ProcessingTask & session_key).fetch1(
+            "processing_output_dir"
         )
+
+        save_path = get_imaging_root_data_dir() / pathlib.Path(output_dir)
+
+        if acquisition_software == "ScanImage":
+            from neuroconv.datainterfaces import ScanImageImagingInterface
+
+            imaging_data_location = get_image_files(session_key)
+            scanimage_interface = ScanImageImagingInterface(
+                file_path=imaging_data_location[0],
+                fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1("fps"),
+            )
+            scanimage_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
+
+            with NWBHDF5IO((save_path / "nwbfile"), "r+") as io:
+                nwbfile = io.read()
+
+            # frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
+            # two_p_series = TwoPhotonSeries(
+            #     name="TwoPhotonSeries",
+            #     data=imaging_data,
+            #     imaging_plane=plane,
+            #     rate=frame_rate,
+            #     unit="raw fluorescence",
+            # )
+        elif acquisition_software == "PrairieView":
+            from neuroconv.datainterfaces import BrukerTiffImagingInterface
+
+            imaging_data_location = get_image_files(session_key)
+            for file in imaging_data_location:
+                bruker_tiff_interface = BrukerTiffImagingInterface(
+                    file_path=file,
+                    fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1(
+                        "fps"
+                    ),
+                )
+            bruker_tiff_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
+
+        elif acquisition_software == "Scanbox":
+            from neuroconv.datainterfaces import SbxImagingInterface
+
+            imaging_data_location = get_image_files(session_key)
+            sbx_interface = SbxImagingInterface(
+                file_path=imaging_data_location[0],
+                fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1("fps"),
+            )
+            sbx_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
+        elif acquisition_software == "NIS":
+            raise NotImplementedError(
+                "Exporting raw data from .nd2 files to NWB files is not supported yet. Please set `raw=False` and try again."
+            )
+
     else:
         imaging_files = (scan.ScanInfo.ScanFile & session_key).fetch("file_path")
         two_p_series = TwoPhotonSeries(
@@ -131,7 +180,7 @@ def add_segmentation_data_to_nwb(session_key, nwbfile, plane):
     channels = (scan.ScanInfo & session_key).fetch1("nchannels")
     for channel in range(channels):
         roi_resp_series = RoiResponseSeries(
-            name=f"RoiResponseSeries{channel}",
+            name=f"RoiFluorescenceSeries{channel}",
             data=np.stack(
                 (
                     imaging.Fluorescence.Trace
