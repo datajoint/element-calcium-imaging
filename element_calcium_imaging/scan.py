@@ -117,6 +117,17 @@ def get_calcium_imaging_files(scan_key: dict, acq_software: str) -> list:
     return _linking_module.get_calcium_imaging_files(scan_key, acq_software)
 
 
+def get_zstack_files(scan_key: dict) -> list:
+    """Retrieve the list of zstack files associated with a given Scan.
+    Args:
+        scan_key: Primary key of a Scan entry.
+    Returns:
+        A list of zstack files' full file-paths.
+    """
+
+    return _linking_module.get_zstack_files(scan_key)
+
+
 # ----------------------------- Table declarations ----------------------
 
 
