@@ -401,6 +401,7 @@ class Processing(dj.Computed):
             method = (ProcessingParamSet * ProcessingTask & key).fetch1(
                 "processing_method"
             )
+            acq_software = (scan.Scan & key).fetch1("acq_software")
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -446,33 +447,70 @@ class Processing(dj.Computed):
                     "fps", "ndepths", "nchannels"
                 )
 
-                is3D = bool(ndepths > 1)
+                is3D = caiman_params.get("is3D", False)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not yet capable of analyzing 3D scans."
+                        "Analyzing 3D scans using CaImAn is not yet supported in this pipeline."
                     )
 
-                # handle multi-channel tiff image before running CaImAn
-                if nchannels > 1:
-                    channel_idx = caiman_params.get("channel_to_process", 0)
-                    tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
-                    tmp_dir.mkdir(exist_ok=True)
-                    _process_scanimage_tiff(
-                        [f.as_posix() for f in image_files], output_dir=tmp_dir
+                channel = caiman_params.get("channel_to_process", 0)
+
+                if ndepths == 1:  # single-plane processing
+                    if nchannels > 1:
+                        if acq_software == "ScanImage":
+                            # handle multi-channel tiff image before running CaImAn
+                            tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
+                            tmp_dir.mkdir(exist_ok=True)
+                            _process_scanimage_tiff(
+                                [f.as_posix() for f in image_files], output_dir=tmp_dir
+                            )
+                            image_files = tmp_dir.glob(f"*_chn{channel}.tif")
+                        elif acq_software == "PrairieView":
+                            from element_interface import PrairieViewMeta
+
+                            pv_dir = pathlib.Path(image_files[0]).parent
+                            PVmeta = PrairieViewMeta(pv_dir)
+                            image_files = [
+                                pv_dir / f
+                                for f in PVmeta.get_prairieview_files(
+                                    channel=caiman_params.get("channel_to_process", 0),
+                                )
+                            ]
+
+                    run_caiman(
+                        file_paths=[f.as_posix() for f in image_files],
+                        parameters=caiman_params,
+                        sampling_rate=sampling_rate,
+                        output_dir=output_dir,
+                        is3D=is3D,
                     )
-                    image_files = tmp_dir.glob(f"*_chn{channel_idx}.tif")
 
-                run_caiman(
-                    file_paths=[f.as_posix() for f in image_files],
-                    parameters=caiman_params,
-                    sampling_rate=sampling_rate,
-                    output_dir=output_dir,
-                    is3D=is3D,
-                )
+                    _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                    caiman_dataset = imaging_dataset
+                    key["processing_time"] = caiman_dataset.creation_time
+                else:  # multi-plane processing
+                    # per-plane processing with CaImAn
+                    if acq_software == "ScanImage":
+                        raise NotImplementedError(
+                            "Multi-plane processing using CaImAn for ScanImage scans is not yet supported in this pipeline."
+                        )
+                    elif acq_software == "PrairieView":
+                        from element_interface import PrairieViewMeta
 
-                _, imaging_dataset = get_loader_result(key, ProcessingTask)
-                caiman_dataset = imaging_dataset
-                key["processing_time"] = caiman_dataset.creation_time
+                        pv_dir = pathlib.Path(image_files[0]).parent
+                        PVmeta = PrairieViewMeta(pv_dir)
+
+                        for plane_idx in PVmeta.meta["plane_indices"]:
+                            pln_output_dir = output_dir / f"pln{plane_idx}_chn{channel}"
+                            pln_output_dir.mkdir(parents=True, exist_ok=True)
+                            PerPlaneProcessingTask.insert1(
+                                {
+                                    **key,
+                                    "plane_idx": plane_idx,
+                                    "processing_output_dir": pln_output_dir,
+                                }
+                            )
+                        return
 
             elif method == "extract":
                 import suite2p
@@ -1577,12 +1615,96 @@ class ProcessingQualityMetrics(dj.Computed):
         )
 
 
+# ---------------- Multi-plane Processing (per-plane basis) ----------------
+
+
+@schema
+class PerPlaneProcessingTask(dj.Manual):
+    definition = """
+    -> ProcessingTask
+    plane_idx: int
+    ---
+    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
+    """
+
+
+@schema
+class PerPlaneProcessing(dj.Computed):
+    definition = """
+    -> PerPlaneProcessingTask
+    ---
+    processing_time     : datetime  # Time of generation of this set of processed, segmented results
+    package_version=''  : varchar(16)
+    channel=''          : int  # Channel used for this processing
+    """
+
+    def make(self, key):
+        output_dir = (PerPlaneProcessingTask & key).fetch1("processing_output_dir")
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+
+        acq_software = (scan.Scan & key).fetch1("acq_software")
+        params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+            "params", "processing_method"
+        )
+        plane_idx = key["plane_idx"]
+        caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+        sampling_rate = (scan.ScanInfo & key).fetch1("fps")
+        channel = params.get("channel_to_process", 0)
+
+        if acq_software == "PrairieView":
+            from element_interface import PrairieViewMeta
+
+            image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
+            image_file = find_full_path(get_imaging_root_data_dir(), image_file)
+            pv_dir = pathlib.Path(image_file).parent
+            PVmeta = PrairieViewMeta(pv_dir)
+
+            channel = (
+                channel
+                if PVmeta.meta["num_channels"] > 1
+                else PVmeta.meta["channels"][0]
+            )
+            image_files = [
+                pv_dir / f
+                for f in PVmeta.get_prairieview_files(
+                    plane_idx=plane_idx,
+                    channel=channel,
+                )
+            ]
+        else:
+            raise NotImplementedError(
+                f"Per-plane processing for {acq_software} scans is not yet supported in this pipeline."
+            )
+
+        if method == "caiman":
+            from element_interface.run_caiman import run_caiman
+
+            run_caiman(
+                file_paths=[f.as_posix() for f in image_files],
+                parameters=caiman_params,
+                sampling_rate=sampling_rate,
+                output_dir=output_dir,
+                is3D=False,
+            )
+        else:
+            raise NotImplementedError(
+                f"Per-plane processing using {method} is not yet supported in this pipeline."
+            )
+
+        _, imaging_dataset = get_loader_result(key, PerPlaneProcessingTask)
+        caiman_dataset = imaging_dataset
+        key["processing_time"] = caiman_dataset.creation_time
+
+        self.insert1({**key, "package_version": "", "channel": channel})
+
+
 # ---------------- HELPER FUNCTIONS ----------------
 
 
 _table_attribute_mapper = {
     "ProcessingTask": "processing_output_dir",
     "Curation": "curation_output_dir",
+    "PerPlaneProcessingTask": "processing_output_dir",
 }
 
 
