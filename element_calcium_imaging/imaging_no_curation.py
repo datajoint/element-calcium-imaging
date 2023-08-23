@@ -360,8 +360,13 @@ class Processing(dj.Computed):
     def key_source(self):
         """Limit the Processing to Scans that have their metadata ingested to the
         database."""
-
-        return ProcessingTask & scan.ScanInfo
+        ks = ProcessingTask & scan.ScanInfo
+        per_plane_proc = (
+            ProcessingTask.aggr(PerPlaneProcessingTask, task_count="count(*)")
+            * ProcessingTask.aggr(PerPlaneProcessing, finished_task_count="count(*)")
+            & "task_count = finished_task_count"
+        )
+        return ks & per_plane_proc
 
     def make(self, key):
         """Execute the calcium imaging analysis defined by the ProcessingTask."""
@@ -508,17 +513,29 @@ class Processing(dj.Computed):
                             else PVmeta.meta["channels"][0]
                         )
 
+                        plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
                             pln_output_dir = output_dir / f"pln{plane_idx}_chn{channel}"
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
-                            PerPlaneProcessingTask.insert1(
+                            plane_processing_tasks.append(
                                 {
                                     **key,
                                     "plane_idx": plane_idx,
                                     "processing_output_dir": pln_output_dir,
                                 }
                             )
-                        return
+
+                        if len(
+                            PerPlaneProcessing.proj() & plane_processing_tasks
+                        ) == len(plane_processing_tasks):
+                            _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                            caiman_dataset = imaging_dataset
+                            key["processing_time"] = caiman_dataset.creation_time
+                        else:
+                            PerPlaneProcessingTask.insert(
+                                plane_processing_tasks, skip_duplicates=True
+                            )
+                            return
 
             elif method == "extract":
                 import suite2p
