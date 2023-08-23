@@ -495,10 +495,18 @@ class Processing(dj.Computed):
                             "Multi-plane processing using CaImAn for ScanImage scans is not yet supported in this pipeline."
                         )
                     elif acq_software == "PrairieView":
+                        # Generate separate processing task for each plane - in `PerPlaneProcessingTask`
+                        # if all `PerPlaneProcessingTask` for this key are done - ingest the results
                         from element_interface import PrairieViewMeta
 
                         pv_dir = pathlib.Path(image_files[0]).parent
                         PVmeta = PrairieViewMeta(pv_dir)
+
+                        channel = (
+                            channel
+                            if PVmeta.meta["num_channels"] > 1
+                            else PVmeta.meta["channels"][0]
+                        )
 
                         for plane_idx in PVmeta.meta["plane_indices"]:
                             pln_output_dir = output_dir / f"pln{plane_idx}_chn{channel}"
@@ -673,7 +681,7 @@ class MotionCorrection(dj.Imported):
         block_z         : longblob  # (z_start, z_end) in pixel of this block
         y_shifts        : longblob  # (pixels) y motion correction shifts for every frame
         x_shifts        : longblob  # (pixels) x motion correction shifts for every frame
-        z_shifts=null   : longblob  # (pixels) x motion correction shifts for every frame
+        z_shifts=null   : longblob  # (pixels) z motion correction shifts for every frame
         y_std           : float     # (pixels) standard deviation of y shifts across all frames
         x_std           : float     # (pixels) standard deviation of x shifts across all frames
         z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
@@ -1640,19 +1648,19 @@ class PerPlaneProcessing(dj.Computed):
 
     def make(self, key):
         output_dir = (PerPlaneProcessingTask & key).fetch1("processing_output_dir")
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
 
+        plane_idx = key["plane_idx"]
         acq_software = (scan.Scan & key).fetch1("acq_software")
         params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
             "params", "processing_method"
         )
-        plane_idx = key["plane_idx"]
         caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
         sampling_rate = (scan.ScanInfo & key).fetch1("fps")
         channel = params.get("channel_to_process", 0)
 
         if acq_software == "PrairieView":
-            from element_interface import PrairieViewMeta
+            from element_interface.prairie_view_loader import PrairieViewMeta
 
             image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
             image_file = find_full_path(get_imaging_root_data_dir(), image_file)
@@ -1664,13 +1672,23 @@ class PerPlaneProcessing(dj.Computed):
                 if PVmeta.meta["num_channels"] > 1
                 else PVmeta.meta["channels"][0]
             )
-            image_files = [
-                pv_dir / f
-                for f in PVmeta.get_prairieview_files(
-                    plane_idx=plane_idx,
-                    channel=channel,
-                )
-            ]
+            if method == "caiman":
+                image_files = [
+                    PVmeta.write_single_tiff(
+                        plane_idx=plane_idx,
+                        channel=channel,
+                        output_dir=output_dir.parent,
+                        caiman_compatible=True,
+                    )
+                ]
+            else:
+                image_files = [
+                    pv_dir / f
+                    for f in PVmeta.get_prairieview_filenames(
+                        plane_idx=plane_idx,
+                        channel=channel,
+                    )
+                ]
         else:
             raise NotImplementedError(
                 f"Per-plane processing for {acq_software} scans is not yet supported in this pipeline."
@@ -1683,7 +1701,7 @@ class PerPlaneProcessing(dj.Computed):
                 file_paths=[f.as_posix() for f in image_files],
                 parameters=caiman_params,
                 sampling_rate=sampling_rate,
-                output_dir=output_dir,
+                output_dir=output_dir.as_posix(),
                 is3D=False,
             )
         else:
