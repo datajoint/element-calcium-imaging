@@ -502,7 +502,9 @@ class Processing(dj.Computed):
                     elif acq_software == "PrairieView":
                         # Generate separate processing task for each plane - in `PerPlaneProcessingTask`
                         # if all `PerPlaneProcessingTask` for this key are done - ingest the results
-                        from element_interface import PrairieViewMeta
+                        from element_interface.prairie_view_loader import (
+                            PrairieViewMeta,
+                        )
 
                         pv_dir = pathlib.Path(image_files[0]).parent
                         PVmeta = PrairieViewMeta(pv_dir)
