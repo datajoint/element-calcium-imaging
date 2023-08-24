@@ -366,7 +366,7 @@ class Processing(dj.Computed):
             * ProcessingTask.aggr(PerPlaneProcessing.proj(), finished_task_count="count(*)")
             & "task_count = finished_task_count"
         )
-        return ks & per_plane_proc
+        return ks - per_plane_proc
 
     def make(self, key):
         """Execute the calcium imaging analysis defined by the ProcessingTask."""
