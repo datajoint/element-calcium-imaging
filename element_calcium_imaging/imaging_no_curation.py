@@ -1693,7 +1693,7 @@ class PerPlaneProcessing(dj.Computed):
             )
             if method == "caiman":
                 image_files = [
-                    PVmeta.write_single_tiff(
+                    PVmeta.write_single_bigtiff(
                         plane_idx=plane_idx,
                         channel=channel,
                         output_dir=output_dir.parent,
