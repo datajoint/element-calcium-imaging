@@ -362,8 +362,8 @@ class Processing(dj.Computed):
         database."""
         ks = ProcessingTask & scan.ScanInfo
         per_plane_proc = (
-            ProcessingTask.aggr(PerPlaneProcessingTask, task_count="count(*)")
-            * ProcessingTask.aggr(PerPlaneProcessing, finished_task_count="count(*)")
+            ProcessingTask.aggr(PerPlaneProcessingTask.proj(), task_count="count(*)")
+            * ProcessingTask.aggr(PerPlaneProcessing.proj(), finished_task_count="count(*)")
             & "task_count = finished_task_count"
         )
         return ks & per_plane_proc
