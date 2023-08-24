@@ -3,6 +3,7 @@ import datajoint as dj
 import numpy as np
 
 from datajoint import DataJointError
+from element_interface.utils import find_full_path
 from pynwb import NWBHDF5IO, NWBFile
 from pynwb.image import ImageSeries
 from pynwb.ophys import (
@@ -15,6 +16,7 @@ from pynwb.ophys import (
     RoiResponseSeries,
     TwoPhotonSeries,
 )
+from neuroconv import ConverterPipe
 
 from ... import imaging, scan
 from ...scan import get_imaging_root_data_dir, get_image_files
@@ -69,79 +71,87 @@ def add_scan_to_nwb(session_key, nwbfile):
     return imaging_plane
 
 
-def add_data_to_nwb(session_key, nwbfile, raw_data, plane):
-    if raw_data:
-        from element_interface.utils import find_full_path
+def rawdata_to_nwb(session_key, output_directory, nwb_path):
 
-        acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
-        output_dir = (imaging.ProcessingTask & session_key).fetch1(
-            "processing_output_dir"
+    acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
+    session_paramset_key = (imaging.ProcessingTask & session_key).fetch1("paramset_idx")
+    processing_method = (
+        imaging.ProcessingParamSet & f"paramset_idx='{session_paramset_key}'"
+    ).fetch1("processing_method")
+
+    if acquisition_software == "ScanImage" and processing_method == "suite2p":
+        from neuroconv.datainterfaces import (
+            ScanImageImagingInterface,
+            Suite2pSegmentationInterface,
         )
 
-        save_path = get_imaging_root_data_dir() / pathlib.Path(output_dir)
-
-        if acquisition_software == "ScanImage":
-            from neuroconv.datainterfaces import ScanImageImagingInterface
-
-            imaging_data_location = get_image_files(session_key)
-            scanimage_interface = ScanImageImagingInterface(
-                file_path=imaging_data_location[0],
-                fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1("fps"),
-            )
-            scanimage_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
-
-            with NWBHDF5IO((save_path / "nwbfile"), "r+") as io:
-                nwbfile = io.read()
-
-            # frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
-            # two_p_series = TwoPhotonSeries(
-            #     name="TwoPhotonSeries",
-            #     data=imaging_data,
-            #     imaging_plane=plane,
-            #     rate=frame_rate,
-            #     unit="raw fluorescence",
-            # )
-        elif acquisition_software == "PrairieView":
-            from neuroconv.datainterfaces import BrukerTiffImagingInterface
-
-            imaging_data_location = get_image_files(session_key)
-            for file in imaging_data_location:
-                bruker_tiff_interface = BrukerTiffImagingInterface(
-                    file_path=file,
-                    fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1(
-                        "fps"
-                    ),
-                )
-            bruker_tiff_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
-
-        elif acquisition_software == "Scanbox":
-            from neuroconv.datainterfaces import SbxImagingInterface
-
-            imaging_data_location = get_image_files(session_key)
-            sbx_interface = SbxImagingInterface(
-                file_path=imaging_data_location[0],
-                fallback_sampling_frequency=(scan.ScanInfo & session_key).fetch1("fps"),
-            )
-            sbx_interface.run_conversion(nwbfile_path=(save_path / "nwbfile"))
-        elif acquisition_software == "NIS":
-            raise NotImplementedError(
-                "Exporting raw data from .nd2 files to NWB files is not supported yet. Please set `raw=False` and try again."
-            )
-
-    else:
-        imaging_files = (scan.ScanInfo.ScanFile & session_key).fetch("file_path")
-        two_p_series = TwoPhotonSeries(
-            name="TwoPhotonSeries",
-            dimension=(scan.ScanInfo.Field & session_key).fetch1(
-                "px_height", "px_width"
-            ),
-            external_file=imaging_files,
-            imaging_plane=plane,
-            starting_frame=[0],
-            format="external",
-            starting_time=0.0,
-            rate=(scan.ScanInfo & session_key).fetch1("fps"),
+        processing_folder_location = pathlib.Path(output_directory).as_posix()
+        raw_data_files_location = get_image_files(session_key, "*.tif")
+        scan_interface = ScanImageImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
         )
+        s2p_interface = Suite2pSegmentationInterface(
+            folder_path=processing_folder_location
+        )
+        converter = ConverterPipe(data_interfaces=[scan_interface, s2p_interface])
+
+    elif acquisition_software == "ScanImage" and processing_method == "CaImAn":
+        from neuroconv.datainterfaces import (
+            ScanImageImagingInterface,
+            CaimanSegmentationInterface,
+        )
+
+        caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
+        scan_interface = ScanImageImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
+        converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
+
+    elif acquisition_software == "Scanbox" and processing_method == "suite2p":
+        from neuroconv.datainterfaces import (
+            SbxImagingInterface,
+            Suite2pSegmentationInterface,
+        )
+
+        scan_interface = SbxImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        s2p_interface = Suite2pSegmentationInterface(
+            folder_path=processing_folder_location
+        )
+        converter = ConverterPipe(data_interfaces=[scan_interface, s2p_interface])
+
+    elif acquisition_software == "Scanbox" and processing_method == "CaImAn":
+        from neuroconv.datainterfaces import (
+            SbxImagingInterface,
+            CaimanSegmentationInterface,
+        )
+
+        caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
+        scan_interface = SbxImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
+        converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
+
+    metadata = converter.get_metadata()
+    metadata["NWBFile"].update(session_description="DataJoint Session")
+    converter.run_conversion(nwbfile_path=(nwb_path / "nwbfile"), metadata=metadata)
+
+
+def add_image_series_to_nwb(session_key, plane):
+    imaging_files = (scan.ScanInfo.ScanFile & session_key).fetch("file_path")
+    two_p_series = TwoPhotonSeries(
+        name="TwoPhotonSeries",
+        dimension=(scan.ScanInfo.Field & session_key).fetch1("px_height", "px_width"),
+        external_file=imaging_files,
+        imaging_plane=plane,
+        starting_frame=[0],
+        format="external",
+        starting_time=0.0,
+        rate=(scan.ScanInfo & session_key).fetch1("fps"),
+    )
 
 
 def add_motion_correction_to_nwb(session_key, nwbfile):
@@ -198,7 +208,9 @@ def add_segmentation_data_to_nwb(session_key, nwbfile, plane):
 
 def imaging_session_to_nwb(
     session_key,
+    save_path=None,
     raw=False,
+    processed_data_source="database" or "filesystem",
     lab_key=None,
     project_key=None,
     protocol_key=None,
@@ -206,19 +218,54 @@ def imaging_session_to_nwb(
 ):
     session_to_nwb = getattr(imaging._linking_module, "session_to_nwb", False)
 
-    if session_to_nwb:
-        nwbfile = session_to_nwb(
-            session_key,
-            lab_key=lab_key,
-            project_key=project_key,
-            protocol_key=protocol_key,
-            additional_nwbfile_kwargs=nwbfile_kwargs,
+    output_relative_dir = (imaging.ProcessingTask & session_key).fetch1(
+        "processing_output_dir"
+    )
+    output_dir = find_full_path(get_imaging_root_data_dir(), output_relative_dir)
+
+    if not save_path:
+        output_relative_dir = (imaging.ProcessingTask & session_key).fetch1(
+            "processing_output_dir"
         )
+        save_path = find_full_path(get_imaging_root_data_dir(), output_relative_dir)
+
+    if raw:
+        rawdata_to_nwb(session_key, output_directory=output_dir, nwb_path=save_path)
+        with NWBHDF5IO((save_path / "nwbfile"), mode="r+") as io:
+            nwb_file = io.read()
+            if session_to_nwb:
+                nwb_file = session_to_nwb(
+                    session_key,
+                    lab_key=lab_key,
+                    project_key=project_key,
+                    protocol_key=protocol_key,
+                    additional_nwbfile_kwargs=nwbfile_kwargs,
+                )
+                io.write(nwb_file)
+            else:
+                if "Subject" in nwbfile_kwargs:
+                    from pynwb.file import Subject
+                    nwb_file.subject = Subject(**nwbfile_kwargs["Subject"])
+                else:
+                    nwb_file = NWBFile(**nwbfile_kwargs)
+                io.write(nwb_file)
     else:
-        nwbfile = NWBFile(**nwbfile_kwargs)
+        if session_to_nwb:
+            nwb_file = session_to_nwb(
+                session_key,
+                lab_key=lab_key,
+                project_key=project_key,
+                protocol_key=protocol_key,
+                additional_nwbfile_kwargs=nwbfile_kwargs,
+            )
+        else:
+            nwb_file = NWBFile(**nwbfile_kwargs)
 
-    imaging_plane = add_scan_to_nwb(session_key, nwbfile)
-    add_data_to_nwb(session_key, nwbfile, raw_data=raw, plane=imaging_plane)
-    add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane)
+        imaging_plane = add_scan_to_nwb(session_key, nwbfile=nwb_file)
+        add_image_series_to_nwb(session_key, plane=imaging_plane)
+        add_segmentation_data_to_nwb(session_key, nwbfile=nwb_file, plane=imaging_plane)
 
-    return nwbfile
+        return nwb_file
+
+
+## TODO: Add a `from_source` flag as with ephys NWB with options for 

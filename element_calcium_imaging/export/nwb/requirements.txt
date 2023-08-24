@@ -1,3 +1,3 @@
 dandi
 pynwb
-neuroconv[scanimage, brukertiff, scanbox]
+neuroconv[scanimage, brukertiff, scanbox, caiman, suite2p]
