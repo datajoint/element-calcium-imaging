@@ -1662,7 +1662,7 @@ class PerPlaneProcessing(dj.Computed):
     ---
     processing_time     : datetime  # Time of generation of this set of processed, segmented results
     package_version=''  : varchar(16)
-    channel=''          : int  # Channel used for this processing
+    channel=null          : int  # Channel used for this processing
     """
 
     def make(self, key):
