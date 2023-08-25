@@ -59,6 +59,22 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
 
+    elif acquisition_software == "ScanImage" and processing_method == "extract":
+        from neuroconv.datainterfaces import (
+            ScanImageImagingInterface,
+            ExtractSegmentationInterface,
+        )
+
+        processing_file_location = pathlib.Path(output_directory).as_posix()
+        raw_data_files_location = get_image_files(session_key, "*.tif")
+        scan_interface = ScanImageImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        extract_interface = Suite2pSegmentationInterface(
+            file_path=processing_file_location
+        )
+        converter = ConverterPipe(data_interfaces=[scan_interface, extract_interface])
+
     elif acquisition_software == "Scanbox" and processing_method == "suite2p":
         from neuroconv.datainterfaces import (
             SbxImagingInterface,
