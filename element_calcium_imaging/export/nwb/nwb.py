@@ -136,7 +136,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
         converter = ConverterPipe(data_interfaces=[bruker_interface, s2p_interface])
 
-        elif acquisition_software == "PrairieView" and processing_method == "caiman":
+    elif acquisition_software == "PrairieView" and processing_method == "caiman":
         n_planes = (scan.ScanInfo & session_key).fetch1("ndepths")
         if n_planes > 1:
             from neuroconv.datainterfaces import BrukerTiffMultiPlaneConverter as BrukerTiffConverter
@@ -153,7 +153,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         converter = ConverterPipe(data_interfaces=[bruker_interface, caiman_interface])
 
-        elif acquisition_software == "PrairieView" and processing_method == "extract":
+    elif acquisition_software == "PrairieView" and processing_method == "extract":
         n_planes = (scan.ScanInfo & session_key).fetch1("ndepths")
         if n_planes > 1:
             from neuroconv.datainterfaces import BrukerTiffMultiPlaneConverter as BrukerTiffConverter
@@ -161,7 +161,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
             from neuroconv.datainterfaces import BrukerTiffSinglePlaneConverter as BrukerTiffConverter
         from neuroconv.datainterfaces import ExtractSegmentationInterface
 
-        processing_folder_location = pathlib.Path(output_directory).as_posix()
+        processing_file_location = pathlib.Path(output_directory).as_posix()
         raw_data_files_location = get_image_files(session_key, "*.tif")
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=30, **bruker_kwargs
@@ -174,6 +174,40 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
     metadata = converter.get_metadata()
     metadata["NWBFile"].update(session_description="DataJoint Session")
     converter.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
+
+def create_processed_data_nwbfile(session_key, output_directory, nwb_path):
+    session_paramset_key = (imaging.ProcessingTask & session_key).fetch1("paramset_idx")
+    processing_method = (
+        imaging.ProcessingParamSet & f"paramset_idx='{session_paramset_key}'"
+    ).fetch1("processing_method")
+
+    if processing_method == "suite2p":
+        from neuroconv.datainterfaces import Suite2pSegmentationInterface
+        
+        s2p_interface = Suite2pSegmentationInterface(
+            folder_path=processing_folder_location
+        )
+        metadata = interface.get_metadata()
+        s2p_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
+    
+    elif processing_method == "caiman":
+        from neuroconv.datainterfaces import CaimanSegmentationInterface
+
+        processing_folder_location = pathlib.Path(output_directory).as_posix()
+        caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
+        caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
+        metadata = caiman_interface.get_metadata()
+        caiman_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
+
+    elif processing_method == "extract":
+        from neuroconv.datainterfaces import ExtractSegmentationInterface
+
+        processing_file_location = pathlib.Path(output_directory).as_posix()
+        extract_interface = ExtractSegmentationInterface(
+            file_path=processing_file_location
+        )
+        metadata = extract_interface.get_metadata()
+        extract_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
 
 
 def add_scan_to_nwb(session_key, nwbfile):
@@ -383,8 +417,8 @@ def imaging_session_to_nwb(
             add_segmentation_data_to_nwb(session_key, nwbfile=nwb_file, imaging_plane=imaging_plane)
 
             return nwb_file
+        
         elif processed_data_source == "filesystem":
             create_processed_data_nwbfile(session_key, output_directory=output_dir, nwb_path=save_path)
-
 
 ## TODO: Add a `from_source` flag as with ephys NWB with options for 
