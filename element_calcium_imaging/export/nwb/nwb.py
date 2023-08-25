@@ -25,6 +25,9 @@ from ...scan import get_imaging_root_data_dir, get_image_files
 def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
 
     acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
+    if acquisition_software == "NIS":
+        raise NotImplementedError("Packaging raw data from Nikon NIS acquisition software (.nd2 file format) is not currently supported.")
+
     session_paramset_key = (imaging.ProcessingTask & session_key).fetch1("paramset_idx")
     processing_method = (
         imaging.ProcessingParamSet & f"paramset_idx='{session_paramset_key}'"
@@ -188,7 +191,7 @@ def create_processed_data_nwbfile(session_key, output_directory, nwb_path):
             folder_path=processing_folder_location
         )
         metadata = interface.get_metadata()
-        s2p_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
+        s2p_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
     
     elif processing_method == "caiman":
         from neuroconv.datainterfaces import CaimanSegmentationInterface
@@ -197,7 +200,7 @@ def create_processed_data_nwbfile(session_key, output_directory, nwb_path):
         caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         metadata = caiman_interface.get_metadata()
-        caiman_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
+        caiman_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
 
     elif processing_method == "extract":
         from neuroconv.datainterfaces import ExtractSegmentationInterface
@@ -207,7 +210,7 @@ def create_processed_data_nwbfile(session_key, output_directory, nwb_path):
             file_path=processing_file_location
         )
         metadata = extract_interface.get_metadata()
-        extract_interface.run_conversion(nwbfile_path=nwb_path, metadata=metadata)
+        extract_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
 
 
 def add_scan_to_nwb(session_key, nwbfile):
@@ -420,5 +423,21 @@ def imaging_session_to_nwb(
         
         elif processed_data_source == "filesystem":
             create_processed_data_nwbfile(session_key, output_directory=output_dir, nwb_path=save_path)
-
-## TODO: Add a `from_source` flag as with ephys NWB with options for 
+            with NWBHDF5IO((save_path / f'{session_key["subject"]}_nwbfile'), mode="r+") as io:
+            nwb_file = io.read()
+            if session_to_nwb:
+                nwb_file = session_to_nwb(
+                    session_key,
+                    lab_key=lab_key,
+                    project_key=project_key,
+                    protocol_key=protocol_key,
+                    additional_nwbfile_kwargs=nwbfile_kwargs,
+                )
+                io.write(nwb_file)
+            else:
+                if "Subject" in nwbfile_kwargs:
+                    from pynwb.file import Subject
+                    nwb_file.subject = Subject(**nwbfile_kwargs["Subject"])
+                else:
+                    nwb_file = NWBFile(**nwbfile_kwargs)
+                io.write(nwb_file)
