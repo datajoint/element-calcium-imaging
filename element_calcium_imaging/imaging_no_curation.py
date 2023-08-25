@@ -517,7 +517,7 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = pathlib.Path(output_dir + f"/pln{plane_idx}_chn{channel}").as_posix()
+                            pln_output_dir = pathlib.Path(output_dir + f"/pln{plane_idx}_chn{channel}")
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
