@@ -70,7 +70,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         scan_interface = ScanImageImagingInterface(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=30
         )
-        extract_interface = Suite2pSegmentationInterface(
+        extract_interface = ExtractSegmentationInterface(
             file_path=processing_file_location
         )
         converter = ConverterPipe(data_interfaces=[scan_interface, extract_interface])
@@ -101,6 +101,40 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
+    
+    elif acquisition_software == "Scanbox" and processing_method == "extract":
+        from neuroconv.datainterfaces import (
+            SbxImagingInterface,
+            ExtractSegmentationInterface,
+        )
+
+        processing_file_location = pathlib.Path(output_directory).as_posix()
+        raw_data_files_location = get_image_files(session_key, "*.tif")
+        scan_interface = SbxImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        extract_interface = ExtractSegmentationInterface(
+            file_path=processing_file_location
+        )
+        converter = ConverterPipe(data_interfaces=[scan_interface, extract_interface])
+    
+    elif acquisition_software == "PrairieView" and processing_method == "suite2p":
+        n_planes = (scan.ScanInfo & session_key).fetch1("ndepths")
+        if n_planes > 1:
+            from neuroconv.datainterfaces import BrukerTiffMultiPlaneConverter as BrukerTiffConverter
+        else:
+            from neuroconv.datainterfaces import BrukerTiffSinglePlaneConverter as BrukerTiffConverter
+        from neuroconv.datainterfaces import Suite2pSegmentationInterface
+
+        processing_folder_location = pathlib.Path(output_directory).as_posix()
+        raw_data_files_location = get_image_files(session_key, "*.tif")
+        bruker_interface = BrukerTiffConverter(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+        )
+        s2p_interface = Suite2pSegmentationInterface(
+            folder_path=processing_folder_location
+        )
+        converter = ConverterPipe(data_interfaces=[scan_interface, s2p_interface])
 
     metadata = converter.get_metadata()
     metadata["NWBFile"].update(session_description="DataJoint Session")
