@@ -1,18 +1,13 @@
 import pathlib
 
-import datajoint as dj
 import numpy as np
 from datajoint import DataJointError
 from element_interface.utils import find_full_path
 from neuroconv import ConverterPipe
 from pynwb import NWBHDF5IO, NWBFile
-from pynwb.image import ImageSeries
 from pynwb.ophys import (
-    CorrectedImageStack,
     Fluorescence,
     ImageSegmentation,
-    MotionCorrection,
-    OnePhotonSeries,
     OpticalChannel,
     RoiResponseSeries,
     TwoPhotonSeries,
@@ -140,7 +135,6 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
-            **bruker_kwargs,
         )
         s2p_interface = Suite2pSegmentationInterface(
             folder_path=processing_folder_location
@@ -164,7 +158,6 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
-            **bruker_kwargs,
         )
         caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
@@ -187,7 +180,6 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
-            **bruker_kwargs,
         )
         extract_interface = ExtractSegmentationInterface(
             file_path=processing_file_location
@@ -210,10 +202,11 @@ def create_processed_data_nwbfile(session_key, output_directory, nwb_path):
     if processing_method == "suite2p":
         from neuroconv.datainterfaces import Suite2pSegmentationInterface
 
+        processing_folder_location = pathlib.Path(output_directory).as_posix()
         s2p_interface = Suite2pSegmentationInterface(
             folder_path=processing_folder_location
         )
-        metadata = interface.get_metadata()
+        metadata = s2p_interface.get_metadata()
         s2p_interface.run_conversion(
             nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'),
             metadata=metadata,
@@ -306,6 +299,7 @@ def add_image_series_to_nwb(session_key, imaging_plane):
         starting_time=0.0,
         rate=(scan.ScanInfo & session_key).fetch1("fps"),
     )
+    return two_p_series
 
 
 def add_motion_correction_to_nwb(session_key, nwbfile):
