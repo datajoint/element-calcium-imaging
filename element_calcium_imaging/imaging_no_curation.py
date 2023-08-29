@@ -895,7 +895,7 @@ class MotionCorrection(dj.Imported):
                 summary_images = [
                     {
                         **key,
-                        **fkey,
+                        **field_key,
                         "ref_image": caiman_dataset.ref_image[:, :, field_idx],
                         "average_image": caiman_dataset.mean_image[:, :, field_idx],
                         "correlation_image": caiman_dataset.correlation_map[:, :, field_idx],
