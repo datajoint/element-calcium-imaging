@@ -908,6 +908,7 @@ class MotionCorrection(dj.Imported):
                     caiman_dataset.max_proj_image,
                 )
             ]
+            raise Exception("Debug summary image dimensions")
             self.Summary.insert(summary_images)
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
