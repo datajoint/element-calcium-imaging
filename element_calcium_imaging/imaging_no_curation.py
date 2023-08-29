@@ -362,8 +362,14 @@ class Processing(dj.Computed):
         database."""
         ks = ProcessingTask & scan.ScanInfo
         per_plane_proc = (
-            ProcessingTask.aggr(PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True)
-            * ProcessingTask.aggr(PerPlaneProcessing.proj(), finished_task_count="count(*)", keep_all_rows=True)
+            ProcessingTask.aggr(
+                PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True
+            )
+            * ProcessingTask.aggr(
+                PerPlaneProcessing.proj(),
+                finished_task_count="count(*)",
+                keep_all_rows=True,
+            )
             & "task_count = finished_task_count"
         )
         return ks & per_plane_proc
@@ -517,7 +523,9 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = pathlib.Path(output_dir + f"/pln{plane_idx}_chn{channel}")
+                            pln_output_dir = pathlib.Path(
+                                output_dir + f"/pln{plane_idx}_chn{channel}"
+                            )
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
@@ -866,31 +874,25 @@ class MotionCorrection(dj.Imported):
                 }
             )
 
-            is3D = caiman_dataset.params.motion["is3D"]
-            if not caiman_dataset.params.motion["pw_rigid"]:
+            is3D = caiman_dataset.is3D
+            if not caiman_dataset.is_pw_rigid:
                 # -- rigid motion correction --
                 rigid_correction = {
                     **key,
-                    "x_shifts": caiman_dataset.motion_correction["shifts_rig"][:, 0],
-                    "y_shifts": caiman_dataset.motion_correction["shifts_rig"][:, 1],
+                    "x_shifts": caiman_dataset.motion_correction["x_shifts"][0, :],
+                    "y_shifts": caiman_dataset.motion_correction["y_shifts"][0, :],
                     "z_shifts": (
-                        caiman_dataset.motion_correction["shifts_rig"][:, 2]
+                        caiman_dataset.motion_correction["z_shifts"][0, :]
                         if is3D
                         else np.full_like(
-                            caiman_dataset.motion_correction["shifts_rig"][:, 0],
+                            caiman_dataset.motion_correction["x_shifts"][0, :],
                             0,
                         )
                     ),
-                    "x_std": np.nanstd(
-                        caiman_dataset.motion_correction["shifts_rig"][:, 0]
-                    ),
-                    "y_std": np.nanstd(
-                        caiman_dataset.motion_correction["shifts_rig"][:, 1]
-                    ),
+                    "x_std": caiman_dataset.motion_correction["x_std"],
+                    "y_std": caiman_dataset.motion_correction["y_std"],
                     "z_std": (
-                        np.nanstd(caiman_dataset.motion_correction["shifts_rig"][:, 2])
-                        if is3D
-                        else np.nan
+                        caiman_dataset.motion_correction["z_std"] if is3D else np.nan
                     ),
                     "outlier_frames": None,
                 }
@@ -1027,26 +1029,18 @@ class MotionCorrection(dj.Imported):
                         2, 0, 1
                     )
                     if is3D
-                    else caiman_dataset.motion_correction["reference_image"][...][
-                        np.newaxis, ...
-                    ],
+                    else caiman_dataset.ref_image,
                     caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
                     if is3D
-                    else caiman_dataset.motion_correction["average_image"][...][
-                        np.newaxis, ...
-                    ],
+                    else caiman_dataset.mean_image,
                     caiman_dataset.motion_correction["correlation_image"].transpose(
                         2, 0, 1
                     )
                     if is3D
-                    else caiman_dataset.motion_correction["correlation_image"][...][
-                        np.newaxis, ...
-                    ],
+                    else caiman_dataset.correlation_map,
                     caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
                     if is3D
-                    else caiman_dataset.motion_correction["max_image"][...][
-                        np.newaxis, ...
-                    ],
+                    else caiman_dataset.max_proj_image,
                 )
             ]
             self.Summary.insert(summary_images)
