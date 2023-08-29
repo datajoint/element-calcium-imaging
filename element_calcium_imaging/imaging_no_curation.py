@@ -894,10 +894,10 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.ref_image,
-                    caiman_dataset.mean_image,
-                    caiman_dataset.correlation_map,
-                    caiman_dataset.max_proj_image,
+                    caiman_dataset.ref_image.transpose(2, 0, 1),
+                    caiman_dataset.mean_image.transpose(2, 0, 1),
+                    caiman_dataset.correlation_map.transpose(2, 0, 1),
+                    caiman_dataset.max_proj_image.transpose(2, 0, 1),
                 )
             ]
             self.Summary.insert(summary_images)
