@@ -874,144 +874,21 @@ class MotionCorrection(dj.Imported):
                 }
             )
 
-            is3D = caiman_dataset.is3D
-            if not caiman_dataset.is_pw_rigid:
-                # -- rigid motion correction --
-                rigid_correction = {
-                    **key,
-                    "x_shifts": caiman_dataset.motion_correction["x_shifts"][0, :],
-                    "y_shifts": caiman_dataset.motion_correction["y_shifts"][0, :],
-                    "z_shifts": (
-                        caiman_dataset.motion_correction["z_shifts"][0, :]
-                        if is3D
-                        else np.full_like(
-                            caiman_dataset.motion_correction["x_shifts"][0, :],
-                            0,
-                        )
-                    ),
-                    "x_std": caiman_dataset.motion_correction["x_std"],
-                    "y_std": caiman_dataset.motion_correction["y_std"],
-                    "z_std": (
-                        caiman_dataset.motion_correction["z_std"] if is3D else np.nan
-                    ),
-                    "outlier_frames": None,
-                }
-
-                self.RigidMotionCorrection.insert1(rigid_correction)
-            else:
+            if caiman_dataset.is_pw_rigid:
                 # -- non-rigid motion correction --
-                nonrigid_correction = {
-                    **key,
-                    "block_height": (
-                        caiman_dataset.params.motion["strides"][0]
-                        + caiman_dataset.params.motion["overlaps"][0]
-                    ),
-                    "block_width": (
-                        caiman_dataset.params.motion["strides"][1]
-                        + caiman_dataset.params.motion["overlaps"][1]
-                    ),
-                    "block_depth": (
-                        caiman_dataset.params.motion["strides"][2]
-                        + caiman_dataset.params.motion["overlaps"][2]
-                        if is3D
-                        else 1
-                    ),
-                    "block_count_x": len(
-                        set(caiman_dataset.motion_correction["coord_shifts_els"][:, 0])
-                    ),
-                    "block_count_y": len(
-                        set(caiman_dataset.motion_correction["coord_shifts_els"][:, 2])
-                    ),
-                    "block_count_z": (
-                        len(
-                            set(
-                                caiman_dataset.motion_correction["coord_shifts_els"][
-                                    :, 4
-                                ]
-                            )
-                        )
-                        if is3D
-                        else 1
-                    ),
-                    "outlier_frames": None,
-                }
-
-                nonrigid_blocks = []
-                for b_id in range(
-                    len(caiman_dataset.motion_correction["x_shifts_els"][0, :])
-                ):
-                    nonrigid_blocks.append(
-                        {
-                            **key,
-                            "block_id": b_id,
-                            "block_x": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][
-                                    b_id, 0:2
-                                ]
-                            ),
-                            "block_y": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][
-                                    b_id, 2:4
-                                ]
-                            ),
-                            "block_z": (
-                                np.arange(
-                                    *caiman_dataset.motion_correction[
-                                        "coord_shifts_els"
-                                    ][b_id, 4:6]
-                                )
-                                if is3D
-                                else np.full_like(
-                                    np.arange(
-                                        *caiman_dataset.motion_correction[
-                                            "coord_shifts_els"
-                                        ][b_id, 0:2]
-                                    ),
-                                    0,
-                                )
-                            ),
-                            "x_shifts": caiman_dataset.motion_correction[
-                                "x_shifts_els"
-                            ][:, b_id],
-                            "y_shifts": caiman_dataset.motion_correction[
-                                "y_shifts_els"
-                            ][:, b_id],
-                            "z_shifts": (
-                                caiman_dataset.motion_correction["z_shifts_els"][
-                                    :, b_id
-                                ]
-                                if is3D
-                                else np.full_like(
-                                    caiman_dataset.motion_correction["x_shifts_els"][
-                                        :, b_id
-                                    ],
-                                    0,
-                                )
-                            ),
-                            "x_std": np.nanstd(
-                                caiman_dataset.motion_correction["x_shifts_els"][
-                                    :, b_id
-                                ]
-                            ),
-                            "y_std": np.nanstd(
-                                caiman_dataset.motion_correction["y_shifts_els"][
-                                    :, b_id
-                                ]
-                            ),
-                            "z_std": (
-                                np.nanstd(
-                                    caiman_dataset.motion_correction["z_shifts_els"][
-                                        :, b_id
-                                    ]
-                                )
-                                if is3D
-                                else np.nan
-                            ),
-                        }
-                    )
-
+                (
+                    nonrigid_correction,
+                    nonrigid_blocks,
+                ) = caiman_dataset.extract_pw_rigid_mc()
+                nonrigid_correction.update(**key)
+                nonrigid_blocks.update(**key)
                 self.NonRigidMotionCorrection.insert1(nonrigid_correction)
                 self.Block.insert(nonrigid_blocks)
+            else:
+                # -- rigid motion correction --
+                rigid_correction = caiman_dataset.extract_rigid_mc()
+                rigid_correction.update(**key)
+                self.RigidMotionCorrection.insert1(rigid_correction)
 
             # -- summary images --
             summary_images = [
@@ -1025,22 +902,10 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.motion_correction["reference_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.ref_image,
-                    caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.mean_image,
-                    caiman_dataset.motion_correction["correlation_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.correlation_map,
-                    caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.max_proj_image,
+                    caiman_dataset.ref_image,
+                    caiman_dataset.mean_image,
+                    caiman_dataset.correlation_map,
+                    caiman_dataset.max_proj_image,
                 )
             ]
             self.Summary.insert(summary_images)
@@ -1180,16 +1045,15 @@ class Segmentation(dj.Computed):
                         "mask_weights": mask["mask_weights"],
                     }
                 )
-                # if caiman_dataset.cnmf.estimates.idx_components is not None:
-                #     if mask["mask_id"] in caiman_dataset.cnmf.estimates.idx_components:
-                #         cells.append(
-                #             {
-                #                 **key,
-                #                 "mask_classification_method": "caiman_default_classifier",
-                #                 "mask": mask["mask_id"],
-                #                 "mask_type": "soma",
-                #             }
-                #         )
+                if mask["accepted"]:
+                    cells.append(
+                        {
+                            **key,
+                            "mask_classification_method": "caiman_default_classifier",
+                            "mask": mask["mask_id"],
+                            "mask_type": "soma",
+                        }
+                    )
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
