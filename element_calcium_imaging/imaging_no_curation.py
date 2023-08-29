@@ -1180,16 +1180,16 @@ class Segmentation(dj.Computed):
                         "mask_weights": mask["mask_weights"],
                     }
                 )
-                if caiman_dataset.cnmf.estimates.idx_components is not None:
-                    if mask["mask_id"] in caiman_dataset.cnmf.estimates.idx_components:
-                        cells.append(
-                            {
-                                **key,
-                                "mask_classification_method": "caiman_default_classifier",
-                                "mask": mask["mask_id"],
-                                "mask_type": "soma",
-                            }
-                        )
+                # if caiman_dataset.cnmf.estimates.idx_components is not None:
+                #     if mask["mask_id"] in caiman_dataset.cnmf.estimates.idx_components:
+                #         cells.append(
+                #             {
+                #                 **key,
+                #                 "mask_classification_method": "caiman_default_classifier",
+                #                 "mask": mask["mask_id"],
+                #                 "mask_type": "soma",
+                #             }
+                #         )
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
