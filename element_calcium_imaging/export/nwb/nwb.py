@@ -475,7 +475,6 @@ def imaging_session_to_nwb(
                         protocol_key=protocol_key,
                         additional_nwbfile_kwargs=nwbfile_kwargs,
                     )
-                    io.write(nwb_file)
                 else:
                     if "Subject" in nwbfile_kwargs:
                         from pynwb.file import Subject
@@ -483,4 +482,4 @@ def imaging_session_to_nwb(
                         nwb_file.subject = Subject(**nwbfile_kwargs["Subject"])
                     else:
                         nwb_file = NWBFile(**nwbfile_kwargs)
-                    io.write(nwb_file)
+                io.write(nwb_file)
