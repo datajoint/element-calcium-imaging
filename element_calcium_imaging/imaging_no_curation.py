@@ -362,8 +362,14 @@ class Processing(dj.Computed):
         database."""
         ks = ProcessingTask & scan.ScanInfo
         per_plane_proc = (
-            ProcessingTask.aggr(PerPlaneProcessingTask, task_count="count(*)")
-            * ProcessingTask.aggr(PerPlaneProcessing, finished_task_count="count(*)")
+            ProcessingTask.aggr(
+                PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True
+            )
+            * ProcessingTask.aggr(
+                PerPlaneProcessing.proj(),
+                finished_task_count="count(*)",
+                keep_all_rows=True,
+            )
             & "task_count = finished_task_count"
         )
         return ks & per_plane_proc
@@ -517,7 +523,8 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = output_dir / f"pln{plane_idx}_chn{channel}"
+                            pln_output_dir = pathlib.Path(output_dir) / f"pln{plane_idx}_chn{channel}"
+                            
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
@@ -1512,7 +1519,7 @@ class PerPlaneProcessing(dj.Computed):
     ---
     processing_time     : datetime  # Time of generation of this set of processed, segmented results
     package_version=''  : varchar(16)
-    channel=''          : int  # Channel used for this processing
+    channel=null          : int  # Channel used for this processing
     """
 
     def make(self, key):
