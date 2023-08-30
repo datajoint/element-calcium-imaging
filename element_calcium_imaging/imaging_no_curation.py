@@ -891,18 +891,23 @@ class MotionCorrection(dj.Imported):
                 self.RigidMotionCorrection.insert1(rigid_correction)
 
             # -- summary images --
-            summary_images = []
-            for field_idx, field_key,  in enumerate(field_keys):
-                summary_images.append(
-                    {
-                        **key,
-                        **field_key,
-                        "ref_image": caiman_dataset.ref_image[:, :, field_idx],
-                        "average_image": caiman_dataset.mean_image[:, :, field_idx],
-                        "correlation_image": caiman_dataset.correlation_map[:, :, field_idx],
-                        "max_proj_image": caiman_dataset.max_proj_image[:, :, field_idx],
-                    }
+            summary_images = [
+                {
+                    **key,
+                    **fkey,
+                    "ref_image": ref_image,
+                    "average_image": ave_img,
+                    "correlation_image": corr_img,
+                    "max_proj_image": max_img,
+                }
+                for fkey, ref_image, ave_img, corr_img, max_img in zip(
+                    field_keys,
+                    caiman_dataset.ref_image.transpose(2, 0, 1),
+                    caiman_dataset.mean_image.transpose(2, 0, 1),
+                    caiman_dataset.correlation_map.transpose(2, 0, 1),
+                    caiman_dataset.max_proj_image.transpose(2, 0, 1),
                 )
+            ]
             self.Summary.insert(summary_images)
         else:
             raise NotImplementedError("Unknown/unimplemented method: {}".format(method))
