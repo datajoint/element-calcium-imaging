@@ -450,7 +450,7 @@ class ProcessingTask(dj.Manual):
 
         scan_dir = find_full_path(
             get_imaging_root_data_dir(),
-            get_image_files(key, filetypes[acq_software])[0],
+            get_calcium_imaging_files(key, filetypes[acq_software])[0],
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
