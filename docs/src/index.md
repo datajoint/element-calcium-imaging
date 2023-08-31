@@ -21,15 +21,25 @@ combined with other Elements to assemble a fully functional pipeline.
 
 ![pipeline](https://raw.githubusercontent.com/datajoint/element-calcium-imaging/main/images/pipeline_imaging.svg)
 
-+ We have designed three variations of the pipeline to handle different use cases. Displayed above is the default `imaging` schema.  Details on all of the `imaging` schemas can be found in the [Data Pipeline](./pipeline.md) documentation page.
++ We have designed three variations of the pipeline to handle different use cases. 
+Displayed above is the default `imaging` schema.  Details on all of the `imaging` 
+schemas can be found in the [Data Pipeline](./pipeline.md) documentation page.
 
 ## Getting Started
 
-+ Install from PyPI
++ Please fork the [repository](https://github.com/datajoint/element-calcium-imaging){:target="_blank"}
 
-     ```bash
-     pip install element-calcium-imaging
-     ```
++ Clone the repository to your computer
+
+  ```bash
+  git clone https://github.com/<enter_github_username>/element-calcium-imaging
+  ```
+
++ Install with `pip`
+
+  ```bash
+  pip install -e .
+  ```
 
 + [Data Pipeline](./pipeline.md) - Pipeline and table descriptions
 
@@ -39,4 +49,5 @@ combined with other Elements to assemble a fully functional pipeline.
 
 ## Support
 
-+ If you need help getting started or run into any errors, please contact our team by email at support@datajoint.com.
++ If you need help getting started or run into any errors, please contact our team by 
+email at support@datajoint.com.

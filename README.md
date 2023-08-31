@@ -1,5 +1,3 @@
-[![PyPI version](https://badge.fury.io/py/element-calcium-imaging.svg)](http://badge.fury.io/py/element-calcium-imaging)
-
 # DataJoint Element for Functional Calcium Imaging
 
 DataJoint Element for functional calcium imaging with 
@@ -32,11 +30,19 @@ documentation page.
 
 ## Getting Started
 
-+ Install from PyPI
++ Please fork this repository
 
-     ```bash
-     pip install element-calcium-imaging
-     ```
++ Clone the repository to your computer
+
+  ```bash
+  git clone https://github.com/<enter_github_username>/element-calcium-imaging
+  ```
+
++ Install with `pip`
+
+  ```bash
+  pip install -e .
+  ```
 
 + [Interactive tutorial on GitHub Codespaces](#interactive-tutorial)
 

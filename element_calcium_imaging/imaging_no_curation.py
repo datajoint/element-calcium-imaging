@@ -9,7 +9,7 @@ from element_interface.utils import dict_to_uuid, find_full_path, find_root_dire
 
 from . import imaging_report, scan
 from .scan import (
-    get_image_files,
+    get_calcium_imaging_files,
     get_imaging_root_data_dir,
     get_processed_root_data_dir,
 )

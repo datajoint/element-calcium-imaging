@@ -26,18 +26,27 @@ def get_imaging_root_data_dir():
         raise TypeError("`imaging_root_data_dir` must be a string, pathlib, or list")
 
 
-def get_image_files(scan_key, file_type: str):
-    """Retrieve the list of absolute paths associated with a given Scan."""
+def get_calcium_imaging_files(scan_key, acq_software: str):
+    """Retrieve the list of absolute paths of the calcium imaging files associated with a given Scan and a given acquisition software (e.g. "ScanImage", "PrairieView", etc.)."""
     # Folder structure: root / subject / session / .tif or .sbx or .nd2
     session_dir = element_interface.utils.find_full_path(
         get_imaging_root_data_dir(),
         (session.SessionDirectory & scan_key).fetch1("session_dir"),
     )
 
-    filepaths = [fp.as_posix() for fp in session_dir.glob(file_type)]
+    if acq_software == "ScanImage":
+        filepaths = [fp.as_posix() for fp in session_dir.glob("*.tif")]
+    elif acq_software == "Scanbox":
+        filepaths = [fp.as_posix() for fp in session_dir.glob("*.sbx")]
+    elif acq_software == "NIS":
+        filepaths = [fp.as_posix() for fp in session_dir.glob("*.nd2")]
+    elif acq_software == "PrairieView":
+        filepaths = [fp.as_posix() for fp in session_dir.glob("*.tif")]
+    else:
+        raise NotImplementedError(f"{acq_software} is not implemented")
 
     if not filepaths:
-        raise FileNotFoundError(f"No {file_type} file found in {session_dir}")
+        raise FileNotFoundError(f"No {acq_software} file found in {session_dir}")
     return filepaths
 
 
