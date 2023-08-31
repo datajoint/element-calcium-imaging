@@ -1603,7 +1603,7 @@ def get_loader_result(key: dict, table: dj.Table) -> Callable:
         see element-interface for more information on the loaders.)
     """
     method, output_dir = (ProcessingParamSet * table & key).fetch1(
-        "processing_method", _table_attribute_mapper[table.table_name]
+        "processing_method", _table_attribute_mapper[table.__name__]
     )
 
     output_path = find_full_path(get_imaging_root_data_dir(), output_dir)
