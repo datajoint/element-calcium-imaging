@@ -2,92 +2,92 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/changelog/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/citation/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/concepts/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/partnerships/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/pipeline/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/roadmap/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/analysis/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/imaging/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/imaging_no_curation/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/imaging_preprocess/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/imaging_report/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/scan/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/plotting/cell_plot/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/api/element_calcium_imaging/plotting/widget/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/tutorials/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/tutorials/quality_metrics/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://localhost/docs/elements/element-calcium-imaging/0.8/tutorials/tutorial/</loc>
-         <lastmod>2023-08-10</lastmod>
+         <lastmod>2023-09-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
