@@ -360,8 +360,19 @@ class Processing(dj.Computed):
     def key_source(self):
         """Limit the Processing to Scans that have their metadata ingested to the
         database."""
-
-        return ProcessingTask & scan.ScanInfo
+        ks = ProcessingTask & scan.ScanInfo
+        per_plane_proc = (
+            ProcessingTask.aggr(
+                PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True
+            )
+            * ProcessingTask.aggr(
+                PerPlaneProcessing.proj(),
+                finished_task_count="count(*)",
+                keep_all_rows=True,
+            )
+            & "task_count = finished_task_count"
+        )
+        return ks & per_plane_proc
 
     def make(self, key):
         """Execute the calcium imaging analysis defined by the ProcessingTask."""
@@ -401,6 +412,7 @@ class Processing(dj.Computed):
             method = (ProcessingParamSet * ProcessingTask & key).fetch1(
                 "processing_method"
             )
+            acq_software = (scan.Scan & key).fetch1("acq_software")
 
             image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
             image_files = [
@@ -446,33 +458,93 @@ class Processing(dj.Computed):
                     "fps", "ndepths", "nchannels"
                 )
 
-                is3D = bool(ndepths > 1)
+                is3D = caiman_params.get("is3D", False)
                 if is3D:
                     raise NotImplementedError(
-                        "Caiman pipeline is not yet capable of analyzing 3D scans."
+                        "Analyzing 3D scans using CaImAn is not yet supported in this pipeline."
                     )
 
-                # handle multi-channel tiff image before running CaImAn
-                if nchannels > 1:
-                    channel_idx = caiman_params.get("channel_to_process", 0)
-                    tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
-                    tmp_dir.mkdir(exist_ok=True)
-                    _process_scanimage_tiff(
-                        [f.as_posix() for f in image_files], output_dir=tmp_dir
+                channel = caiman_params.get("channel_to_process", 0)
+
+                if ndepths == 1:  # single-plane processing
+                    if nchannels > 1:
+                        if acq_software == "ScanImage":
+                            # handle multi-channel tiff image before running CaImAn
+                            tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
+                            tmp_dir.mkdir(exist_ok=True)
+                            _process_scanimage_tiff(
+                                [f.as_posix() for f in image_files], output_dir=tmp_dir
+                            )
+                            image_files = tmp_dir.glob(f"*_chn{channel}.tif")
+                        elif acq_software == "PrairieView":
+                            from element_interface import PrairieViewMeta
+
+                            pv_dir = pathlib.Path(image_files[0]).parent
+                            PVmeta = PrairieViewMeta(pv_dir)
+                            image_files = [
+                                pv_dir / f
+                                for f in PVmeta.get_prairieview_files(
+                                    channel=caiman_params.get("channel_to_process", 0),
+                                )
+                            ]
+
+                    run_caiman(
+                        file_paths=[f.as_posix() for f in image_files],
+                        parameters=caiman_params,
+                        sampling_rate=sampling_rate,
+                        output_dir=output_dir,
+                        is3D=is3D,
                     )
-                    image_files = tmp_dir.glob(f"*_chn{channel_idx}.tif")
 
-                run_caiman(
-                    file_paths=[f.as_posix() for f in image_files],
-                    parameters=caiman_params,
-                    sampling_rate=sampling_rate,
-                    output_dir=output_dir,
-                    is3D=is3D,
-                )
+                    _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                    caiman_dataset = imaging_dataset
+                    key["processing_time"] = caiman_dataset.creation_time
+                else:  # multi-plane processing
+                    # per-plane processing with CaImAn
+                    if acq_software == "ScanImage":
+                        raise NotImplementedError(
+                            "Multi-plane processing using CaImAn for ScanImage scans is not yet supported in this pipeline."
+                        )
+                    elif acq_software == "PrairieView":
+                        # Generate separate processing task for each plane - in `PerPlaneProcessingTask`
+                        # if all `PerPlaneProcessingTask` for this key are done - ingest the results
+                        from element_interface.prairie_view_loader import (
+                            PrairieViewMeta,
+                        )
 
-                _, imaging_dataset = get_loader_result(key, ProcessingTask)
-                caiman_dataset = imaging_dataset
-                key["processing_time"] = caiman_dataset.creation_time
+                        pv_dir = pathlib.Path(image_files[0]).parent
+                        PVmeta = PrairieViewMeta(pv_dir)
+
+                        channel = (
+                            channel
+                            if PVmeta.meta["num_channels"] > 1
+                            else PVmeta.meta["channels"][0]
+                        )
+
+                        plane_processing_tasks = []
+                        for plane_idx in PVmeta.meta["plane_indices"]:
+                            pln_output_dir = pathlib.Path(output_dir) / f"pln{plane_idx}_chn{channel}"
+                            
+                            pln_output_dir.mkdir(parents=True, exist_ok=True)
+                            plane_processing_tasks.append(
+                                {
+                                    **key,
+                                    "plane_idx": plane_idx,
+                                    "processing_output_dir": pln_output_dir,
+                                }
+                            )
+
+                        if len(
+                            PerPlaneProcessing.proj() & plane_processing_tasks
+                        ) == len(plane_processing_tasks):
+                            _, imaging_dataset = get_loader_result(key, ProcessingTask)
+                            caiman_dataset = imaging_dataset
+                            key["processing_time"] = caiman_dataset.creation_time
+                        else:
+                            PerPlaneProcessingTask.insert(
+                                plane_processing_tasks, skip_duplicates=True
+                            )
+                            return
 
             elif method == "extract":
                 import suite2p
@@ -635,7 +707,7 @@ class MotionCorrection(dj.Imported):
         block_z         : longblob  # (z_start, z_end) in pixel of this block
         y_shifts        : longblob  # (pixels) y motion correction shifts for every frame
         x_shifts        : longblob  # (pixels) x motion correction shifts for every frame
-        z_shifts=null   : longblob  # (pixels) x motion correction shifts for every frame
+        z_shifts=null   : longblob  # (pixels) z motion correction shifts for every frame
         y_std           : float     # (pixels) standard deviation of y shifts across all frames
         x_std           : float     # (pixels) standard deviation of x shifts across all frames
         z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
@@ -801,150 +873,21 @@ class MotionCorrection(dj.Imported):
                 }
             )
 
-            is3D = caiman_dataset.params.motion["is3D"]
-            if not caiman_dataset.params.motion["pw_rigid"]:
-                # -- rigid motion correction --
-                rigid_correction = {
-                    **key,
-                    "x_shifts": caiman_dataset.motion_correction["shifts_rig"][:, 0],
-                    "y_shifts": caiman_dataset.motion_correction["shifts_rig"][:, 1],
-                    "z_shifts": (
-                        caiman_dataset.motion_correction["shifts_rig"][:, 2]
-                        if is3D
-                        else np.full_like(
-                            caiman_dataset.motion_correction["shifts_rig"][:, 0],
-                            0,
-                        )
-                    ),
-                    "x_std": np.nanstd(
-                        caiman_dataset.motion_correction["shifts_rig"][:, 0]
-                    ),
-                    "y_std": np.nanstd(
-                        caiman_dataset.motion_correction["shifts_rig"][:, 1]
-                    ),
-                    "z_std": (
-                        np.nanstd(caiman_dataset.motion_correction["shifts_rig"][:, 2])
-                        if is3D
-                        else np.nan
-                    ),
-                    "outlier_frames": None,
-                }
-
-                self.RigidMotionCorrection.insert1(rigid_correction)
-            else:
+            if caiman_dataset.is_pw_rigid:
                 # -- non-rigid motion correction --
-                nonrigid_correction = {
-                    **key,
-                    "block_height": (
-                        caiman_dataset.params.motion["strides"][0]
-                        + caiman_dataset.params.motion["overlaps"][0]
-                    ),
-                    "block_width": (
-                        caiman_dataset.params.motion["strides"][1]
-                        + caiman_dataset.params.motion["overlaps"][1]
-                    ),
-                    "block_depth": (
-                        caiman_dataset.params.motion["strides"][2]
-                        + caiman_dataset.params.motion["overlaps"][2]
-                        if is3D
-                        else 1
-                    ),
-                    "block_count_x": len(
-                        set(caiman_dataset.motion_correction["coord_shifts_els"][:, 0])
-                    ),
-                    "block_count_y": len(
-                        set(caiman_dataset.motion_correction["coord_shifts_els"][:, 2])
-                    ),
-                    "block_count_z": (
-                        len(
-                            set(
-                                caiman_dataset.motion_correction["coord_shifts_els"][
-                                    :, 4
-                                ]
-                            )
-                        )
-                        if is3D
-                        else 1
-                    ),
-                    "outlier_frames": None,
-                }
-
-                nonrigid_blocks = []
-                for b_id in range(
-                    len(caiman_dataset.motion_correction["x_shifts_els"][0, :])
-                ):
-                    nonrigid_blocks.append(
-                        {
-                            **key,
-                            "block_id": b_id,
-                            "block_x": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][
-                                    b_id, 0:2
-                                ]
-                            ),
-                            "block_y": np.arange(
-                                *caiman_dataset.motion_correction["coord_shifts_els"][
-                                    b_id, 2:4
-                                ]
-                            ),
-                            "block_z": (
-                                np.arange(
-                                    *caiman_dataset.motion_correction[
-                                        "coord_shifts_els"
-                                    ][b_id, 4:6]
-                                )
-                                if is3D
-                                else np.full_like(
-                                    np.arange(
-                                        *caiman_dataset.motion_correction[
-                                            "coord_shifts_els"
-                                        ][b_id, 0:2]
-                                    ),
-                                    0,
-                                )
-                            ),
-                            "x_shifts": caiman_dataset.motion_correction[
-                                "x_shifts_els"
-                            ][:, b_id],
-                            "y_shifts": caiman_dataset.motion_correction[
-                                "y_shifts_els"
-                            ][:, b_id],
-                            "z_shifts": (
-                                caiman_dataset.motion_correction["z_shifts_els"][
-                                    :, b_id
-                                ]
-                                if is3D
-                                else np.full_like(
-                                    caiman_dataset.motion_correction["x_shifts_els"][
-                                        :, b_id
-                                    ],
-                                    0,
-                                )
-                            ),
-                            "x_std": np.nanstd(
-                                caiman_dataset.motion_correction["x_shifts_els"][
-                                    :, b_id
-                                ]
-                            ),
-                            "y_std": np.nanstd(
-                                caiman_dataset.motion_correction["y_shifts_els"][
-                                    :, b_id
-                                ]
-                            ),
-                            "z_std": (
-                                np.nanstd(
-                                    caiman_dataset.motion_correction["z_shifts_els"][
-                                        :, b_id
-                                    ]
-                                )
-                                if is3D
-                                else np.nan
-                            ),
-                        }
-                    )
-
+                (
+                    nonrigid_correction,
+                    nonrigid_blocks,
+                ) = caiman_dataset.extract_pw_rigid_mc()
+                nonrigid_correction.update(**key)
+                nonrigid_blocks.update(**key)
                 self.NonRigidMotionCorrection.insert1(nonrigid_correction)
                 self.Block.insert(nonrigid_blocks)
+            else:
+                # -- rigid motion correction --
+                rigid_correction = caiman_dataset.extract_rigid_mc()
+                rigid_correction.update(**key)
+                self.RigidMotionCorrection.insert1(rigid_correction)
 
             # -- summary images --
             summary_images = [
@@ -958,30 +901,10 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.motion_correction["reference_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["reference_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["average_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["correlation_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["correlation_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["max_image"][...][
-                        np.newaxis, ...
-                    ],
+                    caiman_dataset.ref_image.transpose(2, 0, 1),
+                    caiman_dataset.mean_image.transpose(2, 0, 1),
+                    caiman_dataset.correlation_map.transpose(2, 0, 1),
+                    caiman_dataset.max_proj_image.transpose(2, 0, 1),
                 )
             ]
             self.Summary.insert(summary_images)
@@ -1121,16 +1044,15 @@ class Segmentation(dj.Computed):
                         "mask_weights": mask["mask_weights"],
                     }
                 )
-                if caiman_dataset.cnmf.estimates.idx_components is not None:
-                    if mask["mask_id"] in caiman_dataset.cnmf.estimates.idx_components:
-                        cells.append(
-                            {
-                                **key,
-                                "mask_classification_method": "caiman_default_classifier",
-                                "mask": mask["mask_id"],
-                                "mask_type": "soma",
-                            }
-                        )
+                if mask["accepted"]:
+                    cells.append(
+                        {
+                            **key,
+                            "mask_classification_method": "caiman_default_classifier",
+                            "mask": mask["mask_id"],
+                            "mask_type": "soma",
+                        }
+                    )
 
             self.insert1(key)
             self.Mask.insert(masks, ignore_extra_fields=True)
@@ -1577,12 +1499,106 @@ class ProcessingQualityMetrics(dj.Computed):
         )
 
 
+# ---------------- Multi-plane Processing (per-plane basis) ----------------
+
+
+@schema
+class PerPlaneProcessingTask(dj.Manual):
+    definition = """
+    -> ProcessingTask
+    plane_idx: int
+    ---
+    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
+    """
+
+
+@schema
+class PerPlaneProcessing(dj.Computed):
+    definition = """
+    -> PerPlaneProcessingTask
+    ---
+    processing_time     : datetime  # Time of generation of this set of processed, segmented results
+    package_version=''  : varchar(16)
+    channel=null          : int  # Channel used for this processing
+    """
+
+    def make(self, key):
+        output_dir = (PerPlaneProcessingTask & key).fetch1("processing_output_dir")
+        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+        plane_idx = key["plane_idx"]
+        acq_software = (scan.Scan & key).fetch1("acq_software")
+        params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
+            "params", "processing_method"
+        )
+        caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+        sampling_rate = (scan.ScanInfo & key).fetch1("fps")
+        channel = params.get("channel_to_process", 0)
+
+        if acq_software == "PrairieView":
+            from element_interface.prairie_view_loader import PrairieViewMeta
+
+            image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
+            image_file = find_full_path(get_imaging_root_data_dir(), image_file)
+            pv_dir = pathlib.Path(image_file).parent
+            PVmeta = PrairieViewMeta(pv_dir)
+
+            channel = (
+                channel
+                if PVmeta.meta["num_channels"] > 1
+                else PVmeta.meta["channels"][0]
+            )
+            if method == "caiman":
+                image_files = [
+                    PVmeta.write_single_bigtiff(
+                        plane_idx=plane_idx,
+                        channel=channel,
+                        output_dir=output_dir.parent,
+                        caiman_compatible=True,
+                    )
+                ]
+            else:
+                image_files = [
+                    pv_dir / f
+                    for f in PVmeta.get_prairieview_filenames(
+                        plane_idx=plane_idx,
+                        channel=channel,
+                    )
+                ]
+        else:
+            raise NotImplementedError(
+                f"Per-plane processing for {acq_software} scans is not yet supported in this pipeline."
+            )
+
+        if method == "caiman":
+            from element_interface.run_caiman import run_caiman
+
+            run_caiman(
+                file_paths=[f.as_posix() for f in image_files],
+                parameters=caiman_params,
+                sampling_rate=sampling_rate,
+                output_dir=output_dir.as_posix(),
+                is3D=False,
+            )
+        else:
+            raise NotImplementedError(
+                f"Per-plane processing using {method} is not yet supported in this pipeline."
+            )
+
+        _, imaging_dataset = get_loader_result(key, PerPlaneProcessingTask)
+        caiman_dataset = imaging_dataset
+        key["processing_time"] = caiman_dataset.creation_time
+
+        self.insert1({**key, "package_version": "", "channel": channel})
+
+
 # ---------------- HELPER FUNCTIONS ----------------
 
 
 _table_attribute_mapper = {
     "ProcessingTask": "processing_output_dir",
     "Curation": "curation_output_dir",
+    "PerPlaneProcessingTask": "processing_output_dir",
 }
 
 
