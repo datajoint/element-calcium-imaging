@@ -254,13 +254,9 @@ class ProcessingTask(dj.Manual):
                 e.g.: sub4/sess1/scan0/suite2p_0
         """
         acq_software = (scan.Scan & key).fetch1("acq_software")
-        filetypes = dict(
-            ScanImage="*.tif", Scanbox="*.sbx", NIS="*.nd2", PrairieView="*.tif"
-        )
-
         scan_dir = find_full_path(
             get_imaging_root_data_dir(),
-            get_calcium_imaging_files(key, filetypes[acq_software])[0],
+            get_calcium_imaging_files(key, acq_software)[0],
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
@@ -523,8 +519,11 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = pathlib.Path(output_dir) / f"pln{plane_idx}_chn{channel}"
-                            
+                            pln_output_dir = (
+                                pathlib.Path(output_dir)
+                                / f"pln{plane_idx}_chn{channel}"
+                            )
+
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
