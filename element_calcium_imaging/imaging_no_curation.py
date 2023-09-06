@@ -376,7 +376,6 @@ class Processing(dj.Computed):
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
-        acq_software = (scan.Scan & key).fetch1("acq_software")
 
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
@@ -520,8 +519,11 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = pathlib.Path(output_dir) / f"pln{plane_idx}_chn{channel}"
-                            
+                            pln_output_dir = (
+                                pathlib.Path(output_dir)
+                                / f"pln{plane_idx}_chn{channel}"
+                            )
+
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
