@@ -516,7 +516,7 @@ class ScanInfo(dj.Imported):
                     ]
                 )
         elif acq_software == "PrairieView":
-            from element_interface import PrairieViewMeta
+            from element_interface.prairie_view_loader import PrairieViewMeta
 
             pv_dir = pathlib.Path(scan_filepaths[0]).parent
             PVmeta = PrairieViewMeta(pv_dir)
