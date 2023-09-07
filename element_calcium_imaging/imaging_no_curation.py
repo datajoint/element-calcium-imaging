@@ -437,6 +437,7 @@ class Processing(dj.Computed):
                     "data_path": [image_files[0].parent.as_posix()],
                     "tiff_list": [f.as_posix() for f in image_files],
                 }
+                suite2p_params["force_sktiff"] = True
 
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
 
@@ -520,8 +521,11 @@ class Processing(dj.Computed):
 
                         plane_processing_tasks = []
                         for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = pathlib.Path(output_dir) / f"pln{plane_idx}_chn{channel}"
-                            
+                            pln_output_dir = (
+                                pathlib.Path(output_dir)
+                                / f"pln{plane_idx}_chn{channel}"
+                            )
+
                             pln_output_dir.mkdir(parents=True, exist_ok=True)
                             plane_processing_tasks.append(
                                 {
