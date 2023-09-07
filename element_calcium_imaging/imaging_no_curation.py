@@ -254,7 +254,6 @@ class ProcessingTask(dj.Manual):
                 e.g.: sub4/sess1/scan0/suite2p_0
         """
         acq_software = (scan.Scan & key).fetch1("acq_software")
-
         scan_dir = find_full_path(
             get_imaging_root_data_dir(),
             get_calcium_imaging_files(key, acq_software)[0],
@@ -475,7 +474,9 @@ class Processing(dj.Computed):
                             )
                             image_files = tmp_dir.glob(f"*_chn{channel}.tif")
                         elif acq_software == "PrairieView":
-                            from element_interface import PrairieViewMeta
+                            from element_interface.prairie_view_loader import (
+                                PrairieViewMeta,
+                            )
 
                             pv_dir = pathlib.Path(image_files[0]).parent
                             PVmeta = PrairieViewMeta(pv_dir)
