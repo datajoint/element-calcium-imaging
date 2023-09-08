@@ -13,12 +13,12 @@ from pynwb.ophys import (
     TwoPhotonSeries,
 )
 
-from ... import imaging, scan
-from ...scan import get_image_files, get_imaging_root_data_dir
+from ... import scan
+from ... import imaging_no_curation as imaging
+from ...scan import get_calcium_imaging_files, get_imaging_root_data_dir
 
 
 def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
-
     acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
     if acquisition_software == "NIS":
         raise NotImplementedError(
@@ -37,7 +37,9 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
 
         processing_folder_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         scan_interface = ScanImageImagingInterface(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=30
         )
@@ -66,7 +68,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
 
         processing_file_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(session_key, "*.tif")
         scan_interface = ScanImageImagingInterface(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=30
         )
@@ -109,7 +111,9 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
 
         processing_file_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         scan_interface = SbxImagingInterface(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=30
         )
@@ -131,7 +135,9 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         from neuroconv.datainterfaces import Suite2pSegmentationInterface
 
         processing_folder_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
@@ -154,7 +160,9 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         from neuroconv.datainterfaces import CaimanSegmentationInterface
 
         processing_folder_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
@@ -176,7 +184,9 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         from neuroconv.datainterfaces import ExtractSegmentationInterface
 
         processing_file_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_image_files(session_key, "*.tif")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
             fallback_sampling_frequency=30,
@@ -323,11 +333,11 @@ def add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
     mask_keys = (imaging.Segmentation.Mask & session_key).fetch("KEY")
     for mask_key in mask_keys:
         ps.add_roi(
-            image_mask=np.asarray(
+            pixel_mask=np.asarray(
                 (imaging.Segmentation.Mask() & mask_key).fetch1(
                     "mask_xpix", "mask_ypix", "mask_weights"
                 )
-            )
+            ).T
         )
 
     rt_region = ps.create_roi_table_region(
@@ -350,7 +360,7 @@ def add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
             unit="a.u.",
             rate=(scan.ScanInfo & session_key).fetch1("fps"),
         )
-        neuorpil_series = RoiResponseSeries(
+        neuropil_series = RoiResponseSeries(
             name=f"Neuropil_{channel}",
             data=np.stack(
                 (
@@ -375,7 +385,7 @@ def add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
             rate=(scan.ScanInfo & session_key).fetch1("fps"),
         )
     fl = Fluorescence(
-        roi_response_series=[roi_resp_series, neuorpil_series, deconvolved_series]
+        roi_response_series=[roi_resp_series, neuropil_series, deconvolved_series]
     )
     ophys_module.add(fl)
 
@@ -390,7 +400,6 @@ def imaging_session_to_nwb(
     protocol_key=None,
     nwbfile_kwargs=None,
 ):
-
     if processed_data_source not in ["database", "filesystem"]:
         raise ValueError(
             "Invalid processed data source. Expected one of 'database', 'filesystem'"
