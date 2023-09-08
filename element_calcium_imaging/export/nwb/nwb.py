@@ -30,6 +30,8 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         imaging.ProcessingParamSet & f"paramset_idx='{session_paramset_key}'"
     ).fetch1("processing_method")
 
+    frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
+
     if acquisition_software == "ScanImage" and processing_method == "suite2p":
         from neuroconv.datainterfaces import (
             ScanImageImagingInterface,
@@ -41,7 +43,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
             session_key, acquisition_software
         )
         scan_interface = ScanImageImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         s2p_interface = Suite2pSegmentationInterface(
             folder_path=processing_folder_location
@@ -56,7 +58,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
 
         caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
         scan_interface = ScanImageImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
@@ -70,7 +72,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         processing_file_location = pathlib.Path(output_directory).as_posix()
         raw_data_files_location = get_calcium_imaging_files(session_key, "*.tif")
         scan_interface = ScanImageImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         extract_interface = ExtractSegmentationInterface(
             file_path=processing_file_location
@@ -84,7 +86,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
 
         scan_interface = SbxImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         s2p_interface = Suite2pSegmentationInterface(
             folder_path=processing_folder_location
@@ -99,7 +101,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
 
         caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
         scan_interface = SbxImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
         converter = ConverterPipe(data_interfaces=[scan_interface, caiman_interface])
@@ -115,7 +117,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
             session_key, acquisition_software
         )
         scan_interface = SbxImagingInterface(
-            file_path=raw_data_files_location[0], fallback_sampling_frequency=30
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
         extract_interface = ExtractSegmentationInterface(
             file_path=processing_file_location
@@ -140,7 +142,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
-            fallback_sampling_frequency=30,
+            fallback_sampling_frequency=frame_rate,
         )
         s2p_interface = Suite2pSegmentationInterface(
             folder_path=processing_folder_location
@@ -165,7 +167,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
-            fallback_sampling_frequency=30,
+            fallback_sampling_frequency=frame_rate,
         )
         caiman_hdf5 = list(processing_folder_location.rglob("caiman_analysis.hdf5"))
         caiman_interface = CaimanSegmentationInterface(file_path=caiman_hdf5[0])
@@ -189,7 +191,7 @@ def create_raw_data_nwbfile(session_key, output_directory, nwb_path):
         )
         bruker_interface = BrukerTiffConverter(
             file_path=raw_data_files_location[0],
-            fallback_sampling_frequency=30,
+            fallback_sampling_frequency=frame_rate,
         )
         extract_interface = ExtractSegmentationInterface(
             file_path=processing_file_location
