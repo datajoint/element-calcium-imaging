@@ -9,8 +9,8 @@ nav:
   - Data Pipeline: pipeline.md
   - Tutorials:
       - tutorials/index.md
-      - Tutorial Notebook: tutorials/tutorial.ipynb
-      - Quality Metrics Notebook: tutorials/quality_metrics.ipynb
+      - Tutorial Notebook: notebooks/tutorial.ipynb
+      - Quality Metrics Notebook: notebooks/quality_metrics.ipynb
   - Concepts: concepts.md
   - Key Partnerships: partnerships.md
   - Roadmap: roadmap.md

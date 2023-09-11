@@ -39,7 +39,7 @@ setup(
         "ipywidgets",
         "plotly",
     ],
-    extras_require={
+    extras_requires={
         "caiman_requirements": [caiman_requirements],
         "caiman": ["caiman @ git+https://github.com/datajoint/CaImAn"],
         "elements": [
