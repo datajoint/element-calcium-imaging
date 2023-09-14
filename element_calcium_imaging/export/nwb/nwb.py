@@ -73,7 +73,9 @@ def _create_full_nwbfile(session_key, output_directory, nwb_path):
         )
 
         processing_file_location = pathlib.Path(output_directory).as_posix()
-        raw_data_files_location = get_calcium_imaging_files(session_key, acquisition_software)
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
         scan_interface = ScanImageImagingInterface(
             file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
         )
@@ -218,20 +220,30 @@ def _create_raw_data_nwbfile(session_key, output_directory, nwb_path):
             session_key, acquisition_software
         )
 
-        imaging_interface = ScanImageImagingInterface(file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate)
+        imaging_interface = ScanImageImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
+        )
         metadata = imaging_interface.get_metadata()
-        imaging_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
-    
+        imaging_interface.run_conversion(
+            nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'),
+            metadata=metadata,
+        )
+
     elif acquisition_software == "Scanbox":
         from neuroconv.datainterfaces import SbxImagingInterface
-        
+
         raw_data_files_location = get_calcium_imaging_files(
             session_key, acquisition_software
         )
 
-        imaging_interface = SbxImagingInterface(file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate)
+        imaging_interface = SbxImagingInterface(
+            file_path=raw_data_files_location[0], fallback_sampling_frequency=frame_rate
+        )
         metadata = imaging_interface.get_metadata()
-        imaging_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
+        imaging_interface.run_conversion(
+            nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'),
+            metadata=metadata,
+        )
 
     elif acquisition_software == "PrairieView":
         n_planes = (scan.ScanInfo & session_key).fetch1("ndepths")
@@ -252,7 +264,10 @@ def _create_raw_data_nwbfile(session_key, output_directory, nwb_path):
             fallback_sampling_frequency=frame_rate,
         )
         metadata = imaging_interface.get_metadata()
-        imaging_interface.run_conversion(nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'), metadata=metadata)
+        imaging_interface.run_conversion(
+            nwbfile_path=(nwb_path / f'{session_key["subject"]}_nwbfile'),
+            metadata=metadata,
+        )
 
 
 def _add_scan_to_nwb(session_key, nwbfile):
@@ -444,7 +459,9 @@ def imaging_session_to_nwb(
                 nwb_file = NWBFile(**nwbfile_kwargs)
             io.write(nwb_file)
     elif include_raw_data and processed_data_source == "database":
-        _create_raw_data_nwbfile(session_key, output_directory=output_dir, nwb_path=save_path)
+        _create_raw_data_nwbfile(
+            session_key, output_directory=output_dir, nwb_path=save_path
+        )
         with NWBHDF5IO(
             (save_path / f'{session_key["subject"]}_nwbfile'), mode="r+"
         ) as io:
@@ -462,7 +479,9 @@ def imaging_session_to_nwb(
             try:
                 io.write(nwb_file)
             except ValueError:
-                    logger.warn("Group already exists in NWB file. Unable to update values.")
+                logger.warn(
+                    "Group already exists in NWB file. Unable to update values."
+                )
     elif not include_raw_data and processed_data_source == "database":
         if session_to_nwb:
             nwb_file = session_to_nwb(
@@ -486,4 +505,6 @@ def imaging_session_to_nwb(
             io.write(nwb_file)
 
     elif not include_raw_data and processed_data_source == "filesystem":
-        raise NotImplementedError("Creating NWB files without raw data from the filesystem is not supported. Please set `include_raw_data=True` or `processed_data_source='filesystem'`.")
+        raise NotImplementedError(
+            "Creating NWB files without raw data from the filesystem is not supported. Please set `include_raw_data=True` or `processed_data_source='filesystem'`."
+        )
