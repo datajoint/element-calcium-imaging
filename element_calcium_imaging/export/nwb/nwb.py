@@ -15,10 +15,17 @@ from pynwb.ophys import (
 )
 
 from ... import scan
-from ... import imaging_no_curation as imaging
+from ... import imaging_no_curation, imaging, imaging_preprocess
 from ...scan import get_calcium_imaging_files, get_imaging_root_data_dir
 
 logger = dj.logger
+
+if imaging_no_curation.schema.is_activated():
+    imaging = imaging_no_curation
+else:
+    raise DataJointError(
+        "This export function is designed for the `imaging_no_curation` module."
+    )
 
 
 def _create_full_nwbfile(session_key, output_directory, nwb_path):
@@ -422,16 +429,11 @@ def imaging_session_to_nwb(
     protocol_key=None,
     nwbfile_kwargs=None,
 ):
+    session_to_nwb = getattr(imaging._linking_module, "session_to_nwb", False)
     if processed_data_source not in ["database", "filesystem"]:
         raise ValueError(
             "Invalid processed data source. Expected one of 'database', 'filesystem'"
         )
-
-    session_to_nwb = getattr(imaging._linking_module, "session_to_nwb", False)
-    output_relative_dir = (imaging.ProcessingTask & session_key).fetch1(
-        "processing_output_dir"
-    )
-    output_dir = find_full_path(get_imaging_root_data_dir(), output_relative_dir)
 
     if not save_path:
         output_relative_dir = (imaging.ProcessingTask & session_key).fetch1(
@@ -441,7 +443,7 @@ def imaging_session_to_nwb(
 
     if include_raw_data and processed_data_source == "filesystem":
         _create_full_nwbfile(
-            session_key, output_directory=output_dir, nwb_path=save_path
+            session_key, output_directory=save_path, nwb_path=save_path
         )
         with NWBHDF5IO(
             (save_path / f'{session_key["subject"]}_nwbfile'), mode="r+"
@@ -460,7 +462,7 @@ def imaging_session_to_nwb(
             io.write(nwb_file)
     elif include_raw_data and processed_data_source == "database":
         _create_raw_data_nwbfile(
-            session_key, output_directory=output_dir, nwb_path=save_path
+            session_key, output_directory=save_path, nwb_path=save_path
         )
         with NWBHDF5IO(
             (save_path / f'{session_key["subject"]}_nwbfile'), mode="r+"
