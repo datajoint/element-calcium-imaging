@@ -1,5 +1,4 @@
 import pathlib
-
 import numpy as np
 import datajoint as dj
 from datajoint import DataJointError
@@ -14,9 +13,9 @@ from pynwb.ophys import (
     TwoPhotonSeries,
 )
 
-from ... import scan
-from ... import imaging_no_curation
+from ... import scan, imaging_no_curation
 from ...scan import get_calcium_imaging_files, get_imaging_root_data_dir
+
 
 logger = dj.logger
 
@@ -30,20 +29,32 @@ else:
 
 def imaging_session_to_nwb(
     session_key,
-    save_path=None,
     include_raw_data=False,
     lab_key=None,
     project_key=None,
     protocol_key=None,
     nwbfile_kwargs=None,
 ):
-    session_to_nwb = getattr(imaging._linking_module, "session_to_nwb", False)
+    """Main function for converting calcium imaging data to NWB.
 
-    if not save_path:
-        output_relative_dir = (imaging.ProcessingTask & session_key).fetch1(
-            "processing_output_dir"
-        )
-        save_path = find_full_path(get_imaging_root_data_dir(), output_relative_dir)
+    Args:
+        session_key (dict): key from Session table.
+        include_raw_data (bool): Optional. Default False. Include the raw data from
+        source. `ScanImage`, `Scanbox`, and `PrairieView` are supported.
+        lab_key (dict): Optional key to add metadata from Element Lab.
+        project_key (dict): Optional key to add metadata from Element Lab.
+        protocol_key (dict): Optional key to add metadata from Element Lab.
+        nwbfile_kwargs (dict): Optional. If Element Session is not used, this argument
+            is required and must be a dictionary containing 'session_description' (str),
+            'identifier' (str), and 'session_start_time' (datetime), the required
+             minimal data for instantiating an NWBFile object. If element-session is
+             being used, this argument can optionally be used to overwrite NWBFile
+             fields.
+    Returns:
+        nwbfile (NWBFile): nwb file
+    """
+
+    session_to_nwb = getattr(imaging._linking_module, "session_to_nwb", False)
 
     if session_to_nwb:
         nwb_file = session_to_nwb(
@@ -55,6 +66,7 @@ def imaging_session_to_nwb(
         )
     else:
         nwb_file = NWBFile(**nwbfile_kwargs)
+
     if include_raw_data:
         _create_raw_data_nwbfile(session_key, linked_nwb_file=nwb_file)
     else:
@@ -68,6 +80,13 @@ def imaging_session_to_nwb(
 
 
 def _create_raw_data_nwbfile(session_key, linked_nwb_file):
+    """Adds raw data to NWB file.
+
+    Args:
+        session_key (dict): key from Session table
+        linked_nwb_file (NWBFile): nwb file
+    """
+
     acquisition_software = (scan.Scan & session_key).fetch1("acq_software")
     frame_rate = (scan.ScanInfo & session_key).fetch1("fps")
 
@@ -122,6 +141,13 @@ def _create_raw_data_nwbfile(session_key, linked_nwb_file):
 
 
 def _add_scan_to_nwb(session_key, nwbfile):
+    """Adds metadata for a scan from database.
+
+    Args:
+        session_key (dict): key from Session table
+        nwbfile (NWBFile): nwb file
+    """
+
     from math import nan
 
     try:
@@ -192,6 +218,14 @@ def _add_motion_correction_to_nwb(session_key, nwbfile):
 
 
 def _add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
+    """Adds segmentation data from database.
+
+    Args:
+        session_key (dict): key from Session table
+        nwbfile (NWBFile): nwb file
+        imaging_plane (NWBFile Imaging Plane): nwb file imaging plane object
+    """
+
     ophys_module = nwbfile.create_processing_module(
         name="ophys", description="optical physiology processed data"
     )
@@ -264,10 +298,18 @@ def _add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
 
 
 def write_nwb(nwbfile, fname, check_read=True):
-    with pynwb.NWBHDF5IO(fname, "w") as io:
+    """Export NWBFile
+
+    Args:
+        nwbfile (NWBFile): nwb file
+        fname (str): Absolute path including `*.nwb` extension.
+        check_read (bool): If True, PyNWB will try to read the produced NWB file and
+            ensure that it can be read.
+    """
+    with NWBHDF5IO(fname, "w") as io:
         io.write(nwbfile)
 
     if check_read:
-        with pynwb.NWBHDF5IO(fname, "r") as io:
+        with NWBHDF5IO(fname, "r") as io:
             io.read()
     logger.info("File saved successfully")
