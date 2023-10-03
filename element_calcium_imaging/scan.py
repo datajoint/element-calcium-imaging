@@ -201,7 +201,7 @@ class ScanInfo(dj.Imported):
         nfields (int): Number of fields.
         nchannels (int): Number of channels.
         ndepths (int): Number of scanning depths (planes).
-        nframes (int): Number of recorded frames.
+        nframes (int): Number of recorded frames (time steps).
         nrois (int): Number of ROIs (see scanimage's multi ROI imaging).
         x (float, optional): ScanImage's 0 point in the motor coordinate system (um).
         y (float, optional): ScanImage's 0 point in the motor coordinate system (um).
@@ -222,7 +222,7 @@ class ScanInfo(dj.Imported):
     nfields              : tinyint   # number of fields
     nchannels            : tinyint   # number of channels
     ndepths              : int       # Number of scanning depths (planes)
-    nframes              : int       # number of recorded frames
+    nframes              : int       # number of recorded frames (time steps)
     nrois                : tinyint   # number of ROIs (see scanimage's multi ROI imaging)
     x=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
