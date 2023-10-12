@@ -1533,7 +1533,14 @@ class PerPlaneProcessing(dj.Computed):
             "params", "processing_method"
         )
         if "indicies" in params:
-            caiman_params = {"motion": {"indicies": (slice(*params["indicies"][0]), slice(*params["indicies"][1]))}}
+            caiman_params = {
+                "motion": {
+                    "indicies": (
+                        slice(*params["indicies"][0]),
+                        slice(*params["indicies"][1]),
+                    )
+                }
+            }
         else:
             caiman_params = params
         sampling_rate = (scan.ScanInfo & key).fetch1("fps")
