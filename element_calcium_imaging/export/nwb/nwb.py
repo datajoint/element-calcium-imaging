@@ -194,6 +194,13 @@ def _add_scan_to_nwb(session_key, nwbfile):
 
 
 def _add_image_series_to_nwb(session_key, imaging_plane):
+    """Adds TwoPhotonSeries to NWB file.
+
+    Args:
+        session_key (dict): key from Session table
+        imaging_plane (NWBFile Imaging Plane): nwb file imaging plane object
+    """
+
     imaging_files = (scan.ScanInfo.ScanFile & session_key).fetch("file_path")
     two_p_series = TwoPhotonSeries(
         name="TwoPhotonSeries",
