@@ -1,9 +1,6 @@
-import pathlib
 import numpy as np
 import datajoint as dj
 from datajoint import DataJointError
-from element_interface.utils import find_full_path
-from neuroconv import ConverterPipe
 from pynwb import NWBHDF5IO, NWBFile
 from pynwb.ophys import (
     Fluorescence,

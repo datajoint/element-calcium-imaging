@@ -76,4 +76,3 @@ def test_data(pipeline):
         _ = [find_full_path(root_dirs(), p) for p in sessions_dirs]
     except FileNotFoundError as e:
         print(e)
-
