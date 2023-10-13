@@ -3,6 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.9.0] - 2023-10-13
+
++ Add - Export to NWB and upload to DANDI
+
 ## [0.8.1] - 2023-08-31
 
 + Fix - Rename `get_image_files` to `get_calcium_imaging_files` where missed
