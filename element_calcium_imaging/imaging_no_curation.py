@@ -1533,17 +1533,7 @@ class PerPlaneProcessing(dj.Computed):
         params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
             "params", "processing_method"
         )
-        if "indices" in params:
-            caiman_params = {
-                "motion": {
-                    "indices": (
-                        slice(*params["indices"][0]),
-                        slice(*params["indices"][1]),
-                    )
-                }
-            }
-        else:
-            caiman_params = params
+        caiman_params = params
         sampling_rate = (scan.ScanInfo & key).fetch1("fps")
         channel = params.get("channel_to_process", 0)
 
