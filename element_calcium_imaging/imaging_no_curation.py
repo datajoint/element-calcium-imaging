@@ -1533,12 +1533,12 @@ class PerPlaneProcessing(dj.Computed):
         params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
             "params", "processing_method"
         )
-        if "indicies" in params:
+        if "indices" in params:
             caiman_params = {
                 "motion": {
-                    "indicies": (
-                        slice(*params["indicies"][0]),
-                        slice(*params["indicies"][1]),
+                    "indices": (
+                        slice(*params["indices"][0]),
+                        slice(*params["indices"][1]),
                     )
                 }
             }
