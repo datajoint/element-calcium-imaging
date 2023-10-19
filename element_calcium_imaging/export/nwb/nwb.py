@@ -66,6 +66,19 @@ def imaging_session_to_nwb(
 
     if include_raw_data:
         _create_raw_data_nwbfile(session_key, linked_nwb_file=nwb_file)
+
+        if not nwb_file.imaging_planes:
+            imaging_plane = _add_scan_to_nwb(session_key, nwbfile=nwb_file)
+
+        _add_image_series_to_nwb(
+            session_key, imaging_plane=nwb_file.imaging_planes["ImagingPlane"]
+        )
+        _add_segmentation_data_to_nwb(
+            session_key,
+            nwbfile=nwb_file,
+            imaging_plane=nwb_file.imaging_planes["ImagingPlane"],
+        )
+
     else:
         imaging_plane = _add_scan_to_nwb(session_key, nwbfile=nwb_file)
         _add_image_series_to_nwb(session_key, imaging_plane=imaging_plane)
@@ -94,22 +107,29 @@ def _create_raw_data_nwbfile(session_key, linked_nwb_file):
 
     elif acquisition_software == "PrairieView":
         n_planes = (scan.ScanInfo & session_key).fetch1("ndepths")
+        raw_data_files_location = get_calcium_imaging_files(
+            session_key, acquisition_software
+        )
+
         if n_planes > 1:
             from neuroconv.converters import (
                 BrukerTiffMultiPlaneConverter as BrukerTiffConverter,
+            )
+
+            imaging_interface = BrukerTiffConverter(
+                file_path=raw_data_files_location[0],
+                fallback_sampling_frequency=frame_rate,
+                plane_separation_type="disjoint",
             )
         else:
             from neuroconv.converters import (
                 BrukerTiffSinglePlaneConverter as BrukerTiffConverter,
             )
-        raw_data_files_location = get_calcium_imaging_files(
-            session_key, acquisition_software
-        )
 
-        imaging_interface = BrukerTiffConverter(
-            file_path=raw_data_files_location[0],
-            fallback_sampling_frequency=frame_rate,
-        )
+            imaging_interface = BrukerTiffConverter(
+                file_path=raw_data_files_location[0],
+                fallback_sampling_frequency=frame_rate,
+            )
         metadata = imaging_interface.get_metadata()
         imaging_interface.run_conversion(
             nwbfile=linked_nwb_file,
