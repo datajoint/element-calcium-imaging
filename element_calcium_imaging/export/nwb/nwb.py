@@ -66,25 +66,19 @@ def imaging_session_to_nwb(
 
     if include_raw_data:
         _create_raw_data_nwbfile(session_key, linked_nwb_file=nwb_file)
-
         if not nwb_file.imaging_planes:
-            imaging_plane = _add_scan_to_nwb(session_key, nwbfile=nwb_file)
-
-        _add_image_series_to_nwb(
-            session_key, imaging_plane=nwb_file.imaging_planes["ImagingPlane"]
-        )
-        _add_segmentation_data_to_nwb(
-            session_key,
-            nwbfile=nwb_file,
-            imaging_plane=nwb_file.imaging_planes["ImagingPlane"],
-        )
+            _add_scan_to_nwb(session_key, nwbfile=nwb_file)
 
     else:
-        imaging_plane = _add_scan_to_nwb(session_key, nwbfile=nwb_file)
-        _add_image_series_to_nwb(session_key, imaging_plane=imaging_plane)
-        _add_segmentation_data_to_nwb(
-            session_key, nwbfile=nwb_file, imaging_plane=imaging_plane
-        )
+        _add_scan_to_nwb(session_key, nwbfile=nwb_file)
+    _add_image_series_to_nwb(
+        session_key, imaging_plane=nwb_file.imaging_planes["ImagingPlane"]
+    )
+    _add_segmentation_data_to_nwb(
+        session_key,
+        nwbfile=nwb_file,
+        imaging_plane=nwb_file.imaging_planes["ImagingPlane"],
+    )
 
     return nwb_file
 
@@ -131,7 +125,7 @@ def _create_raw_data_nwbfile(session_key, linked_nwb_file):
                 fallback_sampling_frequency=frame_rate,
             )
         metadata = imaging_interface.get_metadata()
-        imaging_interface.run_conversion(
+        imaging_interface.add_to_nwbfile(
             nwbfile=linked_nwb_file,
             metadata=metadata,
         )
@@ -195,12 +189,12 @@ def _add_scan_to_nwb(session_key, nwbfile):
         for field_key in field_keys:
             field_no = (scan.ScanInfo.Field & field_key).fetch1("field_idx")
             imaging_plane = nwbfile.create_imaging_plane(
-                name=f"ImagingPlane{field_no+1}",
+                name="ImagingPlane",
                 optical_channel=optical_channel,
                 imaging_rate=frame_rate,
                 description=scan_notes
                 if scan_notes != ""
-                else f"Imaging plane for channel {channel+1}",
+                else f"Imaging plane for field {field_no+1}, channel {channel+1}",
                 device=device,
                 excitation_lambda=nan,
                 indicator="unknown",
@@ -304,20 +298,18 @@ def _add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
             unit="a.u.",
             rate=(scan.ScanInfo & session_key).fetch1("fps"),
         )
-        deconvolved_series = RoiResponseSeries(
-            name=f"Deconvolved_{channel}",
-            data=np.stack(
-                (
-                    imaging.Activity.Trace & session_key & f"fluo_channel='{channel}'"
-                ).fetch("activity_trace")
-            ).T,
-            rois=rt_region,
-            unit="a.u.",
-            rate=(scan.ScanInfo & session_key).fetch1("fps"),
-        )
-    fl = Fluorescence(
-        roi_response_series=[roi_resp_series, neuropil_series, deconvolved_series]
-    )
+        # deconvolved_series = RoiResponseSeries(
+        #     name=f"Deconvolved_{channel}",
+        #     data=np.stack(
+        #         (
+        #             imaging.Activity.Trace & session_key & f"fluo_channel='{channel}'"
+        #         ).fetch("activity_trace")
+        #     ).T,
+        #     rois=rt_region,
+        #     unit="a.u.",
+        #     rate=(scan.ScanInfo & session_key).fetch1("fps"),
+        # )
+    fl = Fluorescence(roi_response_series=[roi_resp_series, neuropil_series])
     ophys_module.add(fl)
 
 
