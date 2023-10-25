@@ -60,3 +60,18 @@ segmented.
 - Scanbox
 - Nikon NIS-Elements
 - Bruker Prairie View
+
+## Data Export and Publishing
+
+Element Calcium Imaging supports exporting of all data into standard Neurodata
+Without Borders (NWB) files. This makes it easy to share files with collaborators and
+publish results on [DANDI Archive](https://dandiarchive.org/).
+[NWB](https://www.nwb.org/), as an organization, is dedicated to standardizing data
+formats and maximizing interoperability across tools for neurophysiology.
+
+To use the export functionality with additional related dependencies, install the
+Element with the `nwb` option as follows:
+
+```console
+pip install element-calcium-imaging[nwb]
+```
