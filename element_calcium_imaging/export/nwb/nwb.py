@@ -298,18 +298,18 @@ def _add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
             unit="a.u.",
             rate=(scan.ScanInfo & session_key).fetch1("fps"),
         )
-        # deconvolved_series = RoiResponseSeries(
-        #     name=f"Deconvolved_{channel}",
-        #     data=np.stack(
-        #         (
-        #             imaging.Activity.Trace & session_key & f"fluo_channel='{channel}'"
-        #         ).fetch("activity_trace")
-        #     ).T,
-        #     rois=rt_region,
-        #     unit="a.u.",
-        #     rate=(scan.ScanInfo & session_key).fetch1("fps"),
-        # )
-    fl = Fluorescence(roi_response_series=[roi_resp_series, neuropil_series])
+        deconvolved_series = RoiResponseSeries(
+            name=f"Deconvolved_{channel}",
+            data=np.stack(
+                (
+                    imaging.Activity.Trace & session_key & f"fluo_channel='{channel}'"
+                ).fetch("activity_trace")
+            ).T,
+            rois=rt_region,
+            unit="a.u.",
+            rate=(scan.ScanInfo & session_key).fetch1("fps"),
+        )
+    fl = Fluorescence(roi_response_series=[roi_resp_series, neuropil_series, deconvolved_series])
     ophys_module.add(fl)
 
 
