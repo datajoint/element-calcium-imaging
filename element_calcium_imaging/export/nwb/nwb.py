@@ -309,7 +309,9 @@ def _add_segmentation_data_to_nwb(session_key, nwbfile, imaging_plane):
             unit="a.u.",
             rate=(scan.ScanInfo & session_key).fetch1("fps"),
         )
-    fl = Fluorescence(roi_response_series=[roi_resp_series, neuropil_series, deconvolved_series])
+    fl = Fluorescence(
+        roi_response_series=[roi_resp_series, neuropil_series, deconvolved_series]
+    )
     ophys_module.add(fl)
 
 
