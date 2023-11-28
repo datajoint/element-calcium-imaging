@@ -1,0 +1,3 @@
+dandi
+pynwb
+neuroconv[scanimage, brukertiff, scanbox, caiman, suite2p, extract]
