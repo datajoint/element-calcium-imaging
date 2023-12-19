@@ -3,6 +3,11 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.9.1] - 2023-12-19
+
++ Update - Tutorial notebook
++ Fix - minor fixes in `setup.py` and `README`
+
 ## [0.9.0] - 2023-10-13
 
 + Add - Export to NWB and upload to DANDI
@@ -181,6 +186,8 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.9.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.1
+[0.9.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.0
 [0.8.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.8.1
 [0.8.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.8.0
 [0.7.9]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.7.9
