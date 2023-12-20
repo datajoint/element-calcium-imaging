@@ -4,9 +4,9 @@
     "editor.rulers": [
         88
     ],
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
     "[python]": {
-        "editor.defaultFormatter": null
+        "editor.defaultFormatter": "ms-python.black-formatter"
     },
     "[markdown]": {
         "editor.defaultFormatter": "disable"

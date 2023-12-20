@@ -35,7 +35,7 @@ documentation page.
 + Clone the repository to your computer
 
   ```bash
-  git clone https://github.com/<enter_github_username>/element-calcium-imaging
+  git clone https://github.com/<enter_github_username>/element-calcium-imaging.git
   ```
 
 + Install with `pip`
