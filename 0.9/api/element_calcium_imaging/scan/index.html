@@ -745,28 +745,28 @@
       
         <li class="md-nav__item">
   <a href="#element_calcium_imaging.scan.activate" class="md-nav__link">
-    activate()
+    activate
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#element_calcium_imaging.scan.get_imaging_root_data_dir" class="md-nav__link">
-    get_imaging_root_data_dir()
+    get_imaging_root_data_dir
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#element_calcium_imaging.scan.get_processed_root_data_dir" class="md-nav__link">
-    get_processed_root_data_dir()
+    get_processed_root_data_dir
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#element_calcium_imaging.scan.get_calcium_imaging_files" class="md-nav__link">
-    get_calcium_imaging_files()
+    get_calcium_imaging_files
   </a>
   
 </li>
@@ -823,7 +823,7 @@
         
           <li class="md-nav__item">
   <a href="#element_calcium_imaging.scan.ScanInfo.make" class="md-nav__link">
-    make()
+    make
   </a>
   
 </li>
@@ -926,7 +926,6 @@
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -1126,7 +1125,6 @@ Upstream tables:
 
 
 
-
 <h2 id="element_calcium_imaging.scan.get_imaging_root_data_dir" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">get_imaging_root_data_dir</span><span class="p">()</span></code>
 
@@ -1231,7 +1229,6 @@ director(y/ies).</p>
 
 
 
-
 <h2 id="element_calcium_imaging.scan.get_processed_root_data_dir" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">get_processed_root_data_dir</span><span class="p">()</span></code>
 
@@ -1319,7 +1316,6 @@ directory.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -1439,7 +1435,6 @@ directory.</p>
 
 
 
-
 <h2 id="element_calcium_imaging.scan.AcquisitionSoftware" class="doc doc-heading">
           <code>AcquisitionSoftware</code>
 
@@ -1468,7 +1463,7 @@ directory.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>acq_software</code></td>
+          <td><code><span title="element_calcium_imaging.scan.AcquisitionSoftware.acq_software">acq_software</span></code></td>
           <td>
                 <code>str</code>
           </td>
@@ -1525,6 +1520,7 @@ directory.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1533,7 +1529,6 @@ directory.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -1564,7 +1559,7 @@ directory.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>channel</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Channel.channel">channel</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1617,6 +1612,7 @@ directory.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1625,7 +1621,6 @@ directory.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -1658,7 +1653,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>Session</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Scan.Session">Session</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1669,7 +1664,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>scan_id</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Scan.scan_id">scan_id</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1680,7 +1675,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>Equipment</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Scan.Equipment">Equipment</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1691,7 +1686,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>AcquisitionSoftware</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Scan.AcquisitionSoftware">AcquisitionSoftware</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1702,7 +1697,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>scan_notes</code></td>
+          <td><code><span title="element_calcium_imaging.scan.Scan.scan_notes">scan_notes</span></code></td>
           <td>
                 <code>str</code>
           </td>
@@ -1777,6 +1772,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1785,7 +1781,6 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -1816,7 +1811,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>Scan</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanLocation.Scan">Scan</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1827,7 +1822,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>Locaton</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanLocation.Locaton">Locaton</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1884,6 +1879,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1892,7 +1888,6 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -1923,7 +1918,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>Scan</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Scan">Scan</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1934,7 +1929,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>nfields</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.nfields">nfields</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1945,7 +1940,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>nchannels</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.nchannels">nchannels</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1956,7 +1951,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>ndepths</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.ndepths">ndepths</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1967,7 +1962,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>nframes</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.nframes">nframes</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1978,7 +1973,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>nrois</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.nrois">nrois</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -1989,7 +1984,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>x</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.x">x</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2000,7 +1995,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>y</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.y">y</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2011,7 +2006,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>z</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.z">z</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2022,7 +2017,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>fps</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.fps">fps</span></code></td>
           <td>
                 <code>float) </code>
           </td>
@@ -2033,7 +2028,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>bidirectional</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.bidirectional">bidirectional</span></code></td>
           <td>
                 <code>bool</code>
           </td>
@@ -2044,7 +2039,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>usecs_per_line</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.usecs_per_line">usecs_per_line</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2055,7 +2050,7 @@ ScanLocation, ScanInfo, and ScanInfo's part tables.</p>
           </td>
         </tr>
         <tr>
-          <td><code>fill_fraction</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.fill_fraction">fill_fraction</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2067,7 +2062,7 @@ scanimage)</p>
           </td>
         </tr>
         <tr>
-          <td><code>scan_datetime</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.scan_datetime">scan_datetime</span></code></td>
           <td>
                 <code><span title="datetime.datetime">datetime</span></code>
           </td>
@@ -2078,7 +2073,7 @@ scanimage)</p>
           </td>
         </tr>
         <tr>
-          <td><code>scan_duration</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.scan_duration">scan_duration</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2089,7 +2084,7 @@ scanimage)</p>
           </td>
         </tr>
         <tr>
-          <td><code>bidirectional_z</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.bidirectional_z">bidirectional_z</span></code></td>
           <td>
                 <code>bool</code>
           </td>
@@ -2878,7 +2873,6 @@ scanimage)</p>
 
 
 
-
 <h3 id="element_calcium_imaging.scan.ScanInfo.Field" class="doc doc-heading">
           <code>Field</code>
 
@@ -2907,7 +2901,7 @@ pitch, etc.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ScanInfo</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.ScanInfo">ScanInfo</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -2918,7 +2912,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>field_idx</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.field_idx">field_idx</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -2929,7 +2923,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>px_height</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.px_height">px_height</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -2940,7 +2934,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>px_width</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.px_width">px_width</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -2951,7 +2945,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>um_height</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.um_height">um_height</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2962,7 +2956,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>um_width</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.um_width">um_width</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2973,7 +2967,7 @@ pitch, etc.</p>
           </td>
         </tr>
         <tr>
-          <td><code>field_x</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.field_x">field_x</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2985,7 +2979,7 @@ coordinate system (um).</p>
           </td>
         </tr>
         <tr>
-          <td><code>field_y</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.field_y">field_y</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -2997,7 +2991,7 @@ coordinate system (um).</p>
           </td>
         </tr>
         <tr>
-          <td><code>field_z</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.field_z">field_z</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -3008,7 +3002,7 @@ coordinate system (um).</p>
           </td>
         </tr>
         <tr>
-          <td><code>delay_image</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.delay_image">delay_image</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -3020,7 +3014,7 @@ pixels in this field (ms).</p>
           </td>
         </tr>
         <tr>
-          <td><code>roi</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.Field.roi">roi</span></code></td>
           <td>
                 <code>int</code>
           </td>
@@ -3122,6 +3116,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
   </div>
 
+
 </div>
 
 
@@ -3130,7 +3125,6 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3161,7 +3155,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ScanInfo</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.ScanFile.ScanInfo">ScanInfo</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -3172,7 +3166,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>file_path</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanInfo.ScanFile.file_path">file_path</span></code></td>
           <td>
                 <code>str</code>
           </td>
@@ -3225,6 +3219,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
   </div>
 
+
 </div>
 
 
@@ -3234,7 +3229,6 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -3830,6 +3824,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
   </div>
 
+
 </div>
 
 
@@ -3838,7 +3833,6 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -3869,7 +3863,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ScanInfo.Field</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.ScanInfo.Field">ScanInfo.Field</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -4084,7 +4078,6 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
 
 
-
 <h3 id="element_calcium_imaging.scan.ScanQualityMetrics.Frames" class="doc doc-heading">
           <code>Frames</code>
 
@@ -4112,7 +4105,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ScanInfo.Field</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.ScanInfo.Field">ScanInfo.Field</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -4123,7 +4116,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>Channel</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.Channel">Channel</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -4134,7 +4127,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>min_intensity</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.min_intensity">min_intensity</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -4145,7 +4138,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>mean_intensity</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.mean_intensity">mean_intensity</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -4156,7 +4149,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>max_intensity</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.max_intensity">max_intensity</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -4167,7 +4160,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
           </td>
         </tr>
         <tr>
-          <td><code>contrast</code></td>
+          <td><code><span title="element_calcium_imaging.scan.ScanQualityMetrics.Frames.contrast">contrast</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -4238,6 +4231,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
 
   </div>
 
+
 </div>
 
 
@@ -4246,6 +4240,7 @@ software) containing this field - only relevant to mesoscale scans.</p>
   </div>
 
   </div>
+
 
 </div>
 

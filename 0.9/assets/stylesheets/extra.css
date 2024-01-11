@@ -96,7 +96,6 @@ html a[title="YouTube"].md-social__link svg {
     /* --md-footer-fg-color: var(--dj-white); */
 }
 
-[data-md-color-scheme="slate"] td,
-th {
+[data-md-color-scheme="slate"] .jupyter-wrapper .Table Td {
     color: var(--dj-black)
 }

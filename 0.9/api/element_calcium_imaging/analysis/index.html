@@ -531,7 +531,7 @@
       
         <li class="md-nav__item">
   <a href="#element_calcium_imaging.analysis.activate" class="md-nav__link">
-    activate()
+    activate
   </a>
   
 </li>
@@ -573,7 +573,7 @@
         
           <li class="md-nav__item">
   <a href="#element_calcium_imaging.analysis.ActivityAlignment.plot_aligned_activities" class="md-nav__link">
-    plot_aligned_activities()
+    plot_aligned_activities
   </a>
   
 </li>
@@ -873,7 +873,6 @@
 
 
 
-
 <h2 id="element_calcium_imaging.analysis.activate" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">activate</span><span class="p">(</span><span class="n">schema_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">create_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">create_tables</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linking_module</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
@@ -1039,7 +1038,6 @@ session, trial.</p>
 
 
 
-
 <h2 id="element_calcium_imaging.analysis.ActivityAlignmentCondition" class="doc doc-heading">
           <code>ActivityAlignmentCondition</code>
 
@@ -1067,7 +1065,7 @@ session, trial.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>imaging.Activity</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.imaging.Activity">imaging.Activity</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1078,7 +1076,7 @@ session, trial.</p>
           </td>
         </tr>
         <tr>
-          <td><code>event.AlignmentEvent</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.event.AlignmentEvent">event.AlignmentEvent</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1089,7 +1087,7 @@ session, trial.</p>
           </td>
         </tr>
         <tr>
-          <td><code>trial_condition</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.trial_condition">trial_condition</span></code></td>
           <td>
                 <code>str</code>
           </td>
@@ -1100,7 +1098,7 @@ session, trial.</p>
           </td>
         </tr>
         <tr>
-          <td><code>bin_size</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.bin_size">bin_size</span></code></td>
           <td>
                 <code>float</code>
           </td>
@@ -1199,7 +1197,6 @@ session, trial.</p>
 
 
 
-
 <h3 id="element_calcium_imaging.analysis.ActivityAlignmentCondition.Trial" class="doc doc-heading">
           <code>Trial</code>
 
@@ -1227,7 +1224,7 @@ session, trial.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ActivityAlignmentCondition</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.Trial.ActivityAlignmentCondition">ActivityAlignmentCondition</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1239,7 +1236,7 @@ ActivityAlignmentCondition.</p>
           </td>
         </tr>
         <tr>
-          <td><code>trial.Trial</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignmentCondition.Trial.trial.Trial">trial.Trial</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1294,6 +1291,7 @@ ActivityAlignmentCondition.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1302,6 +1300,7 @@ ActivityAlignmentCondition.</p>
   </div>
 
   </div>
+
 
 </div>
 
@@ -1311,7 +1310,6 @@ ActivityAlignmentCondition.</p>
 
 
 <div class="doc doc-object doc-class">
-
 
 
 
@@ -1341,7 +1339,7 @@ ActivityAlignmentCondition.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ActivityAlignmentCondition</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.ActivityAlignmentCondition">ActivityAlignmentCondition</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1353,7 +1351,7 @@ ActivityAlignmentCondition.</p>
           </td>
         </tr>
         <tr>
-          <td><code>aligned_timestamps</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.aligned_timestamps">aligned_timestamps</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -1664,7 +1662,6 @@ ActivityAlignmentCondition.</p>
 
 
 
-
 <h3 id="element_calcium_imaging.analysis.ActivityAlignment.AlignedTrialActivity" class="doc doc-heading">
           <code>AlignedTrialActivity</code>
 
@@ -1692,7 +1689,7 @@ ActivityAlignmentCondition.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>ActivityAlignment</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.AlignedTrialActivity.ActivityAlignment">ActivityAlignment</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1703,7 +1700,7 @@ ActivityAlignmentCondition.</p>
           </td>
         </tr>
         <tr>
-          <td><code>imaging.Activity.Trace</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.AlignedTrialActivity.imaging.Activity.Trace">imaging.Activity.Trace</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1715,7 +1712,7 @@ imaging.Activity.Trace.</p>
           </td>
         </tr>
         <tr>
-          <td><code>ActivityAlignmentCondition.Trial</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.AlignedTrialActivity.ActivityAlignmentCondition.Trial">ActivityAlignmentCondition.Trial</span></code></td>
           <td>
                 <code>foreign key</code>
           </td>
@@ -1727,7 +1724,7 @@ ActivityAlignmentCondition.Trial.</p>
           </td>
         </tr>
         <tr>
-          <td><code>aligned_trace</code></td>
+          <td><code><span title="element_calcium_imaging.analysis.ActivityAlignment.AlignedTrialActivity.aligned_trace">aligned_trace</span></code></td>
           <td>
                 <code>longblob</code>
           </td>
@@ -1794,6 +1791,7 @@ ActivityAlignmentCondition.Trial.</p>
 
   </div>
 
+
 </div>
 
 
@@ -1803,7 +1801,6 @@ ActivityAlignmentCondition.Trial.</p>
 
 
 <div class="doc doc-object doc-function">
-
 
 
 
@@ -2034,6 +2031,7 @@ Default is plt.subplots(2, 1, figsize=(12, 8))</p>
   </div>
 
   </div>
+
 
 </div>
 
