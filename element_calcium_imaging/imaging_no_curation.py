@@ -475,8 +475,8 @@ class Processing(dj.Computed):
                             image_files = tmp_dir.glob(f"*_chn{channel}.tif")
                     elif acq_software == "PrairieView":
                         from element_interface.prairie_view_loader import (
-                                PrairieViewMeta,
-                            )
+                            PrairieViewMeta,
+                        )
 
                         pv_dir = pathlib.Path(image_files[0]).parent
                         PVmeta = PrairieViewMeta(pv_dir)
