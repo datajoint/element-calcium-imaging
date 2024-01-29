@@ -958,30 +958,40 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.motion_correction["reference_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["reference_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["average_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["correlation_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["correlation_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["max_image"][...][
-                        np.newaxis, ...
-                    ],
+                    (
+                        caiman_dataset.motion_correction["reference_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["reference_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["average_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["average_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["correlation_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["correlation_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
+                        if is3D
+                        else caiman_dataset.motion_correction["max_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
                 )
             ]
             self.Summary.insert(summary_images)
