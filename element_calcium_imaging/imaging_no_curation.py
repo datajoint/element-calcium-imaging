@@ -464,8 +464,8 @@ class Processing(dj.Computed):
                 channel = caiman_params.get("channel_to_process", 0)
 
                 if ndepths == 1:  # single-plane processing
-                    if nchannels > 1:
-                        if acq_software == "ScanImage":
+                    if acq_software == "ScanImage":
+                        if nchannels > 1:
                             # handle multi-channel tiff image before running CaImAn
                             tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
                             tmp_dir.mkdir(exist_ok=True)
@@ -473,19 +473,26 @@ class Processing(dj.Computed):
                                 [f.as_posix() for f in image_files], output_dir=tmp_dir
                             )
                             image_files = tmp_dir.glob(f"*_chn{channel}.tif")
-                        elif acq_software == "PrairieView":
-                            from element_interface.prairie_view_loader import (
-                                PrairieViewMeta,
-                            )
+                    elif acq_software == "PrairieView":
+                        from element_interface.prairie_view_loader import (
+                            PrairieViewMeta,
+                        )
 
-                            pv_dir = pathlib.Path(image_files[0]).parent
-                            PVmeta = PrairieViewMeta(pv_dir)
-                            image_files = [
-                                pv_dir / f
-                                for f in PVmeta.get_prairieview_files(
-                                    channel=caiman_params.get("channel_to_process", 0),
-                                )
-                            ]
+                        pv_dir = pathlib.Path(image_files[0]).parent
+                        PVmeta = PrairieViewMeta(pv_dir)
+                        channel = (
+                            channel
+                            if PVmeta.meta["num_channels"] > 1
+                            else PVmeta.meta["channels"][0]
+                        )
+                        image_files = [
+                            PVmeta.write_single_bigtiff(
+                                plane_idx=0,
+                                channel=channel,
+                                output_dir=output_dir,
+                                caiman_compatible=True,
+                            )
+                        ]
 
                     run_caiman(
                         file_paths=[f.as_posix() for f in image_files],
