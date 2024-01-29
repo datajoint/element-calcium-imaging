@@ -436,6 +436,7 @@ class Processing(dj.Computed):
                     "data_path": [image_files[0].parent.as_posix()],
                     "tiff_list": [f.as_posix() for f in image_files],
                 }
+                suite2p_params["force_sktiff"] = True
 
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
 
@@ -473,7 +474,9 @@ class Processing(dj.Computed):
                             )
                             image_files = tmp_dir.glob(f"*_chn{channel}.tif")
                     elif acq_software == "PrairieView":
-                        from element_interface import PrairieViewMeta
+                        from element_interface.prairie_view_loader import (
+                                PrairieViewMeta,
+                            )
 
                         pv_dir = pathlib.Path(image_files[0]).parent
                         PVmeta = PrairieViewMeta(pv_dir)
@@ -1537,7 +1540,7 @@ class PerPlaneProcessing(dj.Computed):
         params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
             "params", "processing_method"
         )
-        caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+        caiman_params = params
         sampling_rate = (scan.ScanInfo & key).fetch1("fps")
         channel = params.get("channel_to_process", 0)
 
