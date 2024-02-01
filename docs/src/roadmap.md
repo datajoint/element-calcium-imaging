@@ -16,8 +16,8 @@ the common motifs to create Element Calcium Imaging. Major features include:
 - [x] Quality metrics
 - [ ] Data compression
 - [ ] Deepinterpolation
-- [ ] Data export to NWB
-- [ ] Data publishing to DANDI
+- [x] Data export to NWB
+- [x] Data publishing to DANDI
 
 Further development of this Element is community driven. Upon user requests and based on
 guidance from the Scientific Steering Group we will continue adding features to this 

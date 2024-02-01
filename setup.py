@@ -41,7 +41,7 @@ setup(
     ],
     extras_require={
         "caiman_requirements": [caiman_requirements],
-        "caiman": ["caiman @ git+https://github.com/datajoint/CaImAn"],
+        "caiman": ["caiman @ git+https://github.com/datajoint/CaImAn.git"],
         "elements": [
             "element-animal>=0.1.8",
             "element-event>=0.2.3",
@@ -51,8 +51,8 @@ setup(
         ],
         "extract": ["matlabengine", "scipy"],
         "nd2": ["nd2"],
-        "sbxreader": ["sbxreader @ git+https://github.com/jcouto/sbxreader"],
-        "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader"],
+        "sbxreader": ["sbxreader @ git+https://github.com/jcouto/sbxreader.git"],
+        "scanreader": ["scanreader @ git+https://github.com/atlab/scanreader.git"],
         "suite2p": ["suite2p[io]>=0.12.1"],
         "tests": ["pytest", "pytest-cov", "shutils"],
     },
