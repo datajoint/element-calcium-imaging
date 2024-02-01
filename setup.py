@@ -38,7 +38,7 @@ setup(
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",
-        "element-interface @ git+https://github.com/datajoint/element-interface.git",
+        "element-interface @ git+https://github.com/datajoint/element-interface.git@staging",
     ],
     extras_require={
         "caiman_requirements": [caiman_requirements],
