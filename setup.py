@@ -44,7 +44,6 @@ setup(
         "caiman_requirements": [caiman_requirements],
         "caiman": ["caiman @ git+https://github.com/datajoint/CaImAn.git"],
         "elements": [
-            "element-interface @ git+https://github.com/datajoint/element-interface.git@staging",
             "element-animal @ git+https://github.com/datajoint/element-animal.git",
             "element-event @ git+https://github.com/datajoint/element-event.git",
             "element-lab @ git+https://github.com/datajoint/element-lab.git",
