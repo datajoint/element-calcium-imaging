@@ -192,9 +192,11 @@ def _add_scan_to_nwb(session_key, nwbfile):
                 name="ImagingPlane",
                 optical_channel=optical_channel,
                 imaging_rate=frame_rate,
-                description=scan_notes
-                if scan_notes != ""
-                else f"Imaging plane for field {field_no+1}, channel {channel+1}",
+                description=(
+                    scan_notes
+                    if scan_notes != ""
+                    else f"Imaging plane for field {field_no+1}, channel {channel+1}"
+                ),
                 device=device,
                 excitation_lambda=nan,
                 indicator="unknown",
