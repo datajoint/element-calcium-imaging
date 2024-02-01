@@ -45,7 +45,7 @@ setup(
         "elements": [
             "element-animal>=0.1.8",
             "element-event>=0.2.3",
-            "element-interface @ git+https://github.com/datajoint/element-interface.git",
+            "element-interface @ git+https://github.com/datajoint/element-interface.git@staging",
             "element-lab>=0.3.0",
             "element-session>=0.1.5",
         ],
