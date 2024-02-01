@@ -487,7 +487,6 @@ class Processing(dj.Computed):
                         )
                         image_files = [
                             PVmeta.write_single_bigtiff(
-                                plane_idx=0,
                                 channel=channel,
                                 output_dir=output_dir,
                                 caiman_compatible=True,
