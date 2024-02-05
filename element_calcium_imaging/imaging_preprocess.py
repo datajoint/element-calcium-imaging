@@ -562,7 +562,18 @@ class Processing(dj.Computed):
             ProcessingTask.update1(
                 {**key, "processing_output_dir": output_dir.as_posix()}
             )
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+
+        try:
+            output_dir = find_full_path(
+                get_imaging_root_data_dir(), output_dir
+            ).as_posix()
+        except FileNotFoundError as e:
+            if task_mode == "trigger":
+                processed_dir = pathlib.Path(get_processed_root_data_dir())
+                output_dir = processed_dir / output_dir
+                output_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                raise e
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
