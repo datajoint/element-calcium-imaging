@@ -3,6 +3,11 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.9.4] - 2024-02-05
+
++ Fix - bugfix ingesting field xyz for mesoscan (multiROI) from ScanImage
++ Update - make `output_dir` if not exist for `task_mode="trigger"`
+
 ## [0.9.3] - 2024-01-29
 
 + Update - DataJoint Elements to install from GitHub instead of PyPI
