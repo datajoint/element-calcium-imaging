@@ -3,6 +3,17 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [0.9.4] - 2024-02-05
+
++ Fix - bugfix ingesting field xyz for mesoscan (multiROI) from ScanImage
++ Update - make `output_dir` if not exist for `task_mode="trigger"`
+
+## [0.9.3] - 2024-01-29
+
++ Update - DataJoint Elements to install from GitHub instead of PyPI
++ Fix - `element-interface` required during package installation
++ Fix - apply formatting with `black` across the repository
+
 ## [0.9.2] - 2024-01-10
 
 + Fix - Imports and attribute values in notebooks to resolve DataJoint errors
@@ -190,6 +201,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.9.3]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.3
 [0.9.2]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.2
 [0.9.1]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.1
 [0.9.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.0

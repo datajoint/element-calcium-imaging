@@ -201,7 +201,7 @@ class ScanInfo(dj.Imported):
         nfields (int): Number of fields.
         nchannels (int): Number of channels.
         ndepths (int): Number of scanning depths (planes).
-        nframes (int): Number of recorded frames.
+        nframes (int): Number of recorded frames (time steps).
         nrois (int): Number of ROIs (see scanimage's multi ROI imaging).
         x (float, optional): ScanImage's 0 point in the motor coordinate system (um).
         y (float, optional): ScanImage's 0 point in the motor coordinate system (um).
@@ -222,7 +222,7 @@ class ScanInfo(dj.Imported):
     nfields              : tinyint   # number of fields
     nchannels            : tinyint   # number of channels
     ndepths              : int       # Number of scanning depths (planes)
-    nframes              : int       # number of recorded frames
+    nframes              : int       # number of recorded frames (time steps)
     nrois                : tinyint   # number of ROIs (see scanimage's multi ROI imaging)
     x=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
@@ -296,55 +296,53 @@ class ScanInfo(dj.Imported):
             import scanreader
 
             # Read the scan
-            scan = scanreader.read_scan(scan_filepaths)
+            scan_ = scanreader.read_scan(scan_filepaths)
 
             # Insert in ScanInfo
-            x_zero, y_zero, z_zero = scan.motor_position_at_zero or (None, None, None)
+            x_zero, y_zero, z_zero = scan_.motor_position_at_zero or (None, None, None)
 
             self.insert1(
                 dict(
                     key,
-                    nfields=scan.num_fields,
-                    nchannels=scan.num_channels,
-                    nframes=scan.num_frames,
-                    ndepths=scan.num_scanning_depths,
+                    nfields=scan_.num_fields,
+                    nchannels=scan_.num_channels,
+                    nframes=scan_.num_frames,
+                    ndepths=scan_.num_scanning_depths,
                     x=x_zero,
                     y=y_zero,
                     z=z_zero,
-                    fps=scan.fps,
-                    bidirectional=scan.is_bidirectional,
-                    usecs_per_line=scan.seconds_per_line * 1e6,
-                    fill_fraction=scan.temporal_fill_fraction,
-                    nrois=scan.num_rois if scan.is_multiROI else 0,
-                    scan_duration=scan.num_frames / scan.fps,
+                    fps=scan_.fps,
+                    bidirectional=scan_.is_bidirectional,
+                    usecs_per_line=scan_.seconds_per_line * 1e6,
+                    fill_fraction=scan_.temporal_fill_fraction,
+                    nrois=scan_.num_rois if scan_.is_multiROI else 0,
+                    scan_duration=scan_.num_frames / scan_.fps,
                 )
             )
             # Insert Field(s)
-            if scan.is_multiROI:
+            if scan_.is_multiROI:
                 self.Field.insert(
                     [
                         dict(
                             key,
                             field_idx=field_id,
-                            px_height=scan.field_heights[field_id],
-                            px_width=scan.field_widths[field_id],
-                            um_height=scan.field_heights_in_microns[field_id],
-                            um_width=scan.field_widths_in_microns[field_id],
-                            field_x=x_zero
-                            + scan._degrees_to_microns(scan.fields[field_id].x)
-                            if x_zero
-                            else None,
-                            field_y=y_zero
-                            + scan._degrees_to_microns(scan.fields[field_id].y)
-                            if y_zero
-                            else None,
-                            field_z=z_zero + scan.fields[field_id].depth
-                            if z_zero
-                            else None,
-                            delay_image=scan.field_offsets[field_id],
-                            roi=scan.field_rois[field_id][0],
+                            px_height=scan_.field_heights[field_id],
+                            px_width=scan_.field_widths[field_id],
+                            um_height=scan_.field_heights_in_microns[field_id],
+                            um_width=scan_.field_widths_in_microns[field_id],
+                            field_x=(
+                                (x_zero or 0)
+                                + scan_._degrees_to_microns(scan_.fields[field_id].x)
+                            ),
+                            field_y=(
+                                (y_zero or 0)
+                                + scan_._degrees_to_microns(scan_.fields[field_id].y)
+                            ),
+                            field_z=((z_zero or 0) + scan_.fields[field_id].depth),
+                            delay_image=scan_.field_offsets[field_id],
+                            roi=scan_.field_rois[field_id][0],
                         )
-                        for field_id in range(scan.num_fields)
+                        for field_id in range(scan_.num_fields)
                     ]
                 )
             else:
@@ -353,18 +351,20 @@ class ScanInfo(dj.Imported):
                         dict(
                             key,
                             field_idx=plane_idx,
-                            px_height=scan.image_height,
-                            px_width=scan.image_width,
-                            um_height=getattr(scan, "image_height_in_microns", None),
-                            um_width=getattr(scan, "image_width_in_microns", None),
+                            px_height=scan_.image_height,
+                            px_width=scan_.image_width,
+                            um_height=getattr(scan_, "image_height_in_microns", None),
+                            um_width=getattr(scan_, "image_width_in_microns", None),
                             field_x=x_zero if x_zero else None,
                             field_y=y_zero if y_zero else None,
-                            field_z=z_zero + scan.scanning_depths[plane_idx]
-                            if z_zero
-                            else None,
-                            delay_image=scan.field_offsets[plane_idx],
+                            field_z=(
+                                z_zero + scan_.scanning_depths[plane_idx]
+                                if z_zero
+                                else None
+                            ),
+                            delay_image=scan_.field_offsets[plane_idx],
                         )
-                        for plane_idx in range(scan.num_scanning_depths)
+                        for plane_idx in range(scan_.num_scanning_depths)
                     ]
                 )
         elif acq_software == "Scanbox":
@@ -387,9 +387,11 @@ class ScanInfo(dj.Imported):
             self.insert1(
                 dict(
                     key,
-                    nfields=sbx_meta["num_fields"]
-                    if is_multiROI
-                    else sbx_meta["num_planes"],
+                    nfields=(
+                        sbx_meta["num_fields"]
+                        if is_multiROI
+                        else sbx_meta["num_planes"]
+                    ),
                     nchannels=sbx_meta["num_channels"],
                     nframes=sbx_meta["num_frames"],
                     ndepths=sbx_meta["num_planes"],
@@ -412,12 +414,16 @@ class ScanInfo(dj.Imported):
                             field_idx=plane_idx,
                             px_height=px_height,
                             px_width=px_width,
-                            um_height=px_height * sbx_meta["um_per_pixel_y"]
-                            if sbx_meta["um_per_pixel_y"]
-                            else None,
-                            um_width=px_width * sbx_meta["um_per_pixel_x"]
-                            if sbx_meta["um_per_pixel_x"]
-                            else None,
+                            um_height=(
+                                px_height * sbx_meta["um_per_pixel_y"]
+                                if sbx_meta["um_per_pixel_y"]
+                                else None
+                            ),
+                            um_width=(
+                                px_width * sbx_meta["um_per_pixel_x"]
+                                if sbx_meta["um_per_pixel_x"]
+                                else None
+                            ),
                             field_x=x_zero,
                             field_y=y_zero,
                             field_z=z_zero + sbx_meta["etl_pos"][plane_idx],
@@ -462,9 +468,11 @@ class ScanInfo(dj.Imported):
                 scan_datetime = nd2_file.text_info["date"]
                 scan_datetime = datetime.strptime(
                     scan_datetime,
-                    "%m/%d/%Y %H:%M:%S %p"
-                    if re.search(("AM|PM"), scan_datetime)
-                    else "%m/%d/%Y %H:%M:%S",
+                    (
+                        "%m/%d/%Y %H:%M:%S %p"
+                        if re.search(("AM|PM"), scan_datetime)
+                        else "%m/%d/%Y %H:%M:%S"
+                    ),
                 )
                 scan_datetime = datetime.strftime(scan_datetime, "%Y-%m-%d %H:%M:%S")
             except:  # noqa: E722
@@ -551,9 +559,11 @@ class ScanInfo(dj.Imported):
                     um_width=PVScan_info["width_in_um"],
                     field_x=PVScan_info["fieldX"],
                     field_y=PVScan_info["fieldY"],
-                    field_z=PVScan_info["fieldZ"]
-                    if PVScan_info["num_planes"] == 1
-                    else PVScan_info["fieldZ"][plane_idx],
+                    field_z=(
+                        PVScan_info["fieldZ"]
+                        if PVScan_info["num_planes"] == 1
+                        else PVScan_info["fieldZ"][plane_idx]
+                    ),
                 )
                 for plane_idx in range(PVScan_info["num_planes"])
             )

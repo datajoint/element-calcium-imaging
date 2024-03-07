@@ -254,13 +254,9 @@ class ProcessingTask(dj.Manual):
                 e.g.: sub4/sess1/scan0/suite2p_0
         """
         acq_software = (scan.Scan & key).fetch1("acq_software")
-        filetypes = dict(
-            ScanImage="*.tif", Scanbox="*.sbx", NIS="*.nd2", PrairieView="*.tif"
-        )
-
         scan_dir = find_full_path(
             get_imaging_root_data_dir(),
-            get_calcium_imaging_files(key, filetypes[acq_software])[0],
+            get_calcium_imaging_files(key, acq_software)[0],
         ).parent
         root_dir = find_root_directory(get_imaging_root_data_dir(), scan_dir)
 
@@ -369,6 +365,7 @@ class Processing(dj.Computed):
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
+        acq_software = (scan.Scan & key).fetch1("acq_software")
 
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
@@ -376,7 +373,18 @@ class Processing(dj.Computed):
             ProcessingTask.update1(
                 {**key, "processing_output_dir": output_dir.as_posix()}
             )
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+
+        try:
+            output_dir = find_full_path(
+                get_imaging_root_data_dir(), output_dir
+            ).as_posix()
+        except FileNotFoundError as e:
+            if task_mode == "trigger":
+                processed_dir = pathlib.Path(get_processed_root_data_dir())
+                output_dir = processed_dir / output_dir
+                output_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                raise e
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
@@ -452,8 +460,8 @@ class Processing(dj.Computed):
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
 
-                # handle multi-channel tiff image before running CaImAn
-                if nchannels > 1:
+                if acq_software == "ScanImage" and nchannels > 1:
+                    # handle multi-channel tiff image before running CaImAn
                     channel_idx = caiman_params.get("channel_to_process", 0)
                     tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
                     tmp_dir.mkdir(exist_ok=True)
@@ -958,30 +966,40 @@ class MotionCorrection(dj.Imported):
                 }
                 for fkey, ref_image, ave_img, corr_img, max_img in zip(
                     field_keys,
-                    caiman_dataset.motion_correction["reference_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["reference_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["average_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["average_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["correlation_image"].transpose(
-                        2, 0, 1
-                    )
-                    if is3D
-                    else caiman_dataset.motion_correction["correlation_image"][...][
-                        np.newaxis, ...
-                    ],
-                    caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
-                    if is3D
-                    else caiman_dataset.motion_correction["max_image"][...][
-                        np.newaxis, ...
-                    ],
+                    (
+                        caiman_dataset.motion_correction["reference_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["reference_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["average_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["average_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["correlation_image"].transpose(
+                            2, 0, 1
+                        )
+                        if is3D
+                        else caiman_dataset.motion_correction["correlation_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
+                    (
+                        caiman_dataset.motion_correction["max_image"].transpose(2, 0, 1)
+                        if is3D
+                        else caiman_dataset.motion_correction["max_image"][...][
+                            np.newaxis, ...
+                        ]
+                    ),
                 )
             ]
             self.Summary.insert(summary_images)
