@@ -46,7 +46,7 @@ def activate(
     )
 
 
-# ---------------- Multi-plane Processing (per-plane basis) ----------------
+# ---------------- Multi-field Processing (per-field basis) ----------------
 
 
 # @schema
@@ -258,5 +258,64 @@ class FieldProcessing(dj.Computed):
                 **key,
                 "execution_time": execution_time,
                 "execution_duration": exec_dur,
+            }
+        )
+
+
+class FieldPostProcessing(dj.Computed):
+    definition = """
+    -> FieldPreprocessing
+    ---
+    execution_time: datetime   # datetime of the start of this step
+    execution_duration: float  # (hour) execution duration
+    """
+
+    @property
+    def key_source(self):
+        """
+        Find FieldPreprocessing entries that have finished processing for all fields
+        """
+        per_plane_proc = (
+            FieldPreprocessing.aggr(
+                FieldPreprocessing.Field.proj(),
+                field_count="count(*)",
+                keep_all_rows=True,
+            )
+            * FieldPreprocessing.aggr(
+                FieldProcessing.proj(),
+                finished_field_count="count(*)",
+                keep_all_rows=True,
+            )
+            & "field_count = finished_field_count"
+        )
+        return FieldPreprocessing & per_plane_proc
+
+    def make(self, key):
+        execution_time = datetime.utcnow()
+        method = (imaging.ProcessingTask * imaging.ProcessingParamSet & key).fetch1(
+            "processing_method"
+        )
+
+        if method == "suite2p":
+            from suite2p import io
+
+            output_dir = (imaging.ProcessingTask & key).fetch1("processing_output_dir")
+            output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
+
+            io.combined(output_dir / "suite2p", save=True)
+
+        exec_dur = (datetime.utcnow() - execution_time).total_seconds() / 3600
+        self.insert1(
+            {
+                **key,
+                "execution_time": execution_time,
+                "execution_duration": exec_dur,
+            }
+        )
+        imaging.Processing.insert1(
+            {
+                **key,
+                "processing_time": datetime.utcnow(),
+                "package_version": "",
             }
         )
