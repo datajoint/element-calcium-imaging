@@ -50,16 +50,26 @@ def activate(
 
 
 # @schema
-class FieldProcessingTask(dj.Computed):
+class FieldPreprocessing(dj.Computed):
     definition = """
     -> imaging.ProcessingTask
-    field_idx: int
     ---
-    params: longblob  # parameter set for this run
-    processing_output_dir: varchar(1000)  #  Output directory of the processed scan relative to root data directory
+    execution_time: datetime   # datetime of the start of this step
+    execution_duration: float  # (hour) execution duration    
     """
 
+    class Field(dj.Part):
+        definition = """
+        -> master
+        -> scan.ScanInfo.Field
+        ---
+        params: longblob  # parameter set for this run
+        processing_output_dir: varchar(1000)  #  Output directory of the processed scan relative to root data directory
+        """
+
     def make(self, key):
+        execution_time = datetime.utcnow()
+
         output_dir = (imaging.ProcessingTask & key).fetch1("processing_output_dir")
         output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
 
@@ -92,6 +102,19 @@ class FieldProcessingTask(dj.Computed):
             for field_idx, plane_idx in zip(field_ind, PVmeta.meta["plane_indices"]):
                 pln_output_dir = output_dir / f"pln{plane_idx}_chn{channel}"
                 pln_output_dir.mkdir(parents=True, exist_ok=True)
+
+                prepared_input_dir = output_dir.parent / "prepared_input"
+                prepared_input_dir.mkdir(exist_ok=True)
+
+                image_files = [
+                    PVmeta.write_single_bigtiff(
+                        plane_idx=plane_idx,
+                        channel=channel,
+                        output_dir=prepared_input_dir,
+                        caiman_compatible=True,
+                    )
+                ]
+
                 field_processing_tasks.append(
                     {
                         **key,
@@ -101,12 +124,12 @@ class FieldProcessingTask(dj.Computed):
                             "extra_dj_params": {
                                 "channel": channel,
                                 "plane_idx": plane_idx,
+                                "image_files": [f.as_posix() for f in image_files],
                             },
                         },
                         "processing_output_dir": pln_output_dir,
                     }
                 )
-
         elif method == "suite2p" and acq_software == "ScanImage" and nrois > 0:
             import scanreader
             from suite2p import default_ops, io
@@ -170,14 +193,26 @@ class FieldProcessingTask(dj.Computed):
                         "processing_output_dir": ops_path.parent.as_posix(),
                     }
                 )
+        else:
+            raise NotImplementedError(
+                f"Field processing for {acq_software} scans with {method} is not yet supported in this table."
+            )
 
-        self.insert(field_processing_tasks, skip_duplicates=True)
+        exec_dur = (datetime.utcnow() - execution_time).total_seconds() / 3600
+        self.insert1(
+            {
+                **key,
+                "execution_time": execution_time,
+                "execution_duration": exec_dur,
+            }
+        )
+        self.Field.insert(field_processing_tasks)
 
 
 # @schema
 class FieldProcessing(dj.Computed):
     definition = """
-    -> FieldProcessingTask
+    -> FieldPreprocessing.Field
     ---
     execution_time: datetime   # datetime of the start of this step
     execution_duration: float  # (hour) execution duration
@@ -186,7 +221,7 @@ class FieldProcessing(dj.Computed):
     def make(self, key):
         execution_time = datetime.utcnow()
 
-        output_dir, params = (FieldProcessingTask & key).fetch1(
+        output_dir, params = (FieldPreprocessing & key).fetch1(
             "processing_output_dir", "params"
         )
         extra_params = params.pop("extra_dj_params", {})
@@ -199,28 +234,10 @@ class FieldProcessing(dj.Computed):
         sampling_rate = (scan.ScanInfo & key).fetch1("fps")
 
         if acq_software == "PrairieView" and method == "caiman":
-            from element_interface.prairie_view_loader import PrairieViewMeta
             from element_interface.run_caiman import run_caiman
 
-            image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
-            image_file = find_full_path(get_imaging_root_data_dir(), image_file)
-            pv_dir = pathlib.Path(image_file).parent
-            PVmeta = PrairieViewMeta(pv_dir)
-
-            prepared_input_dir = output_dir.parent / "prepared_input"
-            prepared_input_dir.mkdir(exist_ok=True)
-
-            image_files = [
-                PVmeta.write_single_bigtiff(
-                    plane_idx=extra_params["plane_idx"],
-                    channel=extra_params["channel"],
-                    output_dir=prepared_input_dir,
-                    caiman_compatible=True,
-                )
-            ]
-
             run_caiman(
-                file_paths=[f.as_posix() for f in image_files],
+                file_paths=extra_params["image_files"],
                 parameters=params,
                 sampling_rate=sampling_rate,
                 output_dir=output_dir.as_posix(),
