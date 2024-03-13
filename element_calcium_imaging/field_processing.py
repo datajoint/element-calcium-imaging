@@ -49,7 +49,7 @@ def activate(
 # ---------------- Multi-field Processing (per-field basis) ----------------
 
 
-# @schema
+@schema
 class FieldPreprocessing(dj.Computed):
     definition = """
     -> imaging.ProcessingTask
@@ -66,6 +66,20 @@ class FieldPreprocessing(dj.Computed):
         params: longblob  # parameter set for this run
         processing_output_dir: varchar(1000)  #  Output directory of the processed scan relative to root data directory
         """
+
+    @property
+    def key_source(self):
+        """
+        Find ProcessingTask entries with method = "suite2p" and roi > 0 or method = "caimain" and depths > 1
+        """
+        ks = (
+            imaging.ProcessingTask
+            * scan.ScanInfo.proj("nrois", "nfields")
+            * imaging.ProcessingParamSet.proj("processing_method")
+            & "task_mode = 'trigger'"
+        ) & "nfields > 0"
+        ks &= "(processing_method = 'suite2p' AND nrois > 0) OR (processing_method = 'caiman' AND nrois = 0)"
+        return ks
 
     def make(self, key):
         execution_time = datetime.utcnow()
@@ -209,7 +223,7 @@ class FieldPreprocessing(dj.Computed):
         self.Field.insert(field_processing_tasks)
 
 
-# @schema
+@schema
 class FieldProcessing(dj.Computed):
     definition = """
     -> FieldPreprocessing.Field
@@ -262,6 +276,7 @@ class FieldProcessing(dj.Computed):
         )
 
 
+@schema
 class FieldPostProcessing(dj.Computed):
     definition = """
     -> FieldPreprocessing
