@@ -354,21 +354,7 @@ class Processing(dj.Computed):
     # Run processing only on Scan with ScanInfo inserted
     @property
     def key_source(self):
-        """Limit the Processing to Scans that have their metadata ingested to the
-        database."""
-        ks = ProcessingTask & scan.ScanInfo
-        per_plane_proc = (
-            ProcessingTask.aggr(
-                PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True
-            )
-            * ProcessingTask.aggr(
-                PerPlaneProcessing.proj(),
-                finished_task_count="count(*)",
-                keep_all_rows=True,
-            )
-            & "task_count = finished_task_count"
-        )
-        return ks & per_plane_proc
+        return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
         """
