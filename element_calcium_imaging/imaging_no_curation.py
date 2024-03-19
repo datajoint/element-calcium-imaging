@@ -14,6 +14,8 @@ from .scan import (
     get_processed_root_data_dir,
 )
 
+logger = dj.logger
+
 schema = dj.Schema()
 
 _linking_module = None
@@ -544,6 +546,12 @@ class Processing(dj.Computed):
                 # Motion Correction with Suite2p
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
 
+                image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
+
                 params["suite2p"]["save_path0"] = output_dir
                 (
                     params["suite2p"]["fs"],
@@ -777,63 +785,69 @@ class MotionCorrection(dj.Imported):
                     )
                 # -- non-rigid motion correction --
                 if s2p.ops["nonrigid"]:
-                    if idx == 0:
-                        nonrigid_correction = {
-                            **key,
-                            "block_height": s2p.ops["block_size"][0],
-                            "block_width": s2p.ops["block_size"][1],
-                            "block_depth": 1,
-                            "block_count_y": s2p.ops["nblocks"][0],
-                            "block_count_x": s2p.ops["nblocks"][1],
-                            "block_count_z": len(suite2p_dataset.planes),
-                            "outlier_frames": s2p.ops["badframes"],
-                        }
+                    if not all(k in s2p.ops for k in ["xblock", "yblock", "nblocks"]):
+                        logger.warning(
+                            f"Unable to load/ingest nonrigid motion correction for plane {plane}. "
+                            f"Nonrigid motion correction output is no longer saved by Suite2p for version above 0.10.*."
+                        )
                     else:
-                        nonrigid_correction["outlier_frames"] = np.logical_or(
-                            nonrigid_correction["outlier_frames"],
-                            s2p.ops["badframes"],
-                        )
-                    for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
-                        zip(
-                            s2p.ops["xblock"],
-                            s2p.ops["yblock"],
-                            s2p.ops["yoff1"].T,
-                            s2p.ops["xoff1"].T,
-                        )
-                    ):
-                        if b_id in nonrigid_blocks:
-                            nonrigid_blocks[b_id]["y_shifts"] = np.vstack(
-                                [nonrigid_blocks[b_id]["y_shifts"], bshift_y]
-                            )
-                            nonrigid_blocks[b_id]["y_std"] = np.nanstd(
-                                nonrigid_blocks[b_id]["y_shifts"].flatten()
-                            )
-                            nonrigid_blocks[b_id]["x_shifts"] = np.vstack(
-                                [nonrigid_blocks[b_id]["x_shifts"], bshift_x]
-                            )
-                            nonrigid_blocks[b_id]["x_std"] = np.nanstd(
-                                nonrigid_blocks[b_id]["x_shifts"].flatten()
-                            )
-                        else:
-                            nonrigid_blocks[b_id] = {
+                        if idx == 0:
+                            nonrigid_correction = {
                                 **key,
-                                "block_id": b_id,
-                                "block_y": b_y,
-                                "block_x": b_x,
-                                "block_z": np.full_like(b_x, plane),
-                                "y_shifts": bshift_y,
-                                "x_shifts": bshift_x,
-                                "z_shifts": np.full(
-                                    (
-                                        len(suite2p_dataset.planes),
-                                        len(bshift_x),
-                                    ),
-                                    0,
-                                ),
-                                "y_std": np.nanstd(bshift_y),
-                                "x_std": np.nanstd(bshift_x),
-                                "z_std": np.nan,
+                                "block_height": s2p.ops["block_size"][0],
+                                "block_width": s2p.ops["block_size"][1],
+                                "block_depth": 1,
+                                "block_count_y": s2p.ops["nblocks"][0],
+                                "block_count_x": s2p.ops["nblocks"][1],
+                                "block_count_z": len(suite2p_dataset.planes),
+                                "outlier_frames": s2p.ops["badframes"],
                             }
+                        else:
+                            nonrigid_correction["outlier_frames"] = np.logical_or(
+                                nonrigid_correction["outlier_frames"],
+                                s2p.ops["badframes"],
+                            )
+                        for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
+                            zip(
+                                s2p.ops["xblock"],
+                                s2p.ops["yblock"],
+                                s2p.ops["yoff1"].T,
+                                s2p.ops["xoff1"].T,
+                            )
+                        ):
+                            if b_id in nonrigid_blocks:
+                                nonrigid_blocks[b_id]["y_shifts"] = np.vstack(
+                                    [nonrigid_blocks[b_id]["y_shifts"], bshift_y]
+                                )
+                                nonrigid_blocks[b_id]["y_std"] = np.nanstd(
+                                    nonrigid_blocks[b_id]["y_shifts"].flatten()
+                                )
+                                nonrigid_blocks[b_id]["x_shifts"] = np.vstack(
+                                    [nonrigid_blocks[b_id]["x_shifts"], bshift_x]
+                                )
+                                nonrigid_blocks[b_id]["x_std"] = np.nanstd(
+                                    nonrigid_blocks[b_id]["x_shifts"].flatten()
+                                )
+                            else:
+                                nonrigid_blocks[b_id] = {
+                                    **key,
+                                    "block_id": b_id,
+                                    "block_y": b_y,
+                                    "block_x": b_x,
+                                    "block_z": np.full_like(b_x, plane),
+                                    "y_shifts": bshift_y,
+                                    "x_shifts": bshift_x,
+                                    "z_shifts": np.full(
+                                        (
+                                            len(suite2p_dataset.planes),
+                                            len(bshift_x),
+                                        ),
+                                        0,
+                                    ),
+                                    "y_std": np.nanstd(bshift_y),
+                                    "x_std": np.nanstd(bshift_x),
+                                    "z_std": np.nan,
+                                }
 
                 # -- summary images --
                 motion_correction_key = (
