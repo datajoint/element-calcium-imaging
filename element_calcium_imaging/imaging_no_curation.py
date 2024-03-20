@@ -14,6 +14,8 @@ from .scan import (
     get_processed_root_data_dir,
 )
 
+logger = dj.logger
+
 schema = dj.Schema()
 
 _linking_module = None
@@ -354,24 +356,21 @@ class Processing(dj.Computed):
     # Run processing only on Scan with ScanInfo inserted
     @property
     def key_source(self):
-        """Limit the Processing to Scans that have their metadata ingested to the
-        database."""
-        ks = ProcessingTask & scan.ScanInfo
-        per_plane_proc = (
-            ProcessingTask.aggr(
-                PerPlaneProcessingTask.proj(), task_count="count(*)", keep_all_rows=True
-            )
-            * ProcessingTask.aggr(
-                PerPlaneProcessing.proj(),
-                finished_task_count="count(*)",
-                keep_all_rows=True,
-            )
-            & "task_count = finished_task_count"
-        )
-        return ks & per_plane_proc
+        return ProcessingTask & scan.ScanInfo
 
     def make(self, key):
-        """Execute the calcium imaging analysis defined by the ProcessingTask."""
+        """
+        Execute the calcium imaging analysis defined by the ProcessingTask.
+        - task_mode: 'load', confirm that the results are already computed
+        - task_mode is 'trigger'
+            1. method is "caiman":
+                - if "multi-ROI" - raise NotImplementedError
+                - if single-plane - run CaImAn as usual for ScanImage/PrairieView - check for multi-channel
+                - if multi-plane - delegate to "field_processing"
+            2. method is "suite2p":
+                - if "multi-ROI" - delegate to "field_processing"
+                - else run Suite2p as usual
+        """
 
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
@@ -383,7 +382,18 @@ class Processing(dj.Computed):
             ProcessingTask.update1(
                 {**key, "processing_output_dir": output_dir.as_posix()}
             )
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir).as_posix()
+
+        try:
+            output_dir = find_full_path(
+                get_imaging_root_data_dir(), output_dir
+            ).as_posix()
+        except FileNotFoundError as e:
+            if task_mode == "trigger":
+                processed_dir = pathlib.Path(get_processed_root_data_dir())
+                output_dir = processed_dir / output_dir
+                output_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                raise e
 
         if task_mode == "load":
             method, imaging_dataset = get_loader_result(key, ProcessingTask)
@@ -410,24 +420,31 @@ class Processing(dj.Computed):
             )
             acq_software = (scan.Scan & key).fetch1("acq_software")
 
-            image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
-            image_files = [
-                find_full_path(get_imaging_root_data_dir(), image_file)
-                for image_file in image_files
-            ]
+            sampling_rate, ndepths, nchannels, nfields, nrois = (
+                scan.ScanInfo & key
+            ).fetch1("fps", "ndepths", "nchannels", "nfields", "nrois")
 
             if method == "suite2p":
+                if nrois > 0:
+                    raise NotImplementedError(
+                        "Multi-ROI processing using Suite2p is not implemented here (suggest using `field_processing`)."
+                    )
+
                 import suite2p
+
+                image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
 
                 suite2p_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
                 )
                 suite2p_params["save_path0"] = output_dir
-                (
-                    suite2p_params["fs"],
-                    suite2p_params["nplanes"],
-                    suite2p_params["nchannels"],
-                ) = (scan.ScanInfo & key).fetch1("fps", "ndepths", "nchannels")
+                suite2p_params["fs"] = sampling_rate
+                suite2p_params["nplanes"] = ndepths
+                suite2p_params["nchannels"] = nchannels
 
                 input_format = pathlib.Path(image_files[0]).suffix
                 suite2p_params["input_format"] = input_format[1:]
@@ -440,19 +457,12 @@ class Processing(dj.Computed):
 
                 suite2p.run_s2p(ops=suite2p_params, db=suite2p_paths)  # Run suite2p
 
-                _, imaging_dataset = get_loader_result(key, ProcessingTask)
-                suite2p_dataset = imaging_dataset
-                key = {**key, "processing_time": suite2p_dataset.creation_time}
-
             elif method == "caiman":
                 from element_interface.caiman_loader import _process_scanimage_tiff
                 from element_interface.run_caiman import run_caiman
 
                 caiman_params = (ProcessingTask * ProcessingParamSet & key).fetch1(
                     "params"
-                )
-                sampling_rate, ndepths, nchannels = (scan.ScanInfo & key).fetch1(
-                    "fps", "ndepths", "nchannels"
                 )
 
                 is3D = caiman_params.get("is3D", False)
@@ -467,18 +477,35 @@ class Processing(dj.Computed):
                     if acq_software == "ScanImage":
                         if nchannels > 1:
                             # handle multi-channel tiff image before running CaImAn
-                            tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
-                            tmp_dir.mkdir(exist_ok=True)
-                            _process_scanimage_tiff(
-                                [f.as_posix() for f in image_files], output_dir=tmp_dir
+                            image_files = (scan.ScanInfo.ScanFile & key).fetch(
+                                "file_path"
                             )
-                            image_files = tmp_dir.glob(f"*_chn{channel}.tif")
+                            image_files = [
+                                find_full_path(get_imaging_root_data_dir(), image_file)
+                                for image_file in image_files
+                            ]
+
+                            prepared_input_dir = (
+                                pathlib.Path(output_dir) / "prepared_input"
+                            )
+                            prepared_input_dir.mkdir(exist_ok=True)
+                            _process_scanimage_tiff(
+                                [f.as_posix() for f in image_files],
+                                output_dir=prepared_input_dir,
+                            )
+                            image_files = prepared_input_dir.glob(f"*_chn{channel}.tif")
                     elif acq_software == "PrairieView":
                         from element_interface.prairie_view_loader import (
                             PrairieViewMeta,
                         )
 
-                        pv_dir = pathlib.Path(image_files[0]).parent
+                        image_file = (scan.ScanInfo.ScanFile & key).fetch(
+                            "file_path", limit=1
+                        )[0]
+                        image_file = find_full_path(
+                            get_imaging_root_data_dir(), image_file
+                        )
+                        pv_dir = pathlib.Path(image_file).parent
                         PVmeta = PrairieViewMeta(pv_dir)
                         channel = (
                             channel
@@ -500,10 +527,6 @@ class Processing(dj.Computed):
                         output_dir=output_dir,
                         is3D=is3D,
                     )
-
-                    _, imaging_dataset = get_loader_result(key, ProcessingTask)
-                    caiman_dataset = imaging_dataset
-                    key["processing_time"] = caiman_dataset.creation_time
                 else:  # multi-plane processing
                     # per-plane processing with CaImAn
                     if acq_software == "ScanImage":
@@ -511,48 +534,9 @@ class Processing(dj.Computed):
                             "Multi-plane processing using CaImAn for ScanImage scans is not yet supported in this pipeline."
                         )
                     elif acq_software == "PrairieView":
-                        # Generate separate processing task for each plane - in `PerPlaneProcessingTask`
-                        # if all `PerPlaneProcessingTask` for this key are done - ingest the results
-                        from element_interface.prairie_view_loader import (
-                            PrairieViewMeta,
+                        raise NotImplementedError(
+                            "Multi-plane processing using CaImAn for PrairieView scans is not implemented here (suggest using `field_processing`)."
                         )
-
-                        pv_dir = pathlib.Path(image_files[0]).parent
-                        PVmeta = PrairieViewMeta(pv_dir)
-
-                        channel = (
-                            channel
-                            if PVmeta.meta["num_channels"] > 1
-                            else PVmeta.meta["channels"][0]
-                        )
-
-                        plane_processing_tasks = []
-                        for plane_idx in PVmeta.meta["plane_indices"]:
-                            pln_output_dir = (
-                                pathlib.Path(output_dir)
-                                / f"pln{plane_idx}_chn{channel}"
-                            )
-
-                            pln_output_dir.mkdir(parents=True, exist_ok=True)
-                            plane_processing_tasks.append(
-                                {
-                                    **key,
-                                    "plane_idx": plane_idx,
-                                    "processing_output_dir": pln_output_dir,
-                                }
-                            )
-
-                        if len(
-                            PerPlaneProcessing.proj() & plane_processing_tasks
-                        ) == len(plane_processing_tasks):
-                            _, imaging_dataset = get_loader_result(key, ProcessingTask)
-                            caiman_dataset = imaging_dataset
-                            key["processing_time"] = caiman_dataset.creation_time
-                        else:
-                            PerPlaneProcessingTask.insert(
-                                plane_processing_tasks, skip_duplicates=True
-                            )
-                            return
 
             elif method == "extract":
                 import suite2p
@@ -561,6 +545,12 @@ class Processing(dj.Computed):
 
                 # Motion Correction with Suite2p
                 params = (ProcessingTask * ProcessingParamSet & key).fetch1("params")
+
+                image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
+                image_files = [
+                    find_full_path(get_imaging_root_data_dir(), image_file)
+                    for image_file in image_files
+                ]
 
                 params["suite2p"]["save_path0"] = output_dir
                 (
@@ -596,19 +586,22 @@ class Processing(dj.Computed):
                 )
 
                 # Execute EXTRACT
-
                 ex = EXTRACT_trigger(
                     scan_matlab_fullpath, params["extract"], output_dir
                 )
                 ex.run()
-
-                _, extract_dataset = get_loader_result(key, ProcessingTask)
-                key["processing_time"] = extract_dataset.creation_time
-
         else:
             raise ValueError(f"Unknown task mode: {task_mode}")
 
-        self.insert1({**key, "package_version": ""})
+        _, processed_results = get_loader_result(key, ProcessingTask)
+
+        self.insert1(
+            {
+                **key,
+                "processing_time": getattr(processed_results, "creation_time"),
+                "package_version": "",
+            }
+        )
 
 
 # -------------- Motion Correction --------------
@@ -792,63 +785,69 @@ class MotionCorrection(dj.Imported):
                     )
                 # -- non-rigid motion correction --
                 if s2p.ops["nonrigid"]:
-                    if idx == 0:
-                        nonrigid_correction = {
-                            **key,
-                            "block_height": s2p.ops["block_size"][0],
-                            "block_width": s2p.ops["block_size"][1],
-                            "block_depth": 1,
-                            "block_count_y": s2p.ops["nblocks"][0],
-                            "block_count_x": s2p.ops["nblocks"][1],
-                            "block_count_z": len(suite2p_dataset.planes),
-                            "outlier_frames": s2p.ops["badframes"],
-                        }
+                    if not all(k in s2p.ops for k in ["xblock", "yblock", "nblocks"]):
+                        logger.warning(
+                            f"Unable to load/ingest nonrigid motion correction for plane {plane}. "
+                            f"Nonrigid motion correction output is no longer saved by Suite2p for version above 0.10.*."
+                        )
                     else:
-                        nonrigid_correction["outlier_frames"] = np.logical_or(
-                            nonrigid_correction["outlier_frames"],
-                            s2p.ops["badframes"],
-                        )
-                    for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
-                        zip(
-                            s2p.ops["xblock"],
-                            s2p.ops["yblock"],
-                            s2p.ops["yoff1"].T,
-                            s2p.ops["xoff1"].T,
-                        )
-                    ):
-                        if b_id in nonrigid_blocks:
-                            nonrigid_blocks[b_id]["y_shifts"] = np.vstack(
-                                [nonrigid_blocks[b_id]["y_shifts"], bshift_y]
-                            )
-                            nonrigid_blocks[b_id]["y_std"] = np.nanstd(
-                                nonrigid_blocks[b_id]["y_shifts"].flatten()
-                            )
-                            nonrigid_blocks[b_id]["x_shifts"] = np.vstack(
-                                [nonrigid_blocks[b_id]["x_shifts"], bshift_x]
-                            )
-                            nonrigid_blocks[b_id]["x_std"] = np.nanstd(
-                                nonrigid_blocks[b_id]["x_shifts"].flatten()
-                            )
-                        else:
-                            nonrigid_blocks[b_id] = {
+                        if idx == 0:
+                            nonrigid_correction = {
                                 **key,
-                                "block_id": b_id,
-                                "block_y": b_y,
-                                "block_x": b_x,
-                                "block_z": np.full_like(b_x, plane),
-                                "y_shifts": bshift_y,
-                                "x_shifts": bshift_x,
-                                "z_shifts": np.full(
-                                    (
-                                        len(suite2p_dataset.planes),
-                                        len(bshift_x),
-                                    ),
-                                    0,
-                                ),
-                                "y_std": np.nanstd(bshift_y),
-                                "x_std": np.nanstd(bshift_x),
-                                "z_std": np.nan,
+                                "block_height": s2p.ops["block_size"][0],
+                                "block_width": s2p.ops["block_size"][1],
+                                "block_depth": 1,
+                                "block_count_y": s2p.ops["nblocks"][0],
+                                "block_count_x": s2p.ops["nblocks"][1],
+                                "block_count_z": len(suite2p_dataset.planes),
+                                "outlier_frames": s2p.ops["badframes"],
                             }
+                        else:
+                            nonrigid_correction["outlier_frames"] = np.logical_or(
+                                nonrigid_correction["outlier_frames"],
+                                s2p.ops["badframes"],
+                            )
+                        for b_id, (b_y, b_x, bshift_y, bshift_x) in enumerate(
+                            zip(
+                                s2p.ops["xblock"],
+                                s2p.ops["yblock"],
+                                s2p.ops["yoff1"].T,
+                                s2p.ops["xoff1"].T,
+                            )
+                        ):
+                            if b_id in nonrigid_blocks:
+                                nonrigid_blocks[b_id]["y_shifts"] = np.vstack(
+                                    [nonrigid_blocks[b_id]["y_shifts"], bshift_y]
+                                )
+                                nonrigid_blocks[b_id]["y_std"] = np.nanstd(
+                                    nonrigid_blocks[b_id]["y_shifts"].flatten()
+                                )
+                                nonrigid_blocks[b_id]["x_shifts"] = np.vstack(
+                                    [nonrigid_blocks[b_id]["x_shifts"], bshift_x]
+                                )
+                                nonrigid_blocks[b_id]["x_std"] = np.nanstd(
+                                    nonrigid_blocks[b_id]["x_shifts"].flatten()
+                                )
+                            else:
+                                nonrigid_blocks[b_id] = {
+                                    **key,
+                                    "block_id": b_id,
+                                    "block_y": b_y,
+                                    "block_x": b_x,
+                                    "block_z": np.full_like(b_x, plane),
+                                    "y_shifts": bshift_y,
+                                    "x_shifts": bshift_x,
+                                    "z_shifts": np.full(
+                                        (
+                                            len(suite2p_dataset.planes),
+                                            len(bshift_x),
+                                        ),
+                                        0,
+                                    ),
+                                    "y_std": np.nanstd(bshift_y),
+                                    "x_std": np.nanstd(bshift_x),
+                                    "z_std": np.nan,
+                                }
 
                 # -- summary images --
                 motion_correction_key = (
@@ -1505,99 +1504,6 @@ class ProcessingQualityMetrics(dj.Computed):
                 fluorescence.std(axis=1),
             )
         )
-
-
-# ---------------- Multi-plane Processing (per-plane basis) ----------------
-
-
-@schema
-class PerPlaneProcessingTask(dj.Manual):
-    definition = """
-    -> ProcessingTask
-    plane_idx: int
-    ---
-    processing_output_dir: varchar(255)  #  Output directory of the processed scan relative to root data directory
-    """
-
-
-@schema
-class PerPlaneProcessing(dj.Computed):
-    definition = """
-    -> PerPlaneProcessingTask
-    ---
-    processing_time     : datetime  # Time of generation of this set of processed, segmented results
-    package_version=''  : varchar(16)
-    channel=null          : int  # Channel used for this processing
-    """
-
-    def make(self, key):
-        output_dir = (PerPlaneProcessingTask & key).fetch1("processing_output_dir")
-        output_dir = find_full_path(get_imaging_root_data_dir(), output_dir)
-
-        plane_idx = key["plane_idx"]
-        acq_software = (scan.Scan & key).fetch1("acq_software")
-        params, method = (ProcessingParamSet * ProcessingTask & key).fetch1(
-            "params", "processing_method"
-        )
-        caiman_params = params
-        sampling_rate = (scan.ScanInfo & key).fetch1("fps")
-        channel = params.get("channel_to_process", 0)
-
-        if acq_software == "PrairieView":
-            from element_interface.prairie_view_loader import PrairieViewMeta
-
-            image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
-            image_file = find_full_path(get_imaging_root_data_dir(), image_file)
-            pv_dir = pathlib.Path(image_file).parent
-            PVmeta = PrairieViewMeta(pv_dir)
-
-            channel = (
-                channel
-                if PVmeta.meta["num_channels"] > 1
-                else PVmeta.meta["channels"][0]
-            )
-            if method == "caiman":
-                image_files = [
-                    PVmeta.write_single_bigtiff(
-                        plane_idx=plane_idx,
-                        channel=channel,
-                        output_dir=output_dir.parent,
-                        caiman_compatible=True,
-                    )
-                ]
-            else:
-                image_files = [
-                    pv_dir / f
-                    for f in PVmeta.get_prairieview_filenames(
-                        plane_idx=plane_idx,
-                        channel=channel,
-                    )
-                ]
-        else:
-            raise NotImplementedError(
-                f"Per-plane processing for {acq_software} scans is not yet supported in this pipeline."
-            )
-
-        if method == "caiman":
-            from element_interface.run_caiman import run_caiman
-
-            run_caiman(
-                file_paths=[f.as_posix() for f in image_files],
-                parameters=caiman_params,
-                sampling_rate=sampling_rate,
-                output_dir=output_dir.as_posix(),
-                is3D=False,
-            )
-        else:
-            raise NotImplementedError(
-                f"Per-plane processing using {method} is not yet supported in this pipeline."
-            )
-
-        _, imaging_dataset = get_loader_result(key, PerPlaneProcessingTask)
-        caiman_dataset = imaging_dataset
-        key["processing_time"] = caiman_dataset.creation_time
-
-        self.insert1({**key, "package_version": "", "channel": channel})
 
 
 # ---------------- HELPER FUNCTIONS ----------------
