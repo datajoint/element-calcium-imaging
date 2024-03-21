@@ -1,14 +1,11 @@
 import os
-import pathlib
 from pathlib import Path
-
 import datajoint as dj
 import pytest
-from element_interface.utils import find_full_path
 
 
 logger = dj.logger
-_tear_down = True
+_tear_down = False
 
 # ---------------------- FIXTURES ----------------------
 
@@ -16,7 +13,7 @@ _tear_down = True
 @pytest.fixture(autouse=True, scope="session")
 def dj_config():
     """If dj_local_config exists, load"""
-    if pathlib.Path("./dj_local_conf.json").exists():
+    if Path("./dj_local_conf.json").exists():
         dj.config.load("./dj_local_conf.json")
     dj.config.update(
         {
@@ -46,7 +43,7 @@ def pipeline():
     }
 
     if _tear_down:
-        pipeline["subject"].Subject.delete()
+        pipeline.subject.Subject.delete()
 
 
 @pytest.fixture(scope="session")
@@ -94,7 +91,7 @@ def insert_upstreams(pipeline):
     yield
 
     if _tear_down:
-        pipeline.subject.Subject.delete()
+        subject.Subject.delete()
         Equipment.delete()
 
 
