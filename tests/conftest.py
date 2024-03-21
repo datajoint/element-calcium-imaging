@@ -43,7 +43,12 @@ def pipeline():
     }
 
     if _tear_down:
-        pipeline.subject.Subject.delete()
+        pipeline.imaging_report.schema.drop()
+        pipeline.imaging.schema.drop()
+        pipeline.scan.schema.drop()
+        pipeline.session.schema.drop()
+        pipeline.subject.schema.drop()
+        pipeline.lab.schema.drop()
 
 
 @pytest.fixture(scope="session")
