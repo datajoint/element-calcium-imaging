@@ -5,7 +5,7 @@ import pytest
 
 
 logger = dj.logger
-_tear_down = False
+_tear_down = True
 
 # ---------------------- FIXTURES ----------------------
 
