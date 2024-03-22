@@ -39,7 +39,7 @@ def pipeline():
         "scan": pipeline.scan,
         "imaging": pipeline.imaging,
         "imaging_report": pipeline.imaging_report,
-        "Equipment": pipeline.Equipment
+        "Equipment": pipeline.Equipment,
     }
 
     if _tear_down:
@@ -59,38 +59,40 @@ def insert_upstreams(pipeline):
     Equipment = pipeline["Equipment"]
 
     subject.Subject.insert1(
-    dict(
-        subject="subject1",
-        subject_nickname="subject1_nickname",
-        sex="F",
-        subject_birth_date="2020-01-01",
-        subject_description="ScanImage acquisition. Suite2p processing.",
+        dict(
+            subject="subject1",
+            subject_nickname="subject1_nickname",
+            sex="F",
+            subject_birth_date="2020-01-01",
+            subject_description="ScanImage acquisition. Suite2p processing.",
         ),
-        skip_duplicates=True
+        skip_duplicates=True,
     )
 
     session_key = dict(subject="subject1", session_datetime="2021-04-30 12:22:15")
     session_dir = "subject1/session1"
     session.Session.insert1(session_key, skip_duplicates=True)
-    session.SessionDirectory.insert1(dict(**session_key, session_dir=session_dir), skip_duplicates=True)
+    session.SessionDirectory.insert1(
+        dict(**session_key, session_dir=session_dir), skip_duplicates=True
+    )
 
     Equipment.insert1(
-    dict(
-        device="Scanner1",
-        modality="Calcium imaging",
-        description="Example microscope",
+        dict(
+            device="Scanner1",
+            modality="Calcium imaging",
+            description="Example microscope",
         ),
-        skip_duplicates=True
+        skip_duplicates=True,
     )
     scan.Scan.insert1(
-    dict(
-        **session_key,
-        scan_id=0,
-        device="Scanner1",
-        acq_software="ScanImage",
-        scan_notes="",
+        dict(
+            **session_key,
+            scan_id=0,
+            device="Scanner1",
+            acq_software="ScanImage",
+            scan_notes="",
         ),
-        skip_duplicates=True
+        skip_duplicates=True,
     )
 
     yield
@@ -131,14 +133,14 @@ def insert_processing_task(pipeline, scan_info):
     processing_output_dir = "subject1/session1/suite2p"
 
     imaging.ProcessingTask.insert1(
-    dict(
-        **session_key,
-        scan_id=0,
-        paramset_idx=0,
-        task_mode="load", 
-        processing_output_dir=processing_output_dir,
+        dict(
+            **session_key,
+            scan_id=0,
+            paramset_idx=0,
+            task_mode="load",
+            processing_output_dir=processing_output_dir,
         ),
-        skip_duplicates=True
+        skip_duplicates=True,
     )
 
     yield
