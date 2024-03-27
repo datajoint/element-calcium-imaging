@@ -124,3 +124,6 @@ example_data
 
 # vscode
 *.code-workspace
+
+# dash widget
+file_system_backend
