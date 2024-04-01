@@ -83,7 +83,21 @@ class FieldPreprocessing(dj.Computed):
         processed_root_data_dir = scan.get_processed_root_data_dir()
 
         output_dir = (imaging.ProcessingTask & key).fetch1("processing_output_dir")
-        output_dir = find_full_path(processed_root_data_dir, output_dir)
+
+        if not output_dir:
+            output_dir = imaging.ProcessingTask.infer_output_dir(
+                key, relative=True, mkdir=True
+            )
+            # update processing_output_dir
+            imaging.ProcessingTask.update1(
+                {**key, "processing_output_dir": output_dir.as_posix()}
+            )
+
+        try:
+            output_dir = find_full_path(processed_root_data_dir, output_dir)
+        except FileNotFoundError:
+            output_dir = processed_root_data_dir / output_dir
+            output_dir.mkdir(parents=True, exist_ok=True)
 
         method, params = (
             imaging.ProcessingTask * imaging.ProcessingParamSet & key
