@@ -76,14 +76,28 @@ class FieldPreprocessing(dj.Computed):
             & "task_mode = 'trigger'"
         ) & "nfields > 0"
         ks &= "(processing_method = 'suite2p' AND nrois > 0) OR (processing_method = 'caiman' AND nrois = 0)"
-        return ks
+        return ks - imaging.Processing.proj()
 
     def make(self, key):
         execution_time = datetime.utcnow()
         processed_root_data_dir = scan.get_processed_root_data_dir()
 
         output_dir = (imaging.ProcessingTask & key).fetch1("processing_output_dir")
-        output_dir = find_full_path(processed_root_data_dir, output_dir)
+
+        if not output_dir:
+            output_dir = imaging.ProcessingTask.infer_output_dir(
+                key, relative=True, mkdir=True
+            )
+            # update processing_output_dir
+            imaging.ProcessingTask.update1(
+                {**key, "processing_output_dir": output_dir.as_posix()}
+            )
+
+        try:
+            output_dir = find_full_path(processed_root_data_dir, output_dir)
+        except FileNotFoundError:
+            output_dir = processed_root_data_dir / output_dir
+            output_dir.mkdir(parents=True, exist_ok=True)
 
         method, params = (
             imaging.ProcessingTask * imaging.ProcessingParamSet & key
