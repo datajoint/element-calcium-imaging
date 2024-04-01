@@ -76,7 +76,7 @@ class FieldPreprocessing(dj.Computed):
             & "task_mode = 'trigger'"
         ) & "nfields > 0"
         ks &= "(processing_method = 'suite2p' AND nrois > 0) OR (processing_method = 'caiman' AND nrois = 0)"
-        return ks
+        return ks - imaging.Processing.proj()
 
     def make(self, key):
         execution_time = datetime.utcnow()
