@@ -74,7 +74,7 @@ class FieldPreprocessing(dj.Computed):
             * scan.ScanInfo.proj("nrois", "nfields")
             * imaging.ProcessingParamSet.proj("processing_method")
             & "task_mode = 'trigger'"
-        ) & "nfields > 0"
+        ) & "nfields > 1"
         ks &= "(processing_method = 'suite2p' AND nrois > 0) OR (processing_method = 'caiman' AND nrois = 0)"
         return ks - imaging.Processing.proj()
 
