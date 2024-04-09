@@ -180,41 +180,40 @@ def load_imaging_data_for_session(scan, key):
 
 def insert_into_database(scan_module, imaging_module, session_key, x_masks, y_masks):
     images = load_imaging_data_for_session(scan_module, session_key)
-    print(f"Images shape: {images.shape}")
     mask_id = (imaging_module.Segmentation.Mask & session_key).fetch(
-        "mask_id", order_by="DESC mask_id", limit=1
+        "mask", order_by="mask desc", limit=1
     )
-    print(f"Mask ID: {mask_id}")
     logger.info(f"Inserting {len(x_masks)} masks into the database.")
-    # imaging_module.Segmentation.Mask.insert(
-    #     [
-    #         dict(
-    #             **session_key,
-    #             mask=mask_id + mask_num,
-    #             segmentation_channel=1,
-    #             mask_npix=y_mask.shape[0],
-    #             mask_center_x=int(sum(x_mask) / x_mask.shape[0]),
-    #             mask_center_y=int(sum(y_mask) / y_mask.shape[0]),
-    #             mask_center_z=0,
-    #             mask_xpix=x_mask,
-    #             mask_ypix=y_mask,
-    #             mask_zpix=0,
-    #             mask_weights=np.ones_like(y_mask),
-    #         )
-    #         for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
-    #     ],
-    #     allow_direct_insert=True,
-    # )
+    imaging_module.Segmentation.Mask.insert(
+        [
+            dict(
+                **session_key,
+                mask=mask_id + mask_num,
+                segmentation_channel=1,
+                mask_npix=y_mask.shape[0],
+                mask_center_x=int(sum(x_mask) / x_mask.shape[0]),
+                mask_center_y=int(sum(y_mask) / y_mask.shape[0]),
+                mask_center_z=0,
+                mask_xpix=x_mask,
+                mask_ypix=y_mask,
+                mask_zpix=0,
+                mask_weights=np.ones_like(y_mask),
+            )
+            for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
+        ],
+        allow_direct_insert=True,
+    )
     logger.info(f"Inserting {len(x_masks)} traces into the database.")
-    # imaging_module.Fluorescence.Trace.insert(
-    #     [
-    #         dict(
-    #             **session_key,
-    #             mask=mask_id + mask_num,
-    #             fluo_channel=1,
-    #             fluorescence=images[:, y_mask, x_mask].mean(axis=1),
-    #         )
-    #         for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
-    #     ],
-    #     allow_direct_insert=True,
-    # )
+    imaging_module.Fluorescence.Trace.insert(
+        [
+            dict(
+                **session_key,
+                mask=mask_id + mask_num,
+                fluo_channel=1,
+                fluorescence=images[:, y_mask, x_mask].mean(axis=1),
+            )
+            for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
+        ],
+        allow_direct_insert=True,
+    )
+    logger.info("Inserts complete.")
