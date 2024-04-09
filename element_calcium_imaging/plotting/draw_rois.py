@@ -224,6 +224,5 @@ def draw_rois(db_prefix: str):
                 return no_update
         else:
             return no_update
-    
-    return app
 
+    return app
