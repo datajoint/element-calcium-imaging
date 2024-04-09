@@ -29,3 +29,8 @@ please set `processing_method="extract"` in the
 ProcessingParamSet table, and provide the `params` attribute of the ProcessingParamSet
 table in the `{'suite2p': {...}, 'extract': {...}}` dictionary format. Please also
 install the [MATLAB engine](https://pypi.org/project/matlabengine/) API for Python.
+
+## Manual ROI Mask Creation and Curation
+
++ Manual creation of ROI masks for fluorescence activity extraction is supported by the `draw_rois.py` plotly/dash widget. This widget allows the user to draw new ROI masks and submit them to the database. The widget can be launched in a Jupyter notebook after following the [installation instructions](#installation-instructions-for-active-projects) and importing `draw_rois` from the module.
++ ROI masks can be curated using the `widget.py` jupyter widget that allows the user to mark each regions as either a `cell` or `non-cell`. This widget can be launched in a Jupyter notebook after following the [installation instructions](#installation-instructions-for-active-projects) and importing `main` from the module.
