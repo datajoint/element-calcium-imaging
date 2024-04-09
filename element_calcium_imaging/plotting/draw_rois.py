@@ -14,9 +14,6 @@ from dash_extensions.enrich import (
     Serverside,
     ServersideOutputTransform,
 )
-from scipy import ndimage
-from skimage import draw, measure
-from tifffile import TiffFile
 
 from .utilities import *
 
@@ -25,6 +22,7 @@ logger = dj.logger
 
 
 def draw_rois(db_prefix: str):
+    scan = dj.create_virtual_module("scan", f"{db_prefix}scan")
     imaging = dj.create_virtual_module("imaging", f"{db_prefix}imaging")
     all_keys = (imaging.MotionCorrection).fetch("KEY")
 
@@ -34,29 +32,42 @@ def draw_rois(db_prefix: str):
     app.layout = html.Div(
         [
             html.H2("Draw ROIs", style={"color": colors["text"]}),
-            html.Label("Select data key from dropdown", style={"color": colors["text"]}),
+            html.Label(
+                "Select data key from dropdown", style={"color": colors["text"]}
+            ),
             dcc.Dropdown(
                 id="toplevel-dropdown", options=[str(key) for key in all_keys]
             ),
             html.Br(),
             html.Div(
                 [
-                    html.Button("Load Image", id="load-image-button", style={"margin-right": "20px"}),
+                    html.Button(
+                        "Load Image",
+                        id="load-image-button",
+                        style={"margin-right": "20px"},
+                    ),
                     dcc.RadioItems(
-                        id='image-type-radio',
+                        id="image-type-radio",
                         options=[
-                            {'label': 'Average Image', 'value': 'average_image'},
-                            {'label': 'Max Projection Image', 'value': 'max_projection_image'}
+                            {"label": "Average Image", "value": "average_image"},
+                            {
+                                "label": "Max Projection Image",
+                                "value": "max_projection_image",
+                            },
                         ],
-                        value='average_image',  # Default value
-                        labelStyle={'display': 'inline-block', 'margin-right': '10px'},  # Inline display with some margin
-                        style={'display': 'inline-block', 'color': colors['text']}  # Inline display to keep it on the same line
+                        value="average_image",
+                        labelStyle={"display": "inline-block", "margin-right": "10px"},
+                        style={"display": "inline-block", "color": colors["text"]},
                     ),
                     html.Div(
                         [
                             html.Button("Submit Curated Masks", id="submit-button"),
                         ],
-                        style={"textAlign": "right", "flex": "1", "display": "inline-block"},
+                        style={
+                            "textAlign": "right",
+                            "flex": "1",
+                            "display": "inline-block",
+                        },
                     ),
                 ],
                 style={
@@ -76,6 +87,7 @@ def draw_rois(db_prefix: str):
                                 "drawclosedpath",
                                 "drawrect",
                                 "drawcircle",
+                                "drawline",
                                 "eraseshape",
                             ],
                         },
@@ -84,10 +96,10 @@ def draw_rois(db_prefix: str):
                 ],
                 style={
                     "display": "flex",
-                    "justify-content": "center",  # Centers the child horizontally
-                    "align-items": "center",  # Centers the child vertically (if you have vertical space to work with)
+                    "justify-content": "center",
+                    "align-items": "center",
                     "padding": "0.0",
-                    "margin": "auto"  # Automatically adjust the margins to center the div
+                    "margin": "auto",
                 },
             ),
             html.Pre(id="annotations"),
@@ -120,13 +132,22 @@ def draw_rois(db_prefix: str):
     def create_figure(value, render_n_clicks, image_type):
         if render_n_clicks is not None:
             if image_type == "average_image":
-                summary_images = (imaging.MotionCorrection.Summary & yaml.safe_load(value)).fetch("average_image")
+                summary_images = (
+                    imaging.MotionCorrection.Summary & yaml.safe_load(value)
+                ).fetch("average_image")
             else:
-                summary_images = (imaging.MotionCorrection.Summary & yaml.safe_load(value)).fetch("max_proj_image")
+                summary_images = (
+                    imaging.MotionCorrection.Summary & yaml.safe_load(value)
+                ).fetch("max_proj_image")
             average_images = [image.astype("float") for image in summary_images]
             roi_contours = get_contours(yaml.safe_load(value), db_prefix)
             logger.info("Generating figure.")
-            fig = px.imshow(np.asarray(average_images), animation_frame=0, binary_string=True, labels=dict(animation_frame="plane"))
+            fig = px.imshow(
+                np.asarray(average_images),
+                animation_frame=0,
+                binary_string=True,
+                labels=dict(animation_frame="plane"),
+            )
             for contour in roi_contours:
                 # Note: contour[:, 1] are x-coordinates, contour[:, 0] are y-coordinates
                 fig.add_trace(
@@ -171,30 +192,36 @@ def draw_rois(db_prefix: str):
             elif any(["shapes" in key for key in relayout_data]):
                 return Serverside(relayout_data)
 
-
     @app.callback(
         Output("submit-output", "children"),
         Input("submit-button", "n_clicks"),
         State("store-mask", "annotation_list"),
-        State("store-key", "value")
+        State("store-key", "value"),
     )
     def submit_annotations(n_clicks, annotation_list, value):
-        print("submitting annotations")
         x_mask_li = []
         y_mask_li = []
         if n_clicks is not None:
-            if "shapes" in annotation_list:
-                shapes = [d["type"] for d in annotation_list["shapes"]]
-                for shape, annotation in zip(shapes, annotation_list["shapes"]):
-                    mask = create_mask(annotation, shape)
-                    y_mask_li.append(mask[0])
-                    x_mask_li.append(mask[1])
-                
-            suite2p_masks = convert_masks_to_suite2p_format(
-                [np.array([x_mask_li, y_mask_li])], (512, 512)
-            )
-            fluo_traces = extract_signals_suite2p(yaml.safe_load(value), suite2p_masks)
-
+            if annotation_list:
+                if "shapes" in annotation_list:
+                    logger.info("Creating Masks.")
+                    shapes = [d["type"] for d in annotation_list["shapes"]]
+                    for shape, annotation in zip(shapes, annotation_list["shapes"]):
+                        mask = create_mask(annotation, shape)
+                        y_mask_li.append(mask[0])
+                        x_mask_li.append(mask[1])
+                    print("Masks created")
+                    insert_into_database(
+                        scan, imaging, yaml.safe_load(value), x_mask_li, y_mask_li
+                    )
+                else:
+                    logger.warn(
+                        "Incorrect annotation list format. This is a known bug. Please draw a line anywhere on the image and click `Submit Curated Masks`. It will be ignored in the final submission but will format the list correctly."
+                    )
+                    return no_update
+            else:
+                logger.warn("No annotations to submit.")
+                return no_update
         else:
             return no_update
 

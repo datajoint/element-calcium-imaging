@@ -1,7 +1,25 @@
+import pathlib
 import datajoint as dj
 import numpy as np
 from scipy import ndimage
 from skimage import draw, measure
+from element_interface.utils import find_full_path
+
+
+logger = dj.logger
+
+
+def get_imaging_root_data_dir():
+    """Retrieve imaging root data directory."""
+    imaging_root_dirs = dj.config.get("custom", {}).get("imaging_root_data_dir", None)
+    if not imaging_root_dirs:
+        return None
+    elif isinstance(imaging_root_dirs, (str, pathlib.Path)):
+        return [imaging_root_dirs]
+    elif isinstance(imaging_root_dirs, list):
+        return imaging_root_dirs
+    else:
+        raise TypeError("`imaging_root_data_dir` must be a string, pathlib, or list")
 
 
 def path_to_indices(path):
@@ -88,9 +106,7 @@ def create_mask(coordinates, shape_type):
             xy_coordinates = np.asarray(
                 [item for item in coordinates.values()], dtype="int"
             )
-            mask = np.asarray(
-                create_ellipse_mask(xy_coordinates, (512, 512))
-            ).nonzero()
+            mask = np.asarray(create_ellipse_mask(xy_coordinates, (512, 512))).nonzero()
     elif shape_type == "rect":
         try:
             mask = np.asarray(
@@ -140,36 +156,7 @@ def get_contours(image_key, prefix):
     return contours
 
 
-def convert_masks_to_suite2p_format(masks, frame_dims):
-    """
-    Convert masks to the format expected by Suite2P.
-
-    Parameters:
-    masks (list of np.ndarray): A list where each item is an array representing a mask,
-                                with non-zero values for the ROI and zeros elsewhere.
-    frame_dims (tuple): The dimensions of the imaging frame, (height, width).
-
-    Returns:
-    np.ndarray: A 2D array where each column represents a flattened binary mask for an ROI.
-    """
-    # Calculate the total number of pixels in a frame
-    num_pixels = frame_dims[0] * frame_dims[1]
-    
-    # Initialize an empty array to store the flattened binary masks
-    suite2p_masks = np.zeros((num_pixels, len(masks)), dtype=np.float32)
-    
-    # Convert each mask
-    for idx, mask in enumerate(masks):
-        # Ensure the mask is binary (1 for ROI, 0 for background)
-        binary_mask = np.where(mask > 0, 1, 0).astype(np.float32)
-        
-        # Flatten the binary mask and add it as a column in the suite2p_masks array
-        suite2p_masks[:, idx] = binary_mask.flatten()
-    
-    return suite2p_masks
-
-
-def load_imaging_data_for_session(key):
+def load_imaging_data_for_session(scan, key):
     image_files = (scan.ScanInfo.ScanFile & key).fetch("file_path")
     image_files = [
         find_full_path(get_imaging_root_data_dir(), image_file)
@@ -177,20 +164,57 @@ def load_imaging_data_for_session(key):
     ]
     acq_software = (scan.Scan & key).fetch1("acq_software")
     if acq_software == "ScanImage":
-        imaging_data =  tifffile.imread(image_files[0])
+        import tifffile
+
+        imaging_data = tifffile.imread(image_files[0])
     elif acq_software == "NIS":
+        import nd2
+
         imaging_data = nd2.imread(image_files[0])
     else:
-        raise ValueError(f"Support for images with acquisition software: {acq_software} is not yet implemented into the widget.")
+        raise ValueError(
+            f"Support for images with acquisition software: {acq_software} is not yet implemented into the widget."
+        )
     return imaging_data
 
 
-def extract_signals_suite2p(key, masks):
-    from suite2p.extraction.extract import extrace_traces
-
-    F, _ = extrace_traces(load_imaging_data_for_session(key), masks, neuropil_masks=np.zeros_like(masks))
-
-
-def insert_signals_into_datajoint(signals, session_key):
-    # Implement logic to insert the extracted signals into DataJoint
-    pass
+def insert_into_database(scan_module, imaging_module, session_key, x_masks, y_masks):
+    images = load_imaging_data_for_session(scan_module, session_key)
+    print(f"Images shape: {images.shape}")
+    mask_id = (imaging_module.Segmentation.Mask & session_key).fetch(
+        "mask_id", order_by="DESC mask_id", limit=1
+    )
+    print(f"Mask ID: {mask_id}")
+    logger.info(f"Inserting {len(x_masks)} masks into the database.")
+    # imaging_module.Segmentation.Mask.insert(
+    #     [
+    #         dict(
+    #             **session_key,
+    #             mask=mask_id + mask_num,
+    #             segmentation_channel=1,
+    #             mask_npix=y_mask.shape[0],
+    #             mask_center_x=int(sum(x_mask) / x_mask.shape[0]),
+    #             mask_center_y=int(sum(y_mask) / y_mask.shape[0]),
+    #             mask_center_z=0,
+    #             mask_xpix=x_mask,
+    #             mask_ypix=y_mask,
+    #             mask_zpix=0,
+    #             mask_weights=np.ones_like(y_mask),
+    #         )
+    #         for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
+    #     ],
+    #     allow_direct_insert=True,
+    # )
+    logger.info(f"Inserting {len(x_masks)} traces into the database.")
+    # imaging_module.Fluorescence.Trace.insert(
+    #     [
+    #         dict(
+    #             **session_key,
+    #             mask=mask_id + mask_num,
+    #             fluo_channel=1,
+    #             fluorescence=images[:, y_mask, x_mask].mean(axis=1),
+    #         )
+    #         for mask_num, (x_mask, y_mask) in enumerate(zip(x_masks, y_masks))
+    #     ],
+    #     allow_direct_insert=True,
+    # )
