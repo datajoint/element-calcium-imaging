@@ -115,7 +115,7 @@ class FieldPreprocessing(dj.Computed):
             )
 
             image_file = (scan.ScanInfo.ScanFile & key).fetch("file_path", limit=1)[0]
-            pv_dir = pathlib.Path(image_file).parent
+            pv_dir = find_full_path(scan.get_imaging_root_data_dir(), image_file).parent
             PVmeta = PrairieViewMeta(pv_dir)
 
             channel = (
