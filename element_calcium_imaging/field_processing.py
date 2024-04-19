@@ -150,7 +150,10 @@ class FieldPreprocessing(dj.Computed):
                             "extra_dj_params": {
                                 "channel": channel,
                                 "plane_idx": plane_idx,
-                                "image_files": [f.as_posix() for f in image_files],
+                                "image_files": [
+                                    f.relative_to(processed_root_data_dir).as_posix()
+                                    for f in image_files
+                                ],
                             },
                         },
                         "processing_output_dir": pln_output_dir.relative_to(
@@ -213,7 +216,9 @@ class FieldPreprocessing(dj.Computed):
             for ops_path in ops_paths:
                 ops = np.load(ops_path, allow_pickle=True).item()
                 ops["extra_dj_params"] = {
-                    "ops_path": ops_path.as_posix(),
+                    "ops_path": ops_path.relative_to(
+                        processed_root_data_dir
+                    ).as_posix(),
                     "field_idx": int(
                         re.search(r"plane(\d+)", ops_path.parent.name).group(1)
                     ),
@@ -255,12 +260,13 @@ class FieldProcessing(dj.Computed):
 
     def make(self, key):
         execution_time = datetime.utcnow()
+        processed_root_data_dir = scan.get_processed_root_data_dir()
 
         output_dir, params = (FieldPreprocessing.Field & key).fetch1(
             "processing_output_dir", "params"
         )
         extra_params = params.pop("extra_dj_params", {})
-        output_dir = find_full_path(scan.get_imaging_root_data_dir(), output_dir)
+        output_dir = find_full_path(processed_root_data_dir, output_dir)
 
         acq_software = (scan.Scan & key).fetch1("acq_software")
         method = (imaging.ProcessingParamSet * imaging.ProcessingTask & key).fetch1(
@@ -271,8 +277,13 @@ class FieldProcessing(dj.Computed):
         if acq_software == "PrairieView" and method == "caiman":
             from element_interface.run_caiman import run_caiman
 
+            file_paths = [
+                find_full_path(processed_root_data_dir, f)
+                for f in extra_params["image_files"]
+            ]
+
             run_caiman(
-                file_paths=extra_params["image_files"],
+                file_paths=file_paths,
                 parameters=params,
                 sampling_rate=sampling_rate,
                 output_dir=output_dir.as_posix(),
@@ -281,7 +292,8 @@ class FieldProcessing(dj.Computed):
         elif acq_software == "ScanImage" and method == "suite2p":
             from suite2p.run_s2p import run_plane
 
-            run_plane(params, ops_path=extra_params["ops_path"])
+            ops_path = find_full_path(processed_root_data_dir, extra_params["ops_path"])
+            run_plane(params, ops_path=ops_path)
         else:
             raise NotImplementedError(
                 f"Field processing for {acq_software} scans with {method} is not yet supported in this table."
