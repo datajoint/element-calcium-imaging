@@ -39,6 +39,8 @@ setup(
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",
+        "dash-extensions",
+        "scikit-image",
         "element-interface @ git+https://github.com/datajoint/element-interface.git",
     ],
     extras_require={
