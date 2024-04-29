@@ -755,42 +755,42 @@ class MotionCorrection(dj.Imported):
             rigid_correction, nonrigid_correction, nonrigid_blocks = {}, {}, {}
             summary_images = []
             for idx, (plane, s2p) in enumerate(suite2p_dataset.planes.items()):
-                # -- rigid motion correction --
-                if idx == 0:
-                    rigid_correction = {
-                        **key,
-                        "y_shifts": s2p.ops["yoff"],
-                        "x_shifts": s2p.ops["xoff"],
-                        "z_shifts": np.full_like(s2p.ops["xoff"], 0),
-                        "y_std": np.nanstd(s2p.ops["yoff"]),
-                        "x_std": np.nanstd(s2p.ops["xoff"]),
-                        "z_std": np.nan,
-                        "outlier_frames": s2p.ops["badframes"],
-                    }
+                if not all(k in s2p.ops for k in ["xblock", "yblock", "nblocks"]):
+                    logger.warning(
+                        f"Unable to load/ingest nonrigid motion correction for plane {plane}. "
+                        f"Nonrigid motion correction output is no longer saved by Suite2p for version above 0.10.*."
+                    )
                 else:
-                    rigid_correction["y_shifts"] = np.vstack(
-                        [rigid_correction["y_shifts"], s2p.ops["yoff"]]
-                    )
-                    rigid_correction["y_std"] = np.nanstd(
-                        rigid_correction["y_shifts"].flatten()
-                    )
-                    rigid_correction["x_shifts"] = np.vstack(
-                        [rigid_correction["x_shifts"], s2p.ops["xoff"]]
-                    )
-                    rigid_correction["x_std"] = np.nanstd(
-                        rigid_correction["x_shifts"].flatten()
-                    )
-                    rigid_correction["outlier_frames"] = np.logical_or(
-                        rigid_correction["outlier_frames"], s2p.ops["badframes"]
-                    )
-                # -- non-rigid motion correction --
-                if s2p.ops["nonrigid"]:
-                    if not all(k in s2p.ops for k in ["xblock", "yblock", "nblocks"]):
-                        logger.warning(
-                            f"Unable to load/ingest nonrigid motion correction for plane {plane}. "
-                            f"Nonrigid motion correction output is no longer saved by Suite2p for version above 0.10.*."
-                        )
+                    # -- rigid motion correction --
+                    if idx == 0:
+                        rigid_correction = {
+                            **key,
+                            "y_shifts": s2p.ops["yoff"],
+                            "x_shifts": s2p.ops["xoff"],
+                            "z_shifts": np.full_like(s2p.ops["xoff"], 0),
+                            "y_std": np.nanstd(s2p.ops["yoff"]),
+                            "x_std": np.nanstd(s2p.ops["xoff"]),
+                            "z_std": np.nan,
+                            "outlier_frames": s2p.ops["badframes"],
+                        }
                     else:
+                        rigid_correction["y_shifts"] = np.vstack(
+                            [rigid_correction["y_shifts"], s2p.ops["yoff"]]
+                        )
+                        rigid_correction["y_std"] = np.nanstd(
+                            rigid_correction["y_shifts"].flatten()
+                        )
+                        rigid_correction["x_shifts"] = np.vstack(
+                            [rigid_correction["x_shifts"], s2p.ops["xoff"]]
+                        )
+                        rigid_correction["x_std"] = np.nanstd(
+                            rigid_correction["x_shifts"].flatten()
+                        )
+                        rigid_correction["outlier_frames"] = np.logical_or(
+                            rigid_correction["outlier_frames"], s2p.ops["badframes"]
+                        )
+                    # -- non-rigid motion correction --
+                    if s2p.ops["nonrigid"]:
                         if idx == 0:
                             nonrigid_correction = {
                                 **key,
