@@ -1,3 +1,4 @@
+import gc
 import importlib
 import inspect
 import pathlib
@@ -298,6 +299,10 @@ class FieldProcessing(dj.Computed):
             raise NotImplementedError(
                 f"Field processing for {acq_software} scans with {method} is not yet supported in this table."
             )
+
+        # explicitly garbage collect after the processing step (caiman or suite2p)
+        # as these may have large memory footprint and may not be cleared fast enough
+        gc.collect()
 
         exec_dur = (datetime.utcnow() - execution_time).total_seconds() / 3600
         self.insert1(
