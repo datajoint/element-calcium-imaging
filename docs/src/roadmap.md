@@ -18,6 +18,8 @@ the common motifs to create Element Calcium Imaging. Major features include:
 - [ ] Deepinterpolation
 - [x] Data export to NWB
 - [x] Data publishing to DANDI
+- [x] Widgets for manual ROI mask creation and curation for cell segmentation of Fluorescent voltage sensitive indicators, neurotransmitter imaging, and neuromodulator imaging
+- [ ] Expand creation widget to provide pixel weights for each mask based on Fluorescence intensity traces at each pixel
 
 Further development of this Element is community driven. Upon user requests and based on
 guidance from the Scientific Steering Group we will continue adding features to this 

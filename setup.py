@@ -9,6 +9,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.md"), "r") as f:
     long_description = f.read()
 
+
 with open(path.join(here, pkg_name, "version.py")) as f:
     exec(f.read())
 
@@ -38,6 +39,8 @@ setup(
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",
+        "dash-extensions",
+        "scikit-image",
         "element-interface @ git+https://github.com/datajoint/element-interface.git",
     ],
     extras_require={
