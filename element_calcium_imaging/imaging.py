@@ -14,7 +14,7 @@ from .scan import (
     get_processed_root_data_dir,
 )
 
-schema = dj.Schema()
+schema = dj.schema()
 
 _linking_module = None
 
