@@ -1,0 +1,10 @@
+name: semantic-release
+on:
+  workflow_dispatch:
+
+jobs:
+  call_semantic_release:
+    uses: datajoint/.github/.github/workflows/semantic-release.yaml@main
+    secrets:
+      APP_ID: ${{ secrets.ELEMENT_APP_ID }}
+      GET_TOKEN_KEY: ${{ secrets.ELEMENT_GET_TOKEN_KEY }}
