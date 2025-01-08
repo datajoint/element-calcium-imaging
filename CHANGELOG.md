@@ -3,6 +3,12 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
+## [1.0.0] - 2025-01-07
+
++ Delete - extra `imaging` modules
++ Update - Rename `imaging_no_curation` -> `imaging`
++ Minor fixes and improvements
+
 ## [0.10.1] - 2024-06-20
 
 + Fix - cleaner plotting in tutorial notebook 
