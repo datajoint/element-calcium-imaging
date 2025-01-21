@@ -14,7 +14,7 @@ with open(path.join(here, pkg_name, "version.py")) as f:
     exec(f.read())
 
 with urllib.request.urlopen(
-    "https://raw.githubusercontent.com/flatironinstitute/CaImAn/master/requirements.txt"
+    "https://raw.githubusercontent.com/datajoint/CaImAn/master/requirements.txt"
 ) as f:
     caiman_requirements = f.read().decode("UTF-8").split("\n")
 
@@ -35,7 +35,7 @@ setup(
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
     scripts=[],
     install_requires=[
-        "datajoint>=0.13.0",
+        "datajoint>=0.14.0",
         "ipykernel>=6.0.1",
         "ipywidgets",
         "plotly",

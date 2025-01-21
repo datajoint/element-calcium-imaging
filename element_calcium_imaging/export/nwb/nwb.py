@@ -10,18 +10,11 @@ from pynwb.ophys import (
     TwoPhotonSeries,
 )
 
-from ... import scan, imaging_no_curation
+from ... import scan, imaging
 from ...scan import get_calcium_imaging_files, get_imaging_root_data_dir
 
 
 logger = dj.logger
-
-if imaging_no_curation.schema.is_activated():
-    imaging = imaging_no_curation
-else:
-    raise DataJointError(
-        "This export function is designed for the `imaging_no_curation` module."
-    )
 
 
 def imaging_session_to_nwb(
