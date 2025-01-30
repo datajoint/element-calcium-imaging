@@ -13,13 +13,37 @@ with open(path.join(here, "README.md"), "r") as f:
 with open(path.join(here, pkg_name, "version.py")) as f:
     exec(f.read())
 
-with urllib.request.urlopen(
-    "https://raw.githubusercontent.com/datajoint/CaImAn/master/requirements.txt"
-) as f:
-    caiman_requirements = f.read().decode("UTF-8").split("\n")
+# TODO: Replace with `tomllib` once Python 3.10 support is dropped
+def fetch_and_parse_dependencies(url):
+    # Fetch the pyproject.toml file
+    with urllib.request.urlopen(url) as f:
+        toml_content = f.read().decode("UTF-8")
 
-caiman_requirements.remove("")
-caiman_requirements.append("future")
+    # Manually parse the dependencies section
+    lines = toml_content.split('\n')
+    dependencies = []
+    start_collecting = False
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith('dependencies = ['):
+            start_collecting = True
+            continue
+        if start_collecting:
+            if line.startswith(']'):
+                break
+            dependency = line.strip(',').strip('"')
+            dependencies.append(dependency)
+
+    return dependencies
+
+# URL of CaImAn's pyproject.toml file
+caiman_url = "https://raw.githubusercontent.com/flatironinstitute/CaImAn/main/pyproject.toml"
+
+# Fetch and parse dependencies
+caiman_requirements = fetch_and_parse_dependencies(caiman_url )
+
+
 
 setup(
     name=pkg_name.replace("_", "-"),
