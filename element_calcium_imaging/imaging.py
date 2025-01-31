@@ -365,6 +365,7 @@ class Processing(dj.Computed):
         task_mode, output_dir = (ProcessingTask & key).fetch1(
             "task_mode", "processing_output_dir"
         )
+        acq_software = (scan.Scan & key).fetch1("acq_software")
 
         if not output_dir:
             output_dir = ProcessingTask.infer_output_dir(key, relative=True, mkdir=True)
@@ -459,8 +460,8 @@ class Processing(dj.Computed):
                         "Caiman pipeline is not yet capable of analyzing 3D scans."
                     )
 
-                # handle multi-channel tiff image before running CaImAn
-                if nchannels > 1:
+                if acq_software == "ScanImage" and nchannels > 1:
+                    # handle multi-channel tiff image before running CaImAn
                     channel_idx = caiman_params.get("channel_to_process", 0)
                     tmp_dir = pathlib.Path(output_dir) / "channel_separated_tif"
                     tmp_dir.mkdir(exist_ok=True)
@@ -538,79 +539,6 @@ class Processing(dj.Computed):
         self.insert1({**key, "package_version": ""})
 
 
-@schema
-class Curation(dj.Manual):
-    """Curated results
-
-    If no curation is applied, the curation_output_dir can be set to
-    the value of processing_output_dir.
-
-    Attributes:
-        Processing (foreign key): Primary key from Processing.
-        curation_id (int): Unique curation ID.
-        curation_time (datetime): Time of generation of this set of curated results.
-        curation_output_dir (str): Output directory of the curated results, relative to
-            root data directory.
-        manual_curation (bool): If True, manual curation has been performed on this
-            result.
-        curation_note (str, optional): Notes about the curation task.
-    """
-
-    definition = """# Curation(s) results
-    -> Processing
-    curation_id: int
-    ---
-    curation_time: datetime  # Time of generation of this set of curated results
-    curation_output_dir: varchar(255)  # Output directory of the curated results, relative to root data directory
-    manual_curation: bool  # Has manual curation been performed on this result?
-    curation_note='': varchar(2000)
-    """
-
-    def create1_from_processing_task(self, key, is_curated=False, curation_note=""):
-        """Create a Curation entry for a given ProcessingTask key.
-
-        Args:
-            key (dict): Primary key set of an entry in the ProcessingTask table.
-            is_curated (bool): When True, indicates a manual curation.
-            curation_note (str): User's note on the specifics of the curation.
-        """
-        if key not in Processing():
-            raise ValueError(
-                f"No corresponding entry in Processing available for: {key};"
-                f"Please run `Processing.populate(key)`"
-            )
-
-        output_dir = (ProcessingTask & key).fetch1("processing_output_dir")
-        method, imaging_dataset = get_loader_result(key, ProcessingTask)
-
-        if method == "suite2p":
-            suite2p_dataset = imaging_dataset
-            curation_time = suite2p_dataset.creation_time
-        elif method == "caiman":
-            caiman_dataset = imaging_dataset
-            curation_time = caiman_dataset.creation_time
-        elif method == "extract":
-            extract_dataset = imaging_dataset
-            curation_time = extract_dataset.creation_time
-        else:
-            raise NotImplementedError("Unknown method: {}".format(method))
-
-        # Synthesize curation_id
-        curation_id = (
-            dj.U().aggr(self & key, n="ifnull(max(curation_id)+1,1)").fetch1("n")
-        )
-        self.insert1(
-            {
-                **key,
-                "curation_id": curation_id,
-                "curation_time": curation_time,
-                "curation_output_dir": output_dir,
-                "manual_curation": is_curated,
-                "curation_note": curation_note,
-            }
-        )
-
-
 # -------------- Motion Correction --------------
 
 
@@ -619,13 +547,13 @@ class MotionCorrection(dj.Imported):
     """Results of motion correction shifts performed on the imaging data.
 
     Attributes:
-        Curation (foreign key): Primary key from Curation.
+        Processing (foreign key): Primary key from Processing.
         scan.Channel.proj(motion_correct_channel='channel') (int): Channel used for
             motion correction in this processing task.
     """
 
     definition = """# Results of motion correction
-    -> Curation
+    -> Processing
     ---
     -> scan.Channel.proj(motion_correct_channel='channel') # channel used for motion correction in this processing task
     """
@@ -747,7 +675,7 @@ class MotionCorrection(dj.Imported):
     def make(self, key):
         """Populate MotionCorrection with results parsed from analysis outputs"""
 
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         field_keys, _ = (scan.ScanInfo.Field & key).fetch(
             "KEY", "field_z", order_by="field_z"
@@ -852,7 +780,7 @@ class MotionCorrection(dj.Imported):
 
                 # -- summary images --
                 motion_correction_key = (
-                    scan.ScanInfo.Field * Curation & key & field_keys[plane]
+                    scan.ScanInfo.Field * Processing & key & field_keys[plane]
                 ).fetch1("KEY")
                 summary_images.append(
                     {
@@ -1087,11 +1015,11 @@ class Segmentation(dj.Computed):
     """Result of the Segmentation process.
 
     Attributes:
-        Curation (foreign key): Primary key from Curation.
+        Processing (foreign key): Primary key from Processing.
     """
 
     definition = """# Different mask segmentations.
-    -> Curation
+    -> Processing
     """
 
     class Mask(dj.Part):
@@ -1130,7 +1058,7 @@ class Segmentation(dj.Computed):
     def make(self, key):
         """Populate the Segmentation with the results parsed from analysis outputs."""
 
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
             suite2p_dataset = imaging_dataset
@@ -1352,7 +1280,7 @@ class Fluorescence(dj.Computed):
     def make(self, key):
         """Populate the Fluorescence with the results parsed from analysis outputs."""
 
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
             suite2p_dataset = imaging_dataset
@@ -1499,7 +1427,7 @@ class Activity(dj.Computed):
     def make(self, key):
         """Populate the Activity with the results parsed from analysis outputs."""
 
-        method, imaging_dataset = get_loader_result(key, Curation)
+        method, imaging_dataset = get_loader_result(key, ProcessingTask)
 
         if method == "suite2p":
             if key["extraction_method"] == "suite2p_deconvolution":
