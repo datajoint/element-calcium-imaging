@@ -3,11 +3,10 @@
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [1.0.0] - 2025-01-07
+## [0.11.0] - 2025-01-31
 
-+ Delete - extra `imaging` modules
-+ Update - Rename `imaging_no_curation` -> `imaging`
-+ Minor fixes and improvements
++ Feat - Single `imaging` module for all imaging data
++ Update - Code fixes and improvements throughout
 
 ## [0.10.1] - 2024-06-20
 
@@ -226,6 +225,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 + Add - `scan` and `imaging` modules
 + Add - Readers for `ScanImage`, `ScanBox`, `Suite2p`, `CaImAn`
 
+[0.11.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.11.0
 [0.10.0]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.10.0
 [0.9.5]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.5
 [0.9.4]: https://github.com/datajoint/element-calcium-imaging/releases/tag/0.9.4
