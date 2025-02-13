@@ -3,7 +3,7 @@ import datajoint as dj
 from element_animal import subject
 from element_animal.subject import Subject
 from element_calcium_imaging import (
-    imaging_no_curation as imaging,
+    imaging,
     scan,
     imaging_report,
     plotting,
