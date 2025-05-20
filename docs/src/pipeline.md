@@ -27,7 +27,7 @@ The Element is composed of two main schemas, `scan` and `imaging`.
 
 ### `lab` schema
 
-- For further details see the [lab schema API docs](https://datajoint.com/docs/elements/element-lab/latest/api/element_lab/lab/)
+- For further details see the [lab schema API docs](https://docs.datajoint.com/elements/element-lab/latest/api/element_lab/lab/)
 
 | Table | Description |
 | --- | --- |
@@ -37,7 +37,7 @@ The Element is composed of two main schemas, `scan` and `imaging`.
 
 - Although not required, most choose to connect the `Session` table to a `Subject` table.
 
-- For further details see the [subject schema API docs](https://datajoint.com/docs/elements/element-animal/latest/api/element_animal/subject/)
+- For further details see the [subject schema API docs](https://docs.datajoint.com/elements/element-animal/latest/api/element_animal/subject/)
 
 | Table | Description |
 | --- | --- |
@@ -45,7 +45,7 @@ The Element is composed of two main schemas, `scan` and `imaging`.
 
 ### `session` schema
 
-- For further details see the [session schema API docs](https://datajoint.com/docs/elements/element-session/latest/api/element_session/session_with_datetime/)
+- For further details see the [session schema API docs](https://docs.datajoint.com/elements/element-session/latest/api/element_session/session_with_datetime/)
 
 | Table | Description |
 | --- | --- |
@@ -53,7 +53,7 @@ The Element is composed of two main schemas, `scan` and `imaging`.
 
 ### `scan` schema
 
-- For further details see the [scan schema API docs](https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/scan/)
+- For further details see the [scan schema API docs](https://docs.datajoint.com/elements/element-calcium-imaging/latest/api/element_calcium_imaging/scan/)
 
 | Table | Description |
 | --- | --- |
@@ -69,7 +69,7 @@ The Element is composed of two main schemas, `scan` and `imaging`.
 
 ### `imaging` schema
 
-- For further details see the [imaging schema API docs](https://datajoint.com/docs/elements/element-calcium-imaging/latest/api/element_calcium_imaging/imaging/)
+- For further details see the [imaging schema API docs](https://docs.datajoint.com/elements/element-calcium-imaging/latest/api/element_calcium_imaging/imaging/)
 
 | Table | Description |
 | --- | --- |
