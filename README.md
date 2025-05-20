@@ -48,7 +48,7 @@ environment and notebooks to learn the pipeline.
 
 + [Interactive tutorial on GitHub Codespaces](#interactive-tutorial)
 
-+ [Documentation](https://datajoint.com/docs/elements/element-calcium-imaging)
++ [Documentation](https://docs.datajoint.com/elements/element-calcium-imaging/)
 
 ## Support
 
