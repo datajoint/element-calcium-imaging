@@ -27,7 +27,7 @@ def activate(
             do not yet exist.
     """
     global imaging
-    imaging = dj.create_virtual_module("imaging", imaging_schema_name)
+    imaging = dj.VirtualModule("imaging", imaging_schema_name)
 
     schema.activate(
         schema_name,
