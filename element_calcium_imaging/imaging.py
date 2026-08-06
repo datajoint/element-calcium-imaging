@@ -121,7 +121,7 @@ class ProcessingParamSet(dj.Lookup):
     paramset_desc: varchar(1280)  # Parameter-set description
     param_set_hash: uuid  # A universally unique identifier for the parameter set
     unique index (param_set_hash)
-    params: longblob  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
+    params: <blob>  # Parameter Set, a dictionary of all applicable parameters to the analysis suite.
     """
 
     @classmethod
@@ -577,10 +577,10 @@ class MotionCorrection(dj.Imported):
         definition = """# Details of rigid motion correction performed on the imaging data
         -> master
         ---
-        outlier_frames=null : longblob  # mask with true for frames with outlier shifts (already corrected)
-        y_shifts            : longblob  # (pixels) y motion correction shifts
-        x_shifts            : longblob  # (pixels) x motion correction shifts
-        z_shifts=null       : longblob  # (pixels) z motion correction shifts (z-drift)
+        outlier_frames=null : <blob>  # mask with true for frames with outlier shifts (already corrected)
+        y_shifts            : <blob>  # (pixels) y motion correction shifts
+        x_shifts            : <blob>  # (pixels) x motion correction shifts
+        z_shifts=null       : <blob>  # (pixels) z motion correction shifts (z-drift)
         y_std               : float     # (pixels) standard deviation of y shifts across all frames
         x_std               : float     # (pixels) standard deviation of x shifts across all frames
         z_std=null          : float     # (pixels) standard deviation of z shifts across all frames
@@ -605,7 +605,7 @@ class MotionCorrection(dj.Imported):
         definition = """# Details of non-rigid motion correction performed on the imaging data
         -> master
         ---
-        outlier_frames=null : longblob # mask with true for frames with outlier shifts (already corrected)
+        outlier_frames=null : <blob> # mask with true for frames with outlier shifts (already corrected)
         block_height        : int      # (pixels)
         block_width         : int      # (pixels)
         block_depth         : int      # (pixels)
@@ -638,12 +638,12 @@ class MotionCorrection(dj.Imported):
         -> master.NonRigidMotionCorrection
         block_id        : int
         ---
-        block_y         : longblob  # (y_start, y_end) in pixel of this block
-        block_x         : longblob  # (x_start, x_end) in pixel of this block
-        block_z         : longblob  # (z_start, z_end) in pixel of this block
-        y_shifts        : longblob  # (pixels) y motion correction shifts for every frame
-        x_shifts        : longblob  # (pixels) x motion correction shifts for every frame
-        z_shifts=null   : longblob  # (pixels) x motion correction shifts for every frame
+        block_y         : <blob>  # (y_start, y_end) in pixel of this block
+        block_x         : <blob>  # (x_start, x_end) in pixel of this block
+        block_z         : <blob>  # (z_start, z_end) in pixel of this block
+        y_shifts        : <blob>  # (pixels) y motion correction shifts for every frame
+        x_shifts        : <blob>  # (pixels) x motion correction shifts for every frame
+        z_shifts=null   : <blob>  # (pixels) x motion correction shifts for every frame
         y_std           : float     # (pixels) standard deviation of y shifts across all frames
         x_std           : float     # (pixels) standard deviation of x shifts across all frames
         z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
@@ -666,10 +666,10 @@ class MotionCorrection(dj.Imported):
         -> master
         -> scan.ScanInfo.Field
         ---
-        ref_image               : longblob  # image used as alignment template
-        average_image           : longblob  # mean of registered frames
-        correlation_image=null  : longblob  # correlation map (computed during cell detection)
-        max_proj_image=null     : longblob  # max of registered frames
+        ref_image               : <blob>  # image used as alignment template
+        average_image           : <blob>  # mean of registered frames
+        correlation_image=null  : <blob>  # correlation map (computed during cell detection)
+        max_proj_image=null     : <blob>  # max of registered frames
         """
 
     def make(self, key):
@@ -1049,10 +1049,10 @@ class Segmentation(dj.Computed):
         mask_center_x      : int       # center x coordinate in pixel
         mask_center_y      : int       # center y coordinate in pixel
         mask_center_z=null : int       # center z coordinate in pixel
-        mask_xpix          : longblob  # x coordinates in pixels
-        mask_ypix          : longblob  # y coordinates in pixels
-        mask_zpix=null     : longblob  # z coordinates in pixels
-        mask_weights       : longblob  # weights of the mask at the indices above
+        mask_xpix          : <blob>  # x coordinates in pixels
+        mask_ypix          : <blob>  # y coordinates in pixels
+        mask_zpix=null     : <blob>  # z coordinates in pixels
+        mask_weights       : <blob>  # weights of the mask at the indices above
         """
 
     def make(self, key):
@@ -1273,8 +1273,8 @@ class Fluorescence(dj.Computed):
         -> Segmentation.Mask
         -> scan.Channel.proj(fluo_channel='channel')  # The channel that this trace comes from
         ---
-        fluorescence                : longblob  # Fluorescence trace associated with this mask
-        neuropil_fluorescence=null  : longblob  # Neuropil fluorescence trace
+        fluorescence                : <blob>  # Fluorescence trace associated with this mask
+        neuropil_fluorescence=null  : <blob>  # Neuropil fluorescence trace
         """
 
     def make(self, key):
@@ -1403,7 +1403,7 @@ class Activity(dj.Computed):
         -> master
         -> Fluorescence.Trace
         ---
-        activity_trace: longblob
+        activity_trace: <blob>
         """
 
     @property

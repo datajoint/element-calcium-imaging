@@ -50,7 +50,7 @@ class ScanLevelReport(dj.Computed):
     definition = """
     -> imaging.Segmentation
     ---
-    cell_overlayed_image: longblob
+    cell_overlayed_image: <blob>
     """
 
     def make(self, key):
@@ -73,7 +73,7 @@ class TraceReport(dj.Computed):
     definition = """
     -> imaging.Segmentation.Mask
     ---
-    cell_traces: longblob
+    cell_traces: <blob>
     """
 
     @property

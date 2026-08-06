@@ -1,3 +1,9 @@
+> ## ⚠️ This is the `datajoint-2.x` branch of a fork
+>
+> Unofficial fork of [`datajoint/element-calcium-imaging`](https://github.com/datajoint/element-calcium-imaging),
+> ported to **DataJoint 2.x**. Not affiliated with DataJoint. See
+> [why this branch exists](#why-this-branch-exists) at the bottom.
+
 # DataJoint Element for Functional Calcium Imaging
 
 DataJoint Element for functional calcium imaging with support for
@@ -118,3 +124,54 @@ MYSQL_VER=8.0 docker compose -f docker-compose-db.yaml up --build -d
    folder locally`. By default, GitHub will also automatically stop the Codespace after
    30 minutes of inactivity.  Once the Codespace is no longer being used, we recommend
    deleting the Codespace.
+
+
+---
+
+## Why this branch exists
+
+Upstream `element-calcium-imaging` was last committed on 2025-05-20 and targets DataJoint
+`>=0.13`. DataJoint **2.0.0** shipped 2026-02-03 as a self-described complete
+rewrite; the current release is 2.3.2. Because the element's dependency pin
+admits 2.x, `pip install element-calcium-imaging` on a fresh environment today resolves
+DataJoint 2.x and produces an installation in which the element cannot be
+imported. No element has a 2.x branch and there is no open migration issue or
+PR anywhere in the `datajoint` org.
+
+This branch is a working port. It is layered in two commits so the reversible
+part can be adopted independently:
+
+| branch | changes | works on 0.14.x | works on 2.x |
+|---|---|---|---|
+| [`compat-fixes`](../../tree/compat-fixes) | 5 lines: `dj.schema`→`dj.Schema`, `boolean`→`bool`, `enum("x")`→`enum('x')` | **yes** | **yes** |
+| `datajoint-2.x` (this branch) | `compat-fixes` **+ 30 × `longblob` → `<blob>`** | **no** | **yes** |
+
+`compat-fixes` is offered upstream as a pull request. This branch is not, because
+`<blob>` has no 0.14.x-compatible spelling — 0.14.9 rejects it with
+`Support for Adapted Attribute types is disabled`.
+
+### The `longblob` change is not cosmetic
+
+Under DataJoint 2.x a `longblob` attribute is a **raw native column**. It
+declares without error and the insert succeeds, but a numpy array written to it
+comes back as `bytes`:
+
+```
+longblob   (as this element declares it)   -> returned type: bytes     round-trip OK: False
+<blob>     (the 2.x codec)                 -> returned type: ndarray   round-trip OK: True
+```
+
+Nothing raises. There is no warning. Existing pipeline code fails later, far
+from the cause, or silently computes on the wrong thing. See the corresponding
+issue on the upstream repo for the full round-trip evidence.
+
+### Using it
+
+```
+pip install git+https://github.com/akshay-jaggi/element-calcium-imaging.git@datajoint-2.x
+```
+
+Pin the commit rather than the branch name if you need reproducibility. Every
+change on both branches was applied mechanically with regexes and reviewed; no
+element behaviour was altered, only attribute-type spellings that 2.x renamed or
+replaced.

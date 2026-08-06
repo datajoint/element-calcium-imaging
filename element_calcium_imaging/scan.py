@@ -269,7 +269,7 @@ class ScanInfo(dj.Imported):
         field_x=null      : float     # (um) center of field in the motor coordinate system
         field_y=null      : float     # (um) center of field in the motor coordinate system
         field_z=null      : float     # (um) relative depth of field
-        delay_image=null  : longblob  # (ms) delay between the start of the scan and pixels in this field
+        delay_image=null  : <blob>  # (ms) delay between the start of the scan and pixels in this field
         roi=null          : int       # the scanning roi (as recorded in the acquisition software) containing this field - only relevant to mesoscale scans
         """
 
@@ -610,10 +610,10 @@ class ScanQualityMetrics(dj.Computed):
         -> master
         -> Channel
         ---
-        min_intensity: longblob   # Minimum value of each frame.
-        mean_intensity: longblob  # Mean value of each frame.
-        max_intensity: longblob   # Maximum value of each frame.
-        contrast: longblob        # Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
+        min_intensity: <blob>   # Minimum value of each frame.
+        mean_intensity: <blob>  # Mean value of each frame.
+        max_intensity: <blob>   # Maximum value of each frame.
+        contrast: <blob>        # Contrast of each frame (i.e. difference between the 99 and 1 percentiles)
         """
 
     def make(self, key):
