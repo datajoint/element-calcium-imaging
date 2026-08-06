@@ -9,7 +9,7 @@ import numpy as np
 import datajoint as dj
 from element_interface.utils import find_root_directory
 
-schema = dj.schema()
+schema = dj.Schema()
 
 _linking_module = None
 
@@ -228,12 +228,12 @@ class ScanInfo(dj.Imported):
     y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
     fps                  : float     # (Hz) frames per second - Volumetric Scan Rate
-    bidirectional        : boolean   # true = bidirectional scanning
+    bidirectional        : bool   # true = bidirectional scanning
     usecs_per_line=null  : float     # microseconds per scan line
     fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
     scan_datetime=null   : datetime  # datetime of the scan
     scan_duration=null   : float     # (seconds) duration of the scan
-    bidirectional_z=null : boolean   # true = bidirectional z-scan
+    bidirectional_z=null : bool   # true = bidirectional z-scan
     """
 
     class Field(dj.Part):
