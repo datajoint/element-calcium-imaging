@@ -143,8 +143,8 @@ def create_mask(coordinates, shape_type):
 
 
 def get_contours(image_key, prefix):
-    scan = dj.create_virtual_module("scan", f"{prefix}scan")
-    imaging = dj.create_virtual_module("imaging", f"{prefix}imaging")
+    scan = dj.VirtualModule("scan", f"{prefix}scan")
+    imaging = dj.VirtualModule("imaging", f"{prefix}imaging")
     yshape, xshape = (scan.ScanInfo.Field & image_key).fetch1("px_height", "px_width")
     mask_xpix, mask_ypix = (imaging.Segmentation.Mask & image_key).fetch(
         "mask_xpix", "mask_ypix"

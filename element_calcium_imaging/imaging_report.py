@@ -2,7 +2,7 @@ import datajoint as dj
 
 from .plotting import cell_plot
 
-schema = dj.schema()
+schema = dj.Schema()
 
 imaging = None
 
@@ -27,7 +27,7 @@ def activate(
             do not yet exist.
     """
     global imaging
-    imaging = dj.create_virtual_module("imaging", imaging_schema_name)
+    imaging = dj.VirtualModule("imaging", imaging_schema_name)
 
     schema.activate(
         schema_name,
@@ -50,7 +50,7 @@ class ScanLevelReport(dj.Computed):
     definition = """
     -> imaging.Segmentation
     ---
-    cell_overlayed_image: longblob
+    cell_overlayed_image: <blob>
     """
 
     def make(self, key):
@@ -73,7 +73,7 @@ class TraceReport(dj.Computed):
     definition = """
     -> imaging.Segmentation.Mask
     ---
-    cell_traces: longblob
+    cell_traces: <blob>
     """
 
     @property
