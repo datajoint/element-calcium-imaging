@@ -145,7 +145,7 @@ class Channel(dj.Lookup):
     """
 
     definition = """  # A recording channel
-    channel     : tinyint  # 0-based indexing
+    channel     : int8  # 0-based indexing
     """
     contents = zip(range(5))
 
@@ -167,7 +167,7 @@ class Scan(dj.Manual):
 
     definition = """
     -> Session
-    scan_id: int
+    scan_id: int32
     ---
     -> [nullable] Equipment
     -> AcquisitionSoftware
@@ -219,20 +219,20 @@ class ScanInfo(dj.Imported):
     definition = """ # General data about the resoscans/mesoscans from header
     -> Scan
     ---
-    nfields              : tinyint   # number of fields
-    nchannels            : tinyint   # number of channels
-    ndepths              : int       # Number of scanning depths (planes)
-    nframes              : int       # number of recorded frames (time steps)
-    nrois                : tinyint   # number of ROIs (see scanimage's multi ROI imaging)
-    x=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
-    y=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
-    z=null               : float     # (um) ScanImage's 0 point in the motor coordinate system
-    fps                  : float     # (Hz) frames per second - Volumetric Scan Rate
+    nfields              : int8   # number of fields
+    nchannels            : int8   # number of channels
+    ndepths              : int32       # Number of scanning depths (planes)
+    nframes              : int32       # number of recorded frames (time steps)
+    nrois                : int8   # number of ROIs (see scanimage's multi ROI imaging)
+    x=null               : float32     # (um) ScanImage's 0 point in the motor coordinate system
+    y=null               : float32     # (um) ScanImage's 0 point in the motor coordinate system
+    z=null               : float32     # (um) ScanImage's 0 point in the motor coordinate system
+    fps                  : float32     # (Hz) frames per second - Volumetric Scan Rate
     bidirectional        : bool   # true = bidirectional scanning
-    usecs_per_line=null  : float     # microseconds per scan line
-    fill_fraction=null   : float     # raster scan temporal fill fraction (see scanimage)
+    usecs_per_line=null  : float32     # microseconds per scan line
+    fill_fraction=null   : float32     # raster scan temporal fill fraction (see scanimage)
     scan_datetime=null   : datetime  # datetime of the scan
-    scan_duration=null   : float     # (seconds) duration of the scan
+    scan_duration=null   : float32     # (seconds) duration of the scan
     bidirectional_z=null : bool   # true = bidirectional z-scan
     """
 
@@ -260,17 +260,17 @@ class ScanInfo(dj.Imported):
 
         definition = """ # field-specific scan information
         -> master
-        field_idx         : int
+        field_idx         : int32
         ---
-        px_height         : smallint  # height in pixels
-        px_width          : smallint  # width in pixels
-        um_height=null    : float     # height in microns
-        um_width=null     : float     # width in microns
-        field_x=null      : float     # (um) center of field in the motor coordinate system
-        field_y=null      : float     # (um) center of field in the motor coordinate system
-        field_z=null      : float     # (um) relative depth of field
+        px_height         : int16  # height in pixels
+        px_width          : int16  # width in pixels
+        um_height=null    : float32     # height in microns
+        um_width=null     : float32     # width in microns
+        field_x=null      : float32     # (um) center of field in the motor coordinate system
+        field_y=null      : float32     # (um) center of field in the motor coordinate system
+        field_z=null      : float32     # (um) relative depth of field
         delay_image=null  : <blob>  # (ms) delay between the start of the scan and pixels in this field
-        roi=null          : int       # the scanning roi (as recorded in the acquisition software) containing this field - only relevant to mesoscale scans
+        roi=null          : int32       # the scanning roi (as recorded in the acquisition software) containing this field - only relevant to mesoscale scans
         """
 
     class ScanFile(dj.Part):

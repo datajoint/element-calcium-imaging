@@ -115,7 +115,7 @@ class ProcessingParamSet(dj.Lookup):
     """
 
     definition = """# Processing Parameter Set
-    paramset_idx: smallint  # Unique parameter set ID.
+    paramset_idx: int16  # Unique parameter set ID.
     ---
     -> ProcessingMethod
     paramset_desc: varchar(1280)  # Parameter-set description
@@ -581,9 +581,9 @@ class MotionCorrection(dj.Imported):
         y_shifts            : <blob>  # (pixels) y motion correction shifts
         x_shifts            : <blob>  # (pixels) x motion correction shifts
         z_shifts=null       : <blob>  # (pixels) z motion correction shifts (z-drift)
-        y_std               : float     # (pixels) standard deviation of y shifts across all frames
-        x_std               : float     # (pixels) standard deviation of x shifts across all frames
-        z_std=null          : float     # (pixels) standard deviation of z shifts across all frames
+        y_std               : float32     # (pixels) standard deviation of y shifts across all frames
+        x_std               : float32     # (pixels) standard deviation of x shifts across all frames
+        z_std=null          : float32     # (pixels) standard deviation of z shifts across all frames
         """
 
     class NonRigidMotionCorrection(dj.Part):
@@ -606,12 +606,12 @@ class MotionCorrection(dj.Imported):
         -> master
         ---
         outlier_frames=null : <blob> # mask with true for frames with outlier shifts (already corrected)
-        block_height        : int      # (pixels)
-        block_width         : int      # (pixels)
-        block_depth         : int      # (pixels)
-        block_count_y       : int      # number of blocks tiled in the y direction
-        block_count_x       : int      # number of blocks tiled in the x direction
-        block_count_z       : int      # number of blocks tiled in the z direction
+        block_height        : int32      # (pixels)
+        block_width         : int32      # (pixels)
+        block_depth         : int32      # (pixels)
+        block_count_y       : int32      # number of blocks tiled in the y direction
+        block_count_x       : int32      # number of blocks tiled in the x direction
+        block_count_z       : int32      # number of blocks tiled in the z direction
         """
 
     class Block(dj.Part):
@@ -636,7 +636,7 @@ class MotionCorrection(dj.Imported):
 
         definition = """# FOV-tiled blocks used for non-rigid motion correction
         -> master.NonRigidMotionCorrection
-        block_id        : int
+        block_id        : int32
         ---
         block_y         : <blob>  # (y_start, y_end) in pixel of this block
         block_x         : <blob>  # (x_start, x_end) in pixel of this block
@@ -644,9 +644,9 @@ class MotionCorrection(dj.Imported):
         y_shifts        : <blob>  # (pixels) y motion correction shifts for every frame
         x_shifts        : <blob>  # (pixels) x motion correction shifts for every frame
         z_shifts=null   : <blob>  # (pixels) x motion correction shifts for every frame
-        y_std           : float     # (pixels) standard deviation of y shifts across all frames
-        x_std           : float     # (pixels) standard deviation of x shifts across all frames
-        z_std=null      : float     # (pixels) standard deviation of z shifts across all frames
+        y_std           : float32     # (pixels) standard deviation of y shifts across all frames
+        x_std           : float32     # (pixels) standard deviation of x shifts across all frames
+        z_std=null      : float32     # (pixels) standard deviation of z shifts across all frames
         """
 
     class Summary(dj.Part):
@@ -1042,13 +1042,13 @@ class Segmentation(dj.Computed):
 
         definition = """ # A mask produced by segmentation.
         -> master
-        mask               : smallint
+        mask               : int16
         ---
         -> scan.Channel.proj(segmentation_channel='channel')  # channel used for segmentation
-        mask_npix          : int       # number of pixels in ROIs
-        mask_center_x      : int       # center x coordinate in pixel
-        mask_center_y      : int       # center y coordinate in pixel
-        mask_center_z=null : int       # center z coordinate in pixel
+        mask_npix          : int32       # number of pixels in ROIs
+        mask_center_x      : int32       # center x coordinate in pixel
+        mask_center_y      : int32       # center y coordinate in pixel
+        mask_center_z=null : int32       # center z coordinate in pixel
         mask_xpix          : <blob>  # x coordinates in pixels
         mask_ypix          : <blob>  # y coordinates in pixels
         mask_zpix=null     : <blob>  # z coordinates in pixels
@@ -1234,7 +1234,7 @@ class MaskClassification(dj.Computed):
         -> Segmentation.Mask
         ---
         -> MaskType
-        confidence=null: float
+        confidence=null: float32
         """
 
     def make(self, key):
@@ -1507,8 +1507,8 @@ class ProcessingQualityMetrics(dj.Computed):
         -> master
         -> Segmentation.Mask
         ---
-        mask_area=null: float  # Mask area in square micrometer.
-        roundness: float       # Roundness between 0 and 1. Values closer to 1 are rounder.
+        mask_area=null: float32  # Mask area in square micrometer.
+        roundness: float32       # Roundness between 0 and 1. Values closer to 1 are rounder.
         """
 
     class Trace(dj.Part):
@@ -1525,8 +1525,8 @@ class ProcessingQualityMetrics(dj.Computed):
         -> master
         -> Fluorescence.Trace
         ---
-        skewness: float   # Skewness of the fluorescence trace.
-        variance: float   # Variance of the fluorescence trace.
+        skewness: float32   # Skewness of the fluorescence trace.
+        variance: float32   # Variance of the fluorescence trace.
         """
 
     def make(self, key):
