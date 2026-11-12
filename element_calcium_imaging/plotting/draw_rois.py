@@ -22,8 +22,8 @@ logger = dj.logger
 
 
 def draw_rois(db_prefix: str):
-    scan = dj.create_virtual_module("scan", f"{db_prefix}scan")
-    imaging = dj.create_virtual_module("imaging", f"{db_prefix}imaging")
+    scan = dj.VirtualModule("scan", f"{db_prefix}scan")
+    imaging = dj.VirtualModule("imaging", f"{db_prefix}imaging")
     all_keys = (imaging.MotionCorrection).fetch("KEY")
 
     colors = {"background": "#111111", "text": "#00a0df"}
